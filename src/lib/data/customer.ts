@@ -279,52 +279,82 @@ export const updateCustomerAddress = async (
     })
 }
 
-export async function googleLoginAction(email: string, firstName: string, lastName: string) {
-  const deterministicPassword = `GoogleAuthSecurePassword_${email}_2026!`
-  const customerForm = {
-    email,
-    first_name: firstName || "Google",
-    last_name: lastName || "User",
-    phone: "",
+// Decode the payload of a Medusa auth JWT (no verification — used only to read
+// non-sensitive claims like actor_id/email after the backend already issued it).
+function decodeAuthToken(token: string): { actor_id?: string; email?: string } {
+  try {
+    const payload = token.split(".")[1]
+    if (!payload) return {}
+    const json = Buffer.from(
+      payload.replace(/-/g, "+").replace(/_/g, "/"),
+      "base64"
+    ).toString("utf-8")
+    const data = JSON.parse(json)
+    return {
+      actor_id: data?.actor_id,
+      email: data?.email ?? data?.app_metadata?.email,
+    }
+  } catch {
+    return {}
+  }
+}
+
+/**
+ * Step 1 of the real Google OAuth flow: ask Medusa where to redirect the user.
+ * Returns the Google consent-screen URL. Requires GOOGLE_CLIENT_ID/SECRET to be
+ * configured on the backend, otherwise the redirect will fail closed.
+ */
+export async function initiateGoogleLogin(): Promise<{ location: string }> {
+  const result = await sdk.auth.login("customer", "google", {})
+
+  if (typeof result === "object" && result !== null && "location" in result) {
+    return { location: (result as { location: string }).location }
   }
 
+  // If a token string is returned the session already exists; treat as ready.
+  if (typeof result === "string") {
+    await setAuthToken(result)
+    return { location: "" }
+  }
+
+  throw new Error("Google ile giriş başlatılamadı. Lütfen tekrar deneyin.")
+}
+
+/**
+ * Step 2: validate the callback Google sent back, creating the customer record on
+ * first login, and persist the resulting session token.
+ */
+export async function validateGoogleCallback(
+  query: Record<string, unknown>
+): Promise<{ success: boolean; error: string | null }> {
   try {
-    // Try to register first
-    const token = await sdk.auth.register("customer", "emailpass", {
-      email,
-      password: deterministicPassword,
-    }).catch(() => null)
+    let token = await sdk.auth.callback("customer", "google", query)
 
-    if (token) {
-      await setAuthToken(token as string)
-
-      const headers = {
-        ...(await getAuthHeaders()),
-      }
-
-      await sdk.store.customer.create(
-        customerForm,
-        {},
-        headers
-      ).catch(() => null)
+    if (typeof token !== "string") {
+      return { success: false, error: "Google doğrulaması tamamlanamadı." }
     }
 
-    // Login (works for both newly registered and existing users registered through our Google simulator)
-    const loginToken = await sdk.auth.login("customer", "emailpass", {
-      email,
-      password: deterministicPassword,
-    })
+    const decoded = decodeAuthToken(token)
 
-    await setAuthToken(loginToken as string)
+    // actor_id is empty on the very first login → the customer record must be created.
+    if (!decoded.actor_id) {
+      await sdk.store.customer.create(
+        { email: decoded.email ?? "" },
+        {},
+        { authorization: `Bearer ${token}` } as Record<string, string>
+      )
+      token = await sdk.auth.refresh()
+    }
+
+    await setAuthToken(token as string)
 
     const customerCacheTag = await getCacheTag("customers")
     revalidateTag(customerCacheTag)
 
     await transferCart()
 
-    return { success: true }
+    return { success: true, error: null }
   } catch (error) {
-    console.error("Google login simulation error:", error)
     return { success: false, error: String(error) }
   }
 }
