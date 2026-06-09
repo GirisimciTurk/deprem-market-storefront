@@ -34,6 +34,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    // NOT: Optimizasyonu açmak (unoptimized'i kaldırmak) için uygulamadaki TÜM
+    // görsel host'ları (ör. Unsplash, S3) remotePatterns'e eklenmeli; aksi halde
+    // next/image tanımsız host'ta 500 atıyor. Bu yüzden şimdilik kapalı bırakıldı.
     unoptimized: true,
     remotePatterns: [
       {
