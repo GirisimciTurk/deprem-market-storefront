@@ -44,16 +44,13 @@ const OrderCard = ({ order }: OrderCardProps) => {
       </div>
       <div className="grid grid-cols-2 small:grid-cols-4 gap-4 my-4">
         {order.items?.slice(0, 3).map((i) => {
-          return (
-            <div
-              key={i.id}
-              className="flex flex-col gap-y-2"
-              data-testid="order-item"
-            >
+          const handle = (i as { product_handle?: string }).product_handle
+          const content = (
+            <>
               <Thumbnail thumbnail={i.thumbnail} images={[]} size="full" />
               <div className="flex items-center text-small-regular text-ui-fg-base">
                 <span
-                  className="text-ui-fg-base font-semibold"
+                  className="text-ui-fg-base font-semibold group-hover:text-orange-600 transition-colors"
                   data-testid="item-title"
                 >
                   {i.title}
@@ -61,6 +58,24 @@ const OrderCard = ({ order }: OrderCardProps) => {
                 <span className="ml-2">x</span>
                 <span data-testid="item-quantity">{i.quantity}</span>
               </div>
+            </>
+          )
+          return handle ? (
+            <LocalizedClientLink
+              key={i.id}
+              href={`/products/${handle}`}
+              className="flex flex-col gap-y-2 group"
+              data-testid="order-item"
+            >
+              {content}
+            </LocalizedClientLink>
+          ) : (
+            <div
+              key={i.id}
+              className="flex flex-col gap-y-2"
+              data-testid="order-item"
+            >
+              {content}
             </div>
           )
         })}

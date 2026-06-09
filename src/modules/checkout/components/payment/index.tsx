@@ -114,9 +114,12 @@ const Payment = ({
     }
   }
 
+  // Ödeme sağlayıcı (Paynkolay) dönüşünde gelen ?error=... mesajını göster;
+  // yoksa adım açılınca hatayı temizle.
   useEffect(() => {
-    setError(null)
-  }, [isOpen])
+    const paymentError = searchParams.get("error")
+    setError(paymentError ? paymentError : null)
+  }, [isOpen, searchParams])
 
   return (
     <div className="bg-white">

@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { retrieveCustomer } from "@lib/data/customer"
+import { getMyResellerApplication } from "@lib/data/reseller"
 import BayilikStatusClient from "./bayilik-status-client"
 
 export const metadata: Metadata = {
@@ -15,5 +16,8 @@ export default async function BayilikPage() {
     notFound()
   }
 
-  return <BayilikStatusClient customerEmail={customer.email} />
+  // Gerçek backend verisi (localStorage yerine).
+  const application = await getMyResellerApplication()
+
+  return <BayilikStatusClient application={application} />
 }

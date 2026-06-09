@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useMemo, useRef } from "react"
+import { listProductReviews, submitReview } from "@lib/data/reviews"
 
 export type Review = {
   id: string
@@ -138,38 +139,45 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
   const [formComment, setFormComment] = useState("")
   const [formImages, setFormImages] = useState<string[]>([])
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Lightbox Modal state
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Load reviews from localStorage or initial map
+  // Load APPROVED reviews from the backend, merged with the curated demo seed
+  // reviews for this product. New customer reviews only appear here once an
+  // admin approves ("Yayınla") them.
   useEffect(() => {
-    try {
-      const storageKey = `product-reviews-${productHandle}`
-      const savedReviews = localStorage.getItem(storageKey)
-      if (savedReviews) {
-        setReviews(JSON.parse(savedReviews))
-      } else {
-        const defaultReviews = initialReviewsMap[productHandle] || [
-          {
-            id: "rev-default-1",
-            name: "Hakan A.",
-            rating: 5,
-            comment: "Çok hızlı kargolandı, ürün de oldukça kaliteli ve işlevsel görünüyor.",
-            date: "1 Haziran 2026",
-            verified: true,
-            approved: true,
-            images: [
-              "https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&q=80&w=600"
-            ]
-          }
-        ]
-        setReviews(defaultReviews)
-        localStorage.setItem(storageKey, JSON.stringify(defaultReviews))
+    let active = true
+    const demo = initialReviewsMap[productHandle] || []
+    ;(async () => {
+      try {
+        const apiReviews = await listProductReviews(productHandle)
+        if (!active) return
+        const mapped: Review[] = apiReviews.map((r) => ({
+          id: r.id,
+          name: r.customer_name,
+          rating: r.rating,
+          comment: r.comment,
+          date: new Date(r.created_at).toLocaleDateString("tr-TR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }),
+          verified: !!r.customer_id,
+          approved: true,
+          images: r.images ?? undefined,
+        }))
+        setReviews([...mapped, ...demo])
+      } catch (e) {
+        console.error(e)
+        if (active) setReviews(demo)
       }
-    } catch (e) {
-      console.error(e)
+    })()
+    return () => {
+      active = false
     }
   }, [productHandle])
 
@@ -233,26 +241,30 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
     setFormImages((prev) => prev.filter((_, idx) => idx !== indexToRemove))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formName.trim() || !formComment.trim()) return
+    if (!formName.trim() || !formComment.trim() || submitting) return
 
-    const newReview: Review = {
-      id: `user-rev-${Date.now()}`,
-      name: formName,
+    setSubmitting(true)
+    const res = await submitReview({
+      product_handle: productHandle,
       rating: formRating,
       comment: formComment,
-      date: "Bugün",
-      verified: true, // Mark self-created web reviews as verified buyers for UX
-      approved: true, // Auto-approve locally so the user sees their uploaded review and photos instantly!
-      images: formImages.length > 0 ? formImages : undefined
+      name: formName.trim(),
+      images: formImages.length > 0 ? formImages : undefined,
+    })
+    setSubmitting(false)
+
+    if (!res.success) {
+      setSubmitError(
+        "Değerlendirmeniz gönderilemedi. Lütfen daha sonra tekrar deneyin."
+      )
+      return
     }
 
-    const updatedReviews = [newReview, ...reviews]
-    setReviews(updatedReviews)
-    localStorage.setItem(`product-reviews-${productHandle}`, JSON.stringify(updatedReviews))
-
-    // Reset form
+    // Submitted successfully — it is now PENDING admin approval, so we do NOT
+    // add it to the visible list. Show a confirmation instead.
+    setSubmitError(null)
     setFormName("")
     setFormRating(5)
     setFormComment("")
@@ -261,7 +273,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
     setTimeout(() => {
       setSubmitSuccess(false)
       setShowForm(false)
-    }, 2500)
+    }, 4000)
   }
 
   return (
@@ -398,10 +410,11 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                     <svg className="w-6 h-6 text-green-600 fill-current" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                     </svg>
-                    Değerlendirmeniz Yayında!
+                    Değerlendirmeniz alındı, teşekkürler!
                   </div>
                   <p className="text-xs text-green-600 font-medium ml-8 mt-1">
-                    Görüşleriniz ve fotoğraflarınız başarıyla kaydedildi. Ürün sayfasında hemen sergilenmeye başlandı.
+                    Yorumunuz onay için ekibimize iletildi. Onaylandıktan sonra ürün
+                    sayfasında yayınlanacaktır.
                   </p>
                 </div>
               ) : (
@@ -488,6 +501,12 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                     </div>
                   </div>
 
+                  {submitError && (
+                    <p className="text-sm font-semibold text-red-600">
+                      {submitError}
+                    </p>
+                  )}
+
                   <div className="flex justify-end gap-x-3 pt-2">
                     <button
                       type="button"
@@ -498,9 +517,10 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                     </button>
                     <button
                       type="submit"
-                      className="bg-orange-650 hover:bg-orange-700 text-white font-extrabold py-2 px-6 rounded-lg text-sm transition-colors shadow-sm cursor-pointer"
+                      disabled={submitting}
+                      className="bg-orange-650 hover:bg-orange-700 text-white font-extrabold py-2 px-6 rounded-lg text-sm transition-colors shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      Gönder
+                      {submitting ? "Gönderiliyor..." : "Gönder"}
                     </button>
                   </div>
                 </div>

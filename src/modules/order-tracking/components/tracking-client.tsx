@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { trackOrder } from "@lib/data/orders"
 import { convertToLocale } from "@lib/util/money"
+import { getCarrierName, getTrackingUrl } from "@lib/util/cargo"
 import {
   Button,
   Input,
@@ -621,19 +622,24 @@ export default function TrackingClient({
                     Kargo Takip Bilgileri
                   </h3>
                   {order.fulfillments.map((fulfillment: any, fIdx: number) => {
-                    const trackingNumbers = fulfillment.tracking_numbers || []
-                    const trackingLinks = fulfillment.tracking_links || []
+                    // Takip bilgisi fulfillment.labels'tan gelir (tracking_number/tracking_url).
+                    const labels = fulfillment.labels || []
+                    const trackingNumbers = labels
+                      .map((l: any) => l?.tracking_number)
+                      .filter(Boolean)
+                    const trackingLinks = labels.map((l: any) => l?.tracking_url)
                     return (
                       <div key={fulfillment.id} className="flex flex-col gap-3">
                         <div className="text-xs text-red-700 font-medium">
                           Paket #{fIdx + 1} - Kargo Firması:{" "}
-                          {fulfillment.provider_id || "Yurtiçi Kargo"}
+                          {getCarrierName(fulfillment.provider_id)}
                         </div>
                         {trackingNumbers.length > 0 ? (
                           trackingNumbers.map((num: string, nIdx: number) => {
                             const link =
                               trackingLinks[nIdx] ||
-                              `https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=${num}`
+                              getTrackingUrl(num, fulfillment.provider_id) ||
+                              `https://kargotakip.araskargo.com.tr/?gonderitakipno=${num}`
                             return (
                               <div
                                 key={nIdx}

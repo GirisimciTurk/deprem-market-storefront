@@ -1,10 +1,6 @@
-"use client"
-
-import React, { useState, useEffect } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type ResellerApplication = {
-  id: string
   companyName: string
   taxOfficeNumber?: string
   contactName: string
@@ -16,32 +12,11 @@ type ResellerApplication = {
   status: "pending" | "approved" | "rejected"
 }
 
-export default function BayilikStatusClient({ customerEmail }: { customerEmail: string }) {
-  const [application, setApplication] = useState<ResellerApplication | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("reseller-applications") || "[]") as ResellerApplication[]
-      const found = saved.find(app => app.email.toLowerCase() === customerEmail.toLowerCase())
-      if (found) {
-        setApplication(found)
-      }
-    } catch (e) {
-      console.error("Failed to parse reseller applications in status client", e)
-    } finally {
-      setLoading(false)
-    }
-  }, [customerEmail])
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-      </div>
-    )
-  }
-
+export default function BayilikStatusClient({
+  application,
+}: {
+  application: ResellerApplication | null
+}) {
   return (
     <div className="space-y-6">
       <div className="border-b pb-4">

@@ -23,7 +23,9 @@ export const retrieveOrder = async (id: string) => {
       },
       headers,
       next,
-      cache: "force-cache",
+      // Per-customer order data must always be fresh; force-cache can serve a
+      // stale (or empty) list that tag revalidation misses.
+      cache: "no-store",
     })
     .then(({ order }) => order)
     .catch((err) => medusaError(err))
@@ -54,7 +56,9 @@ export const listOrders = async (
       },
       headers,
       next,
-      cache: "force-cache",
+      // Per-customer order data must always be fresh; force-cache can serve a
+      // stale (or empty) list that tag revalidation misses.
+      cache: "no-store",
     })
     .then(({ orders }) => orders)
     .catch((err) => medusaError(err))

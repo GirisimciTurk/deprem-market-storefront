@@ -75,31 +75,34 @@ const PaynkolayPaymentButton = ({
   }
 
   const sessionData = paymentSession.data as Record<string, string>
-  const actionUrl = sessionData.actionUrl || "https://paynkolaytest.nkolayislem.com.tr/Vpos"
+  // actionUrl is supplied by the backend payment provider (test/prod endpoint is
+  // chosen there). Never fall back to a hardcoded test endpoint.
+  const actionUrl = sessionData.actionUrl || ""
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitting(true)
     setErrorMessage(null)
 
-    console.log("Paynkolay: handleSubmit triggered. sessionData:", sessionData)
+    if (!actionUrl) {
+      setErrorMessage("Ödeme yöntemi yapılandırılamadı. Lütfen daha sonra tekrar deneyin.")
+      setSubmitting(false)
+      return
+    }
 
     try {
       const selectedCard = sessionStorage.getItem("paynkolay_selected_card") || "new"
       const customerKey = sessionStorage.getItem("paynkolay_customer_key") || ""
       const saveCard = customerKey ? (sessionStorage.getItem("paynkolay_save_card") === "true") : false
+      const usingSavedCard = selectedCard !== "new"
+
+      // Paynkolay'a POST edilecek VE hash'e girecek tek tutarlı csCustomerKey değeri.
+      // Doküman: kart saklama kullanılmıyorsa boş olmalı. Hash bununla imzalanır;
+      // forma da aynısı POST edilir (uyumsuzluk = geçersiz imza).
+      const effectiveCustomerKey = usingSavedCard || saveCard ? customerKey : ""
 
       const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
       const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-      
-      console.log("Paynkolay: Fetching hash from backend:", `${backendUrl}/store/paynkolay/hash`, "with params:", {
-        clientRefCode: sessionData.clientRefCode,
-        amount: sessionData.amount,
-        successUrl: sessionData.successUrl,
-        failUrl: sessionData.failUrl,
-        rnd: sessionData.rnd,
-        csCustomerKey: customerKey,
-      })
 
       const response = await fetch(`${backendUrl}/store/paynkolay/hash`, {
         method: "POST",
@@ -113,18 +116,15 @@ const PaynkolayPaymentButton = ({
           successUrl: sessionData.successUrl,
           failUrl: sessionData.failUrl,
           rnd: sessionData.rnd,
-          csCustomerKey: customerKey,
+          csCustomerKey: effectiveCustomerKey,
         }),
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error("Paynkolay: Backend response not OK:", response.status, errorText)
         throw new Error(`Ödeme imzası oluşturulamadı (Backend Hata Kodu: ${response.status}). Lütfen tekrar deneyin.`)
       }
 
       const hashResult = await response.json()
-      console.log("Paynkolay: Hash result received:", hashResult)
 
       if (!hashResult.success || !hashResult.hashDataV2) {
         throw new Error(hashResult.error || "Ödeme imzası doğrulaması başarısız.")
@@ -163,48 +163,28 @@ const PaynkolayPaymentButton = ({
         form.appendChild(input)
       }
 
-      // If we are paying with a saved card
-      if (selectedCard !== "new") {
-        const tokenInput = document.createElement("input")
-        tokenInput.type = "hidden"
-        tokenInput.name = "csToken"
-        tokenInput.value = selectedCard
-        form.appendChild(tokenInput)
-
-        const keyInput = document.createElement("input")
-        keyInput.type = "hidden"
-        keyInput.name = "csCustomerKey"
-        keyInput.value = customerKey
-        form.appendChild(keyInput)
-      } else {
-        // If we want to save the new card
-        if (saveCard) {
-          const saveInput = document.createElement("input")
-          saveInput.type = "hidden"
-          saveInput.name = "csAutoSave"
-          saveInput.value = "true"
-          form.appendChild(saveInput)
-
-          const keyInput = document.createElement("input")
-          keyInput.type = "hidden"
-          keyInput.name = "csCustomerKey"
-          keyInput.value = customerKey
-          form.appendChild(keyInput)
-        } else {
-          // Explicitly append empty string for csCustomerKey if not saving
-          const keyInput = document.createElement("input")
-          keyInput.type = "hidden"
-          keyInput.name = "csCustomerKey"
-          keyInput.value = ""
-          form.appendChild(keyInput)
-        }
+      const appendHidden = (name: string, value: string) => {
+        const input = document.createElement("input")
+        input.type = "hidden"
+        input.name = name
+        input.value = value
+        form.appendChild(input)
       }
 
-      console.log("Paynkolay: Submitting temporary form to:", actionUrl, "with form elements:", Array.from(form.elements).map((el: any) => ({ name: el.name, value: el.value })))
+      // csCustomerKey: hash'e giren değerle BİREBİR aynı (boş ya da dolu).
+      appendHidden("csCustomerKey", effectiveCustomerKey)
+
+      if (usingSavedCard) {
+        // Kayıtlı kartla ödeme: kartın token'ı gönderilir.
+        appendHidden("csToken", selectedCard)
+      } else if (saveCard) {
+        // Yeni kartı kaydet: csAutoSave=true (3D Secure zorunlu).
+        appendHidden("csAutoSave", "true")
+      }
+
       document.body.appendChild(form)
       form.submit()
     } catch (err: any) {
-      console.error("Paynkolay: submission exception caught:", err)
       setErrorMessage(err.message || "Bir hata oluştu. Lütfen tekrar deneyin.")
       setSubmitting(false)
     }

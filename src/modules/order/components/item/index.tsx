@@ -5,6 +5,7 @@ import LineItemOptions from "@modules/common/components/line-item-options"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import Thumbnail from "@modules/products/components/thumbnail"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem | HttpTypes.StoreOrderLineItem
@@ -12,21 +13,39 @@ type ItemProps = {
 }
 
 const Item = ({ item, currencyCode }: ItemProps) => {
+  const handle = (item as { product_handle?: string }).product_handle
+
   return (
     <Table.Row className="w-full" data-testid="product-row">
       <Table.Cell className="!pl-0 p-4 w-24">
         <div className="flex w-16">
-          <Thumbnail thumbnail={item.thumbnail} size="square" />
+          {handle ? (
+            <LocalizedClientLink href={`/products/${handle}`}>
+              <Thumbnail thumbnail={item.thumbnail} size="square" />
+            </LocalizedClientLink>
+          ) : (
+            <Thumbnail thumbnail={item.thumbnail} size="square" />
+          )}
         </div>
       </Table.Cell>
 
       <Table.Cell className="text-left">
-        <Text
-          className="txt-medium-plus text-ui-fg-base"
-          data-testid="product-name"
-        >
-          {item.product_title}
-        </Text>
+        {handle ? (
+          <LocalizedClientLink
+            href={`/products/${handle}`}
+            className="txt-medium-plus text-ui-fg-base hover:text-orange-600 transition-colors"
+            data-testid="product-name"
+          >
+            {item.product_title}
+          </LocalizedClientLink>
+        ) : (
+          <Text
+            className="txt-medium-plus text-ui-fg-base"
+            data-testid="product-name"
+          >
+            {item.product_title}
+          </Text>
+        )}
         <LineItemOptions variant={item.variant} data-testid="product-variant" />
       </Table.Cell>
 
