@@ -16,7 +16,7 @@ export default function ResellerForm() {
     "idle" | "loading" | "success" | "error"
   >("idle")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (
       !formData.companyName ||
@@ -29,23 +29,31 @@ export default function ResellerForm() {
     }
 
     setStatus("loading")
-    setTimeout(() => {
-      try {
-        const existing = JSON.parse(
-          localStorage.getItem("reseller-applications") || "[]"
-        )
-        const newApp = {
-          id: "reseller-" + Date.now(),
-          ...formData,
-          date: new Date().toLocaleString("tr-TR"),
-          status: "pending",
-        }
-        localStorage.setItem(
-          "reseller-applications",
-          JSON.stringify([newApp, ...existing])
-        )
-      } catch (err) {
-        console.error("Failed to save reseller application", err)
+    try {
+      const backendUrl =
+        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+      const publishableKey =
+        process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
+
+      const res = await fetch(`${backendUrl}/store/reseller-applications`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-publishable-api-key": publishableKey,
+        },
+        body: JSON.stringify({
+          company_name: formData.companyName,
+          applicant_name: formData.contactName,
+          email: formData.email,
+          phone: formData.phone,
+          city: formData.city,
+          tax_number: formData.taxOfficeNumber,
+          message: formData.message,
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error("Başvuru gönderilemedi.")
       }
 
       setStatus("success")
@@ -58,7 +66,10 @@ export default function ResellerForm() {
         city: "",
         message: "",
       })
-    }, 1500)
+    } catch (err) {
+      console.error("Failed to submit reseller application", err)
+      setStatus("error")
+    }
   }
 
   if (status === "success") {

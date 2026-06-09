@@ -292,7 +292,12 @@ function decodeAuthToken(token: string): { actor_id?: string; email?: string } {
     const data = JSON.parse(json)
     return {
       actor_id: data?.actor_id,
-      email: data?.email ?? data?.app_metadata?.email,
+      // Medusa's registration JWT carries the provider profile in `user_metadata`
+      // (the Google provider stores the verified email there).
+      email:
+        data?.email ??
+        data?.user_metadata?.email ??
+        data?.app_metadata?.email,
     }
   } catch {
     return {}
@@ -336,14 +341,22 @@ export async function validateGoogleCallback(
 
     const decoded = decodeAuthToken(token)
 
-    // actor_id is empty on the very first login → the customer record must be created.
+    // actor_id is empty on the very first login with this Google identity.
+    // Hand off to the backend, which either LINKS this identity to an existing
+    // customer that already uses this email (e.g. an email/password account) or
+    // creates a new customer — avoiding duplicate accounts and the
+    // (email, has_account) unique-constraint error.
     if (!decoded.actor_id) {
-      await sdk.store.customer.create(
-        { email: decoded.email ?? "" },
-        {},
-        { authorization: `Bearer ${token}` } as Record<string, string>
-      )
-      token = await sdk.auth.refresh()
+      await sdk.client.fetch("/store/customers/google-link", {
+        method: "POST",
+        headers: { authorization: `Bearer ${token}` },
+      })
+      // Refresh to obtain a token whose actor_id is now populated. The SDK does
+      // not persist the token server-side, so pass it explicitly — otherwise the
+      // refresh call is unauthenticated and Medusa returns 401.
+      token = await sdk.auth.refresh({
+        authorization: `Bearer ${token}`,
+      } as Record<string, string>)
     }
 
     await setAuthToken(token as string)

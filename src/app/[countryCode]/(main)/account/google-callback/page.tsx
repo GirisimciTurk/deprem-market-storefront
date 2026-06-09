@@ -22,13 +22,18 @@ export default function GoogleCallbackPage() {
 
     const countryCode = (params?.countryCode as string) || "tr"
 
-    validateGoogleCallback(query).then((res) => {
-      if (res.success) {
-        router.replace(`/${countryCode}/account`)
-      } else {
-        setError(res.error || "Google ile giriş doğrulanamadı.")
-      }
-    })
+    validateGoogleCallback(query)
+      .then((res) => {
+        if (res.success) {
+          // Hard navigation so the account page is server-rendered fresh with the
+          // newly set auth cookie. router.replace can serve a stale (logged-out)
+          // RSC payload, leaving the spinner stuck even though login succeeded.
+          window.location.replace(`/${countryCode}/account`)
+        } else {
+          setError(res.error || "Google ile giriş doğrulanamadı.")
+        }
+      })
+      .catch((err) => setError(String(err)))
   }, [params, router, searchParams])
 
   return (

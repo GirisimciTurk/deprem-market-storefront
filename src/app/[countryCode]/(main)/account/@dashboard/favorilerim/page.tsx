@@ -77,20 +77,25 @@ export default function FavoritesPage() {
               className="border border-ui-border-base bg-ui-bg-subtle rounded-2xl p-4 flex gap-4 hover:shadow-md transition-shadow relative overflow-hidden group"
             >
               {/* Product Image */}
-              <div className="w-24 h-24 rounded-xl overflow-hidden bg-ui-bg-base border flex-shrink-0 relative">
-                <img 
-                  src={item.image} 
-                  alt={item.title} 
+              <LocalizedClientLink
+                href={`/products/${item.handle}`}
+                className="w-24 h-24 rounded-xl overflow-hidden bg-ui-bg-base border flex-shrink-0 relative block"
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-              </div>
+              </LocalizedClientLink>
 
               {/* Product Details */}
               <div className="flex flex-col justify-between flex-1 min-w-0">
                 <div>
-                  <h3 className="font-bold text-ui-fg-base text-sm sm:text-base truncate group-hover:text-red-655 transition-colors">
-                    {item.title}
-                  </h3>
+                  <LocalizedClientLink href={`/products/${item.handle}`}>
+                    <h3 className="font-bold text-ui-fg-base text-sm sm:text-base truncate group-hover:text-red-655 transition-colors hover:text-red-600">
+                      {item.title}
+                    </h3>
+                  </LocalizedClientLink>
                   <p className="text-3xs sm:text-2xs text-ui-fg-muted line-clamp-2 mt-1">
                     {item.description}
                   </p>

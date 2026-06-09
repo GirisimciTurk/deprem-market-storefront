@@ -54,7 +54,10 @@ export const setAuthToken = async (token: string) => {
   cookies.set("_medusa_jwt", token, {
     maxAge: 60 * 60 * 24 * 7,
     httpOnly: true,
-    sameSite: "strict",
+    // "lax": ödeme sağlayıcısından (Paynkolay) geri dönen top-level yönlendirmede
+    // cookie'nin gönderilmesi gerekir; "strict" bu durumda cookie'yi düşürüp
+    // oturumu/sepeti kaybettiriyor (checkout not-found). Lax CSRF için yeterli.
+    sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   })
 }
@@ -76,7 +79,9 @@ export const setCartId = async (cartId: string) => {
   cookies.set("_medusa_cart_id", cartId, {
     maxAge: 60 * 60 * 24 * 7,
     httpOnly: true,
-    sameSite: "strict",
+    // "lax": Paynkolay ödeme dönüşünde (cross-site → /checkout) sepet cookie'sinin
+    // gönderilmesi şart; "strict" cookie'yi düşürüp "Sayfa Bulunamadı" hatasına yol açıyordu.
+    sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   })
 }
