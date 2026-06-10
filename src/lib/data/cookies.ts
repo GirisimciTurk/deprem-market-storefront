@@ -49,24 +49,34 @@ export const getCacheOptions = async (
   return { tags: [`${cacheTag}`] }
 }
 
+// NOT: Cookie YAZMA (set) yalnız Server Action / Route Handler içinde mümkün; render
+// sırasında çağrılırsa Next.js fırlatır. Bu fonksiyonlar bazen render yolundan da
+// (ör. retrieveCart'ın catch'i → removeCartId) tetiklenebildiği için yazma best-effort
+// yapılır: render bağlamında çökmek yerine sessizce atlanır (server action'da normal çalışır).
 export const setAuthToken = async (token: string) => {
-  const cookies = await nextCookies()
-  cookies.set("_medusa_jwt", token, {
-    maxAge: 60 * 60 * 24 * 7,
-    httpOnly: true,
-    // "lax": ödeme sağlayıcısından (Paynkolay) geri dönen top-level yönlendirmede
-    // cookie'nin gönderilmesi gerekir; "strict" bu durumda cookie'yi düşürüp
-    // oturumu/sepeti kaybettiriyor (checkout not-found). Lax CSRF için yeterli.
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  })
+  try {
+    const cookies = await nextCookies()
+    cookies.set("_medusa_jwt", token, {
+      maxAge: 60 * 60 * 24 * 7,
+      httpOnly: true,
+      // "lax": ödeme sağlayıcısından (Paynkolay) geri dönen top-level yönlendirmede
+      // cookie'nin gönderilmesi gerekir; "strict" bu durumda cookie'yi düşürüp
+      // oturumu/sepeti kaybettiriyor (checkout not-found). Lax CSRF için yeterli.
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    })
+  } catch {
+    /* render bağlamında cookie yazılamaz — best-effort */
+  }
 }
 
 export const removeAuthToken = async () => {
-  const cookies = await nextCookies()
-  cookies.set("_medusa_jwt", "", {
-    maxAge: -1,
-  })
+  try {
+    const cookies = await nextCookies()
+    cookies.set("_medusa_jwt", "", { maxAge: -1 })
+  } catch {
+    /* render bağlamında cookie yazılamaz — best-effort */
+  }
 }
 
 export const getCartId = async () => {
@@ -75,20 +85,26 @@ export const getCartId = async () => {
 }
 
 export const setCartId = async (cartId: string) => {
-  const cookies = await nextCookies()
-  cookies.set("_medusa_cart_id", cartId, {
-    maxAge: 60 * 60 * 24 * 7,
-    httpOnly: true,
-    // "lax": Paynkolay ödeme dönüşünde (cross-site → /checkout) sepet cookie'sinin
-    // gönderilmesi şart; "strict" cookie'yi düşürüp "Sayfa Bulunamadı" hatasına yol açıyordu.
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  })
+  try {
+    const cookies = await nextCookies()
+    cookies.set("_medusa_cart_id", cartId, {
+      maxAge: 60 * 60 * 24 * 7,
+      httpOnly: true,
+      // "lax": Paynkolay ödeme dönüşünde (cross-site → /checkout) sepet cookie'sinin
+      // gönderilmesi şart; "strict" cookie'yi düşürüp "Sayfa Bulunamadı" hatasına yol açıyordu.
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    })
+  } catch {
+    /* render bağlamında cookie yazılamaz — best-effort */
+  }
 }
 
 export const removeCartId = async () => {
-  const cookies = await nextCookies()
-  cookies.set("_medusa_cart_id", "", {
-    maxAge: -1,
-  })
+  try {
+    const cookies = await nextCookies()
+    cookies.set("_medusa_cart_id", "", { maxAge: -1 })
+  } catch {
+    /* render bağlamında cookie yazılamaz — best-effort (retrieveCart catch'i buradan geçer) */
+  }
 }

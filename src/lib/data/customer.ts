@@ -146,6 +146,50 @@ export async function login(_currentState: unknown, formData: FormData) {
   }
 }
 
+/**
+ * Şifre sıfırlama e-postası ister. Medusa `auth.password_reset` event'ini tetikler;
+ * backend subscriber müşteriye sıfırlama linkli e-posta gönderir. E-posta sızıntısını
+ * önlemek için (kayıtlı olsun olmasın) her zaman başarılı döner.
+ */
+export async function requestPasswordReset(
+  email: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    await sdk.auth.resetPassword("customer", "emailpass", { identifier: email })
+  } catch {
+    // Sessizce yut — e-posta kayıtlı mı bilgisini sızdırma.
+  }
+  return { success: true, error: null }
+}
+
+/**
+ * E-postadaki linkten gelen token ile yeni şifreyi belirler.
+ */
+export async function resetPassword(
+  email: string,
+  password: string,
+  token: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    await sdk.auth.updateProvider(
+      "customer",
+      "emailpass",
+      { email, password },
+      token
+    )
+    return { success: true, error: null }
+  } catch (error: any) {
+    const msg = String(error?.message || "")
+    return {
+      success: false,
+      error:
+        msg.includes("401") || msg.toLowerCase().includes("unauthorized")
+          ? "Sıfırlama bağlantısı geçersiz veya süresi dolmuş. Lütfen yeni bir bağlantı isteyin."
+          : error?.message || "Şifre sıfırlanamadı.",
+    }
+  }
+}
+
 export async function signout(countryCode: string) {
   await sdk.auth.logout()
 
