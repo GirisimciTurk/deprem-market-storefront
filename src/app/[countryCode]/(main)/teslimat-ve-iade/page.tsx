@@ -17,21 +17,21 @@ export default async function TeslimatIadePage(props: {
     return (
       <div className="content-container max-w-4xl py-16 px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-extrabold text-ui-fg-base tracking-tight mb-8">
-          Delivery and Returns
+          Teslimat ve İade
         </h1>
         <div className="prose prose-slate max-w-none text-ui-fg-subtle space-y-6">
           <p>
-            We process orders quickly. Returns are accepted within 14 days of receipt.
+            Siparişleri hızlıca işleme alıyoruz. İadeler, teslim tarihinden itibaren 14 gün içinde kabul edilir.
           </p>
           <p>
-            Managed by <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong>.
+            <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong> tarafından yönetilmektedir.
           </p>
           <p>
-            Please switch to Turkish to view the detailed terms.
+            Detaylı koşulları görüntülemek için lütfen Türkçe diline geçin.
           </p>
           <div className="pt-8">
             <LocalizedClientLink href="/" className="text-rose-600 hover:underline font-semibold">
-              &larr; Return to Home Page
+              &larr; Ana Sayfaya Dön
             </LocalizedClientLink>
           </div>
         </div>

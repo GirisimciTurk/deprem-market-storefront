@@ -42,7 +42,7 @@ export default function PreviewPrice({ price }: { price: VariantPrice }) {
 
         {/* Price display with Sepette styling */}
         <div className="flex flex-col mt-0.5">
-          <span className="text-[11px] text-gray-400 font-semibold line-through">
+          <span className="text-[11px] text-gray-500 font-semibold line-through">
             {originalPrice}
           </span>
           <span className="bg-rose-50/80 border border-rose-150 text-rose-600 font-extrabold text-xs sm:text-sm px-2 py-1 rounded-md w-fit mt-0.5 shadow-2xs">

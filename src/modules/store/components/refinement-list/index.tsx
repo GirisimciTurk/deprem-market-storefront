@@ -100,7 +100,7 @@ const RefinementList = ({
       {/* 2. Kategoriler */}
       {categories.length > 0 && (
         <div className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60 flex flex-col gap-y-3">
-          <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">Kategoriler</span>
+          <span className="text-xs font-bold text-slate-600 tracking-wider uppercase">Kategoriler</span>
           <div className="flex flex-col gap-y-1 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
             {categories.map((cat) => {
               const isSelected = categoryId === cat.id
@@ -127,20 +127,20 @@ const RefinementList = ({
 
       {/* 3. Fiyat Filtresi */}
       <div className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60 flex flex-col gap-y-3">
-        <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">Fiyat Aralığı</span>
+        <span className="text-xs font-bold text-slate-600 tracking-wider uppercase">Fiyat Aralığı</span>
         <form onSubmit={handlePriceApply} className="flex flex-col gap-y-3">
           <div className="flex items-center gap-x-2">
             <input
               type="number"
-              placeholder="Min"
+              placeholder="En az"
               value={minInput}
               onChange={(e) => setMinInput(e.target.value)}
               className="w-full text-sm px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500 placeholder-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
-            <span className="text-slate-400">-</span>
+            <span className="text-slate-600">-</span>
             <input
               type="number"
-              placeholder="Max"
+              placeholder="En çok"
               value={maxInput}
               onChange={(e) => setMaxInput(e.target.value)}
               className="w-full text-sm px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500 placeholder-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

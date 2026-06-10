@@ -488,7 +488,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                       {/* Image Previews */}
                       {formImages.map((img, idx) => (
                         <div key={idx} className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 group">
-                          <img src={img} alt="Preview" className="w-full h-full object-cover" />
+                          <img src={img} alt="Önizleme" className="w-full h-full object-cover" />
                           <button
                             type="button"
                             onClick={() => removeFormImage(idx)}
@@ -571,7 +571,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                             className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border border-gray-250 cursor-pointer hover:border-orange-500 transition-all duration-200 flex-shrink-0"
                             onClick={() => setLightboxImage(img)}
                           >
-                            <img src={img} alt="User upload" className="w-full h-full object-cover" />
+                            <img src={img} alt="Kullanıcı yüklemesi" className="w-full h-full object-cover" />
                           </div>
                         ))}
                       </div>

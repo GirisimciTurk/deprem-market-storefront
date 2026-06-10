@@ -131,8 +131,8 @@ export default function SearchModal() {
       <button
         onClick={() => setIsOpen(true)}
         className="flex items-center justify-center p-1 hover:text-ui-fg-base transition-colors"
-        aria-label={isTr ? "Ürün Ara" : "Search Products"}
-        title={isTr ? "Ürün Ara (Ctrl+K)" : "Search (Ctrl+K)"}
+        aria-label={isTr ? "Ürün Ara" : "Ürün Ara"}
+        title={isTr ? "Ürün Ara (Ctrl+K)" : "Ara (Ctrl+K)"}
       >
         <Search className="w-5 h-5 text-slate-700 hover:text-slate-900 transition-colors" />
       </button>

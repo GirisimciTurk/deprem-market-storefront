@@ -14,8 +14,8 @@ describe("PreviewPrice Component", () => {
 
   it("should render regular price if not on sale", () => {
     const price: VariantPrice = {
-      id: "price_1",
-      calculated_price: "150,00 TL",
+      currency_code: "try",
+      calculated_price:"150,00 TL",
       calculated_price_number: 15000,
       original_price: "150,00 TL",
       original_price_number: 15000,
@@ -33,8 +33,8 @@ describe("PreviewPrice Component", () => {
 
   it("should render sale price with crossed-out original price and discount badge when on sale", () => {
     const price: VariantPrice = {
-      id: "price_2",
-      calculated_price: "120,00 TL",
+      currency_code: "try",
+      calculated_price:"120,00 TL",
       calculated_price_number: 120,
       original_price: "150,00 TL",
       original_price_number: 150,

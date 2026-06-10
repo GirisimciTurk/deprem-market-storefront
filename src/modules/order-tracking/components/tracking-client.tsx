@@ -130,7 +130,16 @@ export default function TrackingClient({
     const isCanceled = orderObj.status === "canceled"
     const fStatus = orderObj.fulfillment_status
 
-    const steps = [
+    type TrackingStep = {
+      title: string
+      desc: string
+      date: string | null
+      completed: boolean
+      active: boolean
+      isError?: boolean
+    }
+
+    const steps: TrackingStep[] = [
       {
         title: "Sipariş Alındı",
         desc: "Siparişiniz başarıyla alındı ve onaylandı.",
@@ -181,7 +190,7 @@ export default function TrackingClient({
             active: true,
             isError: true,
           },
-        ],
+        ] as TrackingStep[],
       }
     }
 

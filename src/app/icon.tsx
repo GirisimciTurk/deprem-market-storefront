@@ -1,9 +1,11 @@
 import { ImageResponse } from "next/og"
 
-// Image metadata
+// Image metadata — 512x512 (vektör temiz ölçeklenir). Tek üretilen ikon hem favicon
+// (tarayıcı küçültür) hem PWA manifest ikonu olarak kullanılır; manifest.ts bununla
+// AYNI boyutu (512x512) beyan eder, aksi halde "Resource size is not correct" uyarısı çıkar.
 export const size = {
-  width: 32,
-  height: 32,
+  width: 512,
+  height: 512,
 }
 export const contentType = "image/png"
 
@@ -22,8 +24,8 @@ export default function Icon() {
         }}
       >
         <svg
-          width="32"
-          height="32"
+          width="100%"
+          height="100%"
           viewBox="0 0 36 36"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

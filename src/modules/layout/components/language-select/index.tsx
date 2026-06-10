@@ -128,11 +128,10 @@ const LanguageSelect = ({
       >
         <ListboxButton className="py-1 w-full">
           <div className="txt-compact-small flex items-start gap-x-2">
-            <span>Language:</span>
+            <span>Dil:</span>
             {current && (
               <span className="txt-compact-small flex items-center gap-x-2">
                 {current.countryCode && (
-                  /* @ts-expect-error - ReactCountryFlag type mismatch */
                   <ReactCountryFlag
                     svg
                     style={{
@@ -166,7 +165,6 @@ const LanguageSelect = ({
                   className="py-2 hover:bg-gray-200 px-3 cursor-pointer flex items-center gap-x-2"
                 >
                   {o.countryCode ? (
-                    /* @ts-expect-error - ReactCountryFlag type mismatch */
                     <ReactCountryFlag
                       svg
                       style={{
