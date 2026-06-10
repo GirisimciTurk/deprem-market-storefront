@@ -35,9 +35,10 @@ export default function FavoritesNavIcon() {
 
   return (
     <LocalizedClientLink
-      className="hover:text-ui-fg-base flex items-center justify-center p-1 relative group"
+      className="hover:text-ui-fg-base flex items-center justify-center p-2 relative group"
       href="/favorilerim"
       title="Favorilerim"
+      aria-label="Favorilerim"
     >
       <Heart className="w-5 h-5 text-slate-700 hover:text-rose-600 transition-colors group-hover:scale-105 duration-200" />
       {favoritesCount > 0 && (

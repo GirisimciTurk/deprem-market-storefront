@@ -13,12 +13,12 @@ export default function NotFound() {
   return (
     <div className="flex flex-col gap-4 items-center justify-center min-h-[calc(100vh-64px)] px-4 text-center">
       <h1 className="text-4xl font-extrabold text-ui-fg-base tracking-tight mb-2">
-        {isTr ? "Sayfa Bulunamadı" : "Page Not Found"}
+        {isTr ? "Sayfa Bulunamadı" : "Sayfa Bulunamadı"}
       </h1>
       <p className="max-w-md text-base text-ui-fg-subtle leading-relaxed">
         {isTr
           ? "Ulaşmaya çalıştığınız sayfa mevcut değil veya taşınmış olabilir. Lütfen adresi kontrol edip tekrar deneyin."
-          : "The page you tried to access does not exist. It might have been moved or deleted."}
+          : "Ulaşmaya çalıştığınız sayfa mevcut değil veya taşınmış olabilir. Lütfen adresi kontrol edip tekrar deneyin."}
       </p>
       
       <Link 
@@ -26,7 +26,7 @@ export default function NotFound() {
         href={isTr ? "/tr" : "/"}
       >
         <Text className="text-ui-fg-interactive font-medium">
-          {isTr ? "Ana Sayfaya Dön" : "Go to Frontpage"}
+          {isTr ? "Ana Sayfaya Dön" : "Ana Sayfaya Dön"}
         </Text>
         <ArrowUpRightMini
           className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ease-in-out duration-150"

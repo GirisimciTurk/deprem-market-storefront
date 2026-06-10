@@ -120,7 +120,7 @@ const ImageGallery = ({ images, productHandle }: ImageGalleryProps) => {
             <button
               onClick={handlePrev}
               className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-white/70 backdrop-blur-md border border-white/20 text-gray-800 shadow-md hover:bg-white transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
-              aria-label="Previous image"
+              aria-label="Önceki görsel"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +140,7 @@ const ImageGallery = ({ images, productHandle }: ImageGalleryProps) => {
             <button
               onClick={handleNext}
               className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-white/70 backdrop-blur-md border border-white/20 text-gray-800 shadow-md hover:bg-white transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
-              aria-label="Next image"
+              aria-label="Sonraki görsel"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

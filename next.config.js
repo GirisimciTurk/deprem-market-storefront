@@ -22,6 +22,9 @@ const SCRIPT_SRC_EVAL = process.env.NODE_ENV === "production" ? "" : " 'unsafe-e
  */
 const nextConfig = {
   reactStrictMode: true,
+  // Docker için bağımsız (standalone) çıktı: .next/standalone içinde minimal bir
+  // server.js + sadece gereken node_modules üretilir → çok küçük üretim imajı.
+  output: "standalone",
   logging: {
     fetches: {
       fullUrl: true,
@@ -31,13 +34,17 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // Tip hataları artık build'i durdurur (gizlenmez). Tüm src tsc'den 0 hata ile
+    // geçiyor; yeni bir tip hatası girerse build kırmızıya döner — bilinçli güvenlik tercihi.
+    ignoreBuildErrors: false,
   },
   images: {
     // NOT: Optimizasyonu açmak (unoptimized'i kaldırmak) için uygulamadaki TÜM
     // görsel host'ları (ör. Unsplash, S3) remotePatterns'e eklenmeli; aksi halde
     // next/image tanımsız host'ta 500 atıyor. Bu yüzden şimdilik kapalı bırakıldı.
     unoptimized: true,
+    // next/image quality={50} kullanıyor; Next.js 16 izin verilen kaliteleri açıkça ister.
+    qualities: [50, 75, 100],
     remotePatterns: [
       {
         protocol: "http",

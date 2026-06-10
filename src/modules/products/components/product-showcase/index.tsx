@@ -650,7 +650,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
                   <iframe
                     className="w-full h-full"
                     src={data.videoUrl}
-                    title="Product Usage Video"
+                    title="Ürün Kullanım Videosu"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />

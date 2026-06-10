@@ -190,7 +190,7 @@ export default function ProductPreview({
           <div className="flex items-center gap-x-1 mt-0.5">
             <span className="text-xs font-bold text-gray-750">{ratingInfo.rating}</span>
             {renderStars(ratingInfo.rating)}
-            <span className="text-[9px] font-semibold text-gray-400">
+            <span className="text-[9px] font-semibold text-gray-600">
               ({ratingInfo.count})
             </span>
           </div>

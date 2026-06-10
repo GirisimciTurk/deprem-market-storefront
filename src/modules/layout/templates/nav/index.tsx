@@ -63,10 +63,11 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
             <div className="flex items-center gap-x-6 h-full">
               <SearchModal />
               <LocalizedClientLink
-                className="hover:text-ui-fg-base flex items-center justify-center p-1"
+                className="hover:text-ui-fg-base flex items-center justify-center p-2"
                 href="/account"
                 data-testid="nav-account-link"
                 title={dict.nav.account}
+                aria-label={dict.nav.account}
               >
                 <User className="w-5 h-5 text-slate-700 hover:text-slate-900 transition-colors" />
               </LocalizedClientLink>
@@ -75,10 +76,11 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
             <Suspense
               fallback={
                 <LocalizedClientLink
-                  className="hover:text-ui-fg-base flex items-center gap-x-1.5 p-1"
+                  className="hover:text-ui-fg-base flex items-center gap-x-1.5 p-2"
                   href="/cart"
                   data-testid="nav-cart-link"
                   title={dict.nav.cart}
+                  aria-label={dict.nav.cart}
                 >
                   <ShoppingBag className="w-5 h-5 text-slate-700" />
                 </LocalizedClientLink>
