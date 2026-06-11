@@ -39,9 +39,13 @@ jobs:
       - name: Build + restart
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            -o ServerAliveInterval=30 -o ServerAliveCountMax=40 \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" bash -se <<'REMOTE'
           set -e
+          exec 9>/tmp/deprem-deploy.lock; flock 9
           cd /opt/deprem/deploy
-          docker compose up -d --build storefront
+          # --no-deps: yalnız storefront build/start edilsin (depends_on backend'i build ETMESİN)
+          docker compose build storefront
+          docker compose up -d --no-deps storefront
           docker compose ps storefront
           REMOTE
