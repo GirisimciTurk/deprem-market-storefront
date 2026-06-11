@@ -25,10 +25,10 @@ describe("PreviewPrice Component", () => {
 
     render(<PreviewPrice price={price} />)
 
-    // Regular price with fallback 14% discount should render sale elements
+    // İndirim yoksa düz fiyat gösterilir; indirim rozeti/üstü çizili fiyat OLMAMALI.
     expect(screen.getByText("150,00 TL")).toBeInTheDocument()
-    expect(screen.getByText("Sepette %14 İndirim")).toBeInTheDocument()
-    expect(screen.getByText("174 TL")).toHaveClass("line-through")
+    expect(screen.queryByText(/İndirim/)).not.toBeInTheDocument()
+    expect(screen.queryByText("150,00 TL")).not.toHaveClass("line-through")
   })
 
   it("should render sale price with crossed-out original price and discount badge when on sale", () => {
@@ -50,7 +50,7 @@ describe("PreviewPrice Component", () => {
     expect(originalPrice).toHaveClass("line-through")
 
     // Discount percentage badge should be visible
-    expect(screen.getByText("Sepette %20 İndirim")).toBeInTheDocument()
+    expect(screen.getByText("%20 İndirim")).toBeInTheDocument()
 
     // Calculated price box should be visible
     expect(screen.getByText("120,00 TL")).toBeInTheDocument()

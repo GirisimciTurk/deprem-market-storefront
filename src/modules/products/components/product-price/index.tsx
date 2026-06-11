@@ -19,45 +19,32 @@ export default function ProductPrice({
     return <div className="block w-32 h-9 bg-gray-100 animate-pulse" />
   }
 
-  // Check if it's on sale, or mock a 14% discount for preview purposes
-  let isSale = selectedPrice.price_type === "sale"
-  let discountPercentage = selectedPrice.percentage_diff || 14
-  const calculatedPrice = selectedPrice.calculated_price
-  let originalPrice = selectedPrice.original_price
-
-  if (!isSale) {
-    isSale = true
-    discountPercentage = 14
-    const calcVal = (selectedPrice.calculated_price_number || 0) / 100
-    const origVal = Math.round(calcVal / (1 - 0.14))
-    
-    // Format original price
-    if (
-      selectedPrice.calculated_price.includes("TRY") ||
-      selectedPrice.calculated_price.includes("TL") ||
-      selectedPrice.calculated_price.includes("₺")
-    ) {
-      originalPrice = `${origVal.toLocaleString("tr-TR")} TL`
-    } else {
-      originalPrice = `$${origVal}.00`
-    }
-  }
+  // GERÇEK indirim: ya "sale" fiyat listesi ya da orijinal fiyat > hesaplanan fiyat.
+  // İndirim yoksa hiçbir indirim rozeti/üstü çizili fiyat gösterilmez.
+  const discountPercentage = Number(selectedPrice.percentage_diff) || 0
+  const hasDiscount =
+    (selectedPrice.price_type === "sale" ||
+      (!!selectedPrice.original_price_number &&
+        !!selectedPrice.calculated_price_number &&
+        selectedPrice.original_price_number >
+          selectedPrice.calculated_price_number)) &&
+    discountPercentage > 0
 
   return (
     <div className="flex items-center gap-x-4 my-3">
-      {isSale && (
+      {hasDiscount && (
         <div className="bg-red-600 text-white font-extrabold text-lg px-3 py-2 rounded-md flex items-center justify-center min-w-[55px] select-none">
           %{discountPercentage}
         </div>
       )}
       <div className="flex flex-col text-ui-fg-base">
-        {isSale && (
+        {hasDiscount && (
           <span
             className="text-sm line-through text-gray-400 font-medium"
             data-testid="original-product-price"
             data-value={selectedPrice.original_price_number}
           >
-            {originalPrice}
+            {selectedPrice.original_price}
           </span>
         )}
         <span
@@ -65,7 +52,7 @@ export default function ProductPrice({
           data-testid="product-price"
           data-value={selectedPrice.calculated_price_number}
         >
-          {calculatedPrice}
+          {selectedPrice.calculated_price}
         </span>
       </div>
     </div>
