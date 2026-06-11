@@ -6,7 +6,9 @@ FROM node:20-slim AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+# .npmrc'deki legacy-peer-deps=true bu aşamada henüz kopyalanmadığından (yalnız package*.json
+# var), Next 15 / React 19 peer çakışmalarını önlemek için flag'i açıkça veriyoruz.
+RUN npm ci --legacy-peer-deps
 
 COPY . .
 
