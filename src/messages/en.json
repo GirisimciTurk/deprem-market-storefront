@@ -13,6 +13,10 @@
     "account": "Account",
     "cart": "Cart"
   },
+  "footer": {
+    "affiliateLabel": "An Affiliate of the Girişimci Türk Ecosystem",
+    "affiliateNote": "Deprem Market is the official e-commerce affiliate of the EKYP Earthquake Technologies project under Girişimci Türk, turning engineering solutions into accessible disaster-preparedness products for everyone."
+  },
   "sideMenu": {
     "menu": "Menu",
     "copyright": "© {year} EKYP Deprem Market. All rights reserved.",
@@ -51,7 +55,7 @@
   "homeCorporate": {
     "badge": "MISSION & VISION",
     "heading": "SURVIVING THE ISTANBUL EARTHQUAKE WITH ZERO CASUALTIES",
-    "description": "<strong>Deprem Market</strong> is an official <strong>EKYP</strong> platform bringing together engineering solutions, survival kits, and innovative ideas. Our main mission is to equip households and institutions with resilient tools to survive unexpected disasters.",
+    "description": "<strong>Deprem Market</strong> is the official e-commerce affiliate of the <strong>EKYP Earthquake Technologies</strong> project (depremtek.com) under Girişimci Türk. We turn the domestic, innovative disaster solutions developed by engineers into real products, equipping households and institutions with the most resilient gear against expected disasters.",
     "stat1Label": "Risk Housing Upgrade Plan",
     "stat2Label": "Emergency Prep Speed",
     "stat3Label": "Social Enterprise Backed",

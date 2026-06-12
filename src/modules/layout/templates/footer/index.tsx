@@ -6,12 +6,14 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Logo from "@modules/layout/components/logo";
 import CookieConsentTrigger from "@modules/layout/components/cookie-consent-trigger";
 import LocaleSwitcher from "@modules/layout/components/locale-switcher";
+import { getTranslations } from "next-intl/server";
 
 export default async function Footer() {
   const { collections } = await listCollections({
     fields: "*products",
   });
   const productCategories = await listCategories();
+  const t = await getTranslations("footer");
 
   return (
     <footer className="border-t border-ui-border-base w-full">
@@ -206,6 +208,33 @@ export default async function Footer() {
                 </li>
               </ul>
             </div>
+          </div>
+        </div>
+        {/* İştirak / Ekosistem bandı — Girişimci Türk › EKYP › Deprem Teknolojileri › Deprem Market */}
+        <div className="border-t border-ui-border-base pt-10 pb-8">
+          <div className="flex flex-col items-center text-center gap-4">
+            <span className="text-[11px] font-semibold tracking-[0.15em] uppercase text-ui-fg-muted">
+              {t("affiliateLabel")}
+            </span>
+            <nav className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 text-sm" aria-label="Ekosistem">
+              <a href="https://girisimciturk.com" target="_blank" rel="noreferrer" className="font-bold text-ui-fg-base hover:text-rose-600 transition-colors">
+                Girişimci Türk
+              </a>
+              <span className="text-ui-fg-muted select-none">›</span>
+              <span className="text-ui-fg-subtle">EKYP</span>
+              <span className="text-ui-fg-muted select-none">›</span>
+              <a href="https://girisimciturk.com/ekyp/deprem-teknolojileri/" target="_blank" rel="noreferrer" className="font-bold text-ui-fg-base hover:text-rose-600 transition-colors">
+                Deprem Teknolojileri
+              </a>
+              <span className="text-ui-fg-muted select-none">›</span>
+              <span className="inline-flex items-center gap-1.5 font-bold text-rose-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
+                Deprem Market
+              </span>
+            </nav>
+            <p className="text-xs text-ui-fg-muted max-w-2xl leading-relaxed">
+              {t("affiliateNote")}
+            </p>
           </div>
         </div>
         <div className="flex flex-col gap-y-4 md:flex-row w-full mb-8 justify-between items-center text-ui-fg-muted border-t border-ui-border-base pt-6">

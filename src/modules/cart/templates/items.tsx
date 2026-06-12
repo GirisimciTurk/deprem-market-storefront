@@ -1,6 +1,7 @@
 import repeat from "@lib/util/repeat"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Table } from "@modules/common/components/ui"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 import Item from "@modules/cart/components/item"
 import SkeletonLineItem from "@modules/skeletons/components/skeleton-line-item"
@@ -9,8 +10,42 @@ type ItemsTemplateProps = {
   cart?: HttpTypes.StoreCart
 }
 
+type CartLineItem = NonNullable<HttpTypes.StoreCart["items"]>[number]
+
+type SellerInfo = { id: string; name: string; handle?: string }
+
+const getSeller = (item: CartLineItem): SellerInfo | undefined =>
+  (item.product as any)?.seller
+
 const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
   const items = cart?.items
+
+  const sortedItems = items
+    ? [...items].sort((a, b) =>
+        (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
+      )
+    : undefined
+
+  // Satıcıya göre grupla (satıcısı olmayanlar tek bir "diğer" grubuna düşer).
+  // Grup sırası, ilk görülen ürünün sıralamasını korur.
+  const groups: { seller?: SellerInfo; items: CartLineItem[] }[] = []
+  if (sortedItems) {
+    const indexByKey = new Map<string, number>()
+    for (const item of sortedItems) {
+      const seller = getSeller(item)
+      const key = seller?.id ?? "__no_seller__"
+      let idx = indexByKey.get(key)
+      if (idx === undefined) {
+        idx = groups.length
+        indexByKey.set(key, idx)
+        groups.push({ seller, items: [] })
+      }
+      groups[idx].items.push(item)
+    }
+  }
+
+  const showSellerHeaders = groups.length > 1
+
   return (
     <div>
       <div className="pb-3 flex items-center">
@@ -31,20 +66,47 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {items
-            ? items
-                .sort((a, b) => {
-                  return (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
-                })
-                .map((item) => {
-                  return (
+          {sortedItems
+            ? groups.flatMap((group) => {
+                const rows = []
+                if (showSellerHeaders) {
+                  const seller = group.seller
+                  const name = seller?.name ?? "Diğer satıcılar"
+                  rows.push(
+                    <Table.Row
+                      key={`seller-${seller?.id ?? "none"}`}
+                      className="border-b-0"
+                    >
+                      <Table.Cell
+                        colSpan={5}
+                        className="!pl-0 pt-4 pb-1 text-sm font-semibold text-gray-700"
+                      >
+                        Satıcı:{" "}
+                        {seller?.handle ? (
+                          <LocalizedClientLink
+                            href={`/satici/${seller.handle}`}
+                            className="text-orange-600 hover:text-orange-500 transition-colors"
+                          >
+                            {name}
+                          </LocalizedClientLink>
+                        ) : (
+                          <span className="text-orange-600">{name}</span>
+                        )}
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                }
+                group.items.forEach((item) => {
+                  rows.push(
                     <Item
                       key={item.id}
                       item={item}
-                      currencyCode={cart?.currency_code}
+                      currencyCode={cart?.currency_code ?? ""}
                     />
                   )
                 })
+                return rows
+              })
             : repeat(5).map((i) => {
                 return <SkeletonLineItem key={i} />
               })}

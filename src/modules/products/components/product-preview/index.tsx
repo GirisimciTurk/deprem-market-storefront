@@ -168,7 +168,7 @@ export default function ProductPreview({
           {/* Brand Title */}
           <div className="flex items-center gap-x-1 flex-wrap">
             <span className="text-xs font-bold text-orange-600 tracking-wide uppercase">
-              Deprem Market
+              {(product as any).seller?.name ?? "Deprem Market"}
             </span>
             <svg
               className="w-3.5 h-3.5 text-blue-500 fill-current"

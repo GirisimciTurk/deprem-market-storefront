@@ -6,6 +6,27 @@ import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
+import { getLocaleSafe, pickTranslation } from "@lib/util/localize"
+
+// Ürün başlık/açıklamasını aktif locale için metadata.i18n'den overlay eder.
+// Çeviri yoksa orijinal (tr) alan korunur. Ham veri tek cache'te paylaşılır;
+// overlay request başına JS'de uygulanır (sayfalar cookie okuduğu için dynamic).
+function localizeProduct(
+  product: HttpTypes.StoreProduct,
+  locale: string
+): HttpTypes.StoreProduct {
+  const i18n = (product.metadata as any)?.i18n as
+    | Record<string, { title?: string; subtitle?: string; description?: string }>
+    | undefined
+  const tr = pickTranslation(i18n, locale)
+  if (!tr) return product
+  return {
+    ...product,
+    title: tr.title || product.title,
+    subtitle: tr.subtitle ?? product.subtitle,
+    description: tr.description ?? product.description,
+  }
+}
 
 export const listProducts = async ({
   pageParam = 1,
@@ -53,6 +74,10 @@ export const listProducts = async ({
     ...(await getCacheOptions("products")),
   }
 
+  // Locale'i fetch'ten ÖNCE (request scope'ta) oku — cache'li promise zincirinin
+  // .then microtask'ında cookies() scope'u kaybolabiliyor.
+  const locale = await getLocaleSafe()
+
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
       `/store/products`,
@@ -63,7 +88,7 @@ export const listProducts = async ({
           offset,
           region_id: region?.id,
           fields:
-            "*variants.calculated_price,+variants.inventory_quantity,*variants.images,+metadata,+tags,",
+            "*variants.calculated_price,+variants.inventory_quantity,*variants.images,+metadata,+tags,+seller.id,+seller.name,+seller.handle",
           ...queryParams,
         },
         headers,
@@ -73,10 +98,12 @@ export const listProducts = async ({
     )
     .then(({ products, count }) => {
       const nextPage = count > offset + limit ? pageParam + 1 : null
+      const localized =
+        locale === "tr" ? products : products.map((p) => localizeProduct(p, locale))
 
       return {
         response: {
-          products,
+          products: localized,
           count,
         },
         nextPage: nextPage,

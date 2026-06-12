@@ -25,15 +25,30 @@ const getProductReviewData = (handle: string) => {
 
 const ProductInfo = async ({ product }: ProductInfoProps) => {
   const reviewData = getProductReviewData(product.handle)
+  const seller = (product as any).seller as
+    | { id: string; name: string; handle: string }
+    | undefined
 
   return (
     <div id="product-info">
       <div className="flex flex-col gap-y-3">
         {/* Collection & Brand */}
         <div className="flex items-center gap-x-2 text-sm">
-          <span className="font-bold text-orange-600 tracking-wide">
-            EKYP Deprem Market
-          </span>
+          {seller ? (
+            <span className="text-gray-500">
+              Satıcı:{" "}
+              <LocalizedClientLink
+                href={`/satici/${seller.handle}`}
+                className="font-bold text-orange-600 tracking-wide hover:text-orange-500 transition-colors"
+              >
+                {seller.name}
+              </LocalizedClientLink>
+            </span>
+          ) : (
+            <span className="font-bold text-orange-600 tracking-wide">
+              EKYP Deprem Market
+            </span>
+          )}
           {product.collection && (
             <>
               <span className="text-gray-300">/</span>

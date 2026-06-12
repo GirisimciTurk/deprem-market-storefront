@@ -13,6 +13,10 @@
     "account": "Hesabım",
     "cart": "Sepet"
   },
+  "footer": {
+    "affiliateLabel": "Bir Girişimci Türk Ekosistemi İştiraki",
+    "affiliateNote": "Deprem Market, Girişimci Türk çatısı altındaki EKYP Deprem Teknolojileri projesinin resmi e-ticaret iştirakidir. Mühendislik çözümlerini ürüne dönüştürerek afet hazırlığını herkes için erişilebilir kılıyoruz."
+  },
   "sideMenu": {
     "menu": "Menü",
     "copyright": "© {year} EKYP Deprem Market. Tüm hakları saklıdır.",
@@ -51,7 +55,7 @@
   "homeCorporate": {
     "badge": "MİSYONUMUZ & VİZYONUMUZ",
     "heading": "BÜYÜK İSTANBUL DEPREMİNDEN SIFIR KAYIPLA ÇIKMAK",
-    "description": "<strong>Deprem Market</strong>, deprem güvenliği alanında geliştirilen mühendislik çözümlerini, yenilikçi ürünleri ve girişimci fikirleri bir araya getiren bir <strong>EKYP (Ekonomik Kalkınma ve Yükseliş Projeleri)</strong> platformudur. Amacımız, beklenen afetlere karşı halkımızı ve kurumlarımızı en dayanıklı ekipmanlarla donatmaktır.",
+    "description": "<strong>Deprem Market</strong>, Girişimci Türk çatısı altındaki <strong>EKYP Deprem Teknolojileri</strong> projesinin (depremtek.com) resmi e-ticaret iştirakidir. Mühendislerin geliştirdiği yerli ve yenilikçi afet çözümlerini ürüne dönüştürüp halkımızla buluşturuyor; beklenen afetlere karşı haneleri ve kurumları en dayanıklı ekipmanlarla donatıyoruz.",
     "stat1Label": "Riskli Konut Dönüşümü Planı",
     "stat2Label": "Hızlı Hazırlık & Lojistik",
     "stat3Label": "Sosyal İştirak Modeli",
