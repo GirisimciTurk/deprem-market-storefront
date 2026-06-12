@@ -34,3 +34,9 @@ npm-debug.log*
 
 # Vercel
 .vercel
+
+# serwist PWA — üretilen service worker dosyaları (build çıktısı)
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+public/swe-worker-*.js.map

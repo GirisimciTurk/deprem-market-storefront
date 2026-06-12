@@ -6,6 +6,7 @@ import { getBlogPost } from "@lib/data/blog"
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import ProductPreview from "@modules/products/components/product-preview"
+import { getTranslations } from "next-intl/server"
 
 import { HttpTypes } from "@medusajs/types"
 
@@ -16,8 +17,10 @@ export async function generateMetadata(props: {
   const post = await getBlogPost(params.slug, params.countryCode)
   if (!post) return {}
 
+  const t = await getTranslations("blog")
+
   return {
-    title: `${post.title} | Deprem Market`,
+    title: t("postMetaTitle", { title: post.title }),
     description: post.description,
   }
 }
@@ -27,7 +30,7 @@ export default async function BlogPostPage(props: {
 }) {
   const params = await props.params
   const { slug, countryCode } = params
-  const isTr = countryCode === "tr"
+  const t = await getTranslations("blog")
 
   const post = await getBlogPost(slug, countryCode)
   if (!post) {
@@ -58,11 +61,11 @@ export default async function BlogPostPage(props: {
         {/* Breadcrumb Navigation */}
         <nav className="text-sm text-ui-fg-subtle mb-8 flex items-center gap-x-2">
           <Link href={`/${countryCode}`} className="hover:text-orange-600 transition-colors">
-            {isTr ? "Ana Sayfa" : "Home"}
+            {t("breadcrumbHome")}
           </Link>
           <span>/</span>
           <Link href={`/${countryCode}/blog`} className="hover:text-orange-600 transition-colors">
-            {isTr ? "Rehberler" : "Guides"}
+            {t("breadcrumbGuides")}
           </Link>
           <span>/</span>
           <span className="text-ui-fg-base font-medium truncate max-w-xs">{post.title}</span>
@@ -71,7 +74,7 @@ export default async function BlogPostPage(props: {
         {/* Post Title & Meta */}
         <header className="mb-10 text-center md:text-left">
           <span className="text-sm font-semibold tracking-wider text-orange-600 uppercase px-3 py-1 bg-orange-100 rounded-full dark:bg-orange-900/30 dark:text-orange-400">
-            {isTr ? "Rehber" : "Guide"}
+            {t("badge")}
           </span>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-ui-fg-base mt-4 tracking-tight leading-tight">
             {post.title}
@@ -82,7 +85,7 @@ export default async function BlogPostPage(props: {
             </div>
             <span className="hidden md:inline">•</span>
             <time dateTime={post.date}>
-              {new Date(post.date).toLocaleDateString(isTr ? "tr-TR" : "en-US", {
+              {new Date(post.date).toLocaleDateString(t("dateLocale"), {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -116,15 +119,13 @@ export default async function BlogPostPage(props: {
           <section className="mt-16 pt-12 border-t border-ui-border-base">
             <div className="flex flex-col gap-2 mb-8 text-center md:text-left">
               <span className="text-xs font-semibold tracking-wider text-orange-600 uppercase">
-                {isTr ? "ACİL DURUM İHTİYAÇLARI" : "EMERGENCY NEEDS"}
+                {t("relatedEyebrow")}
               </span>
               <h2 className="text-2xl md:text-3xl font-extrabold text-ui-fg-base mt-0 border-b-0 pb-0">
-                {isTr ? "Afet Çantası İçin Önerilen Malzemeler" : "Recommended Survival Supplies"}
+                {t("relatedHeading")}
               </h2>
               <p className="text-sm text-ui-fg-subtle">
-                {isTr
-                  ? "Yukarıdaki rehberde belirtilen ve acil durum çantanızda bulunması önerilen sertifikalı ürünlerimizi inceleyin:"
-                  : "Explore our certified products mentioned in the guide above that are recommended for your emergency kit:"}
+                {t("relatedIntro")}
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">

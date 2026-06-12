@@ -1,11 +1,12 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export default function CookieConsent({ countryCode }: { countryCode: string }) {
   const [isVisible, setIsVisible] = useState(false)
-  const isTr = countryCode === "tr"
+  const t = useTranslations("cookieConsent")
 
   useEffect(() => {
     // Check if user already consented
@@ -62,46 +63,27 @@ export default function CookieConsent({ countryCode }: { countryCode: string }) 
           </svg>
           <div className="flex flex-col gap-y-1">
             <h4 className="font-bold text-ui-fg-base text-sm">
-              {isTr ? "Çerez Politikası ve KVKK" : "Cookie Settings"}
+              {t("title")}
             </h4>
             <p className="text-xs text-ui-fg-subtle leading-relaxed">
-              {isTr ? (
-                <>
-                  Size daha iyi bir alışveriş deneyimi sunabilmek için çerezler kullanıyoruz. Detaylı bilgi için{" "}
+              {t.rich("description", {
+                cookieLink: (chunks) => (
                   <LocalizedClientLink
                     href="/cerez-politikasi"
                     className="text-rose-600 underline font-medium hover:text-rose-700"
                   >
-                    Çerez Politikamızı
-                  </LocalizedClientLink>{" "}
-                  ve{" "}
-                  <LocalizedClientLink
-                    href="/kvkk"
-                    className="text-rose-600 underline font-medium hover:text-rose-700"
-                  >
-                    KVKK Aydınlatma Metnimizi
-                  </LocalizedClientLink>{" "}
-                  inceleyebilirsiniz.
-                </>
-              ) : (
-                <>
-                  We use cookies to improve your user experience and service quality. For details, view our{" "}
-                  <LocalizedClientLink
-                    href="/cerez-politikasi"
-                    className="text-rose-600 underline font-medium hover:text-rose-700"
-                  >
-                    Cookie Policy
-                  </LocalizedClientLink>{" "}
-                  and{" "}
-                  <LocalizedClientLink
-                    href="/kvkk"
-                    className="text-rose-600 underline font-medium hover:text-rose-700"
-                  >
-                    KVKK Statement
+                    {chunks}
                   </LocalizedClientLink>
-                  .
-                </>
-              )}
+                ),
+                kvkkLink: (chunks) => (
+                  <LocalizedClientLink
+                    href="/kvkk"
+                    className="text-rose-600 underline font-medium hover:text-rose-700"
+                  >
+                    {chunks}
+                  </LocalizedClientLink>
+                ),
+              })}
             </p>
           </div>
         </div>
@@ -112,13 +94,13 @@ export default function CookieConsent({ countryCode }: { countryCode: string }) 
             onClick={handleDecline}
             className="px-4 py-2 text-ui-fg-subtle hover:text-ui-fg-base hover:bg-ui-bg-subtle-hover rounded-md transition-colors"
           >
-            {isTr ? "Reddet" : "Decline"}
+            {t("decline")}
           </button>
           <button
             onClick={handleAccept}
             className="px-4 py-2 bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 rounded-md shadow-sm transition-colors"
           >
-            {isTr ? "Kabul Et" : "Accept All"}
+            {t("accept")}
           </button>
         </div>
       </div>

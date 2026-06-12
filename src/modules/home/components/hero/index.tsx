@@ -1,11 +1,10 @@
 import { Button, Heading } from "@modules/common/components/ui"
-import { getDictionary } from "@lib/get-dictionary"
+import { getTranslations } from "next-intl/server"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
 
 const Hero = async ({ countryCode }: { countryCode: string }) => {
-  const dict = await getDictionary(countryCode)
-  const isTr = countryCode === "tr"
+  const t = await getTranslations("hero")
 
   return (
     <div className="relative h-[85vh] w-full flex items-center justify-start overflow-hidden bg-slate-950">
@@ -28,7 +27,7 @@ const Hero = async ({ countryCode }: { countryCode: string }) => {
         {/* Affiliate Badge */}
         <div className="inline-flex items-center gap-x-2 bg-rose-600/10 border border-rose-500/20 px-3.5 py-1.5 rounded-full text-rose-400 text-xs font-semibold uppercase tracking-wider select-none animate-pulse">
           <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-          {isTr ? "EKYP Deprem Teknolojileri Resmi İştiraki" : "EKYP Earthquake Technologies Affiliate"}
+          {t("affiliateBadge")}
         </div>
 
         {/* Headlines */}
@@ -37,16 +36,14 @@ const Hero = async ({ countryCode }: { countryCode: string }) => {
             level="h1"
             className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none uppercase"
           >
-            {isTr ? "Deprem Hazırlık" : "Earthquake Readiness"}{" "}
+            {t("titleLead")}{" "}
             <span className="text-rose-600 block sm:inline">
-              {isTr ? "Market" : "Market"}
+              {t("titleHighlight")}
             </span>
           </Heading>
           
           <p className="text-lg sm:text-xl text-slate-300 font-medium leading-relaxed">
-            {isTr
-              ? "Güvenli yarınlar için bugünden hazırlanın. EKYP güvencesiyle, uluslararası standartlara uygun sertifikalı acil durum ve deprem hazırlık setleri."
-              : "Prepare today for a safer tomorrow. High-quality certified emergency preparedness kits backed by EKYP Earthquake Technologies."}
+            {t("subtitle")}
           </p>
         </div>
 
@@ -57,7 +54,7 @@ const Hero = async ({ countryCode }: { countryCode: string }) => {
               size="large"
               className="bg-rose-600 border-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 px-8 py-3 rounded-lg shadow-lg font-bold tracking-wide transition-all duration-200"
             >
-              {dict.hero.cta}
+              {t("cta")}
             </Button>
           </LocalizedClientLink>
           
@@ -71,7 +68,7 @@ const Hero = async ({ countryCode }: { countryCode: string }) => {
               size="large"
               className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white px-6 py-3 rounded-lg backdrop-blur-sm transition-all duration-200 font-semibold"
             >
-              {isTr ? "EKYP Projesini İncele" : "Learn About EKYP"}
+              {t("ctaSecondary")}
             </Button>
           </a>
         </div>

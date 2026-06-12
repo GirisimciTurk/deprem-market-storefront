@@ -1,0 +1,155 @@
+{
+  "hero": {
+    "title": "Deprem Hazırlık Market",
+    "subtitle": "Güvenli yarınlar için bugünden hazırlanın. EKYP güvencesiyle, uluslararası standartlara uygun sertifikalı acil durum ve deprem hazırlık setleri.",
+    "cta": "Setleri Keşfet",
+    "affiliateBadge": "EKYP Deprem Teknolojileri Resmi İştiraki",
+    "titleLead": "Deprem Hazırlık",
+    "titleHighlight": "Market",
+    "ctaSecondary": "EKYP Projesini İncele"
+  },
+  "nav": {
+    "menu": "Menü",
+    "account": "Hesabım",
+    "cart": "Sepet"
+  },
+  "sideMenu": {
+    "menu": "Menü",
+    "copyright": "© {year} EKYP Deprem Market. Tüm hakları saklıdır.",
+    "items": {
+      "home": "Ana Sayfa",
+      "store": "Mağaza",
+      "featured": "Trend Ürünler",
+      "reseller": "Bayilik Başvurusu",
+      "faq": "S.S.S.",
+      "contact": "İletişim",
+      "blog": "Blog"
+    }
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "search": "Ara",
+    "checkout": "Ödeme Yap",
+    "products": "Ürünler",
+    "categories": "Kategoriler",
+    "collections": "Koleksiyonlar",
+    "language": "Dil"
+  },
+  "homeFeatures": {
+    "eyebrow": "Neden Biz?",
+    "heading": "Afete Hazırlıkta EKYP Mühendislik Güvencesi",
+    "subheading": "Her an hazır olmak, can kurtarmak demektir. Ürünlerimiz sıradan malzemeler değil, afet anında ihtiyaç duyacağınız özel dayanımlı ekipmanlardır.",
+    "card1Title": "Mühendislik & Güvenlik",
+    "card1Desc": "EKYP Deprem Teknolojileri mühendisleri tarafından incelenmiş, yapısal ve yaşamsal güvenliğe uygun ürünler.",
+    "card2Title": "Hızlı Hazırlık & Sevkiyat",
+    "card2Desc": "Olası acil durumlar için siparişleriniz 24-48 saat içinde özel korumalı ambalajlarla kargoya verilir.",
+    "card3Title": "Sertifikalı Standartlar",
+    "card3Desc": "AFAD, Kızılay ve uluslararası insani yardım standartlarına uygun, dayanıklılık testlerinden geçmiş ekipmanlar.",
+    "card4Title": "7/24 Kurumsal Destek",
+    "card4Desc": "Hem bireysel ihtiyaçlar hem de şirketler/siteler için toplu afet hazırlık projelerinde danışmanlık."
+  },
+  "homeCorporate": {
+    "badge": "MİSYONUMUZ & VİZYONUMUZ",
+    "heading": "BÜYÜK İSTANBUL DEPREMİNDEN SIFIR KAYIPLA ÇIKMAK",
+    "description": "<strong>Deprem Market</strong>, deprem güvenliği alanında geliştirilen mühendislik çözümlerini, yenilikçi ürünleri ve girişimci fikirleri bir araya getiren bir <strong>EKYP (Ekonomik Kalkınma ve Yükseliş Projeleri)</strong> platformudur. Amacımız, beklenen afetlere karşı halkımızı ve kurumlarımızı en dayanıklı ekipmanlarla donatmaktır.",
+    "stat1Label": "Riskli Konut Dönüşümü Planı",
+    "stat2Label": "Hızlı Hazırlık & Lojistik",
+    "stat3Label": "Sosyal İştirak Modeli",
+    "ctaPrimary": "EKYP Deprem Projesi Detayları",
+    "ctaSecondary": "Girişimci Türk Ana Sayfası"
+  },
+  "searchModal": {
+    "triggerAriaLabel": "Ürün Ara",
+    "triggerTitle": "Ürün Ara (Ctrl+K)",
+    "placeholder": "Ürün, kategori veya marka ara...",
+    "noResults": "\"{query}\" için sonuç bulunamadı.",
+    "tryDifferent": "Farklı anahtar kelimelerle tekrar deneyin.",
+    "typeToSearch": "Aramaya başlamak için en az 2 karakter yazın.",
+    "navigate": "gezin",
+    "select": "seçin",
+    "openSearch": "arama aç"
+  },
+  "navLinks": {
+    "store": "Mağaza",
+    "trending": "Trend Ürünler",
+    "reseller": "Bayilik Başvurusu",
+    "trackOrder": "Sipariş Takip",
+    "faq": "S.S.S.",
+    "contact": "İletişim"
+  },
+  "cookieConsent": {
+    "title": "Çerez Politikası ve KVKK",
+    "description": "Size daha iyi bir alışveriş deneyimi sunabilmek için çerezler kullanıyoruz. Detaylı bilgi için <cookieLink>Çerez Politikamızı</cookieLink> ve <kvkkLink>KVKK Aydınlatma Metnimizi</kvkkLink> inceleyebilirsiniz.",
+    "decline": "Reddet",
+    "accept": "Kabul Et"
+  },
+  "billingAddress": {
+    "invoiceType": "Fatura Tipi",
+    "individualInvoice": "Bireysel Fatura",
+    "corporateInvoice": "Kurumsal Fatura",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "address": "Adres",
+    "tckn": "T.C. Kimlik Numarası",
+    "companyName": "Firma Ünvanı",
+    "taxNumber": "Vergi Numarası",
+    "taxOffice": "Vergi Dairesi",
+    "company": "Şirket",
+    "postalCode": "Posta Kodu",
+    "cityProvince": "Şehir (İl)",
+    "selectCity": "Şehir Seçiniz",
+    "city": "Şehir",
+    "district": "İlçe",
+    "selectDistrict": "İlçe Seçiniz",
+    "districtArea": "İlçe / Semt",
+    "phone": "Telefon",
+    "tcknLengthError": "T.C. Kimlik Numarası 11 haneli olmalıdır.",
+    "tcknInvalidError": "Geçersiz T.C. Kimlik Numarası.",
+    "vknLengthError": "Vergi Numarası 10 haneli olmalıdır.",
+    "vknInvalidError": "Geçersiz Vergi Numarası."
+  },
+  "checkoutError": {
+    "accountExists": "Bu e-posta adresiyle kayıtlı bir hesap zaten var.",
+    "invalidCredentials": "E-posta adresi veya şifre hatalı.",
+    "passwordTooShort": "Şifreniz en az 6 karakter olmalıdır.",
+    "discountInvalid": "İndirim kuponu geçersiz veya bulunamadı.",
+    "discountExpired": "Bu indirim kuponunun kullanım süresi dolmuş.",
+    "selectShipping": "Lütfen geçerli bir teslimat yöntemi seçin.",
+    "selectPayment": "Lütfen bir ödeme yöntemi seçin.",
+    "addressRequired": "Lütfen gerekli tüm adres alanlarını doldurun.",
+    "paymentFailed": "Ödeme işlemi başarısız oldu. Kart bilgilerinizi kontrol edip tekrar deneyin.",
+    "outOfStock": "Seçtiğiniz ürün veya adet stokta bulunmamaktadır.",
+    "networkError": "Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.",
+    "serverError": "Sistemde geçici bir hata oluştu. Lütfen biraz sonra tekrar deneyin."
+  },
+  "notFound": {
+    "title": "Sayfa Bulunamadı",
+    "description": "Ulaşmaya çalıştığınız sayfa mevcut değil veya taşınmış olabilir. Lütfen adresi kontrol edip tekrar deneyin.",
+    "backHome": "Ana Sayfaya Dön",
+    "descriptionShort": "Ulaşmaya çalıştığınız sayfa mevcut değil veya taşınmış olabilir. Lütfen adresi kontrol edin.",
+    "backHomeArrow": "← Ana Sayfaya Dön",
+    "cartTitle": "Sepetiniz Bulunamadı",
+    "cartDescription": "Ulaşmaya çalıştığınız sepet mevcut değil. Lütfen tarayıcı çerezlerinizi temizleyip tekrar deneyin.",
+    "startShopping": "← Alışverişe Başla",
+    "checkoutTitle": "Sipariş / Ödeme Sayfası Bulunamadı",
+    "checkoutDescription": "Ulaşmaya çalıştığınız ödeme adımı veya sipariş sepeti bulunamadı. Lütfen alışveriş sepetinize geri dönün.",
+    "returnToCart": "← Sepete Geri Dön"
+  },
+  "blog": {
+    "metaTitle": "Deprem Hazırlık Rehberi | Deprem Market",
+    "metaDescription": "Deprem öncesi, anı ve sonrasında yapılması gerekenler, deprem çantası hazırlama rehberi ve bilgilendirici makaleler.",
+    "eyebrow": "FARKINDALIK VE HAZIRLIK",
+    "heading": "Deprem Hazırlık Rehberleri",
+    "intro": "Afet bilinci edinmek ve acil durumlara eksiksiz hazırlanmak için uzman ekibimiz tarafından hazırlanan hayati rehberleri inceleyin.",
+    "empty": "Henüz rehber yazı eklenmedi.",
+    "readMore": "Detayları Oku",
+    "dateLocale": "tr-TR",
+    "postMetaTitle": "{title} | Deprem Market",
+    "breadcrumbHome": "Ana Sayfa",
+    "breadcrumbGuides": "Rehberler",
+    "badge": "Rehber",
+    "relatedEyebrow": "ACİL DURUM İHTİYAÇLARI",
+    "relatedHeading": "Afet Çantası İçin Önerilen Malzemeler",
+    "relatedIntro": "Yukarıdaki rehberde belirtilen ve acil durum çantanızda bulunması önerilen sertifikalı ürünlerimizi inceleyin:"
+  }
+}

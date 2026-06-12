@@ -1,5 +1,7 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
+import { NextIntlClientProvider } from "next-intl"
+import { getLocale } from "next-intl/server"
 import "styles/globals.css"
 
 export const metadata: Metadata = {
@@ -17,11 +19,14 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
   return (
-    <html lang="tr" data-mode="light" suppressHydrationWarning>
+    <html lang={locale} data-mode="light" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <main className="relative">{children}</main>
+        <NextIntlClientProvider>
+          <main className="relative">{children}</main>
+        </NextIntlClientProvider>
       </body>
     </html>
   )

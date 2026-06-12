@@ -2,6 +2,23 @@ const checkEnvVariables = require("./check-env-variables")
 
 checkEnvVariables()
 
+// next-intl (URL routing'siz mod): dil çerezden okunur, request config src/i18n/request.ts'te.
+const createNextIntlPlugin = require("next-intl/plugin")
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts")
+
+// @serwist/next ESM-only; Node 20.19+ require(ESM) ile .default'a erişiyoruz.
+// PWA service worker'ı src/app/sw.ts'ten derleyip public/sw.js'e yazar ve
+// tarayıcıya otomatik kaydeder (register varsayılan: true).
+const withSerwist = require("@serwist/next").default({
+  swSrc: "src/app/sw.ts",
+  swDest: "public/sw.js",
+  // Dev modunda (next dev) SW'yi kapat: dev chunk'ları sürekli değiştiği için
+  // precache önbelleği bayatlar ve HMR'ı bozar. Üretim build'inde aktif.
+  disable: process.env.NODE_ENV === "development",
+  // Tarayıcı çevrimdışıyken tekrar çevrimiçi olunca sayfayı yenile.
+  reloadOnOnline: true,
+})
+
 /**
  * Medusa Cloud-related environment variables
  */
@@ -109,4 +126,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withSerwist(withNextIntl(nextConfig))

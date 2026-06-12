@@ -3,6 +3,7 @@ import Input from "@modules/common/components/input"
 import Select from "@modules/common/components/select"
 import { TR_CITIES_DISTRICTS } from "@lib/util/tr-cities-districts"
 import React, { useState } from "react"
+import { useTranslations } from "next-intl"
 import CountrySelect from "../country-select"
 
 const isValidTCKN = (val: string): boolean => {
@@ -40,6 +41,7 @@ const isValidVKN = (val: string): boolean => {
 }
 
 const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
+  const t = useTranslations("billingAddress")
   const [formData, setFormData] = useState<Record<string, string>>({
     "billing_address.first_name": cart?.billing_address?.first_name || "",
     "billing_address.last_name": cart?.billing_address?.last_name || "",
@@ -124,16 +126,16 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
 
   const tcknError =
     tckn.length > 0 && tckn.length < 11
-      ? "T.C. Kimlik Numarası 11 haneli olmalıdır."
+      ? t("tcknLengthError")
       : tckn.length === 11 && !isValidTCKN(tckn)
-      ? "Geçersiz T.C. Kimlik Numarası."
+      ? t("tcknInvalidError")
       : ""
 
   const vknError =
     taxNumber.length > 0 && taxNumber.length < 10
-      ? "Vergi Numarası 10 haneli olmalıdır."
+      ? t("vknLengthError")
       : taxNumber.length === 10 && !isValidVKN(taxNumber)
-      ? "Geçersiz Vergi Numarası."
+      ? t("vknInvalidError")
       : ""
 
   const isTr = formData["billing_address.country_code"] === "tr"
@@ -144,7 +146,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         {isTr && (
           <div className="col-span-2 flex flex-col gap-y-2 mb-2">
             <label className="text-small-semi text-ui-fg-base">
-              Fatura Tipi
+              {t("invoiceType")}
             </label>
             <div className="flex gap-x-4">
               <button
@@ -156,7 +158,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
                     : "bg-white border-ui-border-base text-ui-fg-subtle hover:bg-ui-bg-field-hover"
                 }`}
               >
-                Bireysel Fatura
+                {t("individualInvoice")}
               </button>
               <button
                 type="button"
@@ -167,14 +169,14 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
                     : "bg-white border-ui-border-base text-ui-fg-subtle hover:bg-ui-bg-field-hover"
                 }`}
               >
-                Kurumsal Fatura
+                {t("corporateInvoice")}
               </button>
             </div>
           </div>
         )}
 
         <Input
-          label="Ad"
+          label={t("firstName")}
           name="billing_address.first_name"
           autoComplete="given-name"
           value={formData["billing_address.first_name"]}
@@ -183,7 +185,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           data-testid="billing-first-name-input"
         />
         <Input
-          label="Soyad"
+          label={t("lastName")}
           name="billing_address.last_name"
           autoComplete="family-name"
           value={formData["billing_address.last_name"]}
@@ -192,7 +194,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           data-testid="billing-last-name-input"
         />
         <Input
-          label="Adres"
+          label={t("address")}
           name="billing_address.address_1"
           autoComplete="address-line1"
           value={formData["billing_address.address_1"]}
@@ -205,7 +207,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           invoiceType === "individual" ? (
             <div className="col-span-2">
               <Input
-                label="T.C. Kimlik Numarası"
+                label={t("tckn")}
                 name="tckn_input"
                 value={tckn}
                 onChange={(e) =>
@@ -225,7 +227,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             <>
               <div className="col-span-2">
                 <Input
-                  label="Firma Ünvanı"
+                  label={t("companyName")}
                   name="company_input"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
@@ -234,7 +236,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
               </div>
               <div>
                 <Input
-                  label="Vergi Numarası"
+                  label={t("taxNumber")}
                   name="tax_number_input"
                   value={taxNumber}
                   onChange={(e) =>
@@ -252,7 +254,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
               </div>
               <div>
                 <Input
-                  label="Vergi Dairesi"
+                  label={t("taxOffice")}
                   name="tax_office_input"
                   value={taxOffice}
                   onChange={(e) => setTaxOffice(e.target.value)}
@@ -263,7 +265,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           )
         ) : (
           <Input
-            label="Şirket"
+            label={t("company")}
             name="billing_address.company"
             value={formData["billing_address.company"]}
             onChange={handleChange}
@@ -273,7 +275,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         )}
 
         <Input
-          label="Posta Kodu"
+          label={t("postalCode")}
           name="billing_address.postal_code"
           autoComplete="postal-code"
           value={formData["billing_address.postal_code"]}
@@ -283,7 +285,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         />
         {isTr ? (
           <Select
-            label="Şehir (İl)"
+            label={t("cityProvince")}
             name="billing_address.city"
             value={formData["billing_address.city"]}
             onChange={handleChange}
@@ -291,7 +293,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             data-testid="billing-city-select"
           >
             <option value="" disabled hidden>
-              Şehir Seçiniz
+              {t("selectCity")}
             </option>
             {Object.keys(TR_CITIES_DISTRICTS).map((city) => (
               <option key={city} value={city}>
@@ -301,7 +303,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           </Select>
         ) : (
           <Input
-            label="Şehir"
+            label={t("city")}
             name="billing_address.city"
             autoComplete="address-level2"
             value={formData["billing_address.city"]}
@@ -321,7 +323,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
         />
         {isTr ? (
           <Select
-            label="İlçe"
+            label={t("district")}
             name="billing_address.province"
             value={formData["billing_address.province"]}
             onChange={handleChange}
@@ -330,7 +332,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
             disabled={!formData["billing_address.city"]}
           >
             <option value="" disabled hidden>
-              İlçe Seçiniz
+              {t("selectDistrict")}
             </option>
             {formData["billing_address.city"] &&
               TR_CITIES_DISTRICTS[formData["billing_address.city"]]?.map(
@@ -343,7 +345,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           </Select>
         ) : (
           <Input
-            label="İlçe / Semt"
+            label={t("districtArea")}
             name="billing_address.province"
             autoComplete="address-level1"
             value={formData["billing_address.province"]}
@@ -352,7 +354,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           />
         )}
         <Input
-          label="Telefon"
+          label={t("phone")}
           name="billing_address.phone"
           autoComplete="tel"
           value={formData["billing_address.phone"]}

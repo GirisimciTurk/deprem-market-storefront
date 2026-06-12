@@ -1,11 +1,13 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import clx from "clsx"
 
 export default function NavLinks({ countryCode }: { countryCode: string }) {
   const pathname = usePathname()
+  const t = useTranslations("navLinks")
   
   // Strip locale prefix (e.g. "/tr", "/en") from the pathname to make comparison easy
   const strippedPathname = pathname ? pathname.replace(/^\/[a-z]{2}(\/|$)/, "/") : "/"
@@ -13,42 +15,42 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
   const links = [
     {
       href: "/store",
-      label: countryCode === "tr" ? "Mağaza" : "Store",
+      label: t("store"),
       active: strippedPathname === "/store" || strippedPathname.startsWith("/store/"),
       colorClass: "hover:text-orange-600 hover:border-orange-600/30",
       activeColorClass: "text-orange-600 border-orange-600"
     },
     {
       href: "/collections/featured",
-      label: countryCode === "tr" ? "Trend Ürünler" : "Trending",
+      label: t("trending"),
       active: strippedPathname === "/collections/featured",
       colorClass: "hover:text-orange-600 hover:border-orange-600/30",
       activeColorClass: "text-orange-600 border-orange-600"
     },
     {
       href: "/bayilik-basvuru-formu",
-      label: countryCode === "tr" ? "Bayilik Başvurusu" : "Reseller",
+      label: t("reseller"),
       active: strippedPathname === "/bayilik-basvuru-formu",
       colorClass: "hover:text-orange-600 hover:border-orange-600/30",
       activeColorClass: "text-orange-600 border-orange-600"
     },
     {
       href: "/siparis-takip",
-      label: countryCode === "tr" ? "Sipariş Takip" : "Track Order",
+      label: t("trackOrder"),
       active: strippedPathname === "/siparis-takip",
       colorClass: "hover:text-orange-600 hover:border-orange-600/30 text-red-600 font-bold",
       activeColorClass: "text-red-600 border-red-600 font-bold"
     },
     {
       href: "/sikca-sorulan-sorular",
-      label: countryCode === "tr" ? "S.S.S." : "FAQ",
+      label: t("faq"),
       active: strippedPathname === "/sikca-sorulan-sorular",
       colorClass: "hover:text-orange-600 hover:border-orange-600/30",
       activeColorClass: "text-orange-600 border-orange-600"
     },
     {
       href: "/iletisim",
-      label: countryCode === "tr" ? "İletişim" : "Contact",
+      label: t("contact"),
       active: strippedPathname === "/iletisim",
       colorClass: "hover:text-orange-600 hover:border-orange-600/30",
       activeColorClass: "text-orange-600 border-orange-600"

@@ -2,17 +2,15 @@ import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { listBlogPosts } from "@lib/data/blog"
+import { getTranslations } from "next-intl/server"
 
 export async function generateMetadata(props: {
   params: Promise<{ countryCode: string }>
 }): Promise<Metadata> {
-  const params = await props.params
-  const isTr = params.countryCode === "tr"
+  const t = await getTranslations("blog")
   return {
-    title: isTr ? "Deprem Hazırlık Rehberi | Deprem Market" : "Earthquake Preparedness Guides | Emergency Store",
-    description: isTr
-      ? "Deprem öncesi, anı ve sonrasında yapılması gerekenler, deprem çantası hazırlama rehberi ve bilgilendirici makaleler."
-      : "What to do before, during, and after an earthquake, survival kit guides, and informational articles.",
+    title: t("metaTitle"),
+    description: t("metaDescription"),
   }
 }
 
@@ -21,8 +19,8 @@ export default async function BlogPage(props: {
 }) {
   const params = await props.params
   const { countryCode } = params
-  const isTr = countryCode === "tr"
-  
+  const t = await getTranslations("blog")
+
   const posts = await listBlogPosts(countryCode)
 
   return (
@@ -31,15 +29,13 @@ export default async function BlogPage(props: {
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-sm font-semibold tracking-wider text-orange-600 uppercase px-3 py-1 bg-orange-100 rounded-full dark:bg-orange-900/30 dark:text-orange-400">
-            {isTr ? "FARKINDALIK VE HAZIRLIK" : "AWARENESS & PREPAREDNESS"}
+            {t("eyebrow")}
           </span>
           <h1 className="text-4xl md:text-5xl font-extrabold text-ui-fg-base mt-4 tracking-tight leading-none">
-            {isTr ? "Deprem Hazırlık Rehberleri" : "Earthquake Preparation Guides"}
+            {t("heading")}
           </h1>
           <p className="text-lg text-ui-fg-subtle mt-4 leading-relaxed">
-            {isTr
-              ? "Afet bilinci edinmek ve acil durumlara eksiksiz hazırlanmak için uzman ekibimiz tarafından hazırlanan hayati rehberleri inceleyin."
-              : "Read vital guides compiled by our experts to raise awareness and ensure you are fully prepared for emergency situations."}
+            {t("intro")}
           </p>
         </div>
 
@@ -47,7 +43,7 @@ export default async function BlogPage(props: {
         {posts.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-2xl border border-ui-border-base p-8 shadow-sm">
             <p className="text-ui-fg-subtle">
-              {isTr ? "Henüz rehber yazı eklenmedi." : "No guides added yet."}
+              {t("empty")}
             </p>
           </div>
         ) : (
@@ -75,7 +71,7 @@ export default async function BlogPage(props: {
                 <div className="flex flex-col flex-1 p-6">
                   <div className="flex items-center gap-x-3 text-xs text-ui-fg-subtle mb-3">
                     <time dateTime={post.date}>
-                      {new Date(post.date).toLocaleDateString(isTr ? "tr-TR" : "en-US", {
+                      {new Date(post.date).toLocaleDateString(t("dateLocale"), {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
@@ -100,7 +96,7 @@ export default async function BlogPage(props: {
                       href={`/${countryCode}/blog/${post.slug}`}
                       className="inline-flex items-center text-sm font-semibold text-orange-600 hover:text-orange-700 gap-1 group/btn"
                     >
-                      {isTr ? "Detayları Oku" : "Read Full Guide"}
+                      {t("readMore")}
                       <span className="transition-transform duration-200 group-hover/btn:translate-x-1">→</span>
                     </Link>
                   </div>

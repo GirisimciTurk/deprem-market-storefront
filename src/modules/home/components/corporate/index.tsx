@@ -1,8 +1,9 @@
 import React from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@modules/common/components/ui"
 
 export default function CorporateSection({ countryCode }: { countryCode: string }) {
-  const isTr = countryCode === "tr"
+  const t = useTranslations("homeCorporate")
 
   return (
     <div className="bg-slate-900 text-white py-16 sm:py-24 relative overflow-hidden">
@@ -13,27 +14,19 @@ export default function CorporateSection({ countryCode }: { countryCode: string 
       <div className="content-container relative z-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col items-center text-center gap-y-6">
         {/* Badge */}
         <span className="text-xs font-bold tracking-wider text-rose-500 uppercase bg-rose-950/40 border border-rose-900/60 px-3.5 py-1.5 rounded-full select-none">
-          {isTr ? "MİSYONUMUZ & VİZYONUMUZ" : "MISSION & VISION"}
+          {t("badge")}
         </span>
 
         {/* Heading */}
         <h2 className="text-3xl font-black sm:text-4xl lg:text-5xl tracking-tight leading-tight max-w-3xl uppercase">
-          {isTr
-            ? "BÜYÜK İSTANBUL DEPREMİNDEN SIFIR KAYIPLA ÇIKMAK"
-            : "SURVIVING THE ISTANBUL EARTHQUAKE WITH ZERO CASUALTIES"}
+          {t("heading")}
         </h2>
 
         {/* Text Details */}
         <p className="text-lg text-slate-300 max-w-3xl leading-relaxed font-medium">
-          {isTr ? (
-            <>
-              <strong>Deprem Market</strong>, deprem güvenliği alanında geliştirilen mühendislik çözümlerini, yenilikçi ürünleri ve girişimci fikirleri bir araya getiren bir <strong>EKYP (Ekonomik Kalkınma ve Yükseliş Projeleri)</strong> platformudur. Amacımız, beklenen afetlere karşı halkımızı ve kurumlarımızı en dayanıklı ekipmanlarla donatmaktır.
-            </>
-          ) : (
-            <>
-              <strong>Deprem Market</strong> is an official <strong>EKYP</strong> platform bringing together engineering solutions, survival kits, and innovative ideas. Our main mission is to equip households and institutions with resilient tools to survive unexpected disasters.
-            </>
-          )}
+          {t.rich("description", {
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
         </p>
 
         {/* Metadata stats */}
@@ -41,19 +34,19 @@ export default function CorporateSection({ countryCode }: { countryCode: string 
           <div className="flex flex-col">
             <span className="text-3xl text-rose-500 font-black">1.5M+</span>
             <span className="text-xs text-slate-400 mt-1">
-              {isTr ? "Riskli Konut Dönüşümü Planı" : "Risk Housing Upgrade Plan"}
+              {t("stat1Label")}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-3xl text-rose-500 font-black">24/48s</span>
             <span className="text-xs text-slate-400 mt-1">
-              {isTr ? "Hızlı Hazırlık & Lojistik" : "Emergency Prep Speed"}
+              {t("stat2Label")}
             </span>
           </div>
           <div className="flex flex-col col-span-2 md:col-span-1">
             <span className="text-3xl text-rose-500 font-black">EKYP</span>
             <span className="text-xs text-slate-400 mt-1">
-              {isTr ? "Sosyal İştirak Modeli" : "Social Enterprise Backed"}
+              {t("stat3Label")}
             </span>
           </div>
         </div>
@@ -67,7 +60,7 @@ export default function CorporateSection({ countryCode }: { countryCode: string 
             className="w-full sm:w-auto"
           >
             <Button className="w-full bg-rose-600 border-rose-600 hover:bg-rose-700 text-white font-bold px-8 py-3 rounded-lg shadow-lg">
-              {isTr ? "EKYP Deprem Projesi Detayları" : "EKYP Project Details"}
+              {t("ctaPrimary")}
             </Button>
           </a>
           <a
@@ -80,7 +73,7 @@ export default function CorporateSection({ countryCode }: { countryCode: string 
               variant="secondary"
               className="w-full bg-slate-800 border-slate-700 hover:bg-slate-700 text-slate-200 font-bold px-6 py-3 rounded-lg"
             >
-              {isTr ? "Girişimci Türk Ana Sayfası" : "Girişimci Türk Portal"}
+              {t("ctaSecondary")}
             </Button>
           </a>
         </div>

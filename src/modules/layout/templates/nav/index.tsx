@@ -2,24 +2,20 @@ import { Suspense } from "react"
 import { User, ShoppingBag } from "lucide-react"
 import SearchModal from "@modules/layout/components/search-modal"
 
-import { listLocales } from "@lib/data/locales"
-import { getLocale } from "@lib/data/locale-actions"
+import { getTranslations } from "next-intl/server"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
-import { getDictionary } from "@lib/get-dictionary"
 import Logo from "@modules/layout/components/logo"
 import FavoritesNavIcon from "@modules/layout/components/favorites-nav-icon"
 import NavLinks from "@modules/layout/components/nav-links"
 
 export default async function Nav({ countryCode }: { countryCode: string }) {
-  const [regions, locales, currentLocale, dict] = await Promise.all([
+  const [regions, t] = await Promise.all([
     listRegions().then((regions: StoreRegion[]) => regions),
-    listLocales(),
-    getLocale(),
-    getDictionary(countryCode),
+    getTranslations("nav"),
   ])
 
   return (
@@ -30,7 +26,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
           {/* Left: Mobile Menu Trigger / Desktop Logo */}
           <div className="flex-1 basis-0 h-full flex items-center">
             <div className="block small:hidden">
-              <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
+              <SideMenu regions={regions} />
             </div>
             <div className="hidden small:block">
               <LocalizedClientLink
@@ -66,8 +62,8 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
                 className="hover:text-ui-fg-base flex items-center justify-center p-2"
                 href="/account"
                 data-testid="nav-account-link"
-                title={dict.nav.account}
-                aria-label={dict.nav.account}
+                title={t("account")}
+                aria-label={t("account")}
               >
                 <User className="w-5 h-5 text-slate-700 hover:text-slate-900 transition-colors" />
               </LocalizedClientLink>
@@ -79,8 +75,8 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
                   className="hover:text-ui-fg-base flex items-center gap-x-1.5 p-2"
                   href="/cart"
                   data-testid="nav-cart-link"
-                  title={dict.nav.cart}
-                  aria-label={dict.nav.cart}
+                  title={t("cart")}
+                  aria-label={t("cart")}
                 >
                   <ShoppingBag className="w-5 h-5 text-slate-700" />
                 </LocalizedClientLink>

@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import { getLocale } from "next-intl/server"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ContactForm from "./contact-form"
 
@@ -12,7 +13,7 @@ export default async function IletisimPage(props: {
 }) {
   const params = await props.params
   const { countryCode } = params
-  const isTr = countryCode === "tr"
+  const isTr = (await getLocale()) === "tr"
 
   if (!isTr) {
     return (

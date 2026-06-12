@@ -1,0 +1,155 @@
+{
+  "hero": {
+    "title": "Earthquake Preparation Store",
+    "subtitle": "Prepare today for a safer tomorrow. High-quality certified emergency preparedness kits backed by EKYP Earthquake Technologies.",
+    "cta": "Explore Kits",
+    "affiliateBadge": "EKYP Earthquake Technologies Affiliate",
+    "titleLead": "Earthquake Readiness",
+    "titleHighlight": "Market",
+    "ctaSecondary": "Learn About EKYP"
+  },
+  "nav": {
+    "menu": "Menu",
+    "account": "Account",
+    "cart": "Cart"
+  },
+  "sideMenu": {
+    "menu": "Menu",
+    "copyright": "© {year} EKYP Deprem Market. All rights reserved.",
+    "items": {
+      "home": "Home",
+      "store": "Store",
+      "featured": "Trending",
+      "reseller": "Become a Reseller",
+      "faq": "FAQ",
+      "contact": "Contact",
+      "blog": "Blog"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "search": "Search",
+    "checkout": "Checkout",
+    "products": "Products",
+    "categories": "Categories",
+    "collections": "Collections",
+    "language": "Language"
+  },
+  "homeFeatures": {
+    "eyebrow": "Our Advantages",
+    "heading": "Disaster Preparedness Under EKYP Engineering",
+    "subheading": "Being ready save lives. Our products are engineered and selected for the extreme environments of emergency situations.",
+    "card1Title": "Engineering & Safety",
+    "card1Desc": "Products vetted by EKYP Earthquake Technologies engineers for structural and life safety standards.",
+    "card2Title": "Fast Prep & Dispatch",
+    "card2Desc": "For immediate readiness, your orders are packed securely and dispatched within 24-48 hours.",
+    "card3Title": "Certified Standards",
+    "card3Desc": "Equipment that complies with disaster relief regulations and has passed rigorous stress tests.",
+    "card4Title": "Corporate Support",
+    "card4Desc": "Advisory services for both personal prep and bulk institutional disaster readiness planning."
+  },
+  "homeCorporate": {
+    "badge": "MISSION & VISION",
+    "heading": "SURVIVING THE ISTANBUL EARTHQUAKE WITH ZERO CASUALTIES",
+    "description": "<strong>Deprem Market</strong> is an official <strong>EKYP</strong> platform bringing together engineering solutions, survival kits, and innovative ideas. Our main mission is to equip households and institutions with resilient tools to survive unexpected disasters.",
+    "stat1Label": "Risk Housing Upgrade Plan",
+    "stat2Label": "Emergency Prep Speed",
+    "stat3Label": "Social Enterprise Backed",
+    "ctaPrimary": "EKYP Project Details",
+    "ctaSecondary": "Girişimci Türk Portal"
+  },
+  "searchModal": {
+    "triggerAriaLabel": "Search Products",
+    "triggerTitle": "Search (Ctrl+K)",
+    "placeholder": "Search products, categories...",
+    "noResults": "No results found for \"{query}\".",
+    "tryDifferent": "Try different keywords.",
+    "typeToSearch": "Type at least 2 characters to search.",
+    "navigate": "navigate",
+    "select": "select",
+    "openSearch": "open search"
+  },
+  "navLinks": {
+    "store": "Store",
+    "trending": "Trending",
+    "reseller": "Reseller",
+    "trackOrder": "Track Order",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "cookieConsent": {
+    "title": "Cookie Settings",
+    "description": "We use cookies to improve your user experience and service quality. For details, view our <cookieLink>Cookie Policy</cookieLink> and <kvkkLink>KVKK Statement</kvkkLink>.",
+    "decline": "Decline",
+    "accept": "Accept All"
+  },
+  "billingAddress": {
+    "invoiceType": "Invoice Type",
+    "individualInvoice": "Individual Invoice",
+    "corporateInvoice": "Corporate Invoice",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "address": "Address",
+    "tckn": "National ID Number",
+    "companyName": "Company Name",
+    "taxNumber": "Tax Number",
+    "taxOffice": "Tax Office",
+    "company": "Company",
+    "postalCode": "Postal Code",
+    "cityProvince": "City (Province)",
+    "selectCity": "Select City",
+    "city": "City",
+    "district": "District",
+    "selectDistrict": "Select District",
+    "districtArea": "District / Area",
+    "phone": "Phone",
+    "tcknLengthError": "National ID Number must be 11 digits.",
+    "tcknInvalidError": "Invalid National ID Number.",
+    "vknLengthError": "Tax Number must be 10 digits.",
+    "vknInvalidError": "Invalid Tax Number."
+  },
+  "checkoutError": {
+    "accountExists": "An account with this email address already exists.",
+    "invalidCredentials": "Invalid email address or password.",
+    "passwordTooShort": "Your password must be at least 6 characters.",
+    "discountInvalid": "The discount code is invalid or could not be found.",
+    "discountExpired": "This discount code has expired.",
+    "selectShipping": "Please select a valid shipping method.",
+    "selectPayment": "Please select a payment method.",
+    "addressRequired": "Please fill in all required address fields.",
+    "paymentFailed": "Payment failed. Please check your card details and try again.",
+    "outOfStock": "The selected product or quantity is out of stock.",
+    "networkError": "Could not connect to the server. Please check your internet connection and try again.",
+    "serverError": "A temporary system error occurred. Please try again shortly."
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you are trying to reach does not exist or may have been moved. Please check the address and try again.",
+    "backHome": "Back to Home",
+    "descriptionShort": "The page you are trying to reach does not exist or may have been moved. Please check the address.",
+    "backHomeArrow": "← Back to Home",
+    "cartTitle": "Cart Not Found",
+    "cartDescription": "The shopping cart you tried to access does not exist. Please clear your cookies and try again.",
+    "startShopping": "← Start Shopping",
+    "checkoutTitle": "Checkout Page Not Found",
+    "checkoutDescription": "The checkout step or order you tried to access does not exist or has expired.",
+    "returnToCart": "← Return to Cart"
+  },
+  "blog": {
+    "metaTitle": "Earthquake Preparedness Guides | Emergency Store",
+    "metaDescription": "What to do before, during, and after an earthquake, survival kit guides, and informational articles.",
+    "eyebrow": "AWARENESS & PREPAREDNESS",
+    "heading": "Earthquake Preparation Guides",
+    "intro": "Read vital guides compiled by our experts to raise awareness and ensure you are fully prepared for emergency situations.",
+    "empty": "No guides added yet.",
+    "readMore": "Read Full Guide",
+    "dateLocale": "en-US",
+    "postMetaTitle": "{title} | Deprem Market",
+    "breadcrumbHome": "Home",
+    "breadcrumbGuides": "Guides",
+    "badge": "Guide",
+    "relatedEyebrow": "EMERGENCY NEEDS",
+    "relatedHeading": "Recommended Survival Supplies",
+    "relatedIntro": "Explore our certified products mentioned in the guide above that are recommended for your emergency kit:"
+  }
+}

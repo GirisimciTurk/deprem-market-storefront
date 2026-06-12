@@ -5,6 +5,7 @@ import { Text, clx } from "@modules/common/components/ui";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import Logo from "@modules/layout/components/logo";
 import CookieConsentTrigger from "@modules/layout/components/cookie-consent-trigger";
+import LocaleSwitcher from "@modules/layout/components/locale-switcher";
 
 export default async function Footer() {
   const { collections } = await listCollections({
@@ -215,6 +216,9 @@ export default async function Footer() {
             <span className="text-xs text-ui-fg-subtle">
               Bu e-ticaret sitesi bir <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong> iştirakidir.
             </span>
+          </div>
+          <div className="w-full md:w-auto">
+            <LocaleSwitcher />
           </div>
         </div>
       </div>

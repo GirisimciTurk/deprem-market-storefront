@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, Fragment } from "react"
 import { useRouter, usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Search, X, Loader2 } from "lucide-react"
 import Image from "next/image"
 
@@ -22,6 +23,7 @@ export default function SearchModal() {
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const pathname = usePathname()
+  const t = useTranslations("searchModal")
 
   // Extract countryCode from pathname
   const countryCode = pathname?.split("/")?.[1] || "tr"
@@ -131,8 +133,8 @@ export default function SearchModal() {
       <button
         onClick={() => setIsOpen(true)}
         className="flex items-center justify-center p-1 hover:text-ui-fg-base transition-colors"
-        aria-label={isTr ? "Ürün Ara" : "Ürün Ara"}
-        title={isTr ? "Ürün Ara (Ctrl+K)" : "Ara (Ctrl+K)"}
+        aria-label={t("triggerAriaLabel")}
+        title={t("triggerTitle")}
       >
         <Search className="w-5 h-5 text-slate-700 hover:text-slate-900 transition-colors" />
       </button>
@@ -154,11 +156,7 @@ export default function SearchModal() {
               <input
                 ref={inputRef}
                 type="text"
-                placeholder={
-                  isTr
-                    ? "Ürün, kategori veya marka ara..."
-                    : "Search products, categories..."
-                }
+                placeholder={t("placeholder")}
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value)
@@ -246,14 +244,10 @@ export default function SearchModal() {
                 <div className="px-5 py-10 text-center">
                   <Search className="w-10 h-10 text-ui-fg-muted mx-auto mb-3 opacity-40" />
                   <p className="text-sm text-ui-fg-subtle">
-                    {isTr
-                      ? `"${query}" için sonuç bulunamadı.`
-                      : `No results found for "${query}".`}
+                    {t("noResults", { query })}
                   </p>
                   <p className="text-xs text-ui-fg-muted mt-1">
-                    {isTr
-                      ? "Farklı anahtar kelimelerle tekrar deneyin."
-                      : "Try different keywords."}
+                    {t("tryDifferent")}
                   </p>
                 </div>
               )}
@@ -262,9 +256,7 @@ export default function SearchModal() {
               {query.length < 2 && (
                 <div className="px-5 py-10 text-center">
                   <p className="text-sm text-ui-fg-subtle">
-                    {isTr
-                      ? "Aramaya başlamak için en az 2 karakter yazın."
-                      : "Type at least 2 characters to search."}
+                    {t("typeToSearch")}
                   </p>
                 </div>
               )}
@@ -276,17 +268,17 @@ export default function SearchModal() {
                 <span className="flex items-center gap-1">
                   <kbd className="px-1.5 py-0.5 rounded border border-ui-border-base bg-white text-[10px] font-mono">↑</kbd>
                   <kbd className="px-1.5 py-0.5 rounded border border-ui-border-base bg-white text-[10px] font-mono">↓</kbd>
-                  {isTr ? "gezin" : "navigate"}
+                  {t("navigate")}
                 </span>
                 <span className="flex items-center gap-1">
                   <kbd className="px-1.5 py-0.5 rounded border border-ui-border-base bg-white text-[10px] font-mono">↵</kbd>
-                  {isTr ? "seçin" : "select"}
+                  {t("select")}
                 </span>
               </div>
               <span className="flex items-center gap-1">
                 <kbd className="px-1.5 py-0.5 rounded border border-ui-border-base bg-white text-[10px] font-mono">Ctrl</kbd>
                 <kbd className="px-1.5 py-0.5 rounded border border-ui-border-base bg-white text-[10px] font-mono">K</kbd>
-                {isTr ? "arama aç" : "open search"}
+                {t("openSearch")}
               </span>
             </div>
           </div>
