@@ -3,10 +3,14 @@ import { getRegion } from "@lib/data/regions"
 import FavoritesTemplate from "@modules/favorites/templates"
 import { notFound } from "next/navigation"
 import React from "react"
+import { getTranslations } from "next-intl/server"
 
-export const metadata: Metadata = {
-  title: "Beğendiklerim | EKYP Deprem Market",
-  description: "Favorilerinize eklediğiniz acil durum ve deprem hazırlık ürünleri listesi.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("favoritesTitle"),
+    description: t("favoritesDescription"),
+  }
 }
 
 type Props = {

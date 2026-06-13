@@ -7,10 +7,14 @@ import ProfileName from "@modules/account/components/profile-name"
 import { notFound } from "next/navigation"
 import { listRegions } from "@lib/data/regions"
 import { retrieveCustomer } from "@lib/data/customer"
+import { getTranslations } from "next-intl/server"
 
-export const metadata: Metadata = {
-  title: "Profil",
-  description: "EKYP Deprem Market profilinizi görüntüleyin ve düzenleyin.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("profileTitle"),
+    description: t("profileDescription"),
+  }
 }
 
 export default async function Profile() {

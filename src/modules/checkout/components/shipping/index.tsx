@@ -69,9 +69,23 @@ const Shipping: React.FC<ShippingProps> = ({
 
   const isOpen = searchParams.get("step") === "delivery"
 
-  const _shippingMethods = availableShippingMethods?.filter(
-    (sm) => (sm as unknown as { service_zone?: { fulfillment_set?: { type?: string; location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.type !== "pickup"
-  )
+  const _shippingMethods = availableShippingMethods?.filter((sm) => {
+    const isPickup =
+      (sm as unknown as { service_zone?: { fulfillment_set?: { type?: string; location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.type === "pickup"
+
+    if (isPickup) {
+      return false
+    }
+
+    // Hide flat-rate options that have no resolvable price (e.g. legacy
+    // shipping options without a price for the current region). These would
+    // otherwise render as "NaN TL".
+    if (sm.price_type === "flat") {
+      return typeof sm.amount === "number" && Number.isFinite(sm.amount)
+    }
+
+    return true
+  })
 
   const _pickupMethods = availableShippingMethods?.filter(
     (sm) => (sm as unknown as { service_zone?: { fulfillment_set?: { type?: string; location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.type === "pickup"
@@ -234,6 +248,12 @@ const Shipping: React.FC<ShippingProps> = ({
                       </span>
                     </Radio>
                   </RadioGroup>
+                )}
+                {!_shippingMethods?.length && !hasPickupOptions && (
+                  <Text className="txt-medium text-ui-fg-muted py-4">
+                    Bu adres için uygun bir kargo yöntemi bulunamadı. Lütfen
+                    teslimat adresinizi kontrol edin.
+                  </Text>
                 )}
                 <RadioGroup
                   value={shippingMethodId}

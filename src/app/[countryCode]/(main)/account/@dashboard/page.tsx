@@ -1,13 +1,17 @@
 import { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 
 import Overview from "@modules/account/components/overview"
 import { notFound } from "next/navigation"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listOrders } from "@lib/data/orders"
 
-export const metadata: Metadata = {
-  title: "Hesap Paneli",
-  description: "Hesap hareketlerinizin ve afet hazırlık durumunuzun özeti.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("accountTitle"),
+    description: t("accountDescription"),
+  }
 }
 
 export default async function OverviewTemplate() {

@@ -3,10 +3,14 @@ import { notFound } from "next/navigation"
 import { retrieveCustomer } from "@lib/data/customer"
 import { getMyResellerApplication } from "@lib/data/reseller"
 import BayilikStatusClient from "./bayilik-status-client"
+import { getTranslations } from "next-intl/server"
 
-export const metadata: Metadata = {
-  title: "Bayilik Durumu",
-  description: "Bayilik başvuru durumunuzu kontrol edin.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("dealershipStatusTitle"),
+    description: t("dealershipStatusDescription"),
+  }
 }
 
 export default async function BayilikPage() {

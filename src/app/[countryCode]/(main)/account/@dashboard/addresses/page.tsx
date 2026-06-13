@@ -1,14 +1,18 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 
 import AddressBook from "@modules/account/components/address-book"
 
 import { getRegion } from "@lib/data/regions"
 import { retrieveCustomer } from "@lib/data/customer"
 
-export const metadata: Metadata = {
-  title: "Adreslerim",
-  description: "Adreslerinizi görüntüleyin",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("addressesTitle"),
+    description: t("addressesDescription"),
+  }
 }
 
 export default async function Addresses(props: {

@@ -1,22 +1,25 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import { NextIntlClientProvider } from "next-intl"
-import { getLocale } from "next-intl/server"
+import { getLocale, getTranslations } from "next-intl/server"
 import "styles/globals.css"
 
-export const metadata: Metadata = {
-  metadataBase: new URL(getBaseURL()),
-  title: {
-    template: "%s | EKYP Deprem Market",
-    default: "EKYP Deprem Market | Acil Durum & Afet Hazırlık Mağazası",
-  },
-  description: "Türkiye'nin öncü afet ve acil durum hazırlık marketi. Profesyonel deprem çantaları, ilk yardım setleri ve hayati acil durum ekipmanları.",
-  openGraph: {
-    type: "website",
-    locale: "tr_TR",
-    url: "https://depremmarket.com",
-    siteName: "EKYP Deprem Market",
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    metadataBase: new URL(getBaseURL()),
+    title: {
+      template: t("rootTemplate"),
+      default: t("rootDefaultTitle"),
+    },
+    description: t("rootDescription"),
+    openGraph: {
+      type: "website",
+      locale: t("ogLocale"),
+      url: "https://depremmarket.com",
+      siteName: t("siteName"),
+    },
+  }
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

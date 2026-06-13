@@ -1,16 +1,16 @@
 import React from "react"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { render, screen, fireEvent, act } from "@testing-library/react"
+import { render, screen, fireEvent } from "@testing-library/react"
 import ResellerForm from "./reseller-form"
 
 describe("ResellerForm Component", () => {
   beforeEach(() => {
-    vi.useFakeTimers()
-    localStorage.clear()
+    // Component artık backend'e fetch ile POST ediyor (eskiden localStorage'a yazıyordu).
+    vi.restoreAllMocks()
   })
 
   afterEach(() => {
-    vi.useRealTimers()
+    vi.restoreAllMocks()
   })
 
   it("should render all form fields correctly", () => {
@@ -57,7 +57,12 @@ describe("ResellerForm Component", () => {
     expect(emailInput.value).toBe("test@sirket.com")
   })
 
-  it("should save submission to localStorage and show success screen after timeout", async () => {
+  it("should POST to the backend and show the success screen on success", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => ({}) })
+    vi.stubGlobal("fetch", fetchMock)
+
     render(<ResellerForm />)
 
     fireEvent.change(screen.getByPlaceholderText("Örn: EKYP Ticaret Ltd."), {
@@ -84,40 +89,68 @@ describe("ResellerForm Component", () => {
       }
     )
 
-    const submitBtn = screen.getByRole("button", {
-      name: /Bayilik Başvurusunu Gönder/i,
-    })
-    fireEvent.click(submitBtn)
+    fireEvent.click(
+      screen.getByRole("button", { name: /Bayilik Başvurusunu Gönder/i })
+    )
 
-    // Verify it transitions to loading state
+    // Loading durumuna geçer
     expect(screen.getByText(/Başvuru Alınıyor.../i)).toBeInTheDocument()
 
-    // Advance fake timers by 1500ms
-    act(() => {
-      vi.advanceTimersByTime(1500)
-    })
-
-    // Verify success message is rendered
-    expect(screen.getByText("Başvurunuz Alındı!")).toBeInTheDocument()
+    // fetch çözülünce başarı ekranı render olur (async)
+    expect(await screen.findByText("Başvurunuz Alındı!")).toBeInTheDocument()
     expect(
       screen.getByText(
         /Bayilik ön başvurunuz başarıyla tarafımıza iletilmiştir./i
       )
     ).toBeInTheDocument()
 
-    // Verify stored item in localStorage
-    const saved = localStorage.getItem("reseller-applications")
-    expect(saved).toBeDefined()
-    const parsed = JSON.parse(saved || "[]")
-    expect(parsed.length).toBe(1)
-    expect(parsed[0].companyName).toBe("Afet Tedarik A.Ş.")
-    expect(parsed[0].contactName).toBe("Mehmet Yılmaz")
-    expect(parsed[0].email).toBe("mehmet@afettedarik.com")
-    expect(parsed[0].phone).toBe("0555 555 5555")
-    expect(parsed[0].city).toBe("Hatay")
-    expect(parsed[0].message).toBe(
+    // Backend'e doğru uçtan ve alanlarla POST edildiğini doğrula
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const [url, options] = fetchMock.mock.calls[0]
+    expect(String(url)).toContain("/store/reseller-applications")
+    expect(options.method).toBe("POST")
+    const body = JSON.parse(options.body)
+    expect(body.company_name).toBe("Afet Tedarik A.Ş.")
+    expect(body.applicant_name).toBe("Mehmet Yılmaz")
+    expect(body.email).toBe("mehmet@afettedarik.com")
+    expect(body.phone).toBe("0555 555 5555")
+    expect(body.city).toBe("Hatay")
+    expect(body.message).toBe(
       "500 adet deprem çantası siparişi vermek istiyoruz."
     )
-    expect(parsed[0].status).toBe("pending")
+  })
+
+  it("should show the error screen when the request fails", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false })
+    vi.stubGlobal("fetch", fetchMock)
+    // Hata yolundaki console.error testi kirletmesin
+    vi.spyOn(console, "error").mockImplementation(() => {})
+
+    render(<ResellerForm />)
+
+    fireEvent.change(screen.getByPlaceholderText("Örn: EKYP Ticaret Ltd."), {
+      target: { value: "Afet Tedarik A.Ş." },
+    })
+    fireEvent.change(screen.getByPlaceholderText("Örn: Hakan Demir"), {
+      target: { value: "Mehmet Yılmaz" },
+    })
+    fireEvent.change(screen.getByPlaceholderText("corporate@example.com"), {
+      target: { value: "mehmet@afettedarik.com" },
+    })
+    fireEvent.change(screen.getByPlaceholderText("Örn: 0532 000 0000"), {
+      target: { value: "0555 555 5555" },
+    })
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /Bayilik Başvurusunu Gönder/i })
+    )
+
+    // Başarısız istek sonrası form tekrar görünür olmalı (success ekranına geçmez)
+    expect(
+      await screen.findByRole("button", {
+        name: /Bayilik Başvurusunu Gönder/i,
+      })
+    ).toBeInTheDocument()
+    expect(screen.queryByText("Başvurunuz Alındı!")).not.toBeInTheDocument()
   })
 })

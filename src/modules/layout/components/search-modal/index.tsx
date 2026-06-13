@@ -157,6 +157,7 @@ export default function SearchModal() {
                 ref={inputRef}
                 type="text"
                 placeholder={t("placeholder")}
+                aria-label={t("placeholder")}
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value)
@@ -176,6 +177,7 @@ export default function SearchModal() {
                     inputRef.current?.focus()
                   }}
                   className="p-0.5 hover:bg-ui-bg-subtle rounded-md transition-colors"
+                  aria-label="Aramayı temizle"
                 >
                   <X className="w-4 h-4 text-ui-fg-muted" />
                 </button>

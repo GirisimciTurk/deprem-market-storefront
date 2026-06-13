@@ -1,10 +1,14 @@
 import { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 
 import LoginTemplate from "@modules/account/templates/login-template"
 
-export const metadata: Metadata = {
-  title: "Giriş Yap",
-  description: "EKYP Deprem Market hesabınıza giriş yapın.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("loginTitle"),
+    description: t("loginDescription"),
+  }
 }
 
 export default function Login() {

@@ -28,7 +28,11 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
       <Text className="mt-2">
         Sipariş tarihi:{" "}
         <span data-testid="order-date">
-          {new Date(order.created_at).toDateString()}
+          {new Date(order.created_at).toLocaleDateString("tr-TR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
         </span>
       </Text>
       <Text className="mt-2 text-ui-fg-interactive">
@@ -48,7 +52,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
               Ödeme durumu:{" "}
               <span
                 className="text-ui-fg-subtle "
-                sata-testid="order-payment-status"
+                data-testid="order-payment-status"
               >
                 {formatStatus(order.payment_status)}
               </span>

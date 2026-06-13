@@ -35,10 +35,15 @@ export function Pagination({
   ) => (
     <button
       key={p}
-      className={clx("txt-xlarge-plus text-ui-fg-muted", {
-        "text-ui-fg-base hover:text-ui-fg-subtle": isCurrent,
-      })}
+      className={clx(
+        "txt-xlarge-plus text-ui-fg-muted px-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ui-border-interactive",
+        {
+          "text-ui-fg-base hover:text-ui-fg-subtle": isCurrent,
+        }
+      )}
       disabled={isCurrent}
+      aria-current={isCurrent ? "page" : undefined}
+      aria-label={`Sayfa ${p}`}
       onClick={() => handlePageChange(p)}
     >
       {label}
@@ -49,6 +54,7 @@ export function Pagination({
   const renderEllipsis = (key: string) => (
     <span
       key={key}
+      aria-hidden="true"
       className="txt-xlarge-plus text-ui-fg-muted items-center cursor-default"
     >
       ...

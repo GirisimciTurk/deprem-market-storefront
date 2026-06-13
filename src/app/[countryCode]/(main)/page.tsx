@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 
 import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
@@ -7,10 +8,12 @@ import CorporateSection from "@modules/home/components/corporate"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 
-export const metadata: Metadata = {
-  title: "EKYP Deprem Hazırlık Market | Güvenli Yarınlar İçin Şimdiden Hazırlanın",
-  description:
-    "EKYP Deprem Teknolojileri güvencesiyle sertifikalı deprem hazırlık setleri, ilk yardım çantaları ve acil durum ekipmanları e-ticaret platformu.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("homeTitle"),
+    description: t("homeDescription"),
+  }
 }
 
 export default async function Home(props: {

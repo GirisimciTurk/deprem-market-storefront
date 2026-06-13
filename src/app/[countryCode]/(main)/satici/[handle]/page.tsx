@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 
 import { getSellerByHandle } from "@lib/data/sellers"
 import SellerTemplate from "@modules/sellers/templates"
@@ -21,9 +22,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  const t = await getTranslations("metadata")
+
   const metadata = {
-    title: `${data.seller.name} | EKYP Deprem Market`,
-    description: `${data.seller.name} satıcısının ürünleri`,
+    title: t("sellerTitle", { name: data.seller.name }),
+    description: t("sellerDescription", { name: data.seller.name }),
   } as Metadata
 
   return metadata

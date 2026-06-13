@@ -220,6 +220,8 @@ export default function SellerReviews({
                             type="button"
                             key={i}
                             onClick={() => setFormRating(starVal)}
+                            aria-label={`${starVal} yıldız`}
+                            aria-pressed={active}
                             className="text-2xl focus:outline-none hover:scale-115 transition-transform cursor-pointer"
                           >
                             <span

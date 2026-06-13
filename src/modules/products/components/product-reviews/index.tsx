@@ -280,14 +280,18 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
     <div className="bg-white border border-gray-150 rounded-2xl p-6 sm:p-8 mt-12 shadow-sm">
       {/* Lightbox Modal */}
       {lightboxImage && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setLightboxImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Değerlendirme fotoğrafı"
         >
           <div className="relative max-w-3xl max-h-[90vh] bg-white rounded-xl overflow-hidden shadow-2xl flex flex-col">
-            <button 
+            <button
               className="absolute top-4 right-4 bg-black/60 hover:bg-black text-white rounded-full w-9 h-9 flex items-center justify-center font-bold text-lg cursor-pointer z-10 transition-colors"
               onClick={() => setLightboxImage(null)}
+              aria-label="Kapat"
             >
               ✕
             </button>
@@ -442,6 +446,8 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                             type="button"
                             key={i}
                             onClick={() => setFormRating(starVal)}
+                            aria-label={`${starVal} yıldız`}
+                            aria-pressed={active}
                             className="text-2xl focus:outline-none hover:scale-115 transition-transform cursor-pointer"
                           >
                             <span className={active ? "text-yellow-400" : "text-gray-300"}>★</span>

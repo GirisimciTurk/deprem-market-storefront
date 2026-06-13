@@ -3,13 +3,17 @@ import OrderCompletedTemplate from "@modules/order/templates/order-completed-tem
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Metadata } from "next"
 import React from "react"
+import { getTranslations } from "next-intl/server"
 
 type Props = {
   params: Promise<{ id: string }>
 }
-export const metadata: Metadata = {
-  title: "Sipariş Onaylandı",
-  description: "Siparişiniz başarıyla alındı. Teşekkür ederiz!",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("orderConfirmedTitle"),
+    description: t("orderConfirmedDescription"),
+  }
 }
 
 export default async function OrderConfirmedPage(props: Props) {

@@ -113,6 +113,22 @@ export default function InfiniteProducts({
     }
   }, [hasMore, isLoading, page, sortBy, collectionId, categoryId, productsIds, minPrice, maxPrice, inStock, products.length])
 
+  if (products.length === 0) {
+    return (
+      <div
+        className="flex flex-col items-center justify-center text-center py-24 px-6 text-slate-500"
+        data-testid="no-products-message"
+      >
+        <span className="text-base font-medium text-slate-700">
+          Aradığınız kriterlere uygun ürün bulunamadı.
+        </span>
+        <span className="text-sm mt-2 text-slate-500">
+          Filtreleri temizleyerek tekrar deneyebilirsiniz.
+        </span>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-y-6">
       <ul

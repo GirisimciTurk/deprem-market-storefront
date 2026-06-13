@@ -1,10 +1,13 @@
 import { Metadata } from "next"
-import { getLocale } from "next-intl/server"
+import { getLocale, getTranslations } from "next-intl/server"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
-export const metadata: Metadata = {
-  title: "Hakkımızda | EKYP Deprem Market",
-  description: "EKYP Deprem Market olarak amacımız, afet öncesi ve sonrasında ailelerimizin ihtiyaç duyacağı her türlü güvenlik ekipmanını sağlamaktır.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("aboutTitle"),
+    description: t("aboutDescription"),
+  }
 }
 
 export default async function HakkimizdaPage(props: {

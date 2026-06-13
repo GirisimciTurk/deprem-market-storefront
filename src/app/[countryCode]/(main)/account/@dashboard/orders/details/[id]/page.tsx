@@ -2,6 +2,7 @@ import { retrieveOrder } from "@lib/data/orders"
 import OrderDetailsTemplate from "@modules/order/templates/order-details-template"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -15,9 +16,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  const t = await getTranslations("metadata")
+
   return {
-    title: `Sipariş #${order.display_id}`,
-    description: `Siparişinizi görüntüleyin`,
+    title: t("orderDetailTitle", { id: order.display_id ?? "" }),
+    description: t("orderDetailDescription"),
   }
 }
 

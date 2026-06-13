@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
@@ -88,12 +89,16 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  const t = await getTranslations("metadata")
+  const title = t("productBrandTitle", { title: product.title })
+  const description = t("productDescription", { title: product.title })
+
   return {
-    title: `${product.title} | EKYP Deprem Market`,
-    description: `${product.title}`,
+    title,
+    description,
     openGraph: {
-      title: `${product.title} | EKYP Deprem Market`,
-      description: `${product.title}`,
+      title,
+      description,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
   }

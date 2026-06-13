@@ -1,11 +1,14 @@
 import { Metadata } from "next"
-import { getLocale } from "next-intl/server"
+import { getLocale, getTranslations } from "next-intl/server"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import FaqAccordion from "./faq-accordion"
 
-export const metadata: Metadata = {
-  title: "Sıkça Sorulan Sorular | EKYP Deprem Market",
-  description: "Sipariş, kargo, ödeme, teslimat ve deprem çantaları hakkında en çok sorulan sorular ve yanıtları.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("faqTitle"),
+    description: t("faqDescription"),
+  }
 }
 
 export default async function SikcaSorulanSorularPage(props: {

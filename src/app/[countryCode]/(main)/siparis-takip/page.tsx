@@ -2,10 +2,14 @@ import { retrieveCustomer } from "@lib/data/customer"
 import { listOrders } from "@lib/data/orders"
 import TrackingClient from "@modules/order-tracking/components/tracking-client"
 import { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 
-export const metadata: Metadata = {
-  title: "Sipariş Takip & Kargo Sorgulama | EKYP Deprem Market",
-  description: "Sipariş kodunuz ve e-posta adresinizle anlık kargo durumunuzu sorgulayın.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata")
+  return {
+    title: t("orderTrackingTitle"),
+    description: t("orderTrackingDescription"),
+  }
 }
 
 export default async function OrderTrackingPage() {

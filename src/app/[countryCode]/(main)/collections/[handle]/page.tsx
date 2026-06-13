@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 
 import { getCollectionByHandle, listCollections } from "@lib/data/collections"
 import { listRegions } from "@lib/data/regions"
@@ -63,9 +64,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  const t = await getTranslations("metadata")
+
   const metadata = {
-    title: `${collection.title} | EKYP Deprem Market`,
-    description: `${collection.title} collection`,
+    title: t("collectionTitle", { title: collection.title }),
+    description: t("collectionDescription", { title: collection.title }),
   } as Metadata
 
   return metadata

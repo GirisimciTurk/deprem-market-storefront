@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 
 import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
@@ -52,9 +53,13 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   try {
     const productCategory = await getCategoryByHandle(params.category)
 
-    const title = productCategory.name + " | EKYP Deprem Market"
+    const t = await getTranslations("metadata")
 
-    const description = productCategory.description ?? `${title} category.`
+    const title = t("categoryTitle", { name: productCategory.name })
+
+    const description =
+      productCategory.description ??
+      t("categoryFallbackDescription", { title: productCategory.name })
 
     return {
       title: title,
