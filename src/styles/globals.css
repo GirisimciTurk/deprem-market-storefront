@@ -139,3 +139,12 @@
     @apply font-semibold text-ui-fg-base;
   }
 }
+
+/* "Yapım aşamasında" duyuru çubuğu — kayan parlama efekti (açılışta kaldırılacak) */
+@keyframes construction-shine {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(220%); }
+}
+.animate-construction-shine {
+  animation: construction-shine 3.5s ease-in-out infinite;
+}
