@@ -65,9 +65,12 @@ export default function ProductPreview({
       cheapestPrice?.calculated_price_number &&
       cheapestPrice.original_price_number > cheapestPrice.calculated_price_number)
 
-  const discountPercentage = hasRealSale && cheapestPrice?.percentage_diff && parseInt(cheapestPrice.percentage_diff) > 0
-    ? cheapestPrice.percentage_diff
-    : "14"
+  // Yalnız GERÇEK indirim varsa yüzdeyi göster; indirim yoksa rozet hiç çıkmaz
+  // (uydurma "%14 İndirim" KALDIRILDI).
+  const discountPercentage =
+    hasRealSale && cheapestPrice?.percentage_diff && parseInt(cheapestPrice.percentage_diff) > 0
+      ? cheapestPrice.percentage_diff
+      : null
 
   const hasFreeShipping = (product.metadata as Record<string, unknown>)?.free_shipping === true
 
@@ -121,8 +124,8 @@ export default function ProductPreview({
             </div>
           )}
 
-          {/* Top-Left: Discount Badge */}
-          {cheapestPrice && (
+          {/* Top-Left: Discount Badge — yalnız gerçek indirimde */}
+          {discountPercentage && (
             <div
               className={`absolute z-10 bg-red-600 text-white font-extrabold text-[10px] sm:text-xs px-2 py-1 rounded-md shadow-md border border-red-500 tracking-tight left-2 ${
                 rankInfo ? "top-10 sm:top-11" : "top-2"
