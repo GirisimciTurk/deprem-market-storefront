@@ -176,6 +176,17 @@ export default function ProductPreview({
             >
               <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
+            {(() => {
+              const s = (product as any).seller
+              const count = s?.rating_count ?? 0
+              if (!s || count <= 0) return null
+              const avg = Math.round(((s.rating_sum ?? 0) / count) * 10) / 10
+              return (
+                <span className="text-[10px] font-semibold text-yellow-500">
+                  ⭐ {avg.toFixed(1)}
+                </span>
+              )
+            })()}
           </div>
 
           {/* Product Title */}

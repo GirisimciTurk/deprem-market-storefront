@@ -10,6 +10,8 @@ export type StoreSeller = {
   logo?: string | null
   description?: string | null
   is_house: boolean
+  rating_avg?: number | null
+  rating_count?: number | null
 }
 
 export type StoreSellerResponse = {

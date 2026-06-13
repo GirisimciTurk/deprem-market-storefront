@@ -26,8 +26,20 @@ const getProductReviewData = (handle: string) => {
 const ProductInfo = async ({ product }: ProductInfoProps) => {
   const reviewData = getProductReviewData(product.handle)
   const seller = (product as any).seller as
-    | { id: string; name: string; handle: string }
+    | {
+        id: string
+        name: string
+        handle: string
+        rating_sum?: number | null
+        rating_count?: number | null
+      }
     | undefined
+
+  const sellerRating =
+    seller && (seller.rating_count ?? 0) > 0
+      ? Math.round(((seller.rating_sum ?? 0) / (seller.rating_count ?? 1)) * 10) /
+        10
+      : null
 
   return (
     <div id="product-info">
@@ -43,6 +55,11 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
               >
                 {seller.name}
               </LocalizedClientLink>
+              {sellerRating !== null && (
+                <span className="ml-1 text-xs font-semibold text-yellow-500">
+                  ⭐ {sellerRating.toFixed(1)}
+                </span>
+              )}
             </span>
           ) : (
             <span className="font-bold text-orange-600 tracking-wide">
