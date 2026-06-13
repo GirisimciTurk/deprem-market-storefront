@@ -13,6 +13,7 @@ import { HttpTypes } from "@medusajs/types"
 import ProductActionsWrapper from "./product-actions-wrapper"
 import ProductShowcase from "../components/product-showcase"
 import ProductReviews from "@modules/products/components/product-reviews"
+import ProductQuestions from "@modules/products/components/product-questions"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listProducts } from "@lib/data/products"
 import RecentlyViewed from "@modules/products/components/recently-viewed"
@@ -85,6 +86,11 @@ const ProductTemplate = async ({
       {/* Interactive Customer Reviews Section */}
       <div className="content-container my-12">
         <ProductReviews productHandle={product.handle} isLoggedIn={isLoggedIn} />
+      </div>
+
+      {/* Soru & Cevap */}
+      <div className="content-container my-12">
+        <ProductQuestions productHandle={product.handle} isLoggedIn={isLoggedIn} />
       </div>
 
       {/* User Behavior/Personalization: Recently Viewed Section */}
