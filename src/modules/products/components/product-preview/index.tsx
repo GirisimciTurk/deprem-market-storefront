@@ -98,7 +98,7 @@ export default function ProductPreview({
   return (
     <div
       data-testid="product-wrapper"
-      className="bg-white rounded-xl border border-gray-150 overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full"
+      className="relative bg-white rounded-xl border border-gray-150 overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full"
     >
       <LocalizedClientLink href={`/products/${product.handle}`} className="group block">
         {/* Image wrapper */}
