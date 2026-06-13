@@ -6,6 +6,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import PaginatedProducts from "@modules/store/templates/paginated-products"
 import { StoreSellerResponse } from "@lib/data/sellers"
 import SellerReviews from "@modules/sellers/components/seller-reviews"
+import SellerContact from "@modules/sellers/components/seller-contact"
 
 export default function SellerTemplate({
   sortBy,
@@ -91,6 +92,7 @@ export default function SellerTemplate({
             Bu satıcının yayında ürünü yok.
           </div>
         )}
+        <SellerContact sellerHandle={seller.handle} />
         <SellerReviews sellerHandle={seller.handle} />
       </div>
     </div>
