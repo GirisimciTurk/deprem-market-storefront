@@ -99,7 +99,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
               "font-src 'self' data: https://fonts.gstatic.com; " +
               "img-src 'self' data: blob: https: http:; " +
-              `connect-src 'self' ${BACKEND_URL} https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
+              `connect-src 'self' ${BACKEND_URL} https://images.unsplash.com https://pub-972575e25eda4755b1250ca6be181153.r2.dev https://cdn.jsdelivr.net https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
               "frame-src 'self' https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; " +
               `form-action 'self' ${BACKEND_URL} https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
               "object-src 'none';",
