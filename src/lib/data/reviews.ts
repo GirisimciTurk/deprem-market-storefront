@@ -52,6 +52,25 @@ export async function submitReview(input: {
   }
 }
 
+/**
+ * Yorum fotoğraflarını backend'e yükler (base64) → R2'ye kaydedilir, public URL'ler döner.
+ * İstemci (client component) dosyaları okuyup yeniden boyutlandırarak base64 verir.
+ */
+export async function uploadReviewImages(
+  files: { filename: string; mime_type: string; data: string }[]
+): Promise<{ urls: string[]; error: string | null }> {
+  if (!files || files.length === 0) return { urls: [], error: null }
+  try {
+    const res = await sdk.client.fetch<{ urls: string[] }>(`/store/review-uploads`, {
+      method: "POST",
+      body: { files },
+    })
+    return { urls: res.urls ?? [], error: null }
+  } catch (e) {
+    return { urls: [], error: String(e) }
+  }
+}
+
 /** The logged-in customer's own reviews (any status) for the account page. */
 export async function listMyReviews(): Promise<StoreReview[]> {
   const headers = { ...(await getAuthHeaders()) }

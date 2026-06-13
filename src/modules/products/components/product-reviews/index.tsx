@@ -1,7 +1,51 @@
 "use client"
 
 import React, { useState, useEffect, useMemo, useRef } from "react"
-import { listProductReviews, submitReview } from "@lib/data/reviews"
+import { listProductReviews, submitReview, uploadReviewImages } from "@lib/data/reviews"
+
+type ReviewPhoto = { preview: string; filename: string; mime_type: string; data: string }
+
+// Seçilen fotoğrafı tarayıcıda en fazla 1280px'e küçültüp JPEG base64 üretir.
+// Böylece yükleme boyutu küçük kalır (telefon fotoğrafları MB'larca olabiliyor).
+async function fileToResizedPhoto(file: File): Promise<ReviewPhoto> {
+  const dataUrl: string = await new Promise((resolve, reject) => {
+    const r = new FileReader()
+    r.onload = () => resolve(r.result as string)
+    r.onerror = reject
+    r.readAsDataURL(file)
+  })
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const i = new Image()
+    i.onload = () => resolve(i)
+    i.onerror = reject
+    i.src = dataUrl
+  })
+  const MAX = 1280
+  let { width, height } = img
+  if (width > MAX || height > MAX) {
+    if (width >= height) {
+      height = Math.round((height * MAX) / width)
+      width = MAX
+    } else {
+      width = Math.round((width * MAX) / height)
+      height = MAX
+    }
+  }
+  const canvas = document.createElement("canvas")
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext("2d")
+  if (!ctx) {
+    // Canvas yoksa orijinal data URL'i kullan.
+    const base = dataUrl.split(",")[1] ?? ""
+    return { preview: dataUrl, filename: file.name, mime_type: file.type || "image/jpeg", data: base }
+  }
+  ctx.drawImage(img, 0, 0, width, height)
+  const out = canvas.toDataURL("image/jpeg", 0.82)
+  const base = out.split(",")[1] ?? ""
+  const safeName = (file.name || "foto").replace(/\.[^.]+$/, "") + ".jpg"
+  return { preview: out, filename: safeName, mime_type: "image/jpeg", data: base }
+}
 
 export type Review = {
   id: string
@@ -19,115 +63,6 @@ type ProductReviewsProps = {
   isLoggedIn: boolean
 }
 
-// Initial reviews in Turkish with real-looking customer product photos
-const initialReviewsMap: Record<string, Review[]> = {
-  "profesyonel-deprem-cantasi-4-kisilik": [
-    {
-      id: "rev-pro-1",
-      name: "Mehmet Y.",
-      rating: 5,
-      comment: "Çantanın içeriği inanılmaz zengin. İçinden çıkan fener ve düdük çok kaliteli. Deprem hazırlığı için kesinlikle tavsiye ederim.",
-      date: "12 May 2026",
-      verified: true,
-      approved: true,
-      images: [
-        "https://images.unsplash.com/photo-1599740831464-5eec14d0263f?auto=format&fit=crop&q=80&w=600",
-        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600"
-      ]
-    },
-    {
-      id: "rev-pro-2",
-      name: "Ayşe K.",
-      rating: 5,
-      comment: "Her evde mutlaka bulunması gereken bir set. Paketleme çok özenliydi, kargo hızlı ulaştı. Teşekkürler.",
-      date: "25 May 2026",
-      verified: true,
-      approved: true,
-      images: [
-        "https://images.unsplash.com/photo-1583198432857-e6f966144fe9?auto=format&fit=crop&q=80&w=600"
-      ]
-    },
-    {
-      id: "rev-pro-3",
-      name: "Caner B.",
-      rating: 4,
-      comment: "Çanta kumaşı çok sağlam. İçindekiler kaliteli ama belki ilk yardım malzemeleri biraz daha fazla olabilirdi.",
-      date: "29 May 2026",
-      verified: true,
-      approved: true,
-    },
-  ],
-  "bireysel-deprem-cantasi": [
-    {
-      id: "rev-mini-1",
-      name: "Esra A.",
-      rating: 5,
-      comment: "Arabamın bagajı için aldım. Kompakt olması ve su geçirmez kılıfı çok güzel. İçindekiler temel ihtiyaçları fazlasıyla karşılıyor.",
-      date: "10 May 2026",
-      verified: true,
-      approved: true,
-      images: [
-        "https://images.unsplash.com/photo-1583198432857-e6f966144fe9?auto=format&fit=crop&q=80&w=600"
-      ]
-    },
-    {
-      id: "rev-mini-2",
-      name: "Burak H.",
-      rating: 5,
-      comment: "Bireysel kullanım için harika bir çanta. İçine kendim de birkaç ilaç ekledim, çok kullanışlı.",
-      date: "18 May 2026",
-      verified: true,
-      approved: true,
-    },
-  ],
-  "gunes-enerjili-fener-radyo": [
-    {
-      id: "rev-fen-1",
-      name: "Ahmet T.",
-      rating: 5,
-      comment: "Güneş paneli çok iyi çalışıyor, telefonu hızlıca şarj ediyor. Işığı da çok kuvvetli. Çok memnun kaldım.",
-      date: "8 May 2026",
-      verified: true,
-      approved: true,
-      images: [
-        "https://images.unsplash.com/photo-1517055729445-fa7d27394b48?auto=format&fit=crop&q=80&w=600"
-      ]
-    },
-    {
-      id: "rev-fen-2",
-      name: "Elif S.",
-      rating: 5,
-      comment: "Dinamolu olması elektrik kesintilerinde hayat kurtarır. Malzeme kalitesi beklediğimden çok daha iyi.",
-      date: "15 May 2026",
-      verified: true,
-      approved: true,
-    },
-  ],
-  "kapsamli-ilk-yardim-cantasi-120": [
-    {
-      id: "rev-kit-1",
-      name: "Zeynep D.",
-      rating: 5,
-      comment: "Kutusu çok sağlam ve kompakt. İçindeki makas, bandaj ve sargı bezleri kaliteli. Evde ve arabada bulundurmak şart.",
-      date: "2 May 2026",
-      verified: true,
-      approved: true,
-      images: [
-        "https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&q=80&w=600"
-      ]
-    },
-    {
-      id: "rev-kit-2",
-      name: "Murat K.",
-      rating: 5,
-      comment: "Malzeme kalitesi çok güzel, içeriği eksiksiz. Hızlı kargo için satıcıya teşekkür ederim.",
-      date: "22 May 2026",
-      verified: true,
-      approved: true,
-    },
-  ],
-}
-
 export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn }: ProductReviewsProps) {
   const [reviews, setReviews] = useState<Review[]>([])
   const [showForm, setShowForm] = useState(false)
@@ -137,7 +72,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
   const [formName, setFormName] = useState("")
   const [formRating, setFormRating] = useState(5)
   const [formComment, setFormComment] = useState("")
-  const [formImages, setFormImages] = useState<string[]>([])
+  const [formPhotos, setFormPhotos] = useState<ReviewPhoto[]>([])
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -146,12 +81,10 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Load APPROVED reviews from the backend, merged with the curated demo seed
-  // reviews for this product. New customer reviews only appear here once an
-  // admin approves ("Yayınla") them.
+  // Backend'den YALNIZ onaylı (gerçek) yorumları yükle. Yeni müşteri yorumları
+  // ancak admin "Yayınla" dedikten sonra burada görünür. (Örnek/mock yorumlar kaldırıldı.)
   useEffect(() => {
     let active = true
-    const demo = initialReviewsMap[productHandle] || []
     ;(async () => {
       try {
         const apiReviews = await listProductReviews(productHandle)
@@ -170,10 +103,10 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
           approved: true,
           images: r.images ?? undefined,
         }))
-        setReviews([...mapped, ...demo])
+        setReviews(mapped)
       } catch (e) {
         console.error(e)
-        if (active) setReviews(demo)
+        if (active) setReviews([])
       }
     })()
     return () => {
@@ -220,25 +153,27 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
     return approvedReviews.filter((r) => r.rating === filterRating)
   }, [approvedReviews, filterRating])
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const MAX_PHOTOS = 6
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
-    
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith("image/")) return
-      
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          setFormImages((prev) => [...prev, reader.result as string])
-        }
+    const incoming = Array.from(files).filter((f) => f.type.startsWith("image/"))
+    // input'u sıfırla (aynı dosya tekrar seçilebilsin)
+    e.target.value = ""
+    for (const file of incoming) {
+      if (file.size > 15 * 1024 * 1024) continue // 15MB üstü ham dosyayı atla
+      try {
+        const photo = await fileToResizedPhoto(file)
+        setFormPhotos((prev) => (prev.length >= MAX_PHOTOS ? prev : [...prev, photo]))
+      } catch {
+        // bozuk görsel — atla
       }
-      reader.readAsDataURL(file)
-    })
+    }
   }
 
   const removeFormImage = (indexToRemove: number) => {
-    setFormImages((prev) => prev.filter((_, idx) => idx !== indexToRemove))
+    setFormPhotos((prev) => prev.filter((_, idx) => idx !== indexToRemove))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -246,12 +181,28 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
     if (!formName.trim() || !formComment.trim() || submitting) return
 
     setSubmitting(true)
+    setSubmitError(null)
+
+    // Önce fotoğrafları R2'ye yükle, dönen URL'leri yoruma ekle.
+    let imageUrls: string[] = []
+    if (formPhotos.length > 0) {
+      const up = await uploadReviewImages(
+        formPhotos.map((p) => ({ filename: p.filename, mime_type: p.mime_type, data: p.data }))
+      )
+      if (up.error) {
+        setSubmitting(false)
+        setSubmitError("Fotoğraflar yüklenemedi. Lütfen tekrar deneyin veya fotoğrafsız gönderin.")
+        return
+      }
+      imageUrls = up.urls
+    }
+
     const res = await submitReview({
       product_handle: productHandle,
       rating: formRating,
       comment: formComment,
       name: formName.trim(),
-      images: formImages.length > 0 ? formImages : undefined,
+      images: imageUrls.length > 0 ? imageUrls : undefined,
     })
     setSubmitting(false)
 
@@ -262,13 +213,12 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
       return
     }
 
-    // Submitted successfully — it is now PENDING admin approval, so we do NOT
-    // add it to the visible list. Show a confirmation instead.
+    // Başarılı — yorum PENDING (admin onayı bekler), listeye eklemiyoruz; onay mesajı gösteriyoruz.
     setSubmitError(null)
     setFormName("")
     setFormRating(5)
     setFormComment("")
-    setFormImages([])
+    setFormPhotos([])
     setSubmitSuccess(true)
     setTimeout(() => {
       setSubmitSuccess(false)
@@ -492,9 +442,9 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                       />
 
                       {/* Image Previews */}
-                      {formImages.map((img, idx) => (
+                      {formPhotos.map((photo, idx) => (
                         <div key={idx} className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 group">
-                          <img src={img} alt="Önizleme" className="w-full h-full object-cover" />
+                          <img src={photo.preview} alt="Önizleme" className="w-full h-full object-cover" />
                           <button
                             type="button"
                             onClick={() => removeFormImage(idx)}
