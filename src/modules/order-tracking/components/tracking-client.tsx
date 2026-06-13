@@ -648,7 +648,7 @@ export default function TrackingClient({
                             const link =
                               trackingLinks[nIdx] ||
                               getTrackingUrl(num, fulfillment.provider_id) ||
-                              `https://kargotakip.araskargo.com.tr/?gonderitakipno=${num}`
+                              `https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=${num}`
                             return (
                               <div
                                 key={nIdx}
