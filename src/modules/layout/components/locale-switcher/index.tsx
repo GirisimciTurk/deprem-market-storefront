@@ -44,6 +44,9 @@ const LocaleSwitcher = () => {
               svg
               countryCode={LOCALE_META[locale].flag}
               style={{ width: "16px", height: "16px" }}
+              aria-label={LOCALE_META[locale].label}
+              title={LOCALE_META[locale].label}
+              alt={`${LOCALE_META[locale].label} bayrağı`}
             />
             <span className="uppercase">{locale}</span>
           </button>

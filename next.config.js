@@ -42,6 +42,8 @@ const SCRIPT_SRC_EVAL = process.env.NODE_ENV === "production" ? "" : " 'unsafe-e
  */
 const nextConfig = {
   reactStrictMode: true,
+  // SEO/güvenlik: Next.js'in "X-Powered-By" başlığını gönderme (teknoloji ifşası).
+  poweredByHeader: false,
   // Docker için bağımsız (standalone) çıktı: .next/standalone içinde minimal bir
   // server.js + sadece gereken node_modules üretilir → çok küçük üretim imajı.
   output: "standalone",
