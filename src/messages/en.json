@@ -255,6 +255,8 @@
     "dismiss": "Not now",
     "iosTitle": "Add to home screen",
     "iosBody": "In Safari, tap the Share button, then choose \"Add to Home Screen\".",
-    "gotIt": "Got it"
+    "gotIt": "Got it",
+    "share": "Share",
+    "linkCopied": "Link copied"
   }
 }

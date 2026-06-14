@@ -255,6 +255,8 @@
     "dismiss": "Şimdi değil",
     "iosTitle": "Ana ekrana ekle",
     "iosBody": "Safari'de alttaki Paylaş düğmesine dokun, sonra \"Ana Ekrana Ekle\"yi seç.",
-    "gotIt": "Anladım"
+    "gotIt": "Anladım",
+    "share": "Paylaş",
+    "linkCopied": "Bağlantı kopyalandı"
   }
 }

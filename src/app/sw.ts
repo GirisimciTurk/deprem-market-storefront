@@ -42,7 +42,15 @@ serwist.addEventListeners()
 
 // ── Web Push ───────────────────────────────────────────────────────────────
 // Backend (web-push) JSON payload gönderir: { title, body, url?, icon?, image?,
-// tag? }. Sunucu bir bildirim ittiğinde burada yakalanıp gösterilir.
+// tag?, actions? }. Sunucu bir bildirim ittiğinde burada yakalanıp gösterilir.
+// actions = bildirim altındaki butonlar (örn. "Siparişi gör"). Her aksiyonun
+// kendi `url`'i olabilir; yoksa ana `url`'e gider.
+type PushAction = {
+  action: string
+  title: string
+  icon?: string
+  url?: string
+}
 type PushPayload = {
   title?: string
   body?: string
@@ -51,6 +59,7 @@ type PushPayload = {
   badge?: string
   image?: string
   tag?: string
+  actions?: PushAction[]
 }
 
 self.addEventListener("push", (event: PushEvent) => {
@@ -62,6 +71,14 @@ self.addEventListener("push", (event: PushEvent) => {
   }
 
   const title = payload.title || "Deprem Market"
+  // Aksiyon başına URL'leri data'ya gömeriz (NotificationAction tipi url taşımaz),
+  // notificationclick'te tıklanan aksiyona göre hedefi çözeriz.
+  const actions = (payload.actions || []).slice(0, 2) // tarayıcılar genelde 2 buton gösterir
+  const actionUrls: Record<string, string> = {}
+  for (const a of actions) {
+    if (a.url) actionUrls[a.action] = a.url
+  }
+
   // `image` standart NotificationOptions tipinde yok ama tarayıcılar destekler
   // (büyük görsel önizleme) → tipi genişletiyoruz.
   const options: NotificationOptions & { image?: string } = {
@@ -70,7 +87,12 @@ self.addEventListener("push", (event: PushEvent) => {
     badge: payload.badge || "/icon",
     image: payload.image,
     tag: payload.tag,
-    data: { url: payload.url || "/" },
+    actions: actions.map((a) => ({
+      action: a.action,
+      title: a.title,
+      icon: a.icon,
+    })),
+    data: { url: payload.url || "/", actionUrls },
   }
 
   event.waitUntil(self.registration.showNotification(title, options))
@@ -78,7 +100,13 @@ self.addEventListener("push", (event: PushEvent) => {
 
 self.addEventListener("notificationclick", (event: NotificationEvent) => {
   event.notification.close()
-  const targetUrl = (event.notification.data as { url?: string })?.url || "/"
+  const data = event.notification.data as {
+    url?: string
+    actionUrls?: Record<string, string>
+  }
+  // Bir aksiyon butonuna tıklandıysa onun URL'i; yoksa bildirimin ana URL'i.
+  const targetUrl =
+    (event.action && data?.actionUrls?.[event.action]) || data?.url || "/"
 
   event.waitUntil(
     (async () => {

@@ -3,6 +3,7 @@ import { Heading, Text } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import React from "react"
 import FavoriteButton from "@modules/products/components/favorite-button"
+import ShareButton from "@modules/products/components/share-button"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
@@ -88,7 +89,10 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
           >
             {product.title}
           </Heading>
-          {product.id && <FavoriteButton product={product} />}
+          <div className="flex items-center gap-x-1">
+            <ShareButton title={product.title} />
+            {product.id && <FavoriteButton product={product} />}
+          </div>
         </div>
 
         {/* Star Ratings & Review Count */}

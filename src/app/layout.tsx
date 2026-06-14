@@ -2,6 +2,7 @@ import { getBaseURL } from "@lib/util/env"
 import { Metadata, Viewport } from "next"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getTranslations } from "next-intl/server"
+import AppleSplash from "@modules/layout/components/apple-splash"
 import "styles/globals.css"
 
 // theme-color: tarayıcı/PWA adres çubuğu ve iOS standalone üst bar rengi
@@ -46,6 +47,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} data-mode="light" suppressHydrationWarning>
       <body suppressHydrationWarning>
+        {/* React 19 bu <link rel="apple-touch-startup-image"> etiketlerini head'e taşır. */}
+        <AppleSplash />
         <NextIntlClientProvider>
           <main className="relative">{children}</main>
         </NextIntlClientProvider>
