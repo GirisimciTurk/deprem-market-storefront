@@ -9,6 +9,7 @@ import Footer from "@modules/layout/templates/footer"
 import Nav from "@modules/layout/templates/nav"
 import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-price-nudge"
 import CookieConsent from "@modules/layout/components/cookie-consent"
+import PushPrompt from "@modules/layout/components/push-prompt"
 import WhatsAppButton from "@modules/layout/components/whatsapp-button"
 import ConstructionBanner from "@modules/layout/components/construction-banner"
 
@@ -50,6 +51,7 @@ export default async function PageLayout(props: {
       {props.children}
       <Footer />
       <CookieConsent countryCode={countryCode} />
+      <PushPrompt />
       <WhatsAppButton />
     </>
   )

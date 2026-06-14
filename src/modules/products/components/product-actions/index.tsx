@@ -10,6 +10,7 @@ import { useParams, usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
+import StockAlertButton from "../stock-alert-button"
 import { useRouter } from "next/navigation"
 import { getProductPrice } from "@lib/util/get-product-price"
 import InstallmentCargoInfo from "../installment-cargo-info"
@@ -216,6 +217,15 @@ export default function ProductActions({
             ? "Tükendi"
             : "Sepete Ekle"}
         </Button>
+        {/* Tükendiyse: stoğa gelince haber ver */}
+        {selectedVariant && isValidVariant && !inStock && (
+          <StockAlertButton
+            variantId={selectedVariant.id}
+            productId={product.id}
+            productHandle={product.handle ?? undefined}
+            productTitle={product.title}
+          />
+        )}
         <InstallmentCargoInfo price={priceValue / 100} />
         <MobileActions
           product={product}

@@ -26,3 +26,65 @@ const serwist = new Serwist({
 })
 
 serwist.addEventListeners()
+
+// ── Web Push ───────────────────────────────────────────────────────────────
+// Backend (web-push) JSON payload gönderir: { title, body, url?, icon?, image?,
+// tag? }. Sunucu bir bildirim ittiğinde burada yakalanıp gösterilir.
+type PushPayload = {
+  title?: string
+  body?: string
+  url?: string
+  icon?: string
+  badge?: string
+  image?: string
+  tag?: string
+}
+
+self.addEventListener("push", (event: PushEvent) => {
+  let payload: PushPayload = {}
+  try {
+    payload = event.data?.json() ?? {}
+  } catch {
+    payload = { title: "Deprem Market", body: event.data?.text() }
+  }
+
+  const title = payload.title || "Deprem Market"
+  // `image` standart NotificationOptions tipinde yok ama tarayıcılar destekler
+  // (büyük görsel önizleme) → tipi genişletiyoruz.
+  const options: NotificationOptions & { image?: string } = {
+    body: payload.body || "",
+    icon: payload.icon || "/icon",
+    badge: payload.badge || "/icon",
+    image: payload.image,
+    tag: payload.tag,
+    data: { url: payload.url || "/" },
+  }
+
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+self.addEventListener("notificationclick", (event: NotificationEvent) => {
+  event.notification.close()
+  const targetUrl = (event.notification.data as { url?: string })?.url || "/"
+
+  event.waitUntil(
+    (async () => {
+      const allClients = await self.clients.matchAll({
+        type: "window",
+        includeUncontrolled: true,
+      })
+      // Açık bir sekme varsa onu hedefe yönlendirip öne getir; yoksa yeni aç.
+      for (const client of allClients) {
+        if ("focus" in client) {
+          try {
+            await client.navigate(targetUrl)
+          } catch {
+            /* navigate engellenirse sadece focus */
+          }
+          return client.focus()
+        }
+      }
+      return self.clients.openWindow(targetUrl)
+    })()
+  )
+})
