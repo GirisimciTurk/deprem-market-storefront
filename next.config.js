@@ -17,6 +17,9 @@ const withSerwist = require("@serwist/next").default({
   disable: process.env.NODE_ENV === "development",
   // Tarayıcı çevrimdışıyken tekrar çevrimiçi olunca sayfayı yenile.
   reloadOnOnline: true,
+  // /offline yedek sayfasını precache listesine ekle (sw.ts fallbacks bunu kullanır).
+  // revision'ı offline sayfasının içeriği/çevirisi değişince elle artır.
+  additionalPrecacheEntries: [{ url: "/offline", revision: "offline-v1" }],
 })
 
 /**

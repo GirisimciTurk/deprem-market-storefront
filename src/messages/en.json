@@ -241,5 +241,20 @@
     "distanceSalesDescription": "The terms of the Distance Sales Agreement applicable to your e-commerce orders.",
     "preInfoTitle": "Preliminary Information Form | EKYP Deprem Market",
     "preInfoDescription": "Pre-order disclosure terms and your rights."
+  },
+  "offline": {
+    "title": "No internet connection",
+    "description": "You are currently offline. Pages you have already visited remain available, and this page reloads automatically once you are back online.",
+    "retry": "Back to home",
+    "hint": "Tip: Add Deprem Market to your home screen so you can open it without internet during an emergency."
+  },
+  "pwa": {
+    "installTitle": "Install the app",
+    "installBody": "Add Deprem Market to your home screen — open it faster and reach it even offline in an emergency.",
+    "installCta": "Install",
+    "dismiss": "Not now",
+    "iosTitle": "Add to home screen",
+    "iosBody": "In Safari, tap the Share button, then choose \"Add to Home Screen\".",
+    "gotIt": "Got it"
   }
 }

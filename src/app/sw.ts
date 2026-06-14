@@ -23,6 +23,19 @@ const serwist = new Serwist({
   // sayfalar (NetworkFirst), statik chunk'lar (CacheFirst), görseller, API vb.
   // → daha önce ziyaret edilmiş sayfalar internet kesikken (afet anında) açılır.
   runtimeCaching: defaultCache,
+  // Hiç ziyaret edilmemiş bir sayfaya çevrimdışıyken gidilirse tarayıcının çirkin
+  // hata ekranı yerine markalı /offline sayfasını göster. /offline, next.config.js'te
+  // additionalPrecacheEntries ile precache edilir (bu yüzden fallback'te kullanılabilir).
+  fallbacks: {
+    entries: [
+      {
+        url: "/offline",
+        matcher({ request }) {
+          return request.destination === "document"
+        },
+      },
+    ],
+  },
 })
 
 serwist.addEventListeners()

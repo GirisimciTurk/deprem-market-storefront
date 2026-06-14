@@ -241,5 +241,20 @@
     "distanceSalesDescription": "E-ticaret siparişlerinizde geçerli olan Mesafeli Satış Sözleşmesi hükümleri.",
     "preInfoTitle": "Ön Bilgilendirme Formu | EKYP Deprem Market",
     "preInfoDescription": "Sipariş öncesi ön bilgilendirme şartları ve haklarınız."
+  },
+  "offline": {
+    "title": "İnternet bağlantısı yok",
+    "description": "Şu an çevrimdışısın. Daha önce ziyaret ettiğin sayfalar erişilebilir; bağlantın gelince sayfa otomatik yenilenir.",
+    "retry": "Ana sayfaya dön",
+    "hint": "İpucu: Deprem Market'i ana ekranına eklersen acil durumda internetsiz de açabilirsin."
+  },
+  "pwa": {
+    "installTitle": "Uygulamayı yükle",
+    "installBody": "Deprem Market'i ana ekranına ekle; daha hızlı aç, afet anında internetsiz bile eriş.",
+    "installCta": "Yükle",
+    "dismiss": "Şimdi değil",
+    "iosTitle": "Ana ekrana ekle",
+    "iosBody": "Safari'de alttaki Paylaş düğmesine dokun, sonra \"Ana Ekrana Ekle\"yi seç.",
+    "gotIt": "Anladım"
   }
 }

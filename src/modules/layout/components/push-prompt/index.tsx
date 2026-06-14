@@ -8,6 +8,8 @@ import {
 } from "@lib/util/push"
 
 const DISMISS_KEY = "_deprem_market_push_prompt"
+// install-prompt ile PAYLAŞILAN kilit: aynı anda iki alt-bant çıkmasın.
+const OVERLAY_KEY = "_dm_overlay_shown"
 
 /**
  * Site geneli "Bildirimlere izin ver" istemi (çerez bandı stilinde, sol-altta).
@@ -28,8 +30,13 @@ const PushPrompt = () => {
     )
     const delay = cookieDecided ? 2500 : 8000
     const timer = setTimeout(() => {
-      // Tetiklenince izin durumu hâlâ "default" mı tekrar bak.
-      if (getPermission() === "default" && !localStorage.getItem(DISMISS_KEY)) {
+      // Tetiklenince izin durumu hâlâ "default" mı + başka bir bant açılmamış mı bak.
+      if (
+        getPermission() === "default" &&
+        !localStorage.getItem(DISMISS_KEY) &&
+        !sessionStorage.getItem(OVERLAY_KEY)
+      ) {
+        sessionStorage.setItem(OVERLAY_KEY, "push")
         setVisible(true)
       }
     }, delay)
