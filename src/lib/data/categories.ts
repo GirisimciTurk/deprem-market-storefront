@@ -27,7 +27,19 @@ export const listCategories = async (query?: Record<string, unknown>) => {
 }
 
 export const getCategoryByHandle = async (categoryHandle: string[]) => {
-  const handle = `${categoryHandle.join("/")}`
+  // Next.js catch-all route segmentleri (`[...category]`) URL'den %-encoded gelir
+  // (örn. Türkçe/`&` içeren handle'larda `i%CC%87lk-...`). Çözmeden backend'e
+  // verilirse SDK `%`'leri tekrar encode eder → çift-encode → handle eşleşmez →
+  // 404. Bu yüzden her segmenti güvenli şekilde decode ediyoruz (zaten decode
+  // edilmiş/ASCII handle'larda no-op, bozuk girdide orijinali korur).
+  const safeDecode = (s: string) => {
+    try {
+      return decodeURIComponent(s)
+    } catch {
+      return s
+    }
+  }
+  const handle = categoryHandle.map(safeDecode).join("/")
 
   const next = {
     ...(await getCacheOptions("categories")),
