@@ -8,23 +8,10 @@ import React from "react"
 import FavoriteButton from "@modules/products/components/favorite-button"
 import AddToCartButton from "./add-to-cart-button"
 
-const rankMap: Record<string, { rank: number; category: string }> = {
-  "profesyonel-deprem-cantasi": { rank: 1, category: "Deprem Çantası" },
-  "bireysel-deprem-cantasi": { rank: 2, category: "Deprem Çantası" },
-  "tasinabilir-su-filtresi": { rank: 1, category: "Su Filtresi" },
-  "termal-acil-durum-battaniyesi-5li-paket": { rank: 3, category: "İlk Yardım" },
-  "sarj-edilebilir-fener": { rank: 2, category: "Aydınlatma" },
-  "mini-deprem-cantasi": { rank: 4, category: "Deprem Çantası" },
-}
-
-const ratingMap: Record<string, { rating: number; count: number }> = {
-  "profesyonel-deprem-cantasi": { rating: 4.7, count: 132 },
-  "bireysel-deprem-cantasi": { rating: 4.8, count: 85 },
-  "mini-deprem-cantasi": { rating: 4.9, count: 42 },
-  "sarj-edilebilir-fener": { rating: 4.8, count: 28 },
-  "ilk-yardim-kiti": { rating: 4.9, count: 94 },
-  "tasinabilir-su-filtresi": { rating: 4.7, count: 56 },
-}
+// NOT: Eskiden burada handle-bazlı SAHTE rank/rating haritaları + "4.8/Son 4 Ürün/
+// Son 10 Günün En Düşük Fiyatı" uydurma sosyal-kanıt/aciliyet rozetleri vardı.
+// Dürüstlük/mevzuat gereği kaldırıldı — artık yalnız GERÇEK veri (ürün metadata
+// rating'i, gerçek stok, gerçek satıcı puanı) gösterilir.
 
 const renderStars = (rating: number) => {
   const roundedRating = Math.round(rating)
@@ -74,29 +61,27 @@ export default function ProductPreview({
 
   const hasFreeShipping = (product.metadata as Record<string, unknown>)?.free_shipping === true
 
+  // Yalnız GERÇEK metadata varsa rank/rating göster (uydurma fallback YOK).
   const rankInfo = (product.metadata as any)?.rank
     ? {
         rank: (product.metadata as any).rank,
         category: (product.metadata as any).rank_category || "Kategori",
       }
-    : rankMap[product.handle]
+    : null
 
   const ratingInfo = (product.metadata as any)?.rating
     ? {
-        rating: (product.metadata as any).rating,
-        count: (product.metadata as any).review_count || 12,
+        rating: Number((product.metadata as any).rating),
+        count: Number((product.metadata as any).review_count || 0),
       }
-    : ratingMap[product.handle] || { rating: 4.8, count: 15 }
+    : null
 
+  // Gerçek stok: yalnız envanter yönetilen + gerçekten ≤10 adet kaldıysa aciliyet.
   const totalInventory =
     product.variants?.reduce((acc, v) => acc + (v.inventory_quantity || 0), 0) ?? 0
   const manageInventory = product.variants?.some((v) => v.manage_inventory) ?? false
-  const isLowStock =
-    (manageInventory && totalInventory > 0 && totalInventory <= 10) ||
-    product.handle === "sarj-edilebilir-fener" ||
-    product.handle === "tasinabilir-su-filtresi"
-  const displayStock =
-    manageInventory && totalInventory > 0 && totalInventory <= 10 ? totalInventory : 4
+  const isLowStock = manageInventory && totalInventory > 0 && totalInventory <= 10
+  const displayStock = totalInventory
 
   return (
     <div
@@ -152,12 +137,6 @@ export default function ProductPreview({
           )}
         </div>
 
-        {/* Red banner for sale products */}
-        {cheapestPrice?.price_type === "sale" && (
-          <div className="bg-red-600 text-white text-center py-1 text-[9px] sm:text-[10px] font-bold tracking-wide uppercase">
-            Son 10 Günün En Düşük Fiyatı!
-          </div>
-        )}
       </LocalizedClientLink>
 
       {/* Top-Right: Favorite Button (Keep outside the Link context for separate interaction) */}
@@ -200,14 +179,16 @@ export default function ProductPreview({
             {product.title}
           </Text>
 
-          {/* Rating Stars & Count */}
-          <div className="flex items-center gap-x-1 mt-0.5">
-            <span className="text-xs font-bold text-gray-750">{ratingInfo.rating}</span>
-            {renderStars(ratingInfo.rating)}
-            <span className="text-[9px] font-semibold text-gray-600">
-              ({ratingInfo.count})
-            </span>
-          </div>
+          {/* Rating Stars & Count — yalnız gerçek ürün puanı varsa */}
+          {ratingInfo && ratingInfo.count > 0 && (
+            <div className="flex items-center gap-x-1 mt-0.5">
+              <span className="text-xs font-bold text-gray-750">{ratingInfo.rating}</span>
+              {renderStars(ratingInfo.rating)}
+              <span className="text-[9px] font-semibold text-gray-600">
+                ({ratingInfo.count})
+              </span>
+            </div>
+          )}
 
           {/* Delivery Badge */}
           <div className="flex items-center gap-x-1 text-[10px] sm:text-[11px] font-bold text-emerald-600 mt-0.5">
