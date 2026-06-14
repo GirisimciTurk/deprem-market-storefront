@@ -127,6 +127,22 @@ const nextConfig = {
       },
     ]
   },
+  // "Bayilik" → "Satıcı Ol" yeniden adlandırması: eski URL'ler kalıcı (308)
+  // yeni adreslere yönlenir, böylece dış linkler/SEO kırılmaz.
+  async redirects() {
+    return [
+      {
+        source: "/:countryCode/bayilik-basvuru-formu",
+        destination: "/:countryCode/satici-ol",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/account/bayilik",
+        destination: "/:countryCode/account/satici",
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = withSerwist(withNextIntl(nextConfig))

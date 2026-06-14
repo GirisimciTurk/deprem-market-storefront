@@ -28,7 +28,7 @@ interface BackendApplication {
 }
 
 /**
- * Giriş yapmış müşterinin en güncel bayilik başvurusu (gerçek backend verisi,
+ * Giriş yapmış müşterinin en güncel satıcı başvurusu (gerçek backend verisi,
  * /store/reseller-applications/me). Eskiden localStorage demo'su kullanılıyordu.
  */
 export const getMyResellerApplication = async (): Promise<MyResellerApplication | null> => {

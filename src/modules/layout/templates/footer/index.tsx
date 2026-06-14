@@ -6,6 +6,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Logo from "@modules/layout/components/logo";
 import CookieConsentTrigger from "@modules/layout/components/cookie-consent-trigger";
 import LocaleSwitcher from "@modules/layout/components/locale-switcher";
+import TrustBadges from "@modules/layout/components/trust-badges";
 import { getTranslations } from "next-intl/server";
 
 export default async function Footer() {
@@ -145,8 +146,8 @@ export default async function Footer() {
                   <CookieConsentTrigger />
                 </li>
                 <li>
-                  <LocalizedClientLink href="/bayilik-basvuru-formu" className="hover:text-ui-fg-base">
-                    Bayilik Başvuru Formu
+                  <LocalizedClientLink href="/satici-ol" className="hover:text-ui-fg-base">
+                    Satıcı Ol
                   </LocalizedClientLink>
                 </li>
                 <li>
@@ -237,6 +238,8 @@ export default async function Footer() {
             </p>
           </div>
         </div>
+        {/* Ödeme & güven bandı (kart logoları + SSL + ETBİS) */}
+        <TrustBadges />
         <div className="flex flex-col gap-y-4 md:flex-row w-full mb-8 justify-between items-center text-ui-fg-muted border-t border-ui-border-base pt-6">
           <div className="flex flex-col gap-y-1">
             <Text className="txt-compact-small">

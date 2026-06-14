@@ -15,7 +15,10 @@
   },
   "footer": {
     "affiliateLabel": "Bir Girişimci Türk Ekosistemi İştiraki",
-    "affiliateNote": "Deprem Market, Girişimci Türk çatısı altındaki EKYP Deprem Teknolojileri projesinin resmi e-ticaret iştirakidir. Mühendislik çözümlerini ürüne dönüştürerek afet hazırlığını herkes için erişilebilir kılıyoruz."
+    "affiliateNote": "Deprem Market, Girişimci Türk çatısı altındaki EKYP Deprem Teknolojileri projesinin resmi e-ticaret iştirakidir. Mühendislik çözümlerini ürüne dönüştürerek afet hazırlığını herkes için erişilebilir kılıyoruz.",
+    "paymentMethods": "Ödeme Yöntemleri",
+    "securePayment": "256-bit SSL ile güvenli ödeme",
+    "etbisLabel": "ETBİS Kayıtlı İşyeri"
   },
   "sideMenu": {
     "menu": "Menü",
@@ -24,7 +27,7 @@
       "home": "Ana Sayfa",
       "store": "Mağaza",
       "featured": "Trend Ürünler",
-      "reseller": "Bayilik Başvurusu",
+      "reseller": "Satıcı Ol",
       "faq": "S.S.S.",
       "contact": "İletişim",
       "blog": "Blog"
@@ -76,7 +79,7 @@
   "navLinks": {
     "store": "Mağaza",
     "trending": "Trend Ürünler",
-    "reseller": "Bayilik Başvurusu",
+    "reseller": "Satıcı Ol",
     "trackOrder": "Sipariş Takip",
     "faq": "S.S.S.",
     "contact": "İletişim"
@@ -209,10 +212,10 @@
     "addressesDescription": "Adreslerinizi görüntüleyin",
     "profileTitle": "Profil",
     "profileDescription": "EKYP Deprem Market profilinizi görüntüleyin ve düzenleyin.",
-    "dealershipStatusTitle": "Bayilik Durumu",
-    "dealershipStatusDescription": "Bayilik başvuru durumunuzu kontrol edin.",
-    "dealershipFormTitle": "Bayilik Başvuru Formu | EKYP Deprem Market",
-    "dealershipFormDescription": "EKYP Deprem Market bayilik ve B2B toptan satış başvuru formu.",
+    "dealershipStatusTitle": "Satıcı Başvurum",
+    "dealershipStatusDescription": "Satıcı başvurunuzun durumunu kontrol edin.",
+    "dealershipFormTitle": "Satıcı Ol | EKYP Deprem Market",
+    "dealershipFormDescription": "EKYP Deprem Market pazaryerinde satıcı ol; kendi ürünlerini binlerce müşteriye sat.",
     "orderDetailTitle": "Sipariş #{id}",
     "orderDetailDescription": "Siparişinizi görüntüleyin",
     "productBrandTitle": "{title} | EKYP Deprem Market",

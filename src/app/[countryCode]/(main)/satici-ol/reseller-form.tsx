@@ -67,7 +67,7 @@ export default function ResellerForm() {
         message: "",
       })
     } catch (err) {
-      console.error("Failed to submit reseller application", err)
+      console.error("Failed to submit seller application", err)
       setStatus("error")
     }
   }
@@ -82,8 +82,8 @@ export default function ResellerForm() {
           Başvurunuz Alındı!
         </h3>
         <p className="text-sm text-ui-fg-subtle max-w-sm">
-          Bayilik ön başvurunuz başarıyla tarafımıza iletilmiştir. Kurumsal
-          müşteri temsilcimiz sizinle en kısa sürede iletişime geçecektir.
+          Satıcı başvurunuz başarıyla tarafımıza ulaştı. Ekibimiz başvurunuzu
+          değerlendirip en kısa sürede sizinle iletişime geçecek.
         </p>
         <button
           onClick={() => setStatus("idle")}
@@ -100,7 +100,7 @@ export default function ResellerForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Firma Adı <span className="text-red-500">*</span>
+            Firma / Mağaza Adı <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -110,7 +110,7 @@ export default function ResellerForm() {
             onChange={(e) =>
               setFormData({ ...formData, companyName: e.target.value })
             }
-            placeholder="Örn: EKYP Ticaret Ltd."
+            placeholder="Örn: Demir Outdoor Ekipmanları"
             className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
           />
         </div>
@@ -177,7 +177,7 @@ export default function ResellerForm() {
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
-            placeholder="corporate@example.com"
+            placeholder="satici@example.com"
             className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
           />
         </div>
@@ -201,7 +201,7 @@ export default function ResellerForm() {
 
       <div>
         <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-          Mesajınız / Ek Bilgiler
+          Ürünleriniz / Ek Bilgiler
         </label>
         <textarea
           rows={4}
@@ -210,7 +210,7 @@ export default function ResellerForm() {
           onChange={(e) =>
             setFormData({ ...formData, message: e.target.value })
           }
-          placeholder="Faaliyet alanınız, hedeflediğiniz ürün grupları veya adetler hakkında bilgi yazabilirsiniz..."
+          placeholder="Satmak istediğiniz ürün grupları, markanız ve aylık tahmini satış hacminiz hakkında bilgi verebilirsiniz..."
           className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
         ></textarea>
       </div>
@@ -244,9 +244,15 @@ export default function ResellerForm() {
             Başvuru Alınıyor...
           </>
         ) : (
-          "Bayilik Başvurusunu Gönder"
+          "Satıcı Başvurusunu Gönder"
         )}
       </button>
+
+      {status === "error" && (
+        <p className="text-sm text-red-600 text-center">
+          Başvuru gönderilemedi. Lütfen tekrar deneyin veya bizimle iletişime geçin.
+        </p>
+      )}
     </form>
   )
 }

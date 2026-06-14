@@ -15,7 +15,10 @@
   },
   "footer": {
     "affiliateLabel": "An Affiliate of the Girişimci Türk Ecosystem",
-    "affiliateNote": "Deprem Market is the official e-commerce affiliate of the EKYP Earthquake Technologies project under Girişimci Türk, turning engineering solutions into accessible disaster-preparedness products for everyone."
+    "affiliateNote": "Deprem Market is the official e-commerce affiliate of the EKYP Earthquake Technologies project under Girişimci Türk, turning engineering solutions into accessible disaster-preparedness products for everyone.",
+    "paymentMethods": "Payment Methods",
+    "securePayment": "Secure payment with 256-bit SSL",
+    "etbisLabel": "ETBİS Registered Business"
   },
   "sideMenu": {
     "menu": "Menu",
@@ -24,7 +27,7 @@
       "home": "Home",
       "store": "Store",
       "featured": "Trending",
-      "reseller": "Become a Reseller",
+      "reseller": "Become a Seller",
       "faq": "FAQ",
       "contact": "Contact",
       "blog": "Blog"
@@ -76,7 +79,7 @@
   "navLinks": {
     "store": "Store",
     "trending": "Trending",
-    "reseller": "Reseller",
+    "reseller": "Become a Seller",
     "trackOrder": "Track Order",
     "faq": "FAQ",
     "contact": "Contact"
@@ -209,10 +212,10 @@
     "addressesDescription": "View your addresses",
     "profileTitle": "Profile",
     "profileDescription": "View and edit your EKYP Deprem Market profile.",
-    "dealershipStatusTitle": "Dealership Status",
-    "dealershipStatusDescription": "Check the status of your dealership application.",
-    "dealershipFormTitle": "Dealership Application Form | EKYP Deprem Market",
-    "dealershipFormDescription": "EKYP Deprem Market dealership and B2B wholesale application form.",
+    "dealershipStatusTitle": "Seller Application",
+    "dealershipStatusDescription": "Check the status of your seller application.",
+    "dealershipFormTitle": "Become a Seller | EKYP Deprem Market",
+    "dealershipFormDescription": "Become a seller on the EKYP Deprem Market marketplace and sell your products to thousands of customers.",
     "orderDetailTitle": "Order #{id}",
     "orderDetailDescription": "View your order",
     "productBrandTitle": "{title} | EKYP Deprem Market",

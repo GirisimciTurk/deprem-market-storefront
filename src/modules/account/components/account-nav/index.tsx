@@ -226,12 +226,12 @@ const AccountNav = ({
                 </li>
                 <li>
                   <LocalizedClientLink
-                    href="/account/bayilik"
+                    href="/account/satici"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
                   >
                     <div className="flex items-center gap-x-2">
                       <BuildingIcon size={20} />
-                      <span>Bayilik Durumu</span>
+                      <span>Satıcı Başvurum</span>
                     </div>
                     <ChevronDown className="transform -rotate-90" />
                   </LocalizedClientLink>
@@ -338,11 +338,11 @@ const AccountNav = ({
               </li>
               <li>
                 <AccountNavLink
-                  href="/account/bayilik"
-                  active={isActive("/account/bayilik")}
+                  href="/account/satici"
+                  active={isActive("/account/satici")}
                   icon={<BuildingIcon size={18} />}
                 >
-                  Bayilik Durumu
+                  Satıcı Başvurum
                 </AccountNavLink>
               </li>
 

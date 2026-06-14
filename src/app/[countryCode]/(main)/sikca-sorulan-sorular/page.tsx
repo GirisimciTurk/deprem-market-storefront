@@ -1,7 +1,45 @@
 import { Metadata } from "next"
 import { getLocale, getTranslations } from "next-intl/server"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import FaqAccordion from "./faq-accordion"
+import FaqAccordion, {
+  type FaqItem,
+} from "@modules/common/components/faq-accordion"
+
+const FAQS: FaqItem[] = [
+  {
+    question:
+      "Deprem çantasının içeriği ne sıklıkla güncellenmeli veya kontrol edilmelidir?",
+    answer:
+      "Deprem çantası içerisindeki gıda malzemeleri, ilk yardım malzemeleri ve suyun son tüketim tarihleri ile pillerin şarj durumları en geç 6 ayda bir kontrol edilmelidir. Bozulmaya yüz tutmuş veya kullanım ömrünü tamamlamış malzemeler yenilenmelidir.",
+  },
+  {
+    question: "Kargom ne zaman kargolanır ve ne kadar sürede elime ulaşır?",
+    answer:
+      "Hafta içi saat 15:00'e kadar verilen tüm siparişler aynı gün kargoya verilmektedir. İstanbul ve çevre illere teslimat genellikle 1-2 iş günü sürerken, diğer şehirlere teslimat 2-3 iş günü içerisinde gerçekleşmektedir.",
+  },
+  {
+    question:
+      "Toplu sipariş ve kurumlar için özel çanta içeriği hazırlıyor musunuz?",
+    answer:
+      "Evet! Okullar, şirketler, fabrikalar ve sivil toplum kuruluşları için özel logolu, adetli ve istenilen iç donanıma sahip deprem/ilk yardım çantaları tasarlayıp üretmekteyiz. Toplu/kurumsal sipariş talepleriniz için lütfen İletişim sayfamızdan bizimle iletişime geçin.",
+  },
+  {
+    question:
+      "Ürünlerinizin kalitesi ve sertifikaları hakkında bilgi alabilir miyim?",
+    answer:
+      "EKYP Deprem Market olarak satışa sunduğumuz tüm ilk yardım malzemeleri T.C. Sağlık Bakanlığı onaylıdır. Çantalarımız su geçirmez, yüksek mukavemetli yırtılmaz kumaşlardan üretilmekte olup; fener, düdük, radyo ve benzeri mekanik/teknolojik ürünlerimiz kalite sertifikalarına sahiptir.",
+  },
+  {
+    question: "İptal, iade ve değişim süreçleri nasıl işlemektedir?",
+    answer:
+      "Tüketici Kanunu gereği satın aldığınız ürünü teslim aldığınız tarihten itibaren 14 gün içerisinde herhangi bir gerekçe göstermeksizin iade edebilir veya değiştirebilirsiniz. İade edilecek ürünün kullanılmamış, kutusunun ve koruyucu ambalajlarının zarar görmemiş olması gerekmektedir.",
+  },
+  {
+    question: "Hangi ödeme yöntemlerini destekliyorsunuz?",
+    answer:
+      "E-ticaret platformumuz üzerinden tüm bankaların kredi ve banka kartları ile 3D Secure güvenli ödeme altyapısıyla alışveriş yapabilirsiniz. Ayrıca alışverişlerinizde peşin fiyatına taksit veya havale/EFT seçeneklerimiz de mevcuttur.",
+  },
+]
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata")
@@ -52,7 +90,7 @@ export default async function SikcaSorulanSorularPage(props: {
 
       {/* Accordion Component */}
       <div className="space-y-4">
-        <FaqAccordion />
+        <FaqAccordion items={FAQS} />
       </div>
 
       <div className="mt-12 p-6 bg-ui-bg-subtle border border-ui-border-base rounded-xl text-center">

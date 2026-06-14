@@ -28,9 +28,9 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
       activeColorClass: "text-orange-600 border-orange-600"
     },
     {
-      href: "/bayilik-basvuru-formu",
+      href: "/satici-ol",
       label: t("reseller"),
-      active: strippedPathname === "/bayilik-basvuru-formu",
+      active: strippedPathname === "/satici-ol",
       colorClass: "hover:text-orange-600 hover:border-orange-600/30",
       activeColorClass: "text-orange-600 border-orange-600"
     },

@@ -76,7 +76,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.5,
       },
       {
-        url: `${baseUrl}${langPath}/bayilik-basvuru-formu`,
+        url: `${baseUrl}${langPath}/satici-ol`,
         lastModified: new Date(),
         changeFrequency: "monthly",
         priority: 0.5,

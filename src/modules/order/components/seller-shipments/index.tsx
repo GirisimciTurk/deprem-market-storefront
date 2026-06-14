@@ -6,6 +6,7 @@ import {
   getSellerShipments,
   type StoreSellerShipment,
 } from "@lib/data/seller-shipments"
+import { getCarrierName } from "@lib/util/cargo"
 
 type Props = {
   orderId: string
@@ -90,7 +91,9 @@ const SellerShipments = ({ orderId }: Props) => {
                     </span>
                   )}
                   {s.carrier && (
-                    <span className="text-xs text-gray-400">{s.carrier}</span>
+                    <span className="text-xs text-gray-400">
+                      {getCarrierName(s.carrier)}
+                    </span>
                   )}
                 </div>
                 <span

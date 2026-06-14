@@ -16,7 +16,7 @@ const SideMenuItems: { key: string; href: string }[] = [
   { key: "home", href: "/" },
   { key: "store", href: "/store" },
   { key: "featured", href: "/collections/featured" },
-  { key: "reseller", href: "/bayilik-basvuru-formu" },
+  { key: "reseller", href: "/satici-ol" },
   { key: "faq", href: "/sikca-sorulan-sorular" },
   { key: "contact", href: "/iletisim" },
   { key: "blog", href: "/blog" },
