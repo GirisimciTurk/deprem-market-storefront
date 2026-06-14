@@ -1,6 +1,8 @@
 "use client"
 
 import React from "react"
+import { usePathname } from "next/navigation"
+import { clx } from "@modules/common/components/ui"
 
 export default function WhatsAppButton() {
   // Lütfen aşağıdaki telefon numarasını kendi WhatsApp numaranızla güncelleyin.
@@ -8,12 +10,20 @@ export default function WhatsAppButton() {
   const whatsappNumber = "905395741904"
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Merhaba,%20deprem%20hazırlık%20ürünleri%20hakkında%20bilgi%20almak%20istiyorum.`
 
+  // Ürün detay sayfalarında mobilde alt sabit "Sepete ekle" çubuğu var;
+  // butonu onunla çakışmaması için yukarı kaydır (masaüstünde normal konum).
+  const pathname = usePathname()
+  const isProductPage = /\/products\//.test(pathname || "")
+
   return (
     <a
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-40 flex items-center bg-[#25D366] hover:bg-[#20ba5a] text-white p-3.5 rounded-full shadow-2xl hover:shadow-green-200/50 hover:scale-105 transition-all duration-300 group max-w-xs overflow-hidden"
+      className={clx(
+        "fixed right-6 z-40 flex items-center bg-[#25D366] hover:bg-[#20ba5a] text-white p-3.5 rounded-full shadow-2xl hover:shadow-green-200/50 hover:scale-105 transition-all duration-300 group max-w-xs overflow-hidden",
+        isProductPage ? "bottom-28 small:bottom-6" : "bottom-6"
+      )}
       aria-label="WhatsApp Destek Hattı"
     >
       {/* Pulsing Green Glow Effect */}

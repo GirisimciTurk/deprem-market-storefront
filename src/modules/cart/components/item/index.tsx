@@ -46,7 +46,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
   return (
     <Table.Row className="w-full" data-testid="product-row">
-      <Table.Cell className="!pl-0 p-4 w-24">
+      <Table.Cell className="!pl-0 pr-2 py-4 w-16 small:w-24 small:pr-4">
         <LocalizedClientLink
           href={`/products/${item.product_handle}`}
           className={clx("flex", {
@@ -73,8 +73,8 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       </Table.Cell>
 
       {type === "full" && (
-        <Table.Cell>
-          <div className="flex gap-2 items-center w-28">
+        <Table.Cell className="px-1 small:p-4">
+          <div className="flex gap-1 small:gap-2 items-center w-auto small:w-28">
             <DeleteButton id={item.id} data-testid="product-delete-button" />
             <CartItemSelect
               value={item.quantity}
@@ -114,7 +114,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         </Table.Cell>
       )}
 
-      <Table.Cell className="!pr-0">
+      <Table.Cell className="!pr-0 pl-1 small:pl-4 whitespace-nowrap">
         <span
           className={clx("!pr-0", {
             "flex flex-col items-end h-full justify-center": type === "preview",

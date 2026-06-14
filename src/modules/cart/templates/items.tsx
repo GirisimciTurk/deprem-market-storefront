@@ -56,7 +56,7 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
           <Table.Row className="text-ui-fg-subtle txt-medium-plus">
             <Table.HeaderCell className="!pl-0">Ürün</Table.HeaderCell>
             <Table.HeaderCell></Table.HeaderCell>
-            <Table.HeaderCell>Adet</Table.HeaderCell>
+            <Table.HeaderCell className="px-1 small:px-4">Adet</Table.HeaderCell>
             <Table.HeaderCell className="hidden small:table-cell">
               Fiyat
             </Table.HeaderCell>

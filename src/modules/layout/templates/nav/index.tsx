@@ -55,8 +55,8 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
           </div>
 
           {/* Right: User actions & Cart */}
-          <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
-            <div className="flex items-center gap-x-6 h-full">
+          <div className="flex items-center gap-x-4 small:gap-x-6 h-full flex-1 basis-0 justify-end">
+            <div className="flex items-center gap-x-4 small:gap-x-6 h-full">
               <SearchModal />
               <LocalizedClientLink
                 className="hover:text-ui-fg-base flex items-center justify-center p-2"
