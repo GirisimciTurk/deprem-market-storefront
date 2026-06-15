@@ -6,7 +6,7 @@ import {
   getSellerShipments,
   type StoreSellerShipment,
 } from "@lib/data/seller-shipments"
-import { getCarrierName } from "@lib/util/cargo"
+import CarrierLogo from "@modules/common/components/carrier-logo"
 
 type Props = {
   orderId: string
@@ -90,11 +90,7 @@ const SellerShipments = ({ orderId }: Props) => {
                       {s.seller_name}
                     </span>
                   )}
-                  {s.carrier && (
-                    <span className="text-xs text-gray-400">
-                      {getCarrierName(s.carrier)}
-                    </span>
-                  )}
+                  {s.carrier && <CarrierLogo code={s.carrier} height={16} withLabel />}
                 </div>
                 <span
                   className={`text-xs font-bold px-2.5 py-1 rounded-full ${style}`}

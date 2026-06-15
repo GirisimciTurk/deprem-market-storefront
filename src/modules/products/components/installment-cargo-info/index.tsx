@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react"
 import { Truck, CreditCard, MapPin, X, ChevronRight } from "lucide-react"
 import { TR_CITIES_DISTRICTS } from "@lib/util/tr-cities-districts"
 import { sdk } from "@lib/config"
+import CarrierLogo from "@modules/common/components/carrier-logo"
 
 type InstallmentCargoInfoProps = {
   price: number // Base price in Liras (e.g. 1500)
@@ -224,8 +225,8 @@ export default function InstallmentCargoInfo({
           className="flex items-center justify-between cursor-pointer hover:bg-gray-100/60 p-2 -mx-2 rounded-lg transition-colors duration-150"
         >
           <div className="flex items-center gap-x-3 text-sm">
-            <div className="bg-white p-1 rounded-md border border-gray-150">
-              <span className="text-xs font-bold text-brand-600 px-1">aras</span>
+            <div className="bg-white px-1.5 py-1 rounded-md border border-gray-150 flex items-center">
+              <CarrierLogo code="yurtici" height={18} />
             </div>
             <div>
               <span className="text-gray-800 font-medium text-xs block">

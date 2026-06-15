@@ -1,6 +1,7 @@
 "use client"
 
 import { convertToLocale } from "@lib/util/money"
+import { sdk } from "@lib/config"
 import React from "react"
 
 type CartTotalsProps = {
@@ -12,6 +13,8 @@ type CartTotalsProps = {
     item_subtotal?: number | null
     shipping_subtotal?: number | null
     discount_subtotal?: number | null
+    id?: string | null
+    shipping_methods?: { id: string }[] | null
   }
 }
 
@@ -23,7 +26,57 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
     item_subtotal,
     shipping_subtotal,
     discount_subtotal,
+    id: cartId,
+    shipping_methods,
   } = totals
+
+  // Sepet sayfasında henüz kargo YÖNTEMİ seçilmediği için shipping_subtotal 0'dır.
+  // Müşteri kargoyu desiye göre ödediğinden, seçim öncesi DESİ-BAZLI TAHMİNİ
+  // gösteririz (otoriter ücret yine checkout'ta seçimle netleşir).
+  const methodSelected = (shipping_methods?.length ?? 0) > 0
+  const [estimate, setEstimate] = React.useState<{
+    amount: number
+    free: boolean
+  } | null>(null)
+
+  React.useEffect(() => {
+    if (methodSelected || !cartId) return
+    let active = true
+    sdk.client
+      .fetch<{ amount: number; free: boolean }>("/store/shipping-quote", {
+        method: "GET",
+        query: { cart_id: cartId },
+      })
+      .then((r) => {
+        if (active) setEstimate({ amount: r.amount ?? 0, free: !!r.free })
+      })
+      .catch(() => {
+        if (active) setEstimate(null)
+      })
+    return () => {
+      active = false
+    }
+  }, [cartId, methodSelected, item_subtotal])
+
+  // Kargo satırında gösterilecek değer.
+  const renderShipping = () => {
+    if (methodSelected) {
+      return convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
+    }
+    if (estimate) {
+      if (estimate.free) {
+        return <span className="text-green-600 font-medium">Ücretsiz</span>
+      }
+      return (
+        <span>
+          {convertToLocale({ amount: estimate.amount, currency_code })}{" "}
+          <span className="text-ui-fg-muted text-xs">(tahmini)</span>
+        </span>
+      )
+    }
+    // Tahmin yüklenene kadar mevcut shipping_subtotal (genelde 0).
+    return convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
+  }
 
   return (
     <div>
@@ -37,7 +90,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
         <div className="flex items-center justify-between">
           <span>Kargo</span>
           <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
-            {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
+            {renderShipping()}
           </span>
         </div>
         {!!discount_subtotal && (
@@ -71,7 +124,14 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
           data-testid="cart-total"
           data-value={total || 0}
         >
-          {convertToLocale({ amount: total ?? 0, currency_code })}
+          {convertToLocale({
+            // Yöntem seçilmeden tahmini kargo gösteriyorsak toplama dahil et.
+            amount:
+              !methodSelected && estimate && !estimate.free
+                ? (total ?? 0) + estimate.amount
+                : total ?? 0,
+            currency_code,
+          })}
         </span>
       </div>
       <div className="h-px w-full border-b border-gray-200 mt-4" />

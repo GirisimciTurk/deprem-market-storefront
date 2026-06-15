@@ -145,11 +145,9 @@ export default function ProductActions({
   }
 
   const activeSku =
-    selectedVariant?.sku || product.variants?.[0]?.sku || "DEP-PRO-4P"
+    selectedVariant?.sku || product.variants?.[0]?.sku || null
   const activeBarcode =
-    selectedVariant?.barcode ||
-    product.variants?.[0]?.barcode ||
-    "8684008777328"
+    selectedVariant?.barcode || product.variants?.[0]?.barcode || null
 
   const { cheapestPrice, variantPrice } = getProductPrice({
     product,
@@ -162,17 +160,23 @@ export default function ProductActions({
   return (
     <>
       <div className="flex flex-col gap-y-4" ref={actionsRef}>
-        {/* Dynamic SKU and Barcode Display */}
-        <div className="flex flex-col gap-y-1 text-sm text-gray-500 font-medium border-t border-gray-150 pt-2">
-          <div>
-            <span className="text-gray-400">Ürün Kodu:</span>{" "}
-            <span className="text-gray-700 font-semibold">{activeSku}</span>
+        {/* SKU / Barkod — yalnızca gerçek değer varsa gösterilir */}
+        {(activeSku || activeBarcode) && (
+          <div className="flex flex-col gap-y-1 text-sm text-gray-500 font-medium border-t border-gray-150 pt-2">
+            {activeSku && (
+              <div>
+                <span className="text-gray-400">Ürün Kodu:</span>{" "}
+                <span className="text-gray-700 font-semibold">{activeSku}</span>
+              </div>
+            )}
+            {activeBarcode && (
+              <div>
+                <span className="text-gray-400">Barkod:</span>{" "}
+                <span className="text-gray-700 font-semibold">{activeBarcode}</span>
+              </div>
+            )}
           </div>
-          <div>
-            <span className="text-gray-400">Barkod:</span>{" "}
-            <span className="text-gray-700 font-semibold">{activeBarcode}</span>
-          </div>
-        </div>
+        )}
 
         <ProductPrice product={product} variant={selectedVariant} />
 

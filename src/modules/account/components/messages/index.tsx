@@ -149,7 +149,7 @@ export default function Messages({
                 </span>
                 <div className="flex items-center gap-x-2 flex-shrink-0">
                   {c.unread > 0 && (
-                    <span className="bg-orange-650 text-white text-3xs font-extrabold min-w-[1.25rem] h-5 px-1.5 rounded-full inline-flex items-center justify-center">
+                    <span className="bg-brand-650 text-white text-3xs font-extrabold min-w-[1.25rem] h-5 px-1.5 rounded-full inline-flex items-center justify-center">
                       {c.unread}
                     </span>
                   )}
@@ -234,7 +234,7 @@ export default function Messages({
                       <div
                         className={`max-w-[80%] rounded-2xl px-3.5 py-2 ${
                           mine
-                            ? "bg-orange-650 text-white rounded-br-sm"
+                            ? "bg-brand-650 text-white rounded-br-sm"
                             : "bg-ui-bg-base border border-ui-border-base text-ui-fg-base rounded-bl-sm"
                         }`}
                       >
@@ -275,7 +275,7 @@ export default function Messages({
               <button
                 type="submit"
                 disabled={sending || !draft.trim()}
-                className="bg-orange-650 hover:bg-orange-700 text-white font-bold py-2 px-5 rounded-xl text-sm transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed flex-shrink-0"
+                className="bg-brand-650 hover:bg-brand-700 text-white font-bold py-2 px-5 rounded-xl text-sm transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed flex-shrink-0"
               >
                 {sending ? labels.sending : labels.send}
               </button>

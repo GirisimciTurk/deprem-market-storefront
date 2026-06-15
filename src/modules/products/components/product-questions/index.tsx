@@ -87,7 +87,7 @@ export default function ProductQuestions({ productHandle, isLoggedIn: _isLoggedI
             setShowForm((s) => !s)
             setResult(null)
           }}
-          className="bg-orange-650 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-all duration-200 shadow-sm cursor-pointer hover:-translate-y-0.5"
+          className="bg-brand-650 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-all duration-200 shadow-sm cursor-pointer hover:-translate-y-0.5"
         >
           {showForm ? "Vazgeç" : "Soru Sor"}
         </button>
@@ -133,7 +133,7 @@ export default function ProductQuestions({ productHandle, isLoggedIn: _isLoggedI
           <button
             type="submit"
             disabled={submitting}
-            className="bg-orange-650 hover:bg-orange-700 disabled:opacity-60 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-all cursor-pointer"
+            className="bg-brand-650 hover:bg-brand-700 disabled:opacity-60 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-all cursor-pointer"
           >
             {submitting ? "Gönderiliyor..." : "Soruyu Gönder"}
           </button>

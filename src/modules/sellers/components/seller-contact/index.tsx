@@ -61,7 +61,7 @@ export default function SellerContact({ sellerHandle }: SellerContactProps) {
         {!showForm && !success && (
           <button
             onClick={() => setShowForm(true)}
-            className="bg-orange-650 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-all duration-200 shadow-sm cursor-pointer hover:-translate-y-0.5"
+            className="bg-brand-650 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-all duration-200 shadow-sm cursor-pointer hover:-translate-y-0.5"
           >
             Satıcıya Soru Sor
           </button>
@@ -148,7 +148,7 @@ export default function SellerContact({ sellerHandle }: SellerContactProps) {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-orange-650 hover:bg-orange-700 text-white font-extrabold py-2 px-6 rounded-lg text-sm transition-colors shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="bg-brand-650 hover:bg-brand-700 text-white font-extrabold py-2 px-6 rounded-lg text-sm transition-colors shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting ? "Gönderiliyor..." : "Gönder"}
             </button>

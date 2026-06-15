@@ -65,34 +65,21 @@ export default function HavarClient() {
             <circle cx="5" cy="17" r="2" /><circle cx="19" cy="17" r="2" />
           </svg>
         </div>
-        {/* HAVAR logosu — drone (quadcopter) monogramı + wordmark */}
-        <div className="flex items-center gap-3 mb-4">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" className="flex-shrink-0">
-            {/* pervaneler */}
-            <circle cx="12" cy="12" r="6.5" stroke="white" strokeWidth="2" />
-            <circle cx="36" cy="12" r="6.5" stroke="#F08C1A" strokeWidth="2" />
-            <circle cx="12" cy="36" r="6.5" stroke="white" strokeWidth="2" />
-            <circle cx="36" cy="36" r="6.5" stroke="white" strokeWidth="2" />
-            {/* kollar (X) */}
-            <path d="M14.5 14.5 21 21M33.5 14.5 27 21M14.5 33.5 21 27M33.5 33.5 27 27" stroke="white" strokeWidth="2.4" strokeLinecap="round" />
-            {/* gövde */}
-            <rect x="19" y="19" width="10" height="10" rx="2.5" fill="white" />
-            <circle cx="24" cy="24" r="2" fill="#1C5DA9" />
-          </svg>
-          <div className="leading-none">
-            <div className="text-3xl font-black tracking-tight">
-              HAV<span className="text-brand-500">A</span>R
-            </div>
-            <div className="text-[11px] font-semibold tracking-[0.2em] text-white/70 uppercase mt-1">
-              havartek · hava aracı
-            </div>
-          </div>
+        {/* HavarTek resmi logosu */}
+        <div className="mb-4 inline-flex bg-white rounded-2xl px-4 py-3 shadow-sm">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/havartek-logo.webp"
+            alt="HavarTek"
+            className="h-16 w-auto object-contain"
+            draggable={false}
+          />
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold mb-3 max-w-2xl">
           Drone tabanlı kargo ve insan taşıma — eve, aileye, afete hazır
         </h1>
         <p className="text-white/85 max-w-2xl text-sm sm:text-base leading-relaxed">
-          HAVAR hava araçları; bireyler ve aileler için <strong>satın alma</strong> ve{" "}
+          HavarTek hava araçları; bireyler ve aileler için <strong>satın alma</strong> ve{" "}
           <strong>kiralama</strong> modeliyle sunulur. Günlük alışveriş ve kargo taşımadan
           afet anında apartmandan tahliyeye kadar geniş bir kullanım sağlar. Aşağıdan ön
           alım veya ön kiralama talebinizi bırakın, ekibimiz sizinle iletişime geçsin.
@@ -103,7 +90,7 @@ export default function HavarClient() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 mt-4 bg-white/15 hover:bg-white/25 text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors"
         >
-          HAVAR hakkında detaylı bilgi
+          HavarTek hakkında detaylı bilgi
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M7 17 17 7M9 7h8v8" />
           </svg>
@@ -260,7 +247,7 @@ export default function HavarClient() {
             </p>
           </div>
           <div className="border border-ui-border-base rounded-xl p-5">
-            <h3 className="font-bold text-sm mb-2 text-brandblue-700">Neden HAVAR?</h3>
+            <h3 className="font-bold text-sm mb-2 text-brandblue-700">Neden HavarTek?</h3>
             <ul className="text-sm text-ui-fg-subtle space-y-1.5 list-disc pl-4">
               <li>Bireysel ve aile kullanımı için satış + kiralama</li>
               <li>Kargo ve insan taşımacılığı</li>

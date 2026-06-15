@@ -4,28 +4,24 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import React from "react"
 import FavoriteButton from "@modules/products/components/favorite-button"
 import ShareButton from "@modules/products/components/share-button"
+import { listProductReviews } from "@lib/data/reviews"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
 }
 
-const getProductReviewData = (handle: string) => {
-  switch (handle) {
-    case "profesyonel-deprem-cantasi":
-      return { rating: 5, count: 124 }
-    case "mini-deprem-cantasi":
-      return { rating: 5, count: 85 }
-    case "sarj-edilebilir-fener":
-      return { rating: 4, count: 48 }
-    case "ilk-yardim-kiti":
-      return { rating: 5, count: 62 }
-    default:
-      return { rating: 5, count: 60 }
-  }
-}
-
 const ProductInfo = async ({ product }: ProductInfoProps) => {
-  const reviewData = getProductReviewData(product.handle)
+  // GERÇEK değerlendirme verisi (onaylı yorumlardan). Hiç yoksa yıldız/sayı
+  // gösterilmez — sahte değer yerine "Henüz değerlendirilmemiş" yazılır.
+  const reviews = product.handle
+    ? await listProductReviews(product.handle).catch(() => [])
+    : []
+  const reviewCount = reviews.length
+  const reviewAverage =
+    reviewCount > 0
+      ? reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviewCount
+      : 0
+  const roundedRating = Math.round(reviewAverage)
   const seller = (product as any).seller as
     | {
         id: string
@@ -95,14 +91,20 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
           </div>
         </div>
 
-        {/* Star Ratings & Review Count */}
+        {/* Star Ratings & Review Count — GERÇEK veri (yorum yoksa gösterilmez) */}
         <div className="flex items-center gap-x-2">
-          <div className="flex items-center text-yellow-400">
+          <div
+            className={`flex items-center ${
+              reviewCount > 0 ? "text-yellow-400" : "text-gray-300"
+            }`}
+          >
             {Array.from({ length: 5 }).map((_, i) => (
               <svg
                 key={i}
                 className={`w-5 h-5 ${
-                  i < reviewData.rating ? "fill-current" : "text-gray-300"
+                  reviewCount > 0 && i < roundedRating
+                    ? "fill-current"
+                    : "text-gray-300"
                 }`}
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -112,17 +114,27 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
             ))}
           </div>
           <span className="text-sm text-gray-500 font-medium">
-            {reviewData.count} değerlendirme
+            {reviewCount > 0
+              ? `${reviewAverage.toFixed(1)} · ${reviewCount} değerlendirme`
+              : "Henüz değerlendirilmemiş"}
           </span>
         </div>
 
-        {/* Description */}
-        <Text
-          className="text-sm text-gray-600 leading-relaxed whitespace-pre-line mt-2"
-          data-testid="product-description"
-        >
-          {product.description}
-        </Text>
+        {/* Kısa Özet — ana içerikten (aşağıdaki foto+yazı bölümü) görsel olarak
+            farklılaştırılmış özet kutusu. Yalnız özet girilmişse gösterilir. */}
+        {product.description && (
+          <div
+            className="mt-2 rounded-lg border-l-4 border-brand-500 bg-brand-50/60 px-4 py-3"
+            data-testid="product-description"
+          >
+            <span className="block text-[11px] font-bold uppercase tracking-wider text-brand-600 mb-1">
+              Ürün Özeti
+            </span>
+            <Text className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+              {product.description}
+            </Text>
+          </div>
+        )}
       </div>
     </div>
   )

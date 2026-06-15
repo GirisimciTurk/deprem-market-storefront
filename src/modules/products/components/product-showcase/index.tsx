@@ -505,13 +505,18 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
       }
     ]
 
-    // Use product images for dynamic highlights
-    const prodImages = images || product.images || []
-    const fallbackHighlights = prodImages.slice(0, 3).map((img: any, index: number) => ({
-      title: `${product.title} - Görsel ${index + 1}`,
-      desc: product.description || "Ürünün detaylı tasarım detayları ve acil durum uyumluluğu.",
-      image: img.url
-    }))
+    // Detaylı anlatım blokları (foto + yazı) — satıcının ürün formunda eklediği
+    // metadata.content_blocks'tan gelir. Her blok bir foto + yazıdır. Blok yoksa
+    // bu bölüm gizlenir (eski "Görsel 1/2/3 + tekrar eden açıklama" davranışı kaldırıldı).
+    const blocks = ((product.metadata as any)?.content_blocks ?? []) as {
+      image?: string | null
+      text?: string | null
+    }[]
+    const contentHighlights = Array.isArray(blocks)
+      ? blocks
+          .filter((b) => (b?.text && b.text.trim()) || (b?.image && b.image.trim()))
+          .map((b) => ({ title: "", desc: (b.text || "").trim(), image: (b.image || "").trim() }))
+      : []
 
     return {
       tagline: "ACİL DURUM VE AFET HAZIRLIĞI",
@@ -520,13 +525,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
       videoUrl: (product.metadata as any)?.video_url || "",
       features: fallbackFeatures,
       specs: defaultSpecs,
-      highlights: fallbackHighlights.length > 0 ? fallbackHighlights : [
-        {
-          title: product.title,
-          desc: product.description || "Detaylı ürün bilgisi.",
-          image: product.thumbnail || "https://images.unsplash.com/photo-1508873696983-2df519f0397e?auto=format&fit=crop&w=600&q=80"
-        }
-      ]
+      highlights: contentHighlights,
     }
   }
 
@@ -594,28 +593,32 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
                   idx % 2 === 1 ? "lg:flex-row-reverse" : ""
                 }`}
               >
-                <div className="w-full lg:w-1/2">
-                  <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm relative group">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-[300px] sm:h-[400px] object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div 
-                      onClick={() => setActiveImage(item.image)}
-                      className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity duration-300"
-                    >
-                      <button className="bg-white text-slate-900 px-4 py-2 rounded-full font-semibold flex items-center gap-x-2 text-sm shadow-lg">
-                        <Maximize2 className="w-4 h-4" /> Büyük Resmi Gör
-                      </button>
+                {item.image && (
+                  <div className="w-full lg:w-1/2">
+                    <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm relative group">
+                      <img
+                        src={item.image}
+                        alt={item.title || `İçerik görseli ${idx + 1}`}
+                        className="w-full h-[300px] sm:h-[400px] object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div
+                        onClick={() => setActiveImage(item.image)}
+                        className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity duration-300"
+                      >
+                        <button className="bg-white text-slate-900 px-4 py-2 rounded-full font-semibold flex items-center gap-x-2 text-sm shadow-lg">
+                          <Maximize2 className="w-4 h-4" /> Büyük Resmi Gör
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="w-full lg:w-1/2 space-y-4 text-center lg:text-left">
-                  <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 uppercase">
-                    {item.title}
-                  </h3>
-                  <p className="text-slate-600 leading-relaxed text-base sm:text-lg">
+                )}
+                <div className={`w-full ${item.image ? "lg:w-1/2" : ""} space-y-4 text-center lg:text-left`}>
+                  {item.title && (
+                    <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 uppercase">
+                      {item.title}
+                    </h3>
+                  )}
+                  <p className="text-slate-600 leading-relaxed text-base sm:text-lg whitespace-pre-line">
                     {item.desc}
                   </p>
                   <div className="pt-2 flex justify-center lg:justify-start gap-x-2">

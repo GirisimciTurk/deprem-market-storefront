@@ -29,7 +29,8 @@ const Payment = ({
   availablePaymentMethods: { id: string }[]
 }) => {
   const filteredPaymentMethods = availablePaymentMethods?.filter(
-    (pm) => pm.id !== "pp_iyzico-mock_iyzico-mock"
+    // iyzico-mock test sağlayıcısı + Paynkolay gizlenir (aktif kart ödemesi PayTR).
+    (pm) => pm.id !== "pp_iyzico-mock_iyzico-mock" && pm.id !== "pp_paynkolay_paynkolay"
   )
 
   const activeSession = cart.payment_collection?.payment_sessions?.find(

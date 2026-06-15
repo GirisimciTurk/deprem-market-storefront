@@ -5,7 +5,7 @@ import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@modules/common/components/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import ErrorMessage from "../error-message"
 
 type PaymentButtonProps = {
@@ -49,9 +49,135 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           data-testid={dataTestId}
         />
       )
+    case paymentSession?.provider_id === "pp_paytr_paytr":
+      return (
+        <PayTRPaymentButton
+          notReady={notReady || disabled}
+          cart={cart}
+          data-testid={dataTestId}
+        />
+      )
     default:
       return <Button disabled>Ödeme yöntemi seçin</Button>
   }
+}
+
+/**
+ * PayTR iFrame ödeme: "Siparişi Tamamla" → backend'den iframe token alınır →
+ * PayTR güvenli ödeme iframe'i modal'da açılır. Ödeme sonucu sunucu-sunucu
+ * /paytr-callback'e gelir (sipariş orada oluşur); iframe sonra ok/fail URL'ine
+ * (storefront /tr/odeme/sonuc) yönlenir ve üst pencereyi yönlendirir.
+ */
+const PayTRPaymentButton = ({
+  cart,
+  notReady,
+  "data-testid": dataTestId,
+}: {
+  cart: HttpTypes.StoreCart
+  notReady: boolean
+  "data-testid": string
+}) => {
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [iframeToken, setIframeToken] = useState<string | null>(null)
+
+  // PayTR iframe boy uyarlayıcısını token gelince yükle.
+  useEffect(() => {
+    if (!iframeToken) return
+    const s = document.createElement("script")
+    s.src = "https://www.paytr.com/js/iframeResizer.min.js"
+    s.async = true
+    s.onload = () => {
+      try {
+        ;(window as any).iFrameResize?.({}, "#paytriframe")
+      } catch {
+        /* resizer best-effort */
+      }
+    }
+    document.body.appendChild(s)
+    return () => {
+      try {
+        document.body.removeChild(s)
+      } catch {
+        /* noop */
+      }
+    }
+  }, [iframeToken])
+
+  const handleSubmit = async () => {
+    setSubmitting(true)
+    setErrorMessage(null)
+    try {
+      const backendUrl =
+        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+      const publishableKey =
+        process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
+      const res = await fetch(`${backendUrl}/store/paytr/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-publishable-api-key": publishableKey,
+        },
+        credentials: "include",
+        body: JSON.stringify({ cart_id: cart.id }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok || !json.success || !json.iframe_token) {
+        throw new Error(json.error || "PayTR ödeme başlatılamadı. Lütfen tekrar deneyin.")
+      }
+      setIframeToken(json.iframe_token)
+    } catch (err: any) {
+      setErrorMessage(err.message || "Bir hata oluştu. Lütfen tekrar deneyin.")
+      setSubmitting(false)
+    }
+  }
+
+  if (iframeToken) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-3 sm:p-4">
+        <div className="bg-white rounded-xl w-full max-w-lg max-h-[92vh] overflow-auto relative shadow-2xl">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 sticky top-0 bg-white">
+            <span className="font-semibold text-gray-900">Güvenli Ödeme (PayTR)</span>
+            <button
+              type="button"
+              onClick={() => {
+                setIframeToken(null)
+                setSubmitting(false)
+              }}
+              className="text-gray-400 hover:text-gray-700 text-xl leading-none"
+              aria-label="Kapat"
+            >
+              ×
+            </button>
+          </div>
+          <iframe
+            src={`https://www.paytr.com/odeme/guvenli/${iframeToken}`}
+            id="paytriframe"
+            frameBorder={0}
+            scrolling="yes"
+            style={{ width: "100%", minHeight: 620, border: "none" }}
+            title="PayTR Ödeme"
+          />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <Button
+        onClick={handleSubmit}
+        disabled={notReady}
+        isLoading={submitting}
+        size="large"
+        className="w-full"
+        data-testid={dataTestId}
+      >
+        PayTR ile Güvenli Öde
+      </Button>
+      <ErrorMessage error={errorMessage} data-testid="paytr-payment-error-message" />
+    </>
+  )
 }
 
 const PaynkolayPaymentButton = ({

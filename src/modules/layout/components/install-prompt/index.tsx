@@ -53,6 +53,9 @@ const InstallPrompt = () => {
     const claim = (): boolean => {
       if (localStorage.getItem(DISMISS_KEY)) return false
       if (isStandalone()) return false
+      // Çerez bandı ile AYNI ANDA çıkmasın (alt köşede üst üste binmesinler):
+      // çerez kararı verilmemişse bu band gösterilmez.
+      if (!localStorage.getItem("_deprem_market_cookie_consent")) return false
       if (sessionStorage.getItem(OVERLAY_KEY)) return false
       sessionStorage.setItem(OVERLAY_KEY, "install")
       return true

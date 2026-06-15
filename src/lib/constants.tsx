@@ -41,6 +41,10 @@ export const paymentInfoMap: Record<
     title: "Kredi veya Banka Kartı",
     icon: <CreditCard />,
   },
+  "pp_paytr_paytr": {
+    title: "Kredi / Banka Kartı (PayTR)",
+    icon: <CreditCard />,
+  },
   // Add more payment providers here
 }
 
