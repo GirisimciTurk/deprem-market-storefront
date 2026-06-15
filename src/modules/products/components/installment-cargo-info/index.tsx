@@ -31,8 +31,8 @@ const BANK_NAMES: Record<string, { name: string; color: string; bg: string }> =
     },
     AXESS: {
       name: "Axess (Akbank)",
-      color: "text-red-600 border-red-200",
-      bg: "bg-red-50",
+      color: "text-brand-600 border-brand-200",
+      bg: "bg-brand-50",
     },
     WORLD: {
       name: "World (Yapı Kredi)",
@@ -46,8 +46,8 @@ const BANK_NAMES: Record<string, { name: string; color: string; bg: string }> =
     },
     BANKKART: {
       name: "Bankkart (Ziraat)",
-      color: "text-red-700 border-red-200",
-      bg: "bg-red-50",
+      color: "text-brand-700 border-brand-200",
+      bg: "bg-brand-50",
     },
     CARDFINANS: {
       name: "CardFinans (QNB)",
@@ -225,7 +225,7 @@ export default function InstallmentCargoInfo({
         >
           <div className="flex items-center gap-x-3 text-sm">
             <div className="bg-white p-1 rounded-md border border-gray-150">
-              <span className="text-xs font-bold text-rose-600 px-1">aras</span>
+              <span className="text-xs font-bold text-brand-600 px-1">aras</span>
             </div>
             <div>
               <span className="text-gray-800 font-medium text-xs block">
@@ -236,7 +236,7 @@ export default function InstallmentCargoInfo({
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-x-1 text-xs text-rose-600 font-semibold bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100 hover:bg-rose-100">
+          <div className="flex items-center gap-x-1 text-xs text-brand-600 font-semibold bg-brand-50 px-2.5 py-1 rounded-full border border-brand-100 hover:bg-brand-100">
             <MapPin className="w-3.5 h-3.5" />
             <span>
               {district}/{city}
@@ -259,8 +259,8 @@ export default function InstallmentCargoInfo({
             className="bg-white border border-gray-200 rounded-xl p-3.5 flex items-center justify-between shadow-xs hover:border-orange-500 hover:shadow-sm cursor-pointer transition-all duration-200"
           >
             <div className="flex items-center gap-x-3">
-              <div className="bg-rose-50 p-2 rounded-lg border border-rose-100">
-                <CreditCard className="w-5 h-5 text-rose-600" />
+              <div className="bg-brand-50 p-2 rounded-lg border border-brand-100">
+                <CreditCard className="w-5 h-5 text-brand-600" />
               </div>
               <div className="text-left">
                 <span className="font-semibold text-gray-900 text-sm block">
@@ -299,7 +299,7 @@ export default function InstallmentCargoInfo({
                 <select
                   value={city}
                   onChange={handleCityChange}
-                  className="w-full h-11 border border-gray-250 rounded-xl px-3 text-sm focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-shadow bg-white"
+                  className="w-full h-11 border border-gray-250 rounded-xl px-3 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-shadow bg-white"
                 >
                   {Object.keys(TR_CITIES_DISTRICTS).map((c) => (
                     <option key={c} value={c}>
@@ -316,7 +316,7 @@ export default function InstallmentCargoInfo({
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full h-11 border border-gray-250 rounded-xl px-3 text-sm focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-shadow bg-white"
+                  className="w-full h-11 border border-gray-250 rounded-xl px-3 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-shadow bg-white"
                 >
                   {(TR_CITIES_DISTRICTS[city] || []).map((d) => (
                     <option key={d} value={d}>
@@ -328,7 +328,7 @@ export default function InstallmentCargoInfo({
 
               <button
                 onClick={saveLocation}
-                className="w-full h-11 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md transition-colors mt-2"
+                className="w-full h-11 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md transition-colors mt-2"
               >
                 Konumu Güncelle
               </button>
@@ -343,7 +343,7 @@ export default function InstallmentCargoInfo({
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="bg-gray-50 px-6 py-4 border-b border-gray-150 flex items-center justify-between shrink-0">
               <span className="font-bold text-gray-900 text-base flex items-center gap-x-2">
-                <CreditCard className="w-5 h-5 text-rose-600" />
+                <CreditCard className="w-5 h-5 text-brand-600" />
                 Taksit Seçenekleri
               </span>
               <button

@@ -1,10 +1,10 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useActionState } from "react"
 import Input from "@modules/common/components/input"
 import AccountInfo from "../account-info"
 import { HttpTypes } from "@medusajs/types"
-// TODO: Re-add toast notifications when Toaster component is implemented
+import { updateCustomerPassword } from "@lib/data/customer"
 
 type MyInformationProps = {
   customer: HttpTypes.StoreCustomer
@@ -13,53 +13,52 @@ type MyInformationProps = {
 const ProfilePassword: React.FC<MyInformationProps> = ({ customer: _customer }) => {
   const [successState, setSuccessState] = React.useState(false)
 
-  // TODO: Add support for password updates
-  const updatePassword = async () => {
-    // TODO: Re-add toast notification when Toaster component is implemented
-    console.info("Password update is not implemented")
-  }
+  const [state, formAction] = useActionState(updateCustomerPassword, {
+    error: null as string | null,
+    success: false,
+  })
 
-  const clearState = () => {
-    setSuccessState(false)
-  }
+  const clearState = () => setSuccessState(false)
+
+  useEffect(() => {
+    setSuccessState(state.success)
+  }, [state])
 
   return (
-    <form
-      action={updatePassword}
-      onReset={() => clearState()}
-      className="w-full"
-    >
+    <form action={formAction} onReset={clearState} className="w-full">
       <AccountInfo
         label="Şifre"
-        currentInfo={
-          <span>Şifre güvenlik nedeniyle gösterilmez</span>
-        }
+        currentInfo={<span>Şifre güvenlik nedeniyle gösterilmez</span>}
         isSuccess={successState}
-        isError={false}
-        errorMessage={undefined}
+        isError={!!state.error}
+        errorMessage={state.error || undefined}
         clearState={clearState}
         data-testid="account-password-editor"
       >
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
-            label="Eski şifre"
+            label="Mevcut şifre"
             name="old_password"
             required
             type="password"
+            autoComplete="current-password"
             data-testid="old-password-input"
           />
+          <div className="hidden sm:block" />
           <Input
-            label="Yeni şifre"
+            label="Yeni şifre (en az 8 karakter)"
             type="password"
             name="new_password"
             required
+            autoComplete="new-password"
             data-testid="new-password-input"
           />
           <Input
-            label="Şifreyi onayla"
+            label="Yeni şifre (tekrar)"
             type="password"
             name="confirm_password"
             required
+            autoComplete="new-password"
             data-testid="confirm-password-input"
           />
         </div>

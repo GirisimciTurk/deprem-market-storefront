@@ -33,6 +33,33 @@ module.exports = {
           80: "#1F2937",
           90: "#111827",
         },
+        // depremTek marka rengi — TURUNCU (ana). 600 = #F08C1A (ana buton/aksan).
+        brand: {
+          50: "#FEF6EA",
+          100: "#FCE7C6",
+          200: "#F9D195",
+          300: "#F6B85F",
+          400: "#F3A23A",
+          500: "#F2941F",
+          600: "#F08C1A",
+          650: "#E07E10",
+          700: "#C8730F",
+          800: "#9E5A10",
+          900: "#7C4811",
+        },
+        // depremTek marka rengi — MAVİ (ikincil/aksan). 600 = #1C5DA9.
+        brandblue: {
+          50: "#EAF1FA",
+          100: "#CADCF1",
+          200: "#A6C2E5",
+          300: "#7AA2D6",
+          400: "#4A7FC4",
+          500: "#2766B2",
+          600: "#1C5DA9",
+          700: "#174C8B",
+          800: "#143F73",
+          900: "#11335C",
+        },
       },
       borderRadius: {
         none: "0px",

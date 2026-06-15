@@ -67,7 +67,7 @@ export default async function SikcaSorulanSorularPage(props: {
             Please check our FAQ in Turkish for detailed questions or contact us directly at destek@ekyp.com.
           </p>
           <div className="pt-8">
-            <LocalizedClientLink href="/" className="text-rose-600 hover:underline font-semibold">
+            <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
               &larr; Return to Home Page
             </LocalizedClientLink>
           </div>
@@ -79,7 +79,7 @@ export default async function SikcaSorulanSorularPage(props: {
   return (
     <div className="content-container max-w-4xl py-16 px-4 sm:px-6 lg:px-8">
       <div className="text-center max-w-2xl mx-auto mb-12">
-        <span className="text-red-650 text-xs font-semibold tracking-wider uppercase bg-red-50 px-3 py-1 rounded-full border border-red-100">Destek Merkezi</span>
+        <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">Destek Merkezi</span>
         <h1 className="text-3xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-2">
           Sıkça Sorulan Sorular
         </h1>
@@ -101,7 +101,7 @@ export default async function SikcaSorulanSorularPage(props: {
         <div className="flex flex-wrap items-center justify-center gap-4">
           <LocalizedClientLink 
             href="/iletisim" 
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-colors shadow-sm"
+            className="bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-colors shadow-sm"
           >
             Bize Yazın
           </LocalizedClientLink>
@@ -117,7 +117,7 @@ export default async function SikcaSorulanSorularPage(props: {
       </div>
 
       <div className="pt-8 border-t mt-12">
-        <LocalizedClientLink href="/" className="text-rose-600 hover:underline font-semibold">
+        <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
           &larr; Ana Sayfaya Dön
         </LocalizedClientLink>
       </div>

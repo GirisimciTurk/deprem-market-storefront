@@ -73,7 +73,7 @@ const TransferActions = ({ id, token }: { id: string; token: string }) => {
           </Button>
         </div>
       )}
-      {errorMessage && <Text className="text-red-500">{errorMessage}</Text>}
+      {errorMessage && <Text className="text-brand-500">{errorMessage}</Text>}
     </div>
   )
 }

@@ -111,7 +111,7 @@ const ReturnRequest = ({ order }: Props) => {
           className={`text-small-regular rounded-rounded p-3 ${
             result.ok
               ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-red-50 text-red-700 border border-red-200"
+              : "bg-brand-50 text-brand-700 border border-brand-200"
           }`}
           data-testid="return-result"
         >

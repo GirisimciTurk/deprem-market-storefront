@@ -40,7 +40,7 @@ export default function GoogleCallbackPage() {
     <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 px-4 text-center">
       {error ? (
         <>
-          <p className="text-sm font-semibold text-red-600 max-w-md">{error}</p>
+          <p className="text-sm font-semibold text-brand-600 max-w-md">{error}</p>
           <button
             onClick={() => router.replace(`/${(params?.countryCode as string) || "tr"}/account`)}
             className="text-sm text-orange-600 font-bold hover:underline"

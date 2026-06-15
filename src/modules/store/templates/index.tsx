@@ -83,11 +83,11 @@ const StoreTemplate = async ({
 const StoreSeoContent = () => {
   return (
     <section className="content-container pb-16 pt-4">
-      <div className="border-t border-ui-border-base pt-10 max-w-4xl">
+      <div className="border-t border-ui-border-base pt-10 max-w-4xl mx-auto text-center">
         <h2 className="text-xl font-bold text-slate-800 mb-4">
           Afet ve Acil Durum Hazırlığı için Doğru Ürünler
         </h2>
-        <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed">
+        <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed text-center">
           <p>
             Deprem ülkesi olan Türkiye'de hazırlıklı olmak, en kritik anlarda
             hayat kurtarır. Bu sayfada, evde, iş yerinde, okulda ve aracınızda

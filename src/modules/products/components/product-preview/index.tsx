@@ -112,7 +112,7 @@ export default function ProductPreview({
           {/* Top-Left: Discount Badge — yalnız gerçek indirimde */}
           {discountPercentage && (
             <div
-              className={`absolute z-10 bg-red-600 text-white font-extrabold text-[10px] sm:text-xs px-2 py-1 rounded-md shadow-md border border-red-500 tracking-tight left-2 ${
+              className={`absolute z-10 bg-brand-600 text-white font-extrabold text-[10px] sm:text-xs px-2 py-1 rounded-md shadow-md border border-brand-500 tracking-tight left-2 ${
                 rankInfo ? "top-10 sm:top-11" : "top-2"
               }`}
             >
@@ -122,7 +122,7 @@ export default function ProductPreview({
 
           {/* Top-Right: Low Stock / Urgency Badge */}
           {isLowStock && (
-            <div className="absolute top-12 right-2 z-10 bg-red-600/90 text-white font-extrabold text-[9px] sm:text-[10px] px-2 py-1 rounded-full shadow-md animate-pulse border border-red-500/50">
+            <div className="absolute top-12 right-2 z-10 bg-brand-600/90 text-white font-extrabold text-[9px] sm:text-[10px] px-2 py-1 rounded-full shadow-md animate-pulse border border-brand-500/50">
               <span>Son {displayStock} Ürün!</span>
             </div>
           )}

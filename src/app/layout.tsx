@@ -8,7 +8,7 @@ import "styles/globals.css"
 // theme-color: tarayıcı/PWA adres çubuğu ve iOS standalone üst bar rengi
 // (manifest theme_color ile aynı marka rengi).
 export const viewport: Viewport = {
-  themeColor: "#E11D48",
+  themeColor: "#F08C1A",
 }
 
 export async function generateMetadata(): Promise<Metadata> {

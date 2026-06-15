@@ -16,7 +16,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
-import { ShoppingBag } from "lucide-react"
+import { Backpack } from "lucide-react"
 
 const CartDropdown = ({
   cart: cartState,
@@ -88,9 +88,9 @@ const CartDropdown = ({
             data-testid="nav-cart-link"
             aria-label="Sepetim"
           >
-            <ShoppingBag className="w-5 h-5 text-slate-700 hover:text-slate-900 transition-colors" />
+            <Backpack className="w-5 h-5 text-slate-700 hover:text-slate-900 transition-colors" />
             {totalItems > 0 && (
-              <span className="bg-rose-600 text-white rounded-full text-[10px] font-bold w-4 h-4 flex items-center justify-center -mt-2 -ml-2">
+              <span className="bg-brand-600 text-white rounded-full text-[10px] font-bold w-4 h-4 flex items-center justify-center -mt-2 -ml-2">
                 {totalItems}
               </span>
             )}

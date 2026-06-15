@@ -101,13 +101,13 @@ const SortProducts = ({
                     className={clx(
                       "w-full text-left px-4 py-2.5 text-xs transition-colors font-bold",
                       {
-                        "bg-red-50 text-red-700 font-extrabold flex items-center justify-between": active,
+                        "bg-brand-50 text-brand-700 font-extrabold flex items-center justify-between": active,
                         "text-ui-fg-subtle hover:bg-gray-50 hover:text-ui-fg-base": !active,
                       }
                     )}
                   >
                     <span>{option.label}</span>
-                    {active && <span className="text-red-650 font-bold">✓</span>}
+                    {active && <span className="text-brand-650 font-bold">✓</span>}
                   </button>
                 </li>
               )

@@ -45,7 +45,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
         videoUrl: "https://www.youtube.com/embed/Yt7aUepwF4w",
         features: [
           {
-            icon: <Shield className="w-8 h-8 text-rose-600" />,
+            icon: <Shield className="w-8 h-8 text-brand-600" />,
             title: "Askeri Standartta Sırt Çantası",
             desc: "Su geçirmez, yırtılmaz Oxford 1000D Cordura naylon kumaş. Ergonomik sırt desteği ve geniş 40L hacim.",
           },
@@ -97,7 +97,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
         videoUrl: "https://www.youtube.com/embed/Yt7aUepwF4w",
         features: [
           {
-            icon: <Shield className="w-8 h-8 text-rose-600" />,
+            icon: <Shield className="w-8 h-8 text-brand-600" />,
             title: "Kompakt 15L Sırt Çantası",
             desc: "Su geçirmez 600D Polyester kumaş. Ultra hafif ve kolay taşınabilir tasarım.",
           },
@@ -144,7 +144,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
         videoUrl: "https://www.youtube.com/embed/Yt7aUepwF4w",
         features: [
           {
-            icon: <Activity className="w-8 h-8 text-rose-600" />,
+            icon: <Activity className="w-8 h-8 text-brand-600" />,
             title: "120 Parça Steril Ekipman",
             desc: "Turnikeler, ateller, yanık kompresleri, göz solüsyonu, bandajlar ve steril sargı bezleri.",
           },
@@ -200,7 +200,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
             desc: "Afet sonrasında yetkililerin yapacağı acil durum anonslarını ve haberleri takip edebilmeniz için hassas radyo alıcısı.",
           },
           {
-            icon: <AlertTriangle className="w-8 h-8 text-rose-500" />,
+            icon: <AlertTriangle className="w-8 h-8 text-brand-500" />,
             title: "SOS Işıklı Alarm Modu",
             desc: "Yardım çağırmak amacıyla yüksek sesli siren ve kırmızı-mavi flaşör ışık yayar.",
           },
@@ -237,7 +237,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
             desc: "Alüminyum kaplamalı Mylar malzeme sayesinde vücuttan yayılan ısıyı geri yansıtarak hipotermiyi önler.",
           },
           {
-            icon: <Shield className="w-8 h-8 text-rose-600" />,
+            icon: <Shield className="w-8 h-8 text-brand-600" />,
             title: "%100 Rüzgar ve Su Geçirmez",
             desc: "Yağmur, kar ve fırtınalı hava şartlarında mükemmel yalıtım sağlar.",
           },
@@ -316,7 +316,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
         videoUrl: "https://www.youtube.com/embed/Yt7aUepwF4w",
         features: [
           {
-            icon: <Volume2 className="w-8 h-8 text-rose-600" />,
+            icon: <Volume2 className="w-8 h-8 text-brand-600" />,
             title: "120 Desibel Ses Gücü",
             desc: "Enkaz altında ses tellerinizi yormadan, hafif bir üflemeyle kilometrelerce uzaktan duyulabilecek frekansta ses çıkarır."
           },
@@ -362,7 +362,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
             desc: "Her bir bar 400 kcal enerji, vitaminler ve mineraller içererek vücut direncini üst seviyede tutar."
           },
           {
-            icon: <Shield className="w-8 h-8 text-rose-600" />,
+            icon: <Shield className="w-8 h-8 text-brand-600" />,
             title: "5 Yıl Raf Ömrü",
             desc: "Hava ve nem geçirmeyen özel üç katmanlı vakumlu ambalajı sayesinde 5 yıl boyunca bozulmaz."
           },
@@ -408,7 +408,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
             desc: "Elektrik şebekesi olmasa dahi üzerindeki solar panel sayesinde gün ışığıyla yavaşça şarj olur."
           },
           {
-            icon: <Shield className="w-8 h-8 text-rose-600" />,
+            icon: <Shield className="w-8 h-8 text-brand-600" />,
             title: "IP67 Askeri Dayanıklılık",
             desc: "Suya düşmeye, toza ve darbelere karşı ekstra güçlendirilmiş silikon zırh gövde."
           },
@@ -444,7 +444,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
         videoUrl: "https://www.youtube.com/embed/Yt7aUepwF4w",
         features: [
           {
-            icon: <Tent className="w-8 h-8 text-rose-600" />,
+            icon: <Tent className="w-8 h-8 text-brand-600" />,
             title: "30 Saniyede Pop-Up Kurulum",
             desc: "Kılıfından çıkardığınız anda otomatik olarak kendi kendine açılır ve kullanıma hazır hale gelir."
           },
@@ -489,7 +489,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
 
     const fallbackFeatures = [
       {
-        icon: <Shield className="w-8 h-8 text-rose-600" />,
+        icon: <Shield className="w-8 h-8 text-brand-600" />,
         title: "Güvenilir Kalite",
         desc: "Afet ve acil durum koşulları göz önüne alınarak test edilmiş, dayanıklı malzemeden üretilmiştir."
       },
@@ -553,7 +553,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
         
         {/* Banner Section */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
-          <span className="text-xs font-bold text-rose-600 tracking-widest uppercase block mb-3">
+          <span className="text-xs font-bold text-brand-600 tracking-widest uppercase block mb-3">
             {data.tagline}
           </span>
           <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mb-6 uppercase">
@@ -619,7 +619,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
                     {item.desc}
                   </p>
                   <div className="pt-2 flex justify-center lg:justify-start gap-x-2">
-                    <div className="h-1 w-12 bg-rose-600 rounded-full" />
+                    <div className="h-1 w-12 bg-brand-600 rounded-full" />
                   </div>
                 </div>
               </div>
@@ -635,7 +635,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
             
             <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 relative z-10">
               <div className="w-full lg:w-5/12 space-y-6 text-center lg:text-left">
-                <div className="inline-flex items-center gap-x-2 bg-rose-500/10 border border-rose-500/20 text-rose-400 px-3 py-1 rounded-full text-xs font-semibold">
+                <div className="inline-flex items-center gap-x-2 bg-brand-500/10 border border-brand-500/20 text-brand-400 px-3 py-1 rounded-full text-xs font-semibold">
                   <Video className="w-3.5 h-3.5" /> GÖRSEL ANLATIM VE REHBER
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">

@@ -65,7 +65,7 @@ const PushToggle = () => {
           haberdar olun.
         </span>
         {denied && (
-          <span className="text-xs text-rose-600 mt-1">
+          <span className="text-xs text-brand-600 mt-1">
             Bildirim izni tarayıcıda engellenmiş. Site ayarlarından izin verip
             tekrar deneyin.
           </span>

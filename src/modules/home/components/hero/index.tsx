@@ -25,8 +25,8 @@ const Hero = async ({ countryCode }: { countryCode: string }) => {
       {/* Hero Content */}
       <div className="content-container relative z-20 w-full max-w-5xl px-4 sm:px-6 lg:px-8 text-left py-20 flex flex-col items-start gap-y-6">
         {/* Affiliate Badge */}
-        <div className="inline-flex items-center gap-x-2 bg-rose-600/10 border border-rose-500/20 px-3.5 py-1.5 rounded-full text-rose-400 text-xs font-semibold uppercase tracking-wider select-none animate-pulse">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+        <div className="inline-flex items-center gap-x-2 bg-brand-600/10 border border-brand-500/20 px-3.5 py-1.5 rounded-full text-brand-400 text-xs font-semibold uppercase tracking-wider select-none animate-pulse">
+          <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
           {t("affiliateBadge")}
         </div>
 
@@ -37,7 +37,7 @@ const Hero = async ({ countryCode }: { countryCode: string }) => {
             className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none uppercase"
           >
             {t("titleLead")}{" "}
-            <span className="text-rose-600 block sm:inline">
+            <span className="text-brand-600 block sm:inline">
               {t("titleHighlight")}
             </span>
           </Heading>
@@ -52,7 +52,7 @@ const Hero = async ({ countryCode }: { countryCode: string }) => {
           <LocalizedClientLink href="/store">
             <Button
               size="large"
-              className="bg-rose-600 border-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 px-8 py-3 rounded-lg shadow-lg font-bold tracking-wide transition-all duration-200"
+              className="bg-brand-600 border-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 px-8 py-3 rounded-lg shadow-lg font-bold tracking-wide transition-all duration-200"
             >
               {t("cta")}
             </Button>

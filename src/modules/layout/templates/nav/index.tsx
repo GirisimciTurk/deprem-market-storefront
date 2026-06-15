@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { User, ShoppingBag } from "lucide-react"
+import { Backpack } from "lucide-react"
 import SearchModal from "@modules/layout/components/search-modal"
 
 import { getTranslations } from "next-intl/server"
@@ -65,7 +65,26 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
                 title={t("account")}
                 aria-label={t("account")}
               >
-                <User className="w-5 h-5 text-slate-700 hover:text-slate-900 transition-colors" />
+                {/* Baretli kişi (afet/güvenlik temalı hesap ikonu) */}
+                <svg
+                  className="w-5 h-5 text-slate-700 hover:text-slate-900 transition-colors"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  {/* baş */}
+                  <circle cx="12" cy="11.5" r="3.3" />
+                  {/* baret siperi (geniş) */}
+                  <path d="M6.5 8.2h11" />
+                  {/* baret kubbesi */}
+                  <path d="M9 8.2a3 3 0 0 1 6 0" />
+                  {/* omuzlar */}
+                  <path d="M5.5 20.5a6.5 6.5 0 0 1 13 0" />
+                </svg>
               </LocalizedClientLink>
               <FavoritesNavIcon />
             </div>
@@ -78,7 +97,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
                   title={t("cart")}
                   aria-label={t("cart")}
                 >
-                  <ShoppingBag className="w-5 h-5 text-slate-700" />
+                  <Backpack className="w-5 h-5 text-slate-700" />
                 </LocalizedClientLink>
               }
             >

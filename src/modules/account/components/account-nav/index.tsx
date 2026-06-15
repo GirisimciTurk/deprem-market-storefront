@@ -239,7 +239,7 @@ const AccountNav = ({
                 <li>
                   <button
                     type="button"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full text-red-600"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full text-brand-600"
                     onClick={handleLogout}
                     data-testid="logout-button"
                   >
@@ -350,7 +350,7 @@ const AccountNav = ({
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-x-3 px-3 py-2.5 text-red-600 hover:bg-red-50 hover:text-red-750 font-bold rounded-xl transition-all duration-200 text-left text-xs"
+                  className="w-full flex items-center gap-x-3 px-3 py-2.5 text-brand-600 hover:bg-brand-50 hover:text-brand-750 font-bold rounded-xl transition-all duration-200 text-left text-xs"
                 >
                   <ArrowRightOnRectangle />
                   <span>Çıkış Yap</span>
@@ -383,7 +383,7 @@ const AccountNavLink = ({
       className={clx(
         "flex items-center gap-x-3 px-3 py-2.5 rounded-xl font-bold transition-all duration-200 text-xs w-full",
         {
-          "bg-red-600 text-white shadow-sm hover:bg-red-700": active,
+          "bg-brand-600 text-white shadow-sm hover:bg-brand-700": active,
           "text-ui-fg-subtle hover:bg-ui-bg-base hover:text-ui-fg-base":
             !active,
         }

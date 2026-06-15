@@ -5,48 +5,44 @@ interface LogoProps {
   iconOnly?: boolean
 }
 
+/**
+ * depremTek marka logosu — "dT" monogramı (turuncu d + 3D mavi T) + wordmark.
+ * Turuncu #F08C1A (ana), Mavi #1C5DA9 (ikincil), koyu mavi #143F73 (3D yüz).
+ */
 export default function Logo({ className = "", iconOnly = false }: LogoProps) {
   return (
-    <div className={`flex items-center gap-x-3 select-none ${className}`}>
-      {/* SVG Icon: Shield with Seismic Wave & Structural Pillar */}
+    <div className={`flex items-center gap-x-2.5 select-none ${className}`}>
       <svg
-        width="36"
-        height="36"
-        viewBox="0 0 36 36"
+        width="40"
+        height="40"
+        viewBox="0 0 52 48"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="text-rose-600 flex-shrink-0"
+        className="flex-shrink-0"
+        aria-hidden="true"
       >
-        {/* Shield outline representing protection */}
+        {/* d — turuncu bowl (halka) */}
         <path
-          d="M18 3L4 9V17C4 24.5 9.5 31.5 18 33C26.5 31.5 32 24.5 32 17V9L18 3Z"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="#FFF1F2"
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M17 17a11 11 0 1 0 0 22 11 11 0 0 0 0-22Zm0 6.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z"
+          fill="#F08C1A"
         />
-        {/* Seismic Pulse / Fault Line */}
-        <path
-          d="M9 19H13L16 12L20 24L23 16L25 19H27"
-          stroke="#E11D48"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Safety Anchor Point */}
-        <circle cx="18" cy="7" r="2" fill="#E11D48" />
+        {/* d — turuncu dikey gövde (ascender) */}
+        <rect x="24" y="5" width="6.5" height="34" rx="2" fill="#F08C1A" />
+        {/* T — 3D koyu mavi yan yüz (derinlik) */}
+        <path d="M34 8h15l-3.5 3.5H37.5z" fill="#143F73" />
+        <path d="M37.5 11.5h4v27l-4 3.5z" fill="#143F73" />
+        {/* T — mavi ön yüz */}
+        <rect x="31" y="8" width="15" height="6.5" rx="1.2" fill="#1C5DA9" />
+        <rect x="35" y="8" width="6.5" height="31" rx="1.2" fill="#1C5DA9" />
       </svg>
 
       {!iconOnly && (
-        <div className="flex flex-col items-start leading-none">
-          <span className="text-xs font-semibold text-ui-fg-subtle tracking-wider uppercase">
-            EKYP
-          </span>
-          <span className="text-lg font-extrabold text-ui-fg-base tracking-tight uppercase">
-            DEPREM <span className="text-rose-600">MARKET</span>
-          </span>
-        </div>
+        <span className="text-2xl font-extrabold tracking-tight lowercase leading-none">
+          <span className="text-brand-600">deprem</span>
+          <span className="text-brandblue-600">Tek</span>
+        </span>
       )}
     </div>
   )

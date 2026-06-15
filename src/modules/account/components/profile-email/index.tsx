@@ -1,70 +1,39 @@
 "use client"
 
-import React, { useEffect, useActionState } from "react";
-
-import Input from "@modules/common/components/input"
-
-import AccountInfo from "../account-info"
+import React from "react"
 import { HttpTypes } from "@medusajs/types"
-// import { updateCustomer } from "@lib/data/customer"
 
 type MyInformationProps = {
   customer: HttpTypes.StoreCustomer
 }
 
+/**
+ * E-posta SALT-OKUNUR gösterilir. Medusa'da müşteri e-postası giriş (auth) kimliğine
+ * bağlıdır ve /store/customers/me ile değiştirilemez (400 döner). Bu yüzden düzenleme
+ * yerine bilgilendirici not gösterilir (eskiden sahte "başarıyla güncellendi" çıkıyordu).
+ */
 const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
-  const [successState, setSuccessState] = React.useState(false)
-
-  // TODO: It seems we don't support updating emails now?
-  const updateCustomerEmail = (
-    _currentState: Record<string, unknown>,
-    _formData: FormData
-  ) => {
-    try {
-      // email: formData.get("email") as string
-      return { success: true, error: null }
-    } catch (error) {
-      return { success: false, error: String(error) }
-    }
-  }
-
-  const [state, formAction] = useActionState(updateCustomerEmail, {
-    error: null as string | null,
-    success: false,
-  })
-
-  const clearState = () => {
-    setSuccessState(false)
-  }
-
-  useEffect(() => {
-    setSuccessState(state.success)
-  }, [state])
-
   return (
-    <form action={formAction} className="w-full">
-      <AccountInfo
-        label="E-posta"
-        currentInfo={`${customer.email}`}
-        isSuccess={successState}
-        isError={!!state.error}
-        errorMessage={state.error || undefined}
-        clearState={clearState}
-        data-testid="account-email-editor"
-      >
-        <div className="grid grid-cols-1 gap-y-2">
-          <Input
-            label="E-posta"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            defaultValue={customer.email}
-            data-testid="email-input"
-          />
+    <div className="w-full" data-testid="account-email-editor">
+      <div className="flex items-start justify-between">
+        <div className="flex flex-col">
+          <span className="uppercase text-ui-fg-base text-small-regular font-semibold">
+            E-posta
+          </span>
+          <span className="font-semibold mt-1" data-testid="current-info">
+            {customer.email}
+          </span>
         </div>
-      </AccountInfo>
-    </form>
+        <span className="text-small-regular text-ui-fg-muted bg-ui-bg-subtle border border-ui-border-base rounded-full px-3 py-1">
+          Değiştirilemez
+        </span>
+      </div>
+      <p className="text-small-regular text-ui-fg-subtle mt-2 max-w-xl">
+        E-posta adresiniz hesap giriş kimliğinizdir ve bu sayfadan değiştirilemez.
+        Değişiklik için <strong>bilgi@girisimciturk.com</strong> üzerinden bizimle
+        iletişime geçebilirsiniz.
+      </p>
+    </div>
   )
 }
 

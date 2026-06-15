@@ -33,7 +33,7 @@ export default function ProductPrice({
   return (
     <div className="flex items-center gap-x-4 my-3">
       {hasDiscount && (
-        <div className="bg-red-600 text-white font-extrabold text-lg px-3 py-2 rounded-md flex items-center justify-center min-w-[55px] select-none">
+        <div className="bg-brand-600 text-white font-extrabold text-lg px-3 py-2 rounded-md flex items-center justify-center min-w-[55px] select-none">
           %{discountPercentage}
         </div>
       )}

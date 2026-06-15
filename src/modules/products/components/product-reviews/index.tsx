@@ -448,7 +448,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                           <button
                             type="button"
                             onClick={() => removeFormImage(idx)}
-                            className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-md cursor-pointer hover:bg-red-700"
+                            className="absolute -top-1 -right-1 bg-brand-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-md cursor-pointer hover:bg-brand-700"
                           >
                             ✕
                           </button>
@@ -458,7 +458,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                   </div>
 
                   {submitError && (
-                    <p className="text-sm font-semibold text-red-600">
+                    <p className="text-sm font-semibold text-brand-600">
                       {submitError}
                     </p>
                   )}

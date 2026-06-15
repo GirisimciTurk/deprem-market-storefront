@@ -39,7 +39,7 @@ export default function FaqAccordion({
               <span>{faq.question}</span>
               <span
                 className={`text-xl transform transition-transform duration-300 ${
-                  isOpen ? "rotate-45 text-red-600" : "text-ui-fg-muted"
+                  isOpen ? "rotate-45 text-brand-600" : "text-ui-fg-muted"
                 }`}
               >
                 +

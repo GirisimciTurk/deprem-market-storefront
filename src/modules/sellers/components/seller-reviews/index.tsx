@@ -252,7 +252,7 @@ export default function SellerReviews({
                   </div>
 
                   {submitError && (
-                    <p className="text-sm font-semibold text-red-600">
+                    <p className="text-sm font-semibold text-brand-600">
                       {submitError}
                     </p>
                   )}

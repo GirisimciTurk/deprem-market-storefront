@@ -125,7 +125,7 @@ export default function ResellerForm() {
         </p>
         <button
           onClick={() => setStatus("idle")}
-          className="mt-6 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
+          className="mt-6 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
         >
           Yeni Bir Başvuru Yap
         </button>
@@ -138,7 +138,7 @@ export default function ResellerForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Firma / Mağaza Adı <span className="text-red-500">*</span>
+            Firma / Mağaza Adı <span className="text-brand-500">*</span>
           </label>
           <input
             type="text"
@@ -149,7 +149,7 @@ export default function ResellerForm() {
               setFormData({ ...formData, companyName: e.target.value })
             }
             placeholder="Örn: Demir Outdoor Ekipmanları"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
           />
         </div>
         <div>
@@ -164,7 +164,7 @@ export default function ResellerForm() {
               setFormData({ ...formData, taxOfficeNumber: e.target.value })
             }
             placeholder="Örn: Kadıköy V.D / 1234567890"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
@@ -172,7 +172,7 @@ export default function ResellerForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Yetkili Adı Soyadı <span className="text-red-500">*</span>
+            Yetkili Adı Soyadı <span className="text-brand-500">*</span>
           </label>
           <input
             type="text"
@@ -183,12 +183,12 @@ export default function ResellerForm() {
               setFormData({ ...formData, contactName: e.target.value })
             }
             placeholder="Örn: Hakan Demir"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
           />
         </div>
         <div>
           <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Şehir <span className="text-red-500">*</span>
+            Şehir <span className="text-brand-500">*</span>
           </label>
           <input
             type="text"
@@ -197,7 +197,7 @@ export default function ResellerForm() {
             value={formData.city}
             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
             placeholder="Örn: İstanbul"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
@@ -205,7 +205,7 @@ export default function ResellerForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            E-Posta Adresi <span className="text-red-500">*</span>
+            E-Posta Adresi <span className="text-brand-500">*</span>
           </label>
           <input
             type="email"
@@ -216,12 +216,12 @@ export default function ResellerForm() {
               setFormData({ ...formData, email: e.target.value })
             }
             placeholder="satici@example.com"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
           />
         </div>
         <div>
           <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Telefon Numarası <span className="text-red-500">*</span>
+            Telefon Numarası <span className="text-brand-500">*</span>
           </label>
           <input
             type="tel"
@@ -232,7 +232,7 @@ export default function ResellerForm() {
               setFormData({ ...formData, phone: e.target.value })
             }
             placeholder="Örn: 0532 000 0000"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
@@ -249,14 +249,14 @@ export default function ResellerForm() {
             setFormData({ ...formData, message: e.target.value })
           }
           placeholder="Satmak istediğiniz ürün grupları, markanız ve aylık tahmini satış hacminiz hakkında bilgi verebilirsiniz..."
-          className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
+          className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all resize-none"
         ></textarea>
       </div>
 
       {contracts.length > 0 && (
         <div className="border border-ui-border-base rounded-lg p-4 bg-ui-bg-subtle">
           <p className="text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-2">
-            Pazaryeri Satıcı Sözleşmeleri <span className="text-red-500">*</span>
+            Pazaryeri Satıcı Sözleşmeleri <span className="text-brand-500">*</span>
           </p>
           <p className="text-xs text-ui-fg-subtle mb-3">
             Satıcı olmak için aşağıdaki sözleşmeleri okuyup onaylamanız
@@ -270,7 +270,7 @@ export default function ResellerForm() {
                 <button
                   type="button"
                   onClick={() => setViewing(c)}
-                  className="text-xs font-semibold text-red-600 hover:text-red-700 underline shrink-0"
+                  className="text-xs font-semibold text-brand-600 hover:text-brand-700 underline shrink-0"
                 >
                   Görüntüle
                 </button>
@@ -283,7 +283,7 @@ export default function ResellerForm() {
               checked={accepted}
               disabled={status === "loading"}
               onChange={(e) => setAccepted(e.target.checked)}
-              className="mt-0.5 h-4 w-4 accent-red-600"
+              className="mt-0.5 h-4 w-4 accent-brand-600"
             />
             <span className="text-sm text-ui-fg-base">
               Yukarıdaki sözleşmeleri okudum, anladım ve kabul ediyorum.
@@ -325,7 +325,7 @@ export default function ResellerForm() {
               <button
                 type="button"
                 onClick={() => setViewing(null)}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg text-sm"
+                className="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-5 rounded-lg text-sm"
               >
                 Kapat
               </button>
@@ -337,7 +337,7 @@ export default function ResellerForm() {
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg text-sm transition-colors shadow-sm flex items-center justify-center gap-2"
+        className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg text-sm transition-colors shadow-sm flex items-center justify-center gap-2"
       >
         {status === "loading" ? (
           <>
@@ -368,7 +368,7 @@ export default function ResellerForm() {
       </button>
 
       {status === "error" && (
-        <p className="text-sm text-red-600 text-center">
+        <p className="text-sm text-brand-600 text-center">
           Başvuru gönderilemedi. Lütfen tekrar deneyin veya bizimle iletişime geçin.
         </p>
       )}

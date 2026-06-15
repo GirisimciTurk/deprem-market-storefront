@@ -33,7 +33,8 @@ export const retrieveCustomer =
       .fetch<{ customer: HttpTypes.StoreCustomer }>(`/store/customers/me`, {
         method: "GET",
         query: {
-          fields: "*orders",
+          // *addresses → adres etiketi (address_name) dahil tüm adres alanları gelsin
+          fields: "*orders,*addresses",
         },
         headers,
         next,
@@ -190,8 +191,56 @@ export async function resetPassword(
   }
 }
 
+/**
+ * Giriş yapmış müşterinin şifresini değiştirir. Backend custom endpoint
+ * (/store/customers/me/change-password) eski şifreyi DOĞRULAR ve emailpass
+ * provider'ını yeni şifreyle günceller (Medusa'nın /auth/.../update'i yalnız
+ * reset-token kabul ettiği için login token'ıyla çalışmaz → custom endpoint).
+ */
+export async function updateCustomerPassword(
+  _currentState: Record<string, unknown>,
+  formData: FormData
+): Promise<{ success: boolean; error: string | null }> {
+  const oldPassword = (formData.get("old_password") as string) || ""
+  const newPassword = (formData.get("new_password") as string) || ""
+  const confirm = (formData.get("confirm_password") as string) || ""
+
+  if (!oldPassword || !newPassword) {
+    return { success: false, error: "Lütfen tüm alanları doldurun." }
+  }
+  if (newPassword.length < 8) {
+    return { success: false, error: "Yeni şifre en az 8 karakter olmalıdır." }
+  }
+  if (newPassword !== confirm) {
+    return { success: false, error: "Yeni şifreler eşleşmiyor." }
+  }
+
+  const headers = { ...(await getAuthHeaders()) }
+  try {
+    await sdk.client.fetch("/store/customers/me/change-password", {
+      method: "POST",
+      headers,
+      body: { old_password: oldPassword, new_password: newPassword },
+    })
+    return { success: true, error: null }
+  } catch (error: any) {
+    const msg = String(error?.message || "")
+    // Backend mesajını ilet; 401 → eski şifre hatalı
+    if (msg.includes("401") || msg.toLowerCase().includes("hatalı") || msg.toLowerCase().includes("unauthorized")) {
+      return { success: false, error: "Mevcut şifreniz hatalı." }
+    }
+    return { success: false, error: error?.message || "Şifre güncellenemedi." }
+  }
+}
+
 export async function signout(countryCode: string) {
-  await sdk.auth.logout()
+  // sdk.auth.logout() backend session'ına bağlı; JWT/Google girişinde session
+  // bulunmayıp hata verebilir → yerel token silme + yönlendirmeyi ENGELLEMESİN.
+  try {
+    await sdk.auth.logout()
+  } catch {
+    // yoksay — asıl çıkış aşağıdaki removeAuthToken (cookie silme) ile olur
+  }
 
   await removeAuthToken()
 
@@ -229,6 +278,7 @@ export const addCustomerAddress = async (
   const isDefaultShipping = (currentState.isDefaultShipping as boolean) || false
 
   const address = {
+    address_name: (formData.get("address_name") as string) || "Adresim",
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
     company: formData.get("company") as string,
@@ -290,6 +340,7 @@ export const updateCustomerAddress = async (
   }
 
   const address = {
+    address_name: (formData.get("address_name") as string) || undefined,
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
     company: formData.get("company") as string,

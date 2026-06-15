@@ -154,7 +154,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
                 onClick={() => setInvoiceType("individual")}
                 className={`flex-1 py-2.5 px-4 border rounded-md text-sm font-semibold transition-all duration-200 ${
                   invoiceType === "individual"
-                    ? "bg-rose-50 border-rose-500 text-rose-700"
+                    ? "bg-brand-50 border-brand-500 text-brand-700"
                     : "bg-white border-ui-border-base text-ui-fg-subtle hover:bg-ui-bg-field-hover"
                 }`}
               >
@@ -165,7 +165,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
                 onClick={() => setInvoiceType("corporate")}
                 className={`flex-1 py-2.5 px-4 border rounded-md text-sm font-semibold transition-all duration-200 ${
                   invoiceType === "corporate"
-                    ? "bg-rose-50 border-rose-500 text-rose-700"
+                    ? "bg-brand-50 border-brand-500 text-brand-700"
                     : "bg-white border-ui-border-base text-ui-fg-subtle hover:bg-ui-bg-field-hover"
                 }`}
               >

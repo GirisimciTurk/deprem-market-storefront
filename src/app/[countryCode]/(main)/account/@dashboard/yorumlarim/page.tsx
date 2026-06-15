@@ -54,7 +54,7 @@ export default async function ReviewsPage() {
                     </LocalizedClientLink>
                     <div>
                       <LocalizedClientLink href={`/products/${review.product_handle}`}>
-                        <h3 className="font-bold text-ui-fg-base text-sm group-hover:text-red-600 transition-colors">
+                        <h3 className="font-bold text-ui-fg-base text-sm group-hover:text-brand-600 transition-colors">
                           {review.product_title}
                         </h3>
                       </LocalizedClientLink>
@@ -70,7 +70,7 @@ export default async function ReviewsPage() {
                         isApproved
                           ? "bg-green-100 text-green-700 border border-green-200"
                           : review.status === "spam"
-                          ? "bg-red-100 text-red-700 border border-red-200"
+                          ? "bg-brand-100 text-brand-700 border border-brand-200"
                           : "bg-amber-100 text-amber-700 border border-amber-200"
                       }`}
                     >
@@ -110,7 +110,7 @@ export default async function ReviewsPage() {
           </p>
           <LocalizedClientLink
             href="/account/orders"
-            className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm py-2 px-6 rounded-lg transition-colors inline-block"
+            className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs sm:text-sm py-2 px-6 rounded-lg transition-colors inline-block"
           >
             Siparişlerime Git
           </LocalizedClientLink>

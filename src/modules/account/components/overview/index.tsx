@@ -157,23 +157,23 @@ const Overview = ({ customer, orders }: OverviewProps) => {
   return (
     <div data-testid="overview-page-wrapper" className="space-y-8 relative">
       {/* Premium Hero Welcome Card */}
-      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-red-900 to-red-700 p-6 sm:p-8 text-white shadow-md">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-400 via-red-900 to-black"></div>
+      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-brand-900 to-brand-700 p-6 sm:p-8 text-white shadow-md">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-400 via-brand-900 to-black"></div>
         <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <span className="text-amber-400 text-xs font-semibold tracking-wider uppercase bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">
+            <span className="text-amber-400 text-xs font-semibold tracking-wider uppercase bg-brand-950/50 px-3 py-1 rounded-full border border-brand-800/50">
               Kullanıcı Paneli
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-3 mb-1">
               Merhaba, {customer?.first_name || "Değerli Üyemiz"} 👋
             </h1>
-            <p className="text-red-100 text-xs sm:text-sm">
+            <p className="text-brand-100 text-xs sm:text-sm">
               Giriş yaptığınız hesap: <span className="font-semibold text-white">{customer?.email}</span>
             </p>
           </div>
           <LocalizedClientLink
             href="/store"
-            className="bg-white hover:bg-red-50 text-red-700 font-bold text-xs sm:text-sm py-2.5 px-5 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap"
+            className="bg-white hover:bg-brand-50 text-brand-700 font-bold text-xs sm:text-sm py-2.5 px-5 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap"
           >
             🛒 Alışverişe Başla
           </LocalizedClientLink>
@@ -188,7 +188,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             <div className="flex justify-between items-center mb-3 gap-2">
               <h3 className="font-bold text-ui-fg-base text-sm sm:text-base">Afet Hazırlık Puanı</h3>
               <span className={`text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${
-                profileScore <= 25 ? "bg-red-100 text-red-700" :
+                profileScore <= 25 ? "bg-brand-100 text-brand-700" :
                 profileScore <= 75 ? "bg-amber-100 text-amber-700" :
                 "bg-green-100 text-green-700"
               }`}>
@@ -209,7 +209,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             </div>
             <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
               <div 
-                className="bg-gradient-to-r from-red-650 via-amber-500 to-green-600 h-full rounded-full transition-all duration-1000"
+                className="bg-gradient-to-r from-brand-650 via-amber-500 to-green-600 h-full rounded-full transition-all duration-1000"
                 style={{ width: `${profileScore}%` }}
               ></div>
             </div>
@@ -231,7 +231,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             </div>
             <LocalizedClientLink
               href="/account/addresses"
-              className="text-xs text-red-650 hover:underline font-semibold whitespace-nowrap"
+              className="text-xs text-brand-650 hover:underline font-semibold whitespace-nowrap"
             >
               Adreslerimi Yönet &rarr;
             </LocalizedClientLink>
@@ -263,7 +263,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                 {customer?.first_name ? (
                   <span className="text-green-600 text-sm flex-shrink-0">✓</span>
                 ) : (
-                  <span className="text-red-500 text-sm flex-shrink-0">○</span>
+                  <span className="text-brand-500 text-sm flex-shrink-0">○</span>
                 )}
                 <span className="text-xs sm:text-sm font-semibold text-ui-fg-base truncate">Ad & Soyad</span>
               </div>
@@ -272,7 +272,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                   {customer.first_name} {customer.last_name}
                 </span>
               ) : (
-                <LocalizedClientLink href="/account/profile" className="text-xs text-red-650 hover:underline flex-shrink-0">
+                <LocalizedClientLink href="/account/profile" className="text-xs text-brand-650 hover:underline flex-shrink-0">
                   Ekle
                 </LocalizedClientLink>
               )}
@@ -288,7 +288,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                     <span className="text-amber-500 text-sm flex-shrink-0">⚠</span>
                   )
                 ) : (
-                  <span className="text-red-500 text-sm flex-shrink-0">○</span>
+                  <span className="text-brand-500 text-sm flex-shrink-0">○</span>
                 )}
                 <span className="text-xs sm:text-sm font-semibold text-ui-fg-base truncate">Telefon</span>
               </div>
@@ -311,7 +311,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                     )}
                   </>
                 ) : (
-                  <LocalizedClientLink href="/account/profile" className="text-xs text-red-650 hover:underline">
+                  <LocalizedClientLink href="/account/profile" className="text-xs text-brand-650 hover:underline">
                     Ekle
                   </LocalizedClientLink>
                 )}
@@ -324,14 +324,14 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                 {customer?.addresses && customer.addresses.length > 0 ? (
                   <span className="text-green-600 text-sm">✓</span>
                 ) : (
-                  <span className="text-red-500 text-sm">○</span>
+                  <span className="text-brand-500 text-sm">○</span>
                 )}
                 <span className="text-xs sm:text-sm font-semibold text-ui-fg-base whitespace-nowrap">Teslimat Adresi</span>
               </div>
               {customer?.addresses && customer.addresses.length > 0 ? (
                 <span className="text-xs text-ui-fg-subtle text-right">Kayıtlı</span>
               ) : (
-                <LocalizedClientLink href="/account/addresses" className="text-xs text-red-650 hover:underline">
+                <LocalizedClientLink href="/account/addresses" className="text-xs text-brand-650 hover:underline">
                   Ekle
                 </LocalizedClientLink>
               )}
@@ -343,7 +343,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
         <div className="lg:col-span-7 border border-ui-border-base p-6 rounded-2xl bg-ui-bg-subtle shadow-sm space-y-4">
           <div className="flex justify-between items-center border-b pb-2">
             <h3 className="font-bold text-ui-fg-base text-sm sm:text-base">Son Siparişleriniz</h3>
-            <LocalizedClientLink href="/account/orders" className="text-xs text-red-650 hover:underline font-semibold">
+            <LocalizedClientLink href="/account/orders" className="text-xs text-brand-650 hover:underline font-semibold">
               Tümünü Gör
             </LocalizedClientLink>
           </div>
@@ -391,7 +391,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                 </p>
                 <LocalizedClientLink
                   href="/store"
-                  className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors inline-block"
+                  className="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors inline-block"
                 >
                   Ürünleri İncele
                 </LocalizedClientLink>
@@ -426,7 +426,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
               </div>
               <button
                 onClick={() => saveQuizState("active", [], 0)}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm py-2 px-5 rounded-lg transition-colors shadow-sm whitespace-nowrap"
+                className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs sm:text-sm py-2 px-5 rounded-lg transition-colors shadow-sm whitespace-nowrap"
               >
                 Testi Başlat
               </button>
@@ -448,7 +448,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
 
             <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-2">
               <div 
-                className="bg-red-600 h-full rounded-full transition-all duration-300"
+                className="bg-brand-600 h-full rounded-full transition-all duration-300"
                 style={{ width: `${((currentQ + 1) / quizQuestions.length) * 100}%` }}
               ></div>
             </div>
@@ -467,7 +467,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                 </button>
                 <button
                   onClick={() => handleAnswer(false)}
-                  className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5"
+                  className="flex-1 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-300 font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5"
                 >
                   ✕ Hayır, Yok
                 </button>
@@ -489,7 +489,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                 </div>
                 <button
                   onClick={handleResetQuiz}
-                  className="text-xs text-red-650 hover:underline font-semibold"
+                  className="text-xs text-brand-650 hover:underline font-semibold"
                 >
                   Testi Yeniden Çöz
                 </button>
@@ -501,7 +501,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                   <span className="text-xs font-bold text-ui-fg-muted block uppercase tracking-wider">Deprem Çantası Skoru</span>
                   <div className="relative inline-flex items-center justify-center">
                     <span className={`text-4xl font-extrabold ${
-                      score <= 33 ? "text-red-650" :
+                      score <= 33 ? "text-brand-650" :
                       score <= 66 ? "text-amber-500" :
                       "text-green-600"
                     }`}>
@@ -509,7 +509,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                     </span>
                   </div>
                   <span className={`block text-xs font-bold px-2 py-0.5 rounded-full ${
-                    score <= 33 ? "bg-red-100 text-red-700" :
+                    score <= 33 ? "bg-brand-100 text-brand-700" :
                     score <= 66 ? "bg-amber-100 text-amber-700" :
                     "bg-green-100 text-green-700"
                   }`}>
@@ -539,9 +539,9 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                         {missingList.map((item) => (
                           <div 
                             key={item.id}
-                            className="flex items-center gap-x-2 p-2.5 rounded-lg bg-red-50/50 border border-red-100 text-red-800 text-2xs sm:text-xs font-semibold"
+                            className="flex items-center gap-x-2 p-2.5 rounded-lg bg-brand-50/50 border border-brand-100 text-brand-800 text-2xs sm:text-xs font-semibold"
                           >
-                            <span className="text-red-550 flex-shrink-0">✕</span>
+                            <span className="text-brand-550 flex-shrink-0">✕</span>
                             <span className="truncate">{item.missing}</span>
                           </div>
                         ))}
@@ -550,7 +550,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                       <div className="pt-2">
                         <LocalizedClientLink
                           href="/store"
-                          className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2.5 px-5 rounded-lg transition-colors inline-block shadow-sm"
+                          className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs py-2.5 px-5 rounded-lg transition-colors inline-block shadow-sm"
                         >
                           🛒 Eksikleri Deprem Market'ten Tamamla
                         </LocalizedClientLink>
@@ -591,7 +591,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                 <button
                   onClick={handleSendCode}
                   disabled={isSubmitting}
-                  className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2"
+                  className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-400 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? "Kod Gönderiliyor..." : "📞 Doğrulama Kodu Gönder"}
                 </button>
@@ -613,20 +613,20 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                     placeholder="123456"
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ""))}
-                    className="w-full border border-ui-border-base rounded-xl px-4 py-3 bg-ui-bg-base text-center font-bold font-mono text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                    className="w-full border border-ui-border-base rounded-xl px-4 py-3 bg-ui-bg-base text-center font-bold font-mono text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={isSubmitting || verificationCode.length < 4}
-                  className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2"
+                  className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-300 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? "Onaylanıyor..." : "Doğrulamayı Tamamla"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setModalStep("send")}
-                  className="text-xs text-red-650 hover:underline block mx-auto"
+                  className="text-xs text-brand-650 hover:underline block mx-auto"
                 >
                   Tekrar Kod Gönder
                 </button>

@@ -40,9 +40,9 @@ export default function FavoritesNavIcon() {
       title="Favorilerim"
       aria-label="Favorilerim"
     >
-      <Heart className="w-5 h-5 text-slate-700 hover:text-rose-600 transition-colors group-hover:scale-105 duration-200" />
+      <Heart className="w-5 h-5 text-slate-700 hover:text-brand-600 transition-colors group-hover:scale-105 duration-200" />
       {favoritesCount > 0 && (
-        <span className="absolute -top-1 -right-1 bg-rose-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white shadow-xs scale-100 animate-in fade-in zoom-in duration-200">
+        <span className="absolute -top-1 -right-1 bg-brand-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white shadow-xs scale-100 animate-in fade-in zoom-in duration-200">
           {favoritesCount}
         </span>
       )}

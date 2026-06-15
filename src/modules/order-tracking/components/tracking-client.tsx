@@ -262,7 +262,7 @@ export default function TrackingClient({
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
               <svg
-                className="w-5 h-5 text-red-600"
+                className="w-5 h-5 text-brand-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -296,7 +296,7 @@ export default function TrackingClient({
                   onChange={(e) =>
                     setDisplayId(e.target.value.replace(/\D/g, ""))
                   }
-                  className="w-full h-11 border-gray-200 focus:border-red-500 focus:ring-red-500 rounded-xl"
+                  className="w-full h-11 border-gray-200 focus:border-brand-500 focus:ring-brand-500 rounded-xl"
                   required
                 />
               </div>
@@ -314,7 +314,7 @@ export default function TrackingClient({
                   placeholder="ornek@domain.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-11 border-gray-200 focus:border-red-500 focus:ring-red-500 rounded-xl"
+                  className="w-full h-11 border-gray-200 focus:border-brand-500 focus:ring-brand-500 rounded-xl"
                   required
                 />
               </div>
@@ -323,7 +323,7 @@ export default function TrackingClient({
                 <Button
                   type="submit"
                   isLoading={loading}
-                  className="w-full h-12 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all shadow-md shadow-red-100 flex items-center justify-center gap-2"
+                  className="w-full h-12 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition-all shadow-md shadow-brand-100 flex items-center justify-center gap-2"
                 >
                   {!loading && (
                     <svg
@@ -346,9 +346,9 @@ export default function TrackingClient({
             </form>
 
             {error && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl text-sm flex items-start gap-2">
+              <div className="mt-4 p-4 bg-brand-50 border border-brand-100 text-brand-700 rounded-xl text-sm flex items-start gap-2">
                 <svg
-                  className="w-5 h-5 text-red-500 shrink-0"
+                  className="w-5 h-5 text-brand-500 shrink-0"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -477,7 +477,7 @@ export default function TrackingClient({
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-all ${
                           step.completed
                             ? step.isError
-                              ? "bg-red-50 border-red-500 text-red-600"
+                              ? "bg-brand-50 border-brand-500 text-brand-600"
                               : "bg-green-50 border-green-500 text-green-600"
                             : "bg-white border-gray-200 text-gray-400"
                         } ${
@@ -548,7 +548,7 @@ export default function TrackingClient({
                           className={`absolute -left-6 w-4 h-4 rounded-full flex items-center justify-center border-2 z-10 transition-all ${
                             isStepCompleted
                               ? step.isError
-                                ? "bg-red-500 border-red-500 text-white"
+                                ? "bg-brand-500 border-brand-500 text-white"
                                 : "bg-green-500 border-green-500 text-white"
                               : "bg-white border-gray-300 text-gray-400"
                           }`}
@@ -613,10 +613,10 @@ export default function TrackingClient({
 
               {/* Fulfillments / Cargo Tracking Link */}
               {order.fulfillments && order.fulfillments.length > 0 && (
-                <div className="bg-red-50/50 rounded-xl border border-red-100/60 p-5">
-                  <h3 className="font-bold text-red-900 text-sm mb-3 flex items-center gap-2">
+                <div className="bg-brand-50/50 rounded-xl border border-brand-100/60 p-5">
+                  <h3 className="font-bold text-brand-900 text-sm mb-3 flex items-center gap-2">
                     <svg
-                      className="w-4 h-4 text-red-600"
+                      className="w-4 h-4 text-brand-600"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -639,7 +639,7 @@ export default function TrackingClient({
                     const trackingLinks = labels.map((l: any) => l?.tracking_url)
                     return (
                       <div key={fulfillment.id} className="flex flex-col gap-3">
-                        <div className="text-xs text-red-700 font-medium">
+                        <div className="text-xs text-brand-700 font-medium">
                           Paket #{fIdx + 1} - Kargo Firması:{" "}
                           {getCarrierName(fulfillment.provider_id)}
                         </div>
@@ -652,7 +652,7 @@ export default function TrackingClient({
                             return (
                               <div
                                 key={nIdx}
-                                className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-lg border border-red-100"
+                                className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-lg border border-brand-100"
                               >
                                 <div className="flex items-center gap-3">
                                   <span className="text-xs font-semibold text-gray-700">
@@ -706,7 +706,7 @@ export default function TrackingClient({
                                   href={link}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-xs font-bold text-red-600 hover:text-red-700 hover:underline flex items-center gap-1 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors"
+                                  className="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline flex items-center gap-1 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-md transition-colors"
                                 >
                                   Kargom Nerede?
                                   <svg
@@ -831,7 +831,7 @@ export default function TrackingClient({
           {customer ? (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-center gap-3 border-b border-gray-100 pb-4 mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center font-bold">
                   {customer.first_name
                     ? customer.first_name[0].toUpperCase()
                     : "U"}
@@ -856,10 +856,10 @@ export default function TrackingClient({
                       <div
                         key={ord.id}
                         onClick={() => handleQuickTrack(ord)}
-                        className="p-3 bg-gray-50 hover:bg-red-50/40 hover:border-red-200/50 rounded-xl border border-gray-100 cursor-pointer transition-all flex flex-col gap-2 group"
+                        className="p-3 bg-gray-50 hover:bg-brand-50/40 hover:border-brand-200/50 rounded-xl border border-gray-100 cursor-pointer transition-all flex flex-col gap-2 group"
                       >
                         <div className="flex justify-between items-center">
-                          <span className="text-xs font-bold text-gray-900 group-hover:text-red-700 transition-colors">
+                          <span className="text-xs font-bold text-gray-900 group-hover:text-brand-700 transition-colors">
                             Sipariş #{ord.display_id}
                           </span>
                           <span className="text-[10px] text-gray-400 font-mono">
@@ -950,7 +950,7 @@ export default function TrackingClient({
             <div className="flex flex-col gap-3 text-xs text-gray-600">
               <div className="flex gap-2">
                 <svg
-                  className="w-4 h-4 text-red-600 shrink-0"
+                  className="w-4 h-4 text-brand-600 shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -969,7 +969,7 @@ export default function TrackingClient({
               </div>
               <div className="flex gap-2">
                 <svg
-                  className="w-4 h-4 text-red-600 shrink-0"
+                  className="w-4 h-4 text-brand-600 shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -985,7 +985,7 @@ export default function TrackingClient({
                   Sorularınız veya teslimat değişiklik talepleriniz için{" "}
                   <LocalizedClientLink
                     href="/iletisim"
-                    className="text-red-600 font-semibold hover:underline"
+                    className="text-brand-600 font-semibold hover:underline"
                   >
                     Müşteri Hizmetleri
                   </LocalizedClientLink>{" "}

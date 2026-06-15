@@ -83,9 +83,9 @@ export default async function TrustBadges() {
               rel="noreferrer"
               aria-label={t("etbisLabel")}
               title={t("etbisLabel")}
-              className="inline-flex items-center gap-1.5 rounded border border-ui-border-base bg-white px-2.5 py-1.5 text-[11px] font-semibold text-ui-fg-base hover:border-rose-400 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded border border-ui-border-base bg-white px-2.5 py-1.5 text-[11px] font-semibold text-ui-fg-base hover:border-brand-400 transition-colors"
             >
-              <span className="font-bold tracking-wide text-rose-600">ETBİS</span>
+              <span className="font-bold tracking-wide text-brand-600">ETBİS</span>
               <span className="text-ui-fg-subtle">{t("etbisLabel")}</span>
             </a>
           )}

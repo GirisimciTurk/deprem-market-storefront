@@ -35,7 +35,7 @@ export default async function CerezPolitikasiPage(props: {
             Please switch to Turkish to read the detailed policy under KVKK compliance.
           </p>
           <div className="pt-8">
-            <LocalizedClientLink href="/" className="text-rose-600 hover:underline font-semibold">
+            <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
               &larr; Return to Home Page
             </LocalizedClientLink>
           </div>
@@ -108,7 +108,7 @@ export default async function CerezPolitikasiPage(props: {
         </section>
 
         <div className="pt-8 border-t">
-          <LocalizedClientLink href="/" className="text-rose-600 hover:underline font-semibold">
+          <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
             &larr; Ana Sayfaya Dön
           </LocalizedClientLink>
         </div>

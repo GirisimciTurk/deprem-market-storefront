@@ -6,6 +6,7 @@ import {
 } from "@lib/data/customer"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { PencilSquare as Edit, Trash } from "@medusajs/icons"
+import { Home, Briefcase, MapPin } from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
 import CountrySelect from "@modules/checkout/components/country-select"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
@@ -71,6 +72,18 @@ const EditAddress: React.FC<EditAddressProps> = ({
         data-testid="address-container"
       >
         <div className="flex flex-col">
+          {(address as any).address_name && (
+            <div className="flex items-center gap-1.5 mb-2 text-brand-700">
+              {(() => {
+                const n = String((address as any).address_name).toLowerCase()
+                const Icon = n.includes("ev") ? Home : n.includes("iş") || n.includes("is") ? Briefcase : MapPin
+                return <Icon size={15} />
+              })()}
+              <span className="text-xs font-bold uppercase tracking-wider">
+                {(address as any).address_name}
+              </span>
+            </div>
+          )}
           <Heading
             className="text-left text-base-semi"
             data-testid="address-name"
@@ -209,7 +222,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
               />
             </div>
             {formState.error && (
-              <div className="text-rose-500 text-small-regular py-2">
+              <div className="text-brand-500 text-small-regular py-2">
                 {formState.error}
               </div>
             )}

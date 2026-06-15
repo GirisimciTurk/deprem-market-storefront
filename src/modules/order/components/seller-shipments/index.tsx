@@ -29,7 +29,7 @@ const STATUS_STYLES: Record<string, string> = {
   shipped: "bg-blue-50 text-blue-600",
   partially_shipped: "bg-blue-50 text-blue-600",
   delivered: "bg-green-50 text-green-600",
-  canceled: "bg-red-50 text-red-600",
+  canceled: "bg-brand-50 text-brand-600",
 }
 
 const statusLabel = (status: string) =>

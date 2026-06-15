@@ -134,7 +134,7 @@ export default function SellerContact({ sellerHandle }: SellerContactProps) {
           </div>
 
           {error && (
-            <p className="text-sm font-semibold text-red-600">{error}</p>
+            <p className="text-sm font-semibold text-brand-600">{error}</p>
           )}
 
           <div className="flex justify-end gap-x-3 pt-2">

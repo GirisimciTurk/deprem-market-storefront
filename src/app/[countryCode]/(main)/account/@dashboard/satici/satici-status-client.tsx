@@ -56,7 +56,7 @@ export default function SaticiStatusClient({
                 </span>
               )}
               {application.status === "rejected" && (
-                <span className="bg-red-50 text-red-700 border border-red-200 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
+                <span className="bg-brand-50 text-brand-700 border border-brand-200 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
                   ✕ Reddedildi
                 </span>
               )}
@@ -124,15 +124,15 @@ export default function SaticiStatusClient({
 
           <div className="bg-white border border-gray-150 rounded-xl p-4 text-left max-w-md mx-auto space-y-2.5 text-xs text-gray-655">
             <div className="flex items-center gap-2">
-              <span className="text-red-600 font-bold">✓</span>
+              <span className="text-brand-600 font-bold">✓</span>
               <span>Hazır müşteri kitlesine ilk günden ulaşım</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-red-600 font-bold">✓</span>
+              <span className="text-brand-600 font-bold">✓</span>
               <span>Tek panelden kolay ürün ve sipariş yönetimi</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-red-600 font-bold">✓</span>
+              <span className="text-brand-600 font-bold">✓</span>
               <span>Güvenli tahsilat ve düzenli hak ediş ödemeleri</span>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function SaticiStatusClient({
           <div className="pt-4">
             <LocalizedClientLink
               href="/satici-ol"
-              className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm py-3 px-8 rounded-xl transition-all shadow-md inline-block hover:-translate-y-0.5 duration-200"
+              className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs sm:text-sm py-3 px-8 rounded-xl transition-all shadow-md inline-block hover:-translate-y-0.5 duration-200"
             >
               Satıcı Başvurusu Yap &rarr;
             </LocalizedClientLink>

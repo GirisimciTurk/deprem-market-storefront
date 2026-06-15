@@ -93,7 +93,7 @@ const Login = ({ setCurrentView }: Props) => {
 
       {/* Google Sign-in Button */}
       {googleError && (
-        <div className="w-full mb-3 bg-red-50 border border-red-150 text-red-700 text-xs font-semibold p-3 rounded-lg">
+        <div className="w-full mb-3 bg-brand-50 border border-brand-150 text-brand-700 text-xs font-semibold p-3 rounded-lg">
           {googleError}
         </div>
       )}

@@ -58,7 +58,7 @@ export default function FavoriteButton({ product, cheapestPrice, className }: Fa
   return (
     <button
       onClick={toggleFavorite}
-      className={`flex items-center justify-center p-2 rounded-full border border-gray-150 bg-white/95 hover:bg-white hover:border-rose-200 transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer ${className} ${
+      className={`flex items-center justify-center p-2 rounded-full border border-gray-150 bg-white/95 hover:bg-white hover:border-brand-200 transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer ${className} ${
         isAnimating ? "scale-125" : "scale-100"
       }`}
       aria-label={isFavorite ? "Favorilerden çıkar" : "Favorilere ekle"}
@@ -70,8 +70,8 @@ export default function FavoriteButton({ product, cheapestPrice, className }: Fa
         stroke="currentColor"
         className={`w-5 h-5 transition-all duration-350 ${
           isFavorite
-            ? "fill-rose-500 text-rose-500 scale-110"
-            : "fill-none text-gray-400 hover:text-rose-500 hover:scale-105"
+            ? "fill-brand-500 text-brand-500 scale-110"
+            : "fill-none text-gray-400 hover:text-brand-500 hover:scale-105"
         }`}
       >
         <path

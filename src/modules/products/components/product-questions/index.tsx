@@ -98,7 +98,7 @@ export default function ProductQuestions({ productHandle, isLoggedIn: _isLoggedI
           className={`mb-6 p-4 rounded-xl text-sm font-semibold ${
             result.ok
               ? "bg-green-50 border border-green-200 text-green-800"
-              : "bg-red-50 border border-red-200 text-red-700"
+              : "bg-brand-50 border border-brand-200 text-brand-700"
           }`}
         >
           {result.msg}

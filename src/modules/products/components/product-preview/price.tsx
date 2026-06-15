@@ -21,7 +21,7 @@ export default function PreviewPrice({ price }: { price: VariantPrice }) {
       <div className="flex flex-col gap-y-1">
         {/* İndirim yüzdesi rozeti */}
         <div className="flex items-center gap-x-1.5 flex-wrap">
-          <span className="bg-rose-50 text-rose-600 border border-rose-100 text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+          <span className="bg-brand-50 text-brand-600 border border-brand-100 text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider">
             %{percentageDiff} İndirim
           </span>
         </div>
@@ -31,7 +31,7 @@ export default function PreviewPrice({ price }: { price: VariantPrice }) {
           <span className="text-[11px] text-gray-500 font-semibold line-through">
             {price.original_price}
           </span>
-          <span className="text-rose-700 font-black text-sm sm:text-base mt-0.5">
+          <span className="text-brand-700 font-black text-sm sm:text-base mt-0.5">
             {price.calculated_price}
           </span>
         </div>

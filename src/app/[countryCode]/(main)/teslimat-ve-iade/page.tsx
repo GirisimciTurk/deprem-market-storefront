@@ -34,7 +34,7 @@ export default async function TeslimatIadePage(props: {
             Detaylı koşulları görüntülemek için lütfen Türkçe diline geçin.
           </p>
           <div className="pt-8">
-            <LocalizedClientLink href="/" className="text-rose-600 hover:underline font-semibold">
+            <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
               &larr; Ana Sayfaya Dön
             </LocalizedClientLink>
           </div>
@@ -88,7 +88,7 @@ export default async function TeslimatIadePage(props: {
         </section>
 
         <div className="pt-8 border-t">
-          <LocalizedClientLink href="/" className="text-rose-600 hover:underline font-semibold">
+          <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
             &larr; Ana Sayfaya Dön
           </LocalizedClientLink>
         </div>

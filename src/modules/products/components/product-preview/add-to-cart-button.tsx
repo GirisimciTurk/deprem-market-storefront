@@ -46,7 +46,7 @@ export default function AddToCartButton({ variantId, className }: AddToCartButto
       className={`w-full py-2 h-9 text-xs font-bold transition-all duration-300 rounded-lg ${
         success
           ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-          : "bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow"
+          : "bg-brand-600 hover:bg-brand-700 text-white shadow-sm hover:shadow"
       } ${className}`}
     >
       {success ? "Sepete Eklendi ✓" : "Sepete Ekle"}

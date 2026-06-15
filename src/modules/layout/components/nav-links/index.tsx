@@ -28,6 +28,13 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
       activeColorClass: "text-orange-600 border-orange-600"
     },
     {
+      href: "/havar",
+      label: t("havar"),
+      active: strippedPathname === "/havar",
+      colorClass: "hover:text-brandblue-700 hover:border-brandblue-700/30 text-brandblue-700 font-bold",
+      activeColorClass: "text-brandblue-700 border-brandblue-700 font-bold"
+    },
+    {
       href: "/satici-ol",
       label: t("reseller"),
       active: strippedPathname === "/satici-ol",
@@ -38,8 +45,8 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
       href: "/siparis-takip",
       label: t("trackOrder"),
       active: strippedPathname === "/siparis-takip",
-      colorClass: "hover:text-orange-600 hover:border-orange-600/30 text-red-600 font-bold",
-      activeColorClass: "text-red-600 border-red-600 font-bold"
+      colorClass: "hover:text-orange-600 hover:border-orange-600/30 text-brand-600 font-bold",
+      activeColorClass: "text-brand-600 border-brand-600 font-bold"
     },
     {
       href: "/sikca-sorulan-sorular",

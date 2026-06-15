@@ -118,7 +118,7 @@ export default async function Footer() {
               <span className="txt-small-plus txt-ui-fg-base">Destek & Bilgi</span>
               <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
                 <li>
-                  <LocalizedClientLink href="/siparis-takip" className="hover:text-ui-fg-base font-semibold text-red-600">
+                  <LocalizedClientLink href="/siparis-takip" className="hover:text-ui-fg-base font-semibold text-brand-600">
                     Sipariş Takip & Kargo
                   </LocalizedClientLink>
                 </li>
@@ -218,18 +218,18 @@ export default async function Footer() {
               {t("affiliateLabel")}
             </span>
             <nav className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 text-sm" aria-label="Ekosistem">
-              <a href="https://girisimciturk.com" target="_blank" rel="noreferrer" className="font-bold text-ui-fg-base hover:text-rose-600 transition-colors">
+              <a href="https://girisimciturk.com" target="_blank" rel="noreferrer" className="font-bold text-ui-fg-base hover:text-brand-600 transition-colors">
                 Girişimci Türk
               </a>
               <span className="text-ui-fg-muted select-none">›</span>
               <span className="text-ui-fg-subtle">EKYP</span>
               <span className="text-ui-fg-muted select-none">›</span>
-              <a href="https://girisimciturk.com/ekyp/deprem-teknolojileri/" target="_blank" rel="noreferrer" className="font-bold text-ui-fg-base hover:text-rose-600 transition-colors">
+              <a href="https://girisimciturk.com/ekyp/deprem-teknolojileri/" target="_blank" rel="noreferrer" className="font-bold text-ui-fg-base hover:text-brand-600 transition-colors">
                 Deprem Teknolojileri
               </a>
               <span className="text-ui-fg-muted select-none">›</span>
-              <span className="inline-flex items-center gap-1.5 font-bold text-rose-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
+              <span className="inline-flex items-center gap-1.5 font-bold text-brand-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-600" />
                 Deprem Market
               </span>
             </nav>

@@ -33,22 +33,22 @@ export default function Icon() {
           {/* Shield outline representing protection */}
           <path
             d="M18 3L4 9V17C4 24.5 9.5 31.5 18 33C26.5 31.5 32 24.5 32 17V9L18 3Z"
-            stroke="#E11D48"
+            stroke="#F08C1A"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            fill="#FFF1F2"
+            fill="#FEF6EA"
           />
           {/* Seismic Pulse / Fault Line */}
           <path
             d="M9 19H13L16 12L20 24L23 16L25 19H27"
-            stroke="#E11D48"
+            stroke="#F08C1A"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           {/* Safety Anchor Point */}
-          <circle cx="18" cy="7" r="2" fill="#E11D48" />
+          <circle cx="18" cy="7" r="2" fill="#F08C1A" />
         </svg>
       </div>
     ),

@@ -47,13 +47,13 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
               id="agree-terms"
               checked={agreedTerms}
               onChange={(e) => setAgreedTerms(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-ui-border-base text-rose-600 focus:ring-rose-500 cursor-pointer"
+              className="mt-1 h-4 w-4 rounded border-ui-border-base text-brand-600 focus:ring-brand-500 cursor-pointer"
             />
             <label htmlFor="agree-terms" className="text-small-regular text-ui-fg-subtle cursor-pointer select-none">
               <LocalizedClientLink
                 href="/on-bilgilendirme-formu"
                 target="_blank"
-                className="text-rose-600 hover:underline font-semibold"
+                className="text-brand-600 hover:underline font-semibold"
               >
                 Ön Bilgilendirme Formu
               </LocalizedClientLink>{" "}
@@ -61,7 +61,7 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
               <LocalizedClientLink
                 href="/mesafeli-satis-sozlesmesi"
                 target="_blank"
-                className="text-rose-600 hover:underline font-semibold"
+                className="text-brand-600 hover:underline font-semibold"
               >
                 Mesafeli Satış Sözleşmesi
               </LocalizedClientLink>
@@ -75,14 +75,14 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
               id="agree-kvkk"
               checked={agreedKvkk}
               onChange={(e) => setAgreedKvkk(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-ui-border-base text-rose-600 focus:ring-rose-500 cursor-pointer"
+              className="mt-1 h-4 w-4 rounded border-ui-border-base text-brand-600 focus:ring-brand-500 cursor-pointer"
             />
             <label htmlFor="agree-kvkk" className="text-small-regular text-ui-fg-subtle cursor-pointer select-none">
               Kişisel verilerimin işlenmesine ilişkin{" "}
               <LocalizedClientLink
                 href="/kvkk"
                 target="_blank"
-                className="text-rose-600 hover:underline font-semibold"
+                className="text-brand-600 hover:underline font-semibold"
               >
                 KVKK Aydınlatma Metni
               </LocalizedClientLink>

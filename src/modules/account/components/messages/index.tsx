@@ -281,7 +281,7 @@ export default function Messages({
               </button>
             </form>
             {sendError && (
-              <p className="text-xs font-semibold text-red-600 px-4 pb-3">
+              <p className="text-xs font-semibold text-brand-600 px-4 pb-3">
                 {sendError}
               </p>
             )}

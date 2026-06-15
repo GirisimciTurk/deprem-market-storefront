@@ -33,7 +33,7 @@ const FilterRadioGroup = ({
               className={clx(
                 "flex items-center gap-x-3 px-4 py-3 rounded-xl border cursor-pointer transition-all duration-200 select-none",
                 {
-                  "border-rose-600 bg-rose-50/30 text-rose-950 font-semibold shadow-sm":
+                  "border-brand-600 bg-brand-50/30 text-brand-950 font-semibold shadow-sm":
                     isSelected,
                   "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50":
                     !isSelected,
@@ -45,7 +45,7 @@ const FilterRadioGroup = ({
                 className={clx(
                   "w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-200 shrink-0",
                   {
-                    "border-rose-600 bg-rose-600": isSelected,
+                    "border-brand-600 bg-brand-600": isSelected,
                     "border-slate-300 bg-white": !isSelected,
                   }
                 )}

@@ -46,7 +46,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             className="flex items-center justify-center mx-3 px-1 transition-all absolute duration-300 top-3 -z-1 origin-0 text-ui-fg-subtle cursor-pointer"
           >
             {label}
-            {required && <span className="text-rose-500">*</span>}
+            {required && <span className="text-brand-500">*</span>}
           </label>
           <span className="absolute right-4 inset-y-0 flex items-center pointer-events-none text-ui-fg-subtle">
             <ChevronUpDown />

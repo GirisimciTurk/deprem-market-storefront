@@ -18,7 +18,7 @@ export default function NotFound() {
       <div className="mt-4">
         <LocalizedClientLink
           href="/"
-          className="text-rose-600 font-bold hover:underline"
+          className="text-brand-600 font-bold hover:underline"
         >
           {t("backHomeArrow")}
         </LocalizedClientLink>

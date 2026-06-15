@@ -131,7 +131,7 @@ export default async function SaticiOlPage() {
           <div className="pt-8">
             <LocalizedClientLink
               href="/"
-              className="text-rose-600 hover:underline font-semibold"
+              className="text-brand-600 hover:underline font-semibold"
             >
               &larr; Return to Home Page
             </LocalizedClientLink>
@@ -145,7 +145,7 @@ export default async function SaticiOlPage() {
     <div className="content-container max-w-6xl py-16 px-4 sm:px-6 lg:px-8">
       {/* Hero */}
       <div className="text-center max-w-3xl mx-auto mb-14">
-        <span className="text-red-650 text-xs font-semibold tracking-wider uppercase bg-red-50 px-3 py-1 rounded-full border border-red-100">
+        <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
           Deprem Market Pazaryeri
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
@@ -158,7 +158,7 @@ export default async function SaticiOlPage() {
         <div className="mt-6">
           <a
             href="#basvuru"
-            className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5 duration-200"
+            className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5 duration-200"
           >
             Hemen Başvur
           </a>
@@ -176,7 +176,7 @@ export default async function SaticiOlPage() {
               key={s.no}
               className="relative border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6"
             >
-              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-red-600 text-white font-extrabold text-lg mb-4">
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-600 text-white font-extrabold text-lg mb-4">
                 {s.no}
               </span>
               <h3 className="font-bold text-ui-fg-base text-sm mb-1">
@@ -242,7 +242,7 @@ export default async function SaticiOlPage() {
       <div className="pt-8 border-t">
         <LocalizedClientLink
           href="/"
-          className="text-rose-600 hover:underline font-semibold"
+          className="text-brand-600 hover:underline font-semibold"
         >
           &larr; Ana Sayfaya Dön
         </LocalizedClientLink>

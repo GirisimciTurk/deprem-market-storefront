@@ -110,10 +110,14 @@ const AccountInfo = ({
         <Disclosure.Panel
           static
           className={clx(
-            "transition-[max-height,opacity] duration-300 ease-in-out overflow-visible",
+            "transition-[max-height,opacity] duration-300 ease-in-out",
             {
-              "max-h-[1000px] opacity-100": state,
-              "max-h-0 opacity-0": !state,
+              // Açık: dropdown'lar taşabilsin (overflow-visible)
+              "max-h-[1000px] opacity-100 overflow-visible": state,
+              // Kapalı: içerik 0 yükseklikten TAŞIP alttaki alanların üzerine binmesin
+              // ve tıklama çalmasın (yoksa örn. e-posta formunun gizli "kaydet"i
+              // telefon satırının üzerine düşüp yanlış formu submit ediyordu).
+              "max-h-0 opacity-0 overflow-hidden pointer-events-none": !state,
             }
           )}
         >

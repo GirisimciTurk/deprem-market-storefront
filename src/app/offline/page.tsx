@@ -25,20 +25,20 @@ export default async function OfflinePage() {
       >
         <path
           d="M18 3L4 9V17C4 24.5 9.5 31.5 18 33C26.5 31.5 32 24.5 32 17V9L18 3Z"
-          stroke="#E11D48"
+          stroke="#F08C1A"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          fill="#FFF1F2"
+          fill="#FEF6EA"
         />
         <path
           d="M9 19H13L16 12L20 24L23 16L25 19H27"
-          stroke="#E11D48"
+          stroke="#F08C1A"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle cx="18" cy="7" r="2" fill="#E11D48" />
+        <circle cx="18" cy="7" r="2" fill="#F08C1A" />
       </svg>
 
       <div className="flex flex-col gap-2">
@@ -48,7 +48,7 @@ export default async function OfflinePage() {
 
       <a
         href="/tr"
-        className="rounded-md bg-rose-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-rose-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600"
+        className="rounded-md bg-brand-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
       >
         {t("retry")}
       </a>

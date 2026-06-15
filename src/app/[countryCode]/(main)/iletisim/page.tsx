@@ -32,7 +32,7 @@ export default async function IletisimPage(props: {
             Managed by <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong>.
           </p>
           <div className="pt-8">
-            <LocalizedClientLink href="/" className="text-rose-600 hover:underline font-semibold">
+            <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
               &larr; Return to Home Page
             </LocalizedClientLink>
           </div>
@@ -57,13 +57,13 @@ export default async function IletisimPage(props: {
         <div className="lg:col-span-5 space-y-4">
           <div className="border border-ui-border-base p-6 rounded-xl bg-ui-bg-subtle shadow-sm">
             <div className="flex items-center gap-x-4 mb-4">
-              <span className="text-2xl p-2 bg-red-50 text-red-650 rounded-lg">📞</span>
+              <span className="text-2xl p-2 bg-brand-50 text-brand-650 rounded-lg">📞</span>
               <div>
                 <h3 className="font-bold text-ui-fg-base text-sm">Müşteri Hizmetleri</h3>
                 <p className="text-xs text-ui-fg-muted">Hafta içi 09:00 - 18:00</p>
               </div>
             </div>
-            <a href="tel:+905395741904" className="text-ui-fg-base hover:text-red-600 font-semibold block text-base">
+            <a href="tel:+905395741904" className="text-ui-fg-base hover:text-brand-600 font-semibold block text-base">
               +90 (539) 574 19 04
             </a>
           </div>
@@ -122,7 +122,7 @@ export default async function IletisimPage(props: {
       </div>
 
       <div className="pt-12 border-t mt-12">
-        <LocalizedClientLink href="/" className="text-rose-600 hover:underline font-semibold">
+        <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
           &larr; Ana Sayfaya Dön
         </LocalizedClientLink>
       </div>

@@ -110,7 +110,7 @@ const RefinementList = ({
                   onClick={() => handleCategoryToggle(cat.id)}
                   className={`flex items-center justify-between text-left text-sm py-2 px-3 rounded-xl transition-all duration-200 select-none ${
                     isSelected
-                      ? "bg-rose-600 text-white font-semibold shadow-sm"
+                      ? "bg-brand-600 text-white font-semibold shadow-sm"
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
@@ -135,7 +135,7 @@ const RefinementList = ({
               placeholder="En az"
               value={minInput}
               onChange={(e) => setMinInput(e.target.value)}
-              className="w-full text-sm px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500 placeholder-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-full text-sm px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 placeholder-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
             <span className="text-slate-600">-</span>
             <input
@@ -143,13 +143,13 @@ const RefinementList = ({
               placeholder="En çok"
               value={maxInput}
               onChange={(e) => setMaxInput(e.target.value)}
-              className="w-full text-sm px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500 placeholder-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-full text-sm px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 placeholder-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
           <div className="flex gap-x-2">
             <button
               type="submit"
-              className="flex-1 text-xs font-semibold py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl transition-all duration-200 shadow-sm"
+              className="flex-1 text-xs font-semibold py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl transition-all duration-200 shadow-sm"
             >
               Uygula
             </button>
@@ -174,7 +174,7 @@ const RefinementList = ({
         <span className="text-sm font-semibold text-slate-700">Sadece Stoktakiler</span>
         <button
           className={`w-9 h-5 flex items-center rounded-full p-0.5 transition-all duration-300 pointer-events-none ${
-            inStock === "true" ? "bg-rose-600 justify-end" : "bg-slate-300 justify-start"
+            inStock === "true" ? "bg-brand-600 justify-end" : "bg-slate-300 justify-start"
           }`}
         >
           <span className="w-4 h-4 rounded-full bg-white shadow-sm" />

@@ -56,7 +56,7 @@ export default function ResetPasswordPage() {
 
         {!linkValid ? (
           <div className="text-center">
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-medium p-4 rounded-xl mb-5 leading-relaxed">
+            <div className="bg-brand-50 border border-brand-200 text-brand-700 text-sm font-medium p-4 rounded-xl mb-5 leading-relaxed">
               Sıfırlama bağlantısı geçersiz. Lütfen şifre sıfırlama e-postasındaki bağlantıyı
               kullanın veya yeni bir bağlantı isteyin.
             </div>
@@ -102,7 +102,7 @@ export default function ResetPasswordPage() {
               </div>
               <p className="text-xs text-gray-400 mt-2">En az 8 karakter.</p>
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-semibold p-3 rounded-lg mt-3">
+                <div className="bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold p-3 rounded-lg mt-3">
                   {error}
                 </div>
               )}

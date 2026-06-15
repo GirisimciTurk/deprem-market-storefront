@@ -57,7 +57,7 @@ const ErrorMessage = ({ error, 'data-testid': dataTestid }: { error?: string | n
   const translatedText = key ? t(key) : error
 
   return (
-    <div className="pt-2 text-rose-500 text-small-regular animate-in fade-in-50 duration-200" data-testid={dataTestid}>
+    <div className="pt-2 text-brand-500 text-small-regular animate-in fade-in-50 duration-200" data-testid={dataTestid}>
       <span>{translatedText}</span>
     </div>
   )

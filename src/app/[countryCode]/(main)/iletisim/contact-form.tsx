@@ -42,7 +42,7 @@ export default function ContactForm() {
         </p>
         <button 
           onClick={() => setStatus("idle")}
-          className="mt-6 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
+          className="mt-6 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
         >
           Yeni Mesaj Gönder
         </button>
@@ -54,7 +54,7 @@ export default function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-          Adınız Soyadınız <span className="text-red-500">*</span>
+          Adınız Soyadınız <span className="text-brand-500">*</span>
         </label>
         <input
           type="text"
@@ -63,14 +63,14 @@ export default function ContactForm() {
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           placeholder="Örn: Ahmet Yılmaz"
-          className="w-full border border-ui-border-base rounded-lg px-4 py-2.5 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+          className="w-full border border-ui-border-base rounded-lg px-4 py-2.5 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            E-Posta Adresiniz <span className="text-red-500">*</span>
+            E-Posta Adresiniz <span className="text-brand-500">*</span>
           </label>
           <input
             type="email"
@@ -79,7 +79,7 @@ export default function ContactForm() {
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             placeholder="name@example.com"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2.5 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            className="w-full border border-ui-border-base rounded-lg px-4 py-2.5 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
           />
         </div>
         <div>
@@ -92,14 +92,14 @@ export default function ContactForm() {
             value={formData.subject}
             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
             placeholder="Mesajınızın konusu"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2.5 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            className="w-full border border-ui-border-base rounded-lg px-4 py-2.5 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
 
       <div>
         <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-          Mesajınız <span className="text-red-500">*</span>
+          Mesajınız <span className="text-brand-500">*</span>
         </label>
         <textarea
           rows={5}
@@ -108,14 +108,14 @@ export default function ContactForm() {
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
           placeholder="Talebinizi detaylıca buraya yazın..."
-          className="w-full border border-ui-border-base rounded-lg px-4 py-2.5 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
+          className="w-full border border-ui-border-base rounded-lg px-4 py-2.5 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all resize-none"
         ></textarea>
       </div>
 
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg text-sm transition-colors shadow-sm flex items-center justify-center gap-2"
+        className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg text-sm transition-colors shadow-sm flex items-center justify-center gap-2"
       >
         {status === "loading" ? (
           <>

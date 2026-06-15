@@ -11,7 +11,7 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     background_color: "#ffffff",
-    theme_color: "#E11D48",
+    theme_color: "#F08C1A",
     orientation: "portrait-primary",
     categories: ["shopping", "safety", "emergency"],
     // Beyan edilen boyut gerçek üretilen boyutla eşleşmeli (yoksa "Resource size is
