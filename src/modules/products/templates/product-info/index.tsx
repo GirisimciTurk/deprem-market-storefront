@@ -4,24 +4,13 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import React from "react"
 import FavoriteButton from "@modules/products/components/favorite-button"
 import ShareButton from "@modules/products/components/share-button"
-import { listProductReviews } from "@lib/data/reviews"
+import ProductRating from "@modules/products/components/product-rating"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
 }
 
 const ProductInfo = async ({ product }: ProductInfoProps) => {
-  // GERÇEK değerlendirme verisi (onaylı yorumlardan). Hiç yoksa yıldız/sayı
-  // gösterilmez — sahte değer yerine "Henüz değerlendirilmemiş" yazılır.
-  const reviews = product.handle
-    ? await listProductReviews(product.handle).catch(() => [])
-    : []
-  const reviewCount = reviews.length
-  const reviewAverage =
-    reviewCount > 0
-      ? reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviewCount
-      : 0
-  const roundedRating = Math.round(reviewAverage)
   const seller = (product as any).seller as
     | {
         id: string
@@ -91,34 +80,9 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
           </div>
         </div>
 
-        {/* Star Ratings & Review Count — GERÇEK veri (yorum yoksa gösterilmez) */}
-        <div className="flex items-center gap-x-2">
-          <div
-            className={`flex items-center ${
-              reviewCount > 0 ? "text-yellow-400" : "text-gray-300"
-            }`}
-          >
-            {Array.from({ length: 5 }).map((_, i) => (
-              <svg
-                key={i}
-                className={`w-5 h-5 ${
-                  reviewCount > 0 && i < roundedRating
-                    ? "fill-current"
-                    : "text-gray-300"
-                }`}
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
-          </div>
-          <span className="text-sm text-gray-500 font-medium">
-            {reviewCount > 0
-              ? `${reviewAverage.toFixed(1)} · ${reviewCount} değerlendirme`
-              : "Henüz değerlendirilmemiş"}
-          </span>
-        </div>
+        {/* Star Ratings & Review Count — CANLI (client) çekilir, alt "Müşteri
+            Değerlendirmeleri" bölümüyle tutarlı; ISR cache'i bayatlamaz. */}
+        {product.handle && <ProductRating productHandle={product.handle} />}
 
         {/* Kısa Özet — ana içerikten (aşağıdaki foto+yazı bölümü) görsel olarak
             farklılaştırılmış özet kutusu. Yalnız özet girilmişse gösterilir. */}

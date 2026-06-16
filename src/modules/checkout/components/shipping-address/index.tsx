@@ -46,14 +46,16 @@ const ShippingAddress = ({
     [cart?.region]
   )
 
-  // Bölgedeki kayıtlı adresler.
-  const addressesInRegion = useMemo(
-    () =>
-      customer?.addresses.filter(
-        (a) => a.country_code && countriesInRegion?.includes(a.country_code)
-      ) ?? [],
-    [customer?.addresses, countriesInRegion]
-  )
+  // Bölgedeki kayıtlı adresler. cart fetch'inde region.countries gelmeyebilir →
+  // countriesInRegion undefined olursa filtre TÜM adresleri eler ve hiç kart
+  // gösterilmezdi. Bu yüzden: ülke listesi yoksa tüm adresleri göster (fallback).
+  const addressesInRegion = useMemo(() => {
+    const all = customer?.addresses ?? []
+    if (!countriesInRegion || countriesInRegion.length === 0) return all
+    return all.filter(
+      (a) => a.country_code && countriesInRegion.includes(a.country_code)
+    )
+  }, [customer?.addresses, countriesInRegion])
   const hasSaved = addressesInRegion.length > 0
 
   // Mod: kayıtlı adres varsa hızlı "seç" modu; yoksa manuel form.
