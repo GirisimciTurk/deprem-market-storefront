@@ -1,4 +1,4 @@
-import { retrieveCart } from "@lib/data/cart"
+import { refreshCartPrices, retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import CartTemplate from "@modules/cart/templates"
 import { Metadata } from "next"
@@ -14,10 +14,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Cart() {
-  const cart = await retrieveCart().catch((error) => {
-    console.error(error)
-    return notFound()
-  })
+  // Sepet açılırken kalem fiyatlarını güncel fiyat/kampanyalara göre tazele,
+  // sonra taze (cache'siz) oku.
+  await refreshCartPrices()
+  const cart = await retrieveCart(undefined, undefined, { fresh: true }).catch(
+    (error) => {
+      console.error(error)
+      return notFound()
+    }
+  )
 
   const customer = await retrieveCustomer()
 

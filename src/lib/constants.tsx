@@ -37,10 +37,6 @@ export const paymentInfoMap: Record<
     title: "Kredi / Banka Kartı (iyzico)",
     icon: <CreditCard />,
   },
-  "pp_paynkolay_paynkolay": {
-    title: "Kredi veya Banka Kartı",
-    icon: <CreditCard />,
-  },
   "pp_paytr_paytr": {
     title: "Kredi / Banka Kartı (PayTR)",
     icon: <CreditCard />,

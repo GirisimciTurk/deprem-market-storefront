@@ -15,6 +15,7 @@ const StoreTemplate = async ({
   categoryId,
   inStock,
   countryCode,
+  showSeoContent = true,
 }: {
   sortBy?: SortOptions
   page?: string
@@ -23,6 +24,7 @@ const StoreTemplate = async ({
   categoryId?: string
   inStock?: string
   countryCode: string
+  showSeoContent?: boolean
 }) => {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
@@ -70,7 +72,7 @@ const StoreTemplate = async ({
         </div>
       </div>
 
-      <StoreSeoContent />
+      {showSeoContent && <StoreSeoContent />}
     </>
   )
 }

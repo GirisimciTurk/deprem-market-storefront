@@ -274,8 +274,12 @@ export const addCustomerAddress = async (
   currentState: Record<string, unknown>,
   formData: FormData
 ): Promise<{ success: boolean; error: string | null }> => {
-  const isDefaultBilling = (currentState.isDefaultBilling as boolean) || false
-  const isDefaultShipping = (currentState.isDefaultShipping as boolean) || false
+  // Varsayılan: currentState'ten ya da formdaki "is_default" onay kutusundan.
+  const formDefault = formData.get("is_default_shipping") != null
+  const isDefaultBilling =
+    (currentState.isDefaultBilling as boolean) || formDefault || false
+  const isDefaultShipping =
+    (currentState.isDefaultShipping as boolean) || formDefault || false
 
   const address = {
     address_name: (formData.get("address_name") as string) || "Adresim",
@@ -356,6 +360,12 @@ export const updateCustomerAddress = async (
 
   if (phone) {
     address.phone = phone
+  }
+
+  // "Varsayılan adresim yap" işaretliyse hem teslimat hem fatura varsayılanı yap.
+  if (formData.get("is_default_shipping") != null) {
+    address.is_default_shipping = true
+    address.is_default_billing = true
   }
 
   const headers = {

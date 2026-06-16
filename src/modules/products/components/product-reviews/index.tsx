@@ -130,7 +130,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
   }, [approvedReviews])
 
   const stats = useMemo(() => {
-    if (approvedReviews.length === 0) return { average: 5, distribution: [0, 0, 0, 0, 0], total: 0 }
+    if (approvedReviews.length === 0) return { average: 0, distribution: [0, 0, 0, 0, 0], total: 0 }
     
     const sum = approvedReviews.reduce((acc, curr) => acc + curr.rating, 0)
     const average = Math.round((sum / approvedReviews.length) * 10) / 10
@@ -220,10 +220,6 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
     setFormComment("")
     setFormPhotos([])
     setSubmitSuccess(true)
-    setTimeout(() => {
-      setSubmitSuccess(false)
-      setShowForm(false)
-    }, 4000)
   }
 
   return (
@@ -370,6 +366,16 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
                     Yorumunuz onay için ekibimize iletildi. Onaylandıktan sonra ürün
                     sayfasında yayınlanacaktır.
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSubmitSuccess(false)
+                      setShowForm(false)
+                    }}
+                    className="self-start ml-8 mt-2 text-xs font-bold text-green-700 underline hover:text-green-800 cursor-pointer"
+                  >
+                    Tamam
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -486,7 +492,9 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
             <div className="space-y-6">
               {filteredReviews.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-100 text-gray-500 text-sm font-semibold">
-                  Bu puan derecesinde henüz onaylanmış yorum bulunmamaktadır.
+                  {filterRating !== null
+                    ? "Bu puan derecesinde henüz onaylanmış yorum bulunmamaktadır."
+                    : "Bu ürün için henüz değerlendirme yapılmamış. İlk değerlendirmeyi siz ekleyin!"}
                 </div>
               ) : (
                 filteredReviews.map((r) => (

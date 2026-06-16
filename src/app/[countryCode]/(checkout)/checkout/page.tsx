@@ -1,4 +1,4 @@
-import { retrieveCart } from "@lib/data/cart"
+import { refreshCartPrices, retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
@@ -16,7 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Checkout() {
-  const cart = await retrieveCart()
+  // Ödeme adımından önce fiyatları güncelle → müşteri daima güncel fiyatı öder.
+  await refreshCartPrices()
+  const cart = await retrieveCart(undefined, undefined, { fresh: true })
 
   if (!cart) {
     return notFound()

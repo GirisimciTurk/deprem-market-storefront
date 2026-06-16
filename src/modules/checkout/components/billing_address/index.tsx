@@ -42,15 +42,31 @@ const isValidVKN = (val: string): boolean => {
 
 const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
   const t = useTranslations("billingAddress")
+  // TR: geçersiz İl/İlçe değerlerini (eski/bozuk kayıt) yanlış "Adana" fallback'ine
+  // düşmesin diye boşa çevir; kullanıcı doğru seçer.
+  const billingCountry = cart?.billing_address?.country_code || ""
+  const rawBillingCity = cart?.billing_address?.city || ""
+  const rawBillingProvince = cart?.billing_address?.province || ""
+  const initBillingCity =
+    billingCountry === "tr" &&
+    !Object.prototype.hasOwnProperty.call(TR_CITIES_DISTRICTS, rawBillingCity)
+      ? ""
+      : rawBillingCity
+  const initBillingProvince =
+    billingCountry === "tr" &&
+    !(initBillingCity && TR_CITIES_DISTRICTS[initBillingCity]?.includes(rawBillingProvince))
+      ? ""
+      : rawBillingProvince
+
   const [formData, setFormData] = useState<Record<string, string>>({
     "billing_address.first_name": cart?.billing_address?.first_name || "",
     "billing_address.last_name": cart?.billing_address?.last_name || "",
     "billing_address.address_1": cart?.billing_address?.address_1 || "",
     "billing_address.company": cart?.billing_address?.company || "",
     "billing_address.postal_code": cart?.billing_address?.postal_code || "",
-    "billing_address.city": cart?.billing_address?.city || "",
-    "billing_address.country_code": cart?.billing_address?.country_code || "",
-    "billing_address.province": cart?.billing_address?.province || "",
+    "billing_address.city": initBillingCity,
+    "billing_address.country_code": billingCountry,
+    "billing_address.province": initBillingProvince,
     "billing_address.phone": cart?.billing_address?.phone || "",
   })
 

@@ -8,10 +8,11 @@ import useToggleState from "@lib/hooks/use-toggle-state"
 import { PencilSquare as Edit, Trash } from "@medusajs/icons"
 import { Home, Briefcase, MapPin } from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
-import CountrySelect from "@modules/checkout/components/country-select"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
 import Modal from "@modules/common/components/modal"
+import AddressRegionFields from "./address-region-fields"
+import AddressLabelPicker from "./address-label-picker"
 import { Button, Heading, Text, clx } from "@modules/common/components/ui"
 import Spinner from "@modules/common/icons/spinner"
 import React, { useActionState, useEffect, useState } from "react"
@@ -72,18 +73,27 @@ const EditAddress: React.FC<EditAddressProps> = ({
         data-testid="address-container"
       >
         <div className="flex flex-col">
-          {(address as any).address_name && (
-            <div className="flex items-center gap-1.5 mb-2 text-brand-700">
-              {(() => {
-                const n = String((address as any).address_name).toLowerCase()
-                const Icon = n.includes("ev") ? Home : n.includes("iş") || n.includes("is") ? Briefcase : MapPin
-                return <Icon size={15} />
-              })()}
-              <span className="text-xs font-bold uppercase tracking-wider">
-                {(address as any).address_name}
+          <div className="flex items-center justify-between mb-2">
+            {(address as any).address_name ? (
+              <div className="flex items-center gap-1.5 text-brand-700">
+                {(() => {
+                  const n = String((address as any).address_name).toLowerCase()
+                  const Icon = n.includes("ev") ? Home : n.includes("iş") || n.includes("is") ? Briefcase : MapPin
+                  return <Icon size={15} />
+                })()}
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  {(address as any).address_name}
+                </span>
+              </div>
+            ) : (
+              <span />
+            )}
+            {address.is_default_shipping && (
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-700 rounded px-1.5 py-0.5">
+                Varsayılan
               </span>
-            </div>
-          )}
+            )}
+          </div>
           <Heading
             className="text-left text-base-semi"
             data-testid="address-name"
@@ -140,6 +150,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
           <input type="hidden" name="addressId" value={address.id} />
           <Modal.Body>
             <div className="grid grid-cols-1 gap-y-2">
+              <AddressLabelPicker initial={(address as any).address_name} />
               <div className="grid grid-cols-2 gap-x-2">
                 <Input
                   label="Ad"
@@ -166,7 +177,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 data-testid="company-input"
               />
               <Input
-                label="Adres"
+                label="Adres (mahalle, cadde, sokak)"
                 name="address_1"
                 required
                 autoComplete="address-line1"
@@ -174,44 +185,25 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 data-testid="address-1-input"
               />
               <Input
-                label="Daire, kat, vb."
+                label="Bina no, kat, daire"
                 name="address_2"
                 autoComplete="address-line2"
                 defaultValue={address.address_2 || undefined}
                 data-testid="address-2-input"
               />
-              <div className="grid grid-cols-[144px_1fr] gap-x-2">
-                <Input
-                  label="Posta kodu"
-                  name="postal_code"
-                  required
-                  autoComplete="postal-code"
-                  defaultValue={address.postal_code || undefined}
-                  data-testid="postal-code-input"
-                />
-                <Input
-                  label="Şehir"
-                  name="city"
-                  required
-                  autoComplete="locality"
-                  defaultValue={address.city || undefined}
-                  data-testid="city-input"
-                />
-              </div>
               <Input
-                label="İl"
-                name="province"
-                autoComplete="address-level1"
-                defaultValue={address.province || undefined}
-                data-testid="state-input"
-              />
-              <CountrySelect
-                name="country_code"
-                region={region}
+                label="Posta kodu"
+                name="postal_code"
                 required
-                autoComplete="country"
-                defaultValue={address.country_code || undefined}
-                data-testid="country-select"
+                autoComplete="postal-code"
+                defaultValue={address.postal_code || undefined}
+                data-testid="postal-code-input"
+              />
+              <AddressRegionFields
+                region={region}
+                defaultCountryCode={address.country_code}
+                defaultCity={address.city}
+                defaultProvince={address.province}
               />
               <Input
                 label="Telefon"
@@ -220,6 +212,16 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 defaultValue={address.phone || undefined}
                 data-testid="phone-input"
               />
+              <label className="flex items-center gap-2 mt-1 cursor-pointer text-small-regular text-ui-fg-base">
+                <input
+                  type="checkbox"
+                  name="is_default_shipping"
+                  className="w-4 h-4 accent-brand-600"
+                  defaultChecked={!!address.is_default_shipping}
+                  data-testid="default-address-checkbox"
+                />
+                Bu adresi varsayılan adresim yap
+              </label>
             </div>
             {formState.error && (
               <div className="text-brand-500 text-small-regular py-2">

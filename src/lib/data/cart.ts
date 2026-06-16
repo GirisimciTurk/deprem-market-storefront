@@ -20,7 +20,11 @@ import { getRegion } from "./regions"
  * @param cartId - optional - The ID of the cart to retrieve.
  * @returns The cart object if found, or null if not found.
  */
-export async function retrieveCart(cartId?: string, fields?: string) {
+export async function retrieveCart(
+  cartId?: string,
+  fields?: string,
+  opts?: { fresh?: boolean }
+) {
   const id = cartId || (await getCartId())
   fields ??=
     "*items, *region, *items.product, *items.product.seller, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name"
@@ -33,9 +37,13 @@ export async function retrieveCart(cartId?: string, fields?: string) {
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("carts")),
-  }
+  // fresh=true → cache'i atla (refreshCartPrices sonrası güncel fiyatlar gelsin).
+  const cacheOpts = opts?.fresh
+    ? { cache: "no-store" as const }
+    : {
+        next: { ...(await getCacheOptions("carts")) },
+        cache: "force-cache" as const,
+      }
 
   return await sdk.client
     .fetch<HttpTypes.StoreCartResponse>(`/store/carts/${id}`, {
@@ -44,14 +52,40 @@ export async function retrieveCart(cartId?: string, fields?: string) {
         fields,
       },
       headers,
-      next,
-      cache: "force-cache",
+      ...cacheOpts,
     })
     .then(({ cart }: { cart: HttpTypes.StoreCart }) => cart)
     .catch(async () => {
       await removeCartId()
       return null
     })
+}
+
+/**
+ * Sepet kalemlerinin birim fiyatlarını backend'de GÜNCEL fiyatlara göre yeniden
+ * hesaplatır (refreshCartItemsWorkflow): baz fiyat değişiklikleri + aktif sale
+ * kampanyalarının başlaması/bitmesi sepete/ödemeye yansır. Sepet ve checkout
+ * sayfası açılırken çağrılır. Best-effort: hata olsa bile akışı bozmaz, ve
+ * render sırasında güvenli olması için revalidateTag KULLANMAZ (çağıran sayfa
+ * sonrasında retrieveCart'ı { fresh: true } ile okur).
+ */
+export async function refreshCartPrices(cartId?: string) {
+  const id = cartId || (await getCartId())
+  if (!id) {
+    return
+  }
+  try {
+    const headers = {
+      ...(await getAuthHeaders()),
+    }
+    await sdk.client.fetch(`/store/refresh-cart-prices`, {
+      method: "POST",
+      headers,
+      body: { cart_id: id },
+    })
+  } catch {
+    // best-effort — fiyat tazeleme başarısız olsa da sepet gösterimi sürsün
+  }
 }
 
 export async function getOrSetCart(countryCode: string) {

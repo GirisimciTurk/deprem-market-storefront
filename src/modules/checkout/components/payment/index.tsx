@@ -7,7 +7,6 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import PaymentContainer, {
   StripeCardContainer,
   IyzicoCardContainer,
-  PaynkolayContainer,
 } from "@modules/checkout/components/payment-container"
 import Divider from "@modules/common/components/divider"
 import {
@@ -29,8 +28,8 @@ const Payment = ({
   availablePaymentMethods: { id: string }[]
 }) => {
   const filteredPaymentMethods = availablePaymentMethods?.filter(
-    // iyzico-mock test sağlayıcısı + Paynkolay gizlenir (aktif kart ödemesi PayTR).
-    (pm) => pm.id !== "pp_iyzico-mock_iyzico-mock" && pm.id !== "pp_paynkolay_paynkolay"
+    // iyzico-mock test sağlayıcısı gizlenir (aktif kart ödemesi PayTR).
+    (pm) => pm.id !== "pp_iyzico-mock_iyzico-mock"
   )
 
   const activeSession = cart.payment_collection?.payment_sessions?.find(
@@ -115,7 +114,7 @@ const Payment = ({
     }
   }
 
-  // Ödeme sağlayıcı (Paynkolay) dönüşünde gelen ?error=... mesajını göster;
+  // Ödeme sağlayıcı (PayTR) dönüşünde gelen ?error=... mesajını göster;
   // yoksa adım açılınca hatayı temizle.
   useEffect(() => {
     const paymentError = searchParams.get("error")
@@ -175,13 +174,6 @@ const Payment = ({
                         selectedPaymentOptionId={selectedPaymentMethod}
                         paymentInfoMap={paymentInfoMap}
                         setIyzicoComplete={setIyzicoComplete}
-                      />
-                    ) : paymentMethod.id === "pp_paynkolay_paynkolay" ? (
-                      <PaynkolayContainer
-                        cart={cart}
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                        paymentInfoMap={paymentInfoMap}
                       />
                     ) : (
                       <PaymentContainer

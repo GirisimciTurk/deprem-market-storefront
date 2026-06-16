@@ -50,19 +50,6 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
                           payment.created_at ?? ""
                         ).toLocaleString("tr-TR")}`}
                   </Text>
-                  {payment.provider_id === "pp_paynkolay_paynkolay" && (
-                    <div className="text-xs text-ui-fg-subtle flex flex-col gap-y-0.5 mt-1 border-t border-slate-100 pt-1">
-                      {!!payment.data?.reference_code && (
-                        <span><strong>İşlem No (Ref):</strong> {String(payment.data.reference_code)}</span>
-                      )}
-                      {!!payment.data?.auth_code && (
-                        <span><strong>Onay Kodu (Auth):</strong> {String(payment.data.auth_code)}</span>
-                      )}
-                      {!!payment.data?.installment && Number(payment.data.installment) > 1 && (
-                        <span><strong>Taksit:</strong> {String(payment.data.installment)} Taksit</span>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

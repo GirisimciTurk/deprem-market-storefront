@@ -3,11 +3,21 @@ import { getTranslations } from "next-intl/server"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
 
-const Hero = async ({ countryCode }: { countryCode: string }) => {
+const Hero = async ({
+  countryCode,
+  compact = false,
+}: {
+  countryCode: string
+  compact?: boolean
+}) => {
   const t = await getTranslations("hero")
 
   return (
-    <div className="relative h-[85vh] w-full flex items-center justify-start overflow-hidden bg-slate-950">
+    <div
+      className={`relative w-full flex items-center justify-start overflow-hidden bg-slate-950 ${
+        compact ? "h-[44vh] min-h-[320px] max-h-[480px]" : "h-[85vh]"
+      }`}
+    >
       {/* Background Image with Dark Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -23,7 +33,11 @@ const Hero = async ({ countryCode }: { countryCode: string }) => {
       </div>
 
       {/* Hero Content */}
-      <div className="content-container relative z-20 w-full max-w-5xl px-4 sm:px-6 lg:px-8 text-left py-20 flex flex-col items-start gap-y-6">
+      <div
+        className={`content-container relative z-20 w-full max-w-5xl px-4 sm:px-6 lg:px-8 text-left flex flex-col items-start ${
+          compact ? "py-8 gap-y-4" : "py-20 gap-y-6"
+        }`}
+      >
         {/* Affiliate Badge */}
         <div className="inline-flex items-center gap-x-2 bg-brand-600/10 border border-brand-500/20 px-3.5 py-1.5 rounded-full text-brand-400 text-xs font-semibold uppercase tracking-wider select-none animate-pulse">
           <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
@@ -33,8 +47,12 @@ const Hero = async ({ countryCode }: { countryCode: string }) => {
         {/* Headlines */}
         <div className="max-w-2xl flex flex-col gap-y-3">
           <Heading
-            level="h1"
-            className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none uppercase"
+            level={compact ? "h2" : "h1"}
+            className={`font-black text-white tracking-tight leading-none uppercase ${
+              compact
+                ? "text-3xl sm:text-4xl lg:text-5xl"
+                : "text-4xl sm:text-5xl lg:text-6xl"
+            }`}
           >
             {t("titleLead")}{" "}
             <span className="text-brand-600 block sm:inline">
