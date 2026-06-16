@@ -103,8 +103,8 @@ export default function HavarClient() {
           {/* Sekmeler */}
           <div className="flex gap-2 mb-6">
             {([
-              ["purchase", "Satın Al", "Ön Alım Talebi"],
-              ["rental", "Kiralama", "Ön Kiralama Talebi"],
+              ["purchase", "Satın Alma Talep Formu", "Ön Alım Talebi"],
+              ["rental", "Kiralama Talep Formu", "Ön Kiralama Talebi"],
             ] as const).map(([key, label]) => (
               <button
                 key={key}
@@ -250,7 +250,9 @@ export default function HavarClient() {
             <h3 className="font-bold text-sm mb-2 text-brandblue-700">Neden HavarTek?</h3>
             <ul className="text-sm text-ui-fg-subtle space-y-1.5 list-disc pl-4">
               <li>Bireysel ve aile kullanımı için satış + kiralama</li>
-              <li>Kargo ve insan taşımacılığı</li>
+              <li><strong>Günlük kullanım:</strong> market ve günlük alışveriş getir-götür</li>
+              <li><strong>Paket & kargo taşıma:</strong> kapıdan kapıya hızlı teslimat</li>
+              <li>İnsan taşımacılığı</li>
               <li>Afet anında hızlı tahliye</li>
               <li>Şehir içi lojistiği hızlandırır</li>
             </ul>
