@@ -26,8 +26,8 @@
     "items": {
       "home": "Home",
       "store": "Store",
-      "ourStore": "Our Store",
-      "reseller": "Become a Seller",
+      "ourStore": "Our Services",
+      "reseller": "Become Our Dealer",
       "faq": "FAQ",
       "contact": "Contact",
       "blog": "Blog"
@@ -78,8 +78,8 @@
   },
   "navLinks": {
     "store": "Store",
-    "ourStore": "Our Store",
-    "reseller": "Become a Seller",
+    "ourStore": "Our Services",
+    "reseller": "Become Our Dealer",
     "trackOrder": "Track Order",
     "faq": "FAQ",
     "contact": "Contact",
@@ -215,8 +215,8 @@
     "profileDescription": "View and edit your EKYP Deprem Market profile.",
     "dealershipStatusTitle": "Seller Application",
     "dealershipStatusDescription": "Check the status of your seller application.",
-    "dealershipFormTitle": "Become a Seller | EKYP Deprem Market",
-    "dealershipFormDescription": "Become a seller on the EKYP Deprem Market marketplace and sell your products to thousands of customers.",
+    "dealershipFormTitle": "Become Our Dealer | EKYP Deprem Market",
+    "dealershipFormDescription": "Become an authorized dealer of EKYP Deprem Market and offer your products to thousands of customers.",
     "orderDetailTitle": "Order #{id}",
     "orderDetailDescription": "View your order",
     "productBrandTitle": "{title} | EKYP Deprem Market",

@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
 import ResellerForm from "./reseller-form"
 
-describe("ResellerForm Component (Satıcı Ol)", () => {
+describe("ResellerForm Component (Bayimiz Olun)", () => {
   beforeEach(() => {
     // Component backend'e fetch ile POST ediyor (/store/reseller-applications).
     vi.restoreAllMocks()
@@ -25,7 +25,7 @@ describe("ResellerForm Component (Satıcı Ol)", () => {
     expect(screen.getByPlaceholderText("Örn: Hakan Demir")).toBeInTheDocument()
     expect(screen.getByPlaceholderText("Örn: İstanbul")).toBeInTheDocument()
     expect(
-      screen.getByPlaceholderText("satici@example.com")
+      screen.getByPlaceholderText("bayi@example.com")
     ).toBeInTheDocument()
     expect(
       screen.getByPlaceholderText("Örn: 0532 000 0000")
@@ -37,7 +37,7 @@ describe("ResellerForm Component (Satıcı Ol)", () => {
     ).toBeInTheDocument()
 
     expect(
-      screen.getByRole("button", { name: /Satıcı Başvurusunu Gönder/i })
+      screen.getByRole("button", { name: /Bayilik Başvurusunu Gönder/i })
     ).toBeInTheDocument()
   })
 
@@ -51,7 +51,7 @@ describe("ResellerForm Component (Satıcı Ol)", () => {
     expect(companyInput.value).toBe("Test Şirketi")
 
     const emailInput = screen.getByPlaceholderText(
-      "satici@example.com"
+      "bayi@example.com"
     ) as HTMLInputElement
     fireEvent.change(emailInput, { target: { value: "test@sirket.com" } })
     expect(emailInput.value).toBe("test@sirket.com")
@@ -74,7 +74,7 @@ describe("ResellerForm Component (Satıcı Ol)", () => {
     fireEvent.change(screen.getByPlaceholderText("Örn: Hakan Demir"), {
       target: { value: "Mehmet Yılmaz" },
     })
-    fireEvent.change(screen.getByPlaceholderText("satici@example.com"), {
+    fireEvent.change(screen.getByPlaceholderText("bayi@example.com"), {
       target: { value: "mehmet@afettedarik.com" },
     })
     fireEvent.change(screen.getByPlaceholderText("Örn: 0532 000 0000"), {
@@ -93,7 +93,7 @@ describe("ResellerForm Component (Satıcı Ol)", () => {
     )
 
     fireEvent.click(
-      screen.getByRole("button", { name: /Satıcı Başvurusunu Gönder/i })
+      screen.getByRole("button", { name: /Bayilik Başvurusunu Gönder/i })
     )
 
     // Loading durumuna geçer
@@ -102,12 +102,16 @@ describe("ResellerForm Component (Satıcı Ol)", () => {
     // fetch çözülünce başarı ekranı render olur (async)
     expect(await screen.findByText("Başvurunuz Alındı!")).toBeInTheDocument()
     expect(
-      screen.getByText(/Satıcı başvurunuz başarıyla tarafımıza ulaştı./i)
+      screen.getByText(/Bayilik başvurunuz başarıyla tarafımıza ulaştı./i)
     ).toBeInTheDocument()
 
-    // Backend'e doğru uçtan ve alanlarla POST edildiğini doğrula
-    expect(fetchMock).toHaveBeenCalledTimes(1)
-    const [url, options] = fetchMock.mock.calls[0]
+    // Backend'e doğru uçtan ve alanlarla POST edildiğini doğrula. (Bileşen mount'ta
+    // ayrıca /store/seller-contracts'i GET eder → çağrılar arasından POST'u bul.)
+    const postCall = fetchMock.mock.calls.find((c: any[]) =>
+      String(c[0]).includes("/store/reseller-applications")
+    )
+    expect(postCall).toBeTruthy()
+    const [url, options] = postCall as any[]
     expect(String(url)).toContain("/store/reseller-applications")
     expect(options.method).toBe("POST")
     const body = JSON.parse(options.body)
@@ -138,7 +142,7 @@ describe("ResellerForm Component (Satıcı Ol)", () => {
     fireEvent.change(screen.getByPlaceholderText("Örn: Hakan Demir"), {
       target: { value: "Mehmet Yılmaz" },
     })
-    fireEvent.change(screen.getByPlaceholderText("satici@example.com"), {
+    fireEvent.change(screen.getByPlaceholderText("bayi@example.com"), {
       target: { value: "mehmet@afettedarik.com" },
     })
     fireEvent.change(screen.getByPlaceholderText("Örn: 0532 000 0000"), {
@@ -146,13 +150,13 @@ describe("ResellerForm Component (Satıcı Ol)", () => {
     })
 
     fireEvent.click(
-      screen.getByRole("button", { name: /Satıcı Başvurusunu Gönder/i })
+      screen.getByRole("button", { name: /Bayilik Başvurusunu Gönder/i })
     )
 
     // Başarısız istek sonrası form tekrar görünür olmalı (success ekranına geçmez)
     expect(
       await screen.findByRole("button", {
-        name: /Satıcı Başvurusunu Gönder/i,
+        name: /Bayilik Başvurusunu Gönder/i,
       })
     ).toBeInTheDocument()
     expect(screen.queryByText("Başvurunuz Alındı!")).not.toBeInTheDocument()

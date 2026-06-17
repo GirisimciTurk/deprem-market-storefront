@@ -26,8 +26,8 @@
     "items": {
       "home": "Ana Sayfa",
       "store": "Mağaza",
-      "ourStore": "Mağazamız",
-      "reseller": "Satıcı Ol",
+      "ourStore": "Hizmetlerimiz",
+      "reseller": "Bayimiz Olun",
       "faq": "S.S.S.",
       "contact": "İletişim",
       "blog": "Blog"
@@ -78,8 +78,8 @@
   },
   "navLinks": {
     "store": "Mağaza",
-    "ourStore": "Mağazamız",
-    "reseller": "Satıcı Ol",
+    "ourStore": "Hizmetlerimiz",
+    "reseller": "Bayimiz Olun",
     "trackOrder": "Sipariş Takip",
     "faq": "S.S.S.",
     "contact": "İletişim",
@@ -215,8 +215,8 @@
     "profileDescription": "EKYP Deprem Market profilinizi görüntüleyin ve düzenleyin.",
     "dealershipStatusTitle": "Satıcı Başvurum",
     "dealershipStatusDescription": "Satıcı başvurunuzun durumunu kontrol edin.",
-    "dealershipFormTitle": "Satıcı Ol | EKYP Deprem Market",
-    "dealershipFormDescription": "EKYP Deprem Market pazaryerinde satıcı ol; kendi ürünlerini binlerce müşteriye sat.",
+    "dealershipFormTitle": "Bayimiz Olun | EKYP Deprem Market",
+    "dealershipFormDescription": "EKYP Deprem Market bayisi olun; ürünlerinizi binlerce müşteriye ulaştırın ve markamızın gücüyle kazanın.",
     "orderDetailTitle": "Sipariş #{id}",
     "orderDetailDescription": "Siparişinizi görüntüleyin",
     "productBrandTitle": "{title} | EKYP Deprem Market",

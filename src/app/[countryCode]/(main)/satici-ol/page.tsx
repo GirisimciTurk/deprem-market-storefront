@@ -17,23 +17,23 @@ export async function generateMetadata(): Promise<Metadata> {
 const STEPS = [
   {
     no: "1",
-    title: "Başvur",
-    desc: "Aşağıdaki formu doldur. Birkaç dakikada başvurunu tamamla.",
+    title: "Başvurun",
+    desc: "Aşağıdaki formu doldurun. Birkaç dakikada bayilik başvurunuzu tamamlayın.",
   },
   {
     no: "2",
-    title: "Onay & Mağaza",
-    desc: "Ekibimiz başvurunu inceler; onaylandığında satıcı mağazan açılır.",
+    title: "Onay & Bayilik",
+    desc: "Ekibimiz başvurunuzu inceler; onaylandığında bayilik paneliniz açılır.",
   },
   {
     no: "3",
-    title: "Ürünlerini Ekle",
-    desc: "Panelinden ürünlerini, fiyat ve stoklarını kolayca yükle.",
+    title: "Ürünlerinizi Ekleyin",
+    desc: "Panelinizden ürünlerinizi, fiyat ve stoklarınızı kolayca yükleyin.",
   },
   {
     no: "4",
-    title: "Sat & Kazan",
-    desc: "Siparişleri hazırla, kargola; kazancın periyodik olarak hesabına geçsin.",
+    title: "Satış & Kazanç",
+    desc: "Siparişleri hazırlayıp kargolayın; kazancınız periyodik olarak hesabınıza aktarılsın.",
   },
 ]
 
@@ -41,75 +41,75 @@ const BENEFITS = [
   {
     icon: "🛒",
     title: "Hazır Müşteri Kitlesi",
-    desc: "Afet ve acil durum hazırlığı arayan binlerce ziyaretçiye ilk günden ulaş.",
+    desc: "Afet ve acil durum hazırlığı arayan binlerce müşteriye ilk günden ulaşırsınız.",
   },
   {
     icon: "🏪",
-    title: "Kolay Mağaza Yönetimi",
-    desc: "Ürün, fiyat, stok ve siparişlerini tek panelden dakikalar içinde yönet.",
+    title: "Kolay Bayilik Yönetimi",
+    desc: "Ürün, fiyat, stok ve siparişlerinizi tek panelden dakikalar içinde yönetirsiniz.",
   },
   {
     icon: "🔒",
     title: "Güvenli & Zamanında Ödeme",
-    desc: "Tahsilat altyapısı bizde; hak edişlerin düzenli olarak hesabına aktarılır.",
+    desc: "Tahsilat altyapısı bizde; hak edişleriniz düzenli olarak hesabınıza aktarılır.",
   },
   {
     icon: "🚚",
     title: "Kargo & Lojistik Kolaylığı",
-    desc: "Anlaşmalı kargo ile siparişlerini hızlıca gönder, panelden takip et.",
+    desc: "Anlaşmalı kargo ile siparişlerinizi hızlıca gönderir, panelden takip edersiniz.",
   },
   {
     icon: "📈",
-    title: "Görünürlük & Pazarlama",
-    desc: "Kampanya, push bildirim ve öne çıkan ürün alanlarıyla satışını büyüt.",
+    title: "Marka Gücü & Pazarlama",
+    desc: "Deprem Market markasının güveni, kampanyalar ve push bildirimlerle satışınızı büyütürsünüz.",
   },
   {
     icon: "🤝",
-    title: "Satıcı Desteği",
-    desc: "Başvurudan ilk satışına kadar her adımda ekibimiz yanında.",
+    title: "Bayi Desteği",
+    desc: "Başvurudan ilk satışınıza kadar her adımda ekibimiz yanınızda.",
   },
 ]
 
 const FAQS: FaqItem[] = [
   {
-    question: "Deprem Market'te nasıl satıcı olurum?",
+    question: "Deprem Market bayisi nasıl olurum?",
     answer:
-      "Bu sayfadaki başvuru formunu doldurman yeterli. Başvurun ekibimiz tarafından incelenir; uygun bulunduğunda satıcı mağazan açılır, panelinden ürünlerini ekleyip satışa başlarsın.",
+      "Bu sayfadaki başvuru formunu doldurmanız yeterli. Başvurunuz ekibimiz tarafından incelenir; uygun bulunduğunda bayilik paneliniz açılır, panelinizden ürünlerinizi ekleyip satışa başlarsınız.",
   },
   {
-    question: "Satıcı olmak için neye ihtiyacım var?",
+    question: "Bayi olmak için neye ihtiyacım var?",
     answer:
-      "Vergi mükellefiyeti (şahıs ya da limited/anonim şirket), geçerli bir vergi numarası ve iletişim bilgilerin yeterli. Onay sürecinde gerekli evraklar tarafına ayrıca iletilir.",
+      "Vergi mükellefiyeti (şahıs ya da limited/anonim şirket), geçerli bir vergi numarası ve iletişim bilgileriniz yeterli. Onay sürecinde gerekli evraklar tarafınıza ayrıca iletilir.",
   },
   {
-    question: "Komisyon oranı nedir?",
+    question: "Bayilik komisyon oranı nedir?",
     answer:
-      "Komisyon oranı ürün kategorisine göre değişir ve başvurun onaylanırken net olarak seninle paylaşılır. Başvuru ve mağaza açılışı için ücret alınmaz.",
+      "Komisyon oranı ürün kategorisine göre değişir ve başvurunuz onaylanırken net olarak sizinle paylaşılır. Başvuru ve bayilik açılışı için herhangi bir ücret alınmaz.",
   },
   {
     question: "Ödemelerim ne zaman yapılır?",
     answer:
-      "Siparişler müşteriye teslim edilip yasal iade süresi tamamlandıktan sonra, komisyon kesintisi düşülerek hak edişlerin periyodik olarak banka hesabına aktarılır.",
+      "Siparişler müşteriye teslim edilip yasal iade süresi tamamlandıktan sonra, komisyon kesintisi düşülerek hak edişleriniz periyodik olarak banka hesabınıza aktarılır.",
   },
   {
     question: "Hangi ürünleri satabilirim?",
     answer:
-      "Deprem çantaları, ilk yardım, aydınlatma, ısınma, güvenlik ve afet/outdoor hazırlığına uygun ürünleri satabilirsin. Mevzuata aykırı ve yasaklı ürünler platformda satılamaz.",
+      "Deprem çantaları, ilk yardım, aydınlatma, ısınma, güvenlik ve afet/outdoor hazırlığına uygun ürünleri satabilirsiniz. Mevzuata aykırı ve yasaklı ürünler platformda satılamaz.",
   },
   {
     question: "Siparişleri nasıl kargolarım?",
     answer:
-      "Gönderiyi sen yaparsın ve iki seçeneğin olur: (1) Anlaşmalı Kargo — Deprem Market'in anlaşmalı kargosuyla gönderirsin, kargo ücreti hak edişinden düşülür; (2) Kendi Kargon — kendi anlaştığın kargo firmasıyla gönderirsin, bu durumda senden kargo ücreti kesilmez. Her iki seçenekte de panelden kargo firmasını ve takip numarasını girersin; müşteri ve sen süreci takip edersiniz.",
+      "Gönderiyi siz yaparsınız ve iki seçeneğiniz olur: (1) Anlaşmalı Kargo — Deprem Market'in anlaşmalı kargosuyla gönderirsiniz, kargo ücreti hak edişinizden düşülür; (2) Kendi Kargonuz — kendi anlaştığınız kargo firmasıyla gönderirsiniz, bu durumda sizden kargo ücreti kesilmez. Her iki seçenekte de panelden kargo firmasını ve takip numarasını girersiniz; müşteri ve siz süreci takip edersiniz.",
   },
   {
     question: "Kendi kargo anlaşmamla gönderebilir miyim?",
     answer:
-      "Evet. 'Kendi Kargom' seçeneğiyle kendi anlaştığın kargo firmasını kullanabilir, panele kargo firmasını ve takip numaranı girebilirsin. Listede olmayan bir firmayla gönderiyorsan takip bağlantısını elle de ekleyebilirsin; müşteri yine 'Kargom Nerede?' bağlantısından gönderisini takip eder.",
+      "Evet. 'Kendi Kargom' seçeneğiyle kendi anlaştığınız kargo firmasını kullanabilir, panele kargo firmasını ve takip numaranızı girebilirsiniz. Listede olmayan bir firmayla gönderiyorsanız takip bağlantısını elle de ekleyebilirsiniz; müşteri yine 'Kargom Nerede?' bağlantısından gönderisini takip eder.",
   },
   {
     question: "Başvurum ne kadar sürede sonuçlanır?",
     answer:
-      "Başvurular genellikle birkaç iş günü içinde değerlendirilir. Sonuç, başvuruda belirttiğin telefon veya e-posta üzerinden iletilir; durumu hesabındaki 'Satıcı Başvurum' sayfasından da takip edebilirsin.",
+      "Başvurular genellikle birkaç iş günü içinde değerlendirilir. Sonuç, başvuruda belirttiğiniz telefon veya e-posta üzerinden iletilir; durumu hesabınızdaki 'Bayilik Başvurum' sayfasından da takip edebilirsiniz.",
   },
 ]
 
@@ -120,13 +120,13 @@ export default async function SaticiOlPage() {
     return (
       <div className="content-container max-w-4xl py-16 px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-extrabold text-ui-fg-base tracking-tight mb-8">
-          Become a Seller
+          Become Our Dealer
         </h1>
         <div className="prose prose-slate max-w-none text-ui-fg-subtle space-y-6">
           <p>
-            Sell your earthquake-preparedness and outdoor products to thousands
-            of customers on Deprem Market. To apply, please email us at
-            destek@ekyp.com.
+            Join Deprem Market as an authorized dealer and offer engineered
+            earthquake-preparedness and emergency products to thousands of
+            customers. To apply, please email us at destek@ekyp.com.
           </p>
           <div className="pt-8">
             <LocalizedClientLink
@@ -146,21 +146,22 @@ export default async function SaticiOlPage() {
       {/* Hero */}
       <div className="text-center max-w-3xl mx-auto mb-14">
         <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
-          Deprem Market Pazaryeri
+          Deprem Market Yetkili Bayilik Programı
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
-          Deprem Market'te Satıcı Ol
+          Deprem Market Bayimiz Olun
         </h1>
         <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed">
-          Ürünlerini Türkiye'nin afet ve acil durum hazırlık pazaryerinde
-          binlerce müşteriye sat. Mağazanı aç, ürünlerini ekle, kazanmaya başla.
+          Türkiye'nin afet ve acil durum hazırlık platformunda yerinizi alın.
+          Bayiliğinizi açın, ürünlerinizi binlerce müşteriye ulaştırın ve
+          Deprem Market markasının gücüyle kazanmaya başlayın.
         </p>
         <div className="mt-6">
           <a
             href="#basvuru"
             className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5 duration-200"
           >
-            Hemen Başvur
+            Hemen Başvurun
           </a>
         </div>
       </div>
@@ -193,7 +194,7 @@ export default async function SaticiOlPage() {
       {/* Avantajlar */}
       <div className="mb-16">
         <h2 className="text-center text-xl font-extrabold text-ui-fg-base mb-8">
-          Neden Deprem Market'te Satmalısın?
+          Bayimiz Olursanız Ne Kazanırsınız?
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {BENEFITS.map((b) => (
@@ -218,10 +219,10 @@ export default async function SaticiOlPage() {
         <div className="max-w-2xl mx-auto border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6 sm:p-8">
           <div className="text-center mb-6">
             <h2 className="text-xl font-extrabold text-ui-fg-base">
-              Satıcı Başvuru Formu
+              Bayilik Başvuru Formu
             </h2>
             <p className="text-xs text-ui-fg-muted mt-1">
-              Bilgilerini bırak, ekibimiz en kısa sürede dönüş yapsın.
+              Bilgilerinizi bırakın, ekibimiz en kısa sürede dönüş yapsın.
             </p>
           </div>
           <ResellerForm />
@@ -234,7 +235,7 @@ export default async function SaticiOlPage() {
           Sıkça Sorulan Sorular
         </h2>
         <p className="text-center text-sm text-ui-fg-muted mb-8">
-          Satıcılık sürecinin nasıl işlediğine dair en çok merak edilenler.
+          Bayilik sürecinin nasıl işlediğine dair en çok merak edilenler.
         </p>
         <FaqAccordion items={FAQS} defaultOpen={0} />
       </div>

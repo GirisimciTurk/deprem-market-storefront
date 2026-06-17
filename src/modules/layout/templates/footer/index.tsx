@@ -147,7 +147,7 @@ export default async function Footer() {
                 </li>
                 <li>
                   <LocalizedClientLink href="/satici-ol" className="hover:text-ui-fg-base">
-                    Satıcı Ol
+                    Bayimiz Olun
                   </LocalizedClientLink>
                 </li>
                 <li>

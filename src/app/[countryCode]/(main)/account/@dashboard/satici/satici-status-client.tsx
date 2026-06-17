@@ -21,10 +21,10 @@ export default function SaticiStatusClient({
     <div className="space-y-6">
       <div className="border-b pb-4">
         <h1 className="text-2xl font-extrabold text-ui-fg-base flex items-center gap-2">
-          🏪 Satıcı Başvurum
+          🏪 Bayilik Başvurum
         </h1>
         <p className="text-xs text-ui-fg-muted mt-1">
-          Deprem Market pazaryeri satıcı başvurunuzun güncel durumu.
+          Deprem Market bayilik başvurunuzun güncel durumu.
         </p>
       </div>
 
@@ -114,12 +114,12 @@ export default function SaticiStatusClient({
         <div className="border border-ui-border-base bg-ui-bg-subtle rounded-2xl p-6 md:p-8 space-y-6 text-center max-w-2xl mx-auto py-12">
           <span className="text-5xl block animate-bounce">🏪</span>
           <h2 className="text-xl font-extrabold text-gray-900">
-            Deprem Market'te Satıcı Ol
+            Deprem Market Bayimiz Olun
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
-            Kendi ürünlerini Türkiye'nin afet ve acil durum hazırlık
-            pazaryerinde sat. Mağazanı aç, ürünlerini ekle ve binlerce müşteriye
-            ulaş.
+            Türkiye'nin afet ve acil durum hazırlık platformunda yerinizi alın.
+            Bayiliğinizi açın, ürünlerinizi ekleyin ve binlerce müşteriye
+            ulaşın.
           </p>
 
           <div className="bg-white border border-gray-150 rounded-xl p-4 text-left max-w-md mx-auto space-y-2.5 text-xs text-gray-655">
@@ -142,7 +142,7 @@ export default function SaticiStatusClient({
               href="/satici-ol"
               className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs sm:text-sm py-3 px-8 rounded-xl transition-all shadow-md inline-block hover:-translate-y-0.5 duration-200"
             >
-              Satıcı Başvurusu Yap &rarr;
+              Bayilik Başvurusu Yap &rarr;
             </LocalizedClientLink>
           </div>
         </div>

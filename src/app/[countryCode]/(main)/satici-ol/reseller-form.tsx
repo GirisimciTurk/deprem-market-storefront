@@ -54,7 +54,7 @@ export default function ResellerForm() {
     }
     if (contracts.length > 0 && !accepted) {
       alert(
-        "Devam etmek için pazaryeri satıcı sözleşmelerini okuyup onaylamanız gerekmektedir."
+        "Devam etmek için bayilik sözleşmelerini okuyup onaylamanız gerekmektedir."
       )
       return
     }
@@ -120,7 +120,7 @@ export default function ResellerForm() {
           Başvurunuz Alındı!
         </h3>
         <p className="text-sm text-ui-fg-subtle max-w-sm">
-          Satıcı başvurunuz başarıyla tarafımıza ulaştı. Ekibimiz başvurunuzu
+          Bayilik başvurunuz başarıyla tarafımıza ulaştı. Ekibimiz başvurunuzu
           değerlendirip en kısa sürede sizinle iletişime geçecek.
         </p>
         <button
@@ -138,7 +138,7 @@ export default function ResellerForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Firma / Mağaza Adı <span className="text-brand-500">*</span>
+            Firma / İşletme Adı <span className="text-brand-500">*</span>
           </label>
           <input
             type="text"
@@ -215,7 +215,7 @@ export default function ResellerForm() {
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
-            placeholder="satici@example.com"
+            placeholder="bayi@example.com"
             className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
           />
         </div>
@@ -256,11 +256,11 @@ export default function ResellerForm() {
       {contracts.length > 0 && (
         <div className="border border-ui-border-base rounded-lg p-4 bg-ui-bg-subtle">
           <p className="text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-2">
-            Pazaryeri Satıcı Sözleşmeleri <span className="text-brand-500">*</span>
+            Bayilik Sözleşmeleri <span className="text-brand-500">*</span>
           </p>
           <p className="text-xs text-ui-fg-subtle mb-3">
-            Satıcı olmak için aşağıdaki sözleşmeleri okuyup onaylamanız
-            gerekmektedir. Başvurunuz onaylandıktan sonra satıcı panelinde, kimlik
+            Bayi olmak için aşağıdaki sözleşmeleri okuyup onaylamanız
+            gerekmektedir. Başvurunuz onaylandıktan sonra bayilik panelinde, kimlik
             ve IP bilgilerinizle birlikte bağlayıcı dijital onayınız ayrıca alınır.
           </p>
           <ul className="space-y-1.5 mb-3">
@@ -363,7 +363,7 @@ export default function ResellerForm() {
             Başvuru Alınıyor...
           </>
         ) : (
-          "Satıcı Başvurusunu Gönder"
+          "Bayilik Başvurusunu Gönder"
         )}
       </button>
 
