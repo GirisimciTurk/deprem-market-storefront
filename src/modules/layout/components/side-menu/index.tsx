@@ -15,7 +15,8 @@ import LocaleSwitcher from "../locale-switcher"
 const SideMenuItems: { key: string; href: string }[] = [
   { key: "home", href: "/" },
   { key: "store", href: "/store" },
-  { key: "featured", href: "/collections/featured" },
+  // Birinci-parti house mağazası (is_house) — backend HOUSE_HANDLE = "deprem-market".
+  { key: "ourStore", href: "/satici/deprem-market" },
   { key: "reseller", href: "/satici-ol" },
   { key: "faq", href: "/sikca-sorulan-sorular" },
   { key: "contact", href: "/iletisim" },

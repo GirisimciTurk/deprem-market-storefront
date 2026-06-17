@@ -100,6 +100,25 @@ const BuildingIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 )
 
+const HardHatIcon = ({ size = 20 }: { size?: number }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1z" />
+    <path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5" />
+    <path d="M4 15v-3a6 6 0 0 1 6-6" />
+    <path d="M14 6a6 6 0 0 1 6 6v3" />
+  </svg>
+)
+
 const AccountNav = ({
   customer,
 }: {
@@ -184,6 +203,18 @@ const AccountNav = ({
                     <div className="flex items-center gap-x-2">
                       <Package size={20} />
                       <span>Siparişlerim</span>
+                    </div>
+                    <ChevronDown className="transform -rotate-90" />
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink
+                    href="/account/hizmet-taleplerim"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <HardHatIcon size={20} />
+                      <span>Hizmet Taleplerim</span>
                     </div>
                     <ChevronDown className="transform -rotate-90" />
                   </LocalizedClientLink>
@@ -307,6 +338,15 @@ const AccountNav = ({
                   icon={<Package size={18} />}
                 >
                   Siparişlerim
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/hizmet-taleplerim"
+                  active={isActive("/account/hizmet-taleplerim")}
+                  icon={<HardHatIcon size={18} />}
+                >
+                  Hizmet Taleplerim
                 </AccountNavLink>
               </li>
               <li>

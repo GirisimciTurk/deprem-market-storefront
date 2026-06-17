@@ -13,6 +13,7 @@ import { clearCartCookie } from "./actions"
 export default function OdemeSonucPage() {
   const [ready, setReady] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [isService, setIsService] = useState(false)
 
   useEffect(() => {
     // 1) Iframe içindeysek üst pencereyi bu sayfaya yönlendir (breakout).
@@ -25,11 +26,15 @@ export default function OdemeSonucPage() {
       return
     }
     // 2) Üst penceredeyiz: durumu oku.
-    const status = new URLSearchParams(window.location.search).get("status")
-    const ok = status === "success"
+    const params = new URLSearchParams(window.location.search)
+    const ok = params.get("status") === "success"
+    // kind=service → hizmet talebi (keşifli kurulum) ödemesi; sipariş değil.
+    const service = params.get("kind") === "service"
     setSuccess(ok)
+    setIsService(service)
     setReady(true)
-    if (ok) {
+    // Hizmet ödemesinde sepet yok → çerez temizleme yalnız normal sipariş için.
+    if (ok && !service) {
       clearCartCookie().catch(() => {})
     }
   }, [])
@@ -54,15 +59,16 @@ export default function OdemeSonucPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Ödemeniz Alındı</h1>
           <p className="text-gray-600 mb-8">
-            Siparişiniz başarıyla oluşturuldu. Sipariş detaylarını ve durumunu hesabınızdan takip
-            edebilirsiniz. Onay e-postanız gönderildi.
+            {isService
+              ? "Hizmet ödemeniz başarıyla alındı. Tahsilat, iş teslim edilene kadar güvence hesabında tutulur. Talebinizin durumunu hesabınızdan takip edebilirsiniz."
+              : "Siparişiniz başarıyla oluşturuldu. Sipariş detaylarını ve durumunu hesabınızdan takip edebilirsiniz. Onay e-postanız gönderildi."}
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <LocalizedClientLink
-              href="/account/orders"
+              href={isService ? "/account/hizmet-taleplerim" : "/account/orders"}
               className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
             >
-              Siparişlerim
+              {isService ? "Hizmet Taleplerim" : "Siparişlerim"}
             </LocalizedClientLink>
             <LocalizedClientLink
               href="/store"
@@ -81,15 +87,16 @@ export default function OdemeSonucPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Ödeme Tamamlanamadı</h1>
           <p className="text-gray-600 mb-8">
-            Ödemeniz alınamadı veya iptal edildi. Sepetiniz korundu; dilerseniz tekrar
-            deneyebilirsiniz.
+            {isService
+              ? "Ödemeniz alınamadı veya iptal edildi. Talebiniz korundu; hesabınızdan tekrar deneyebilirsiniz."
+              : "Ödemeniz alınamadı veya iptal edildi. Sepetiniz korundu; dilerseniz tekrar deneyebilirsiniz."}
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <LocalizedClientLink
-              href="/cart"
+              href={isService ? "/account/hizmet-taleplerim" : "/cart"}
               className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
             >
-              Sepete Dön
+              {isService ? "Hizmet Taleplerim" : "Sepete Dön"}
             </LocalizedClientLink>
             <LocalizedClientLink
               href="/store"
