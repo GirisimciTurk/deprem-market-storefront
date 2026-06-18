@@ -38,6 +38,34 @@ describe("getPricesForVariant", () => {
     expect(result!.price_type).toBe("sale")
     expect(result!.percentage_diff).toBe("20")
   })
+
+  it("manuel İndirimsiz Fiyat (compare_at_price) ürün seviyesi fallback ile üstü çizili olur", () => {
+    // Kampanya YOK (calculated === original = 150 TL), ama İndirimsiz Fiyat 200 TL (major).
+    const result = getPricesForVariant(makeVariant(15000, 15000), 200)
+    expect(result!.calculated_price_number).toBe(15000)
+    expect(result!.original_price_number).toBe(20000) // 200 TL × 100
+    expect(result!.original_price).toBe("200 TL")
+    expect(result!.percentage_diff).toBe("25") // (20000-15000)/20000
+  })
+
+  it("varyant metadata.compare_at_price ürün fallback'ini geçersiz kılar", () => {
+    const variant = { ...makeVariant(15000, 15000), metadata: { compare_at_price: 250 } }
+    const result = getPricesForVariant(variant, 200)
+    expect(result!.original_price_number).toBe(25000) // varyant 250 TL öncelikli
+    expect(result!.original_price).toBe("250 TL")
+  })
+
+  it("compare_at_price satış fiyatından düşük/eşitse indirim göstermez", () => {
+    const result = getPricesForVariant(makeVariant(15000, 15000), 100) // 100 TL < 150 TL
+    expect(result!.original_price_number).toBe(15000) // değişmez
+    expect(result!.percentage_diff).toBe("0")
+  })
+
+  it("native kampanya ile manuel compare'in BÜYÜĞÜ kullanılır", () => {
+    // Kampanya 150→120 var; manuel İndirimsiz 200 TL daha büyük → 200 gösterilir.
+    const result = getPricesForVariant(makeVariant(12000, 15000, "sale"), 200)
+    expect(result!.original_price_number).toBe(20000)
+  })
 })
 
 describe("getProductPrice", () => {

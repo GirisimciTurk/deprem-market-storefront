@@ -13,28 +13,44 @@ type VariantWithPrice = HttpTypes.StoreProductVariant & {
   }
 }
 
-export const getPricesForVariant = (variant: VariantWithPrice) => {
+export const getPricesForVariant = (
+  variant: VariantWithPrice,
+  /** Ürün seviyesi manuel İndirimsiz Fiyat (TL major) — varyant metadata'sı yoksa fallback. */
+  productCompareAt?: number | null
+) => {
   if (!variant?.calculated_price?.calculated_amount) {
     return null
   }
 
+  const calculated = variant.calculated_price.calculated_amount
+  const nativeOriginal = variant.calculated_price.original_amount
+  const currency = variant.calculated_price.currency_code
+
+  // Manuel "İndirimsiz Fiyat" (compare_at_price): varyant metadata'sı öncelikli,
+  // yoksa ürün seviyesi. MAJOR (TL) saklanır → calculated_amount minor (kuruş)
+  // olduğu için ×100 ile aynı birime çevrilir.
+  const compareAtRaw =
+    (variant.metadata as Record<string, unknown> | null | undefined)?.compare_at_price ??
+    productCompareAt ??
+    null
+  const compareAtMinor =
+    compareAtRaw != null && !Number.isNaN(Number(compareAtRaw))
+      ? Number(compareAtRaw) * 100
+      : 0
+
+  // Etkin orijinal fiyat: native "sale" (kampanya) ile manuel compare'in büyüğü.
+  // Yalnız satış fiyatından büyükse üstü çizili gösterilir.
+  const effectiveOriginal = Math.max(nativeOriginal, compareAtMinor)
+  const originalAmount = effectiveOriginal > calculated ? effectiveOriginal : nativeOriginal
+
   return {
-    calculated_price_number: variant.calculated_price.calculated_amount,
-    calculated_price: convertToLocale({
-      amount: variant.calculated_price.calculated_amount,
-      currency_code: variant.calculated_price.currency_code,
-    }),
-    original_price_number: variant.calculated_price.original_amount,
-    original_price: convertToLocale({
-      amount: variant.calculated_price.original_amount,
-      currency_code: variant.calculated_price.currency_code,
-    }),
-    currency_code: variant.calculated_price.currency_code,
+    calculated_price_number: calculated,
+    calculated_price: convertToLocale({ amount: calculated, currency_code: currency }),
+    original_price_number: originalAmount,
+    original_price: convertToLocale({ amount: originalAmount, currency_code: currency }),
+    currency_code: currency,
     price_type: variant.calculated_price.calculated_price.price_list_type,
-    percentage_diff: getPercentageDiff(
-      variant.calculated_price.original_amount,
-      variant.calculated_price.calculated_amount
-    ),
+    percentage_diff: getPercentageDiff(originalAmount, calculated),
   }
 }
 
@@ -48,6 +64,10 @@ export function getProductPrice({
   if (!product || !product.id) {
     throw new Error("No product provided")
   }
+
+  // Ürün seviyesi manuel İndirimsiz Fiyat (varyant metadata'sı yoksa fallback).
+  const productCompareAt = (product.metadata as Record<string, unknown> | null | undefined)
+    ?.compare_at_price as number | undefined
 
   const cheapestPrice = () => {
     if (!product || !product.variants?.length) {
@@ -63,7 +83,7 @@ export function getProductPrice({
         )
       })[0]
 
-    return getPricesForVariant(cheapestVariant)
+    return getPricesForVariant(cheapestVariant, productCompareAt)
   }
 
   const variantPrice = () => {
@@ -79,7 +99,7 @@ export function getProductPrice({
       return null
     }
 
-    return getPricesForVariant(variant)
+    return getPricesForVariant(variant, productCompareAt)
   }
 
   return {

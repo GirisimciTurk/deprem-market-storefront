@@ -41,7 +41,7 @@ export default function FavoritesTemplate({
       queryParams.append("region_id", region.id)
       queryParams.append(
         "fields",
-        "*variants.calculated_price,+variants.inventory_quantity,*variants.images,+metadata,+tags,"
+        "*variants.calculated_price,+variants.inventory_quantity,+variants.metadata,*variants.images,+metadata,+tags,"
       )
 
       // Fetch up-to-date prices, inventory and metadata from Medusa

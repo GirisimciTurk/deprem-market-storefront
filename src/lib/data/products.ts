@@ -88,7 +88,7 @@ export const listProducts = async ({
           offset,
           region_id: region?.id,
           fields:
-            "*variants.calculated_price,*variants.options,+variants.title,+variants.sku,+variants.barcode,+variants.manage_inventory,+variants.allow_backorder,+variants.inventory_quantity,*variants.images,*options,*options.values,+metadata,+tags,+seller.id,+seller.name,+seller.handle,+seller.rating_sum,+seller.rating_count",
+            "*variants.calculated_price,*variants.options,+variants.title,+variants.sku,+variants.barcode,+variants.manage_inventory,+variants.allow_backorder,+variants.inventory_quantity,+variants.metadata,*variants.images,*options,*options.values,+metadata,+tags,+seller.id,+seller.name,+seller.handle,+seller.rating_sum,+seller.rating_count",
           ...queryParams,
         },
         headers,
