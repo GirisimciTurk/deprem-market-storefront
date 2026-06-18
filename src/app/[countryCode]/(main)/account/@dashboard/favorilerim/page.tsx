@@ -2,56 +2,24 @@
 
 import React, { useState, useEffect } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-
-interface FavoriteProduct {
-  id: string
-  title: string
-  price: string
-  image: string
-  handle: string
-  description: string
-}
-
-const defaultFavorites: FavoriteProduct[] = [
-  {
-    id: "prod_mini_deprem",
-    title: "EKYP Mini Afet & Deprem Çantası",
-    price: "799,00 TL",
-    image: "https://images.unsplash.com/photo-1583198432857-e6f966144fe9?auto=format&fit=crop&q=80&w=400",
-    handle: "ekyp-mini-afet-deprem-cantasi",
-    description: "Acil durumlar için özel olarak hazırlanmış 24 parça temel yaşam destek paketi."
-  },
-  {
-    id: "prod_pro_ilkyardim",
-    title: "EKYP Profesyonel İlkyardım Seti",
-    price: "449,00 TL",
-    image: "https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&q=80&w=400",
-    handle: "ekyp-profesyonel-ilkyardim-seti",
-    description: "Tüm pansuman ve steril müdahale ekipmanlarını içeren dayanıklı çanta."
-  }
-]
+import { getFavorites, removeFavorite, FavoriteProduct } from "@lib/util/favorites"
 
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<FavoriteProduct[]>([])
 
   useEffect(() => {
-    const saved = localStorage.getItem("deprem_market_favorites")
-    if (saved) {
-      try {
-        setFavorites(JSON.parse(saved))
-      } catch {
-        setFavorites(defaultFavorites)
-      }
-    } else {
-      localStorage.setItem("deprem_market_favorites", JSON.stringify(defaultFavorites))
-      setFavorites(defaultFavorites)
-    }
+    // Yalnızca kullanıcının gerçekten eklediği favorileri (paylaşılan localStorage)
+    // oku. Demo/varsayılan favori TOHUMLAMA YOK — yeni hesaplar boş başlar.
+    const load = () => setFavorites(getFavorites())
+    load()
+    // Kalp butonu veya ana favori sayfasındaki değişiklikleri anlık yansıt.
+    window.addEventListener("favorites-updated", load)
+    return () => window.removeEventListener("favorites-updated", load)
   }, [])
 
   const handleRemove = (id: string) => {
-    const updated = favorites.filter(item => item.id !== id)
-    localStorage.setItem("deprem_market_favorites", JSON.stringify(updated))
-    setFavorites(updated)
+    // localStorage'ı günceller + 'favorites-updated' yayar → liste ve nav sayacı senkron kalır.
+    removeFavorite(id)
   }
 
   const handleAddToCart = (item: FavoriteProduct) => {
