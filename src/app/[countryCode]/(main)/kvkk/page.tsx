@@ -73,14 +73,33 @@ export default async function KVKKPage(props: {
             <li>Müşteri ilişkileri yönetimi süreçlerinin planlanması ve icrası,</li>
             <li>Sözleşme süreçlerinin takibi, hukuki işlemlerin tesisi ve takibi,</li>
             <li>Bilgi güvenliği süreçlerinin planlanması, denetlenmesi ve icrası,</li>
-            <li>Müşteri talep ve şikayetlerinin takibi ve sonuçlandırılması.</li>
+            <li>Müşteri talep ve şikayetlerinin takibi ve sonuçlandırılması,</li>
+            <li>Platformda paylaşılan yorum, fotoğraf ve ürün ilanlarının; uygunsuz, yanıltıcı veya hukuka aykırı içeriklerden arındırılması amacıyla yapay zekâ destekli otomatik sistemlerle moderasyondan geçirilmesi.</li>
           </ul>
         </section>
 
         <section>
           <h2 className="text-xl font-bold text-ui-fg-base mb-3 border-b pb-2">2. İşlenen Kişisel Verilerin Aktarıldığı Taraflar ve Aktarım Amacı</h2>
           <p>
-            Elde edilen kişisel verileriniz; yukarıda belirtilen amaçların gerçekleştirilmesi doğrultusunda, iş ortaklarımıza, tedarikçilerimize (kargo/lojistik firmaları, ödeme altyapısı sağlayıcıları vb.), kanunen yetkili kamu kurumlarına ve özel kişilere, KVKK&rsquo;nın 8. ve 9. maddelerinde belirtilen kişisel veri işleme şartları ve amaçları çerçevesinde aktarılabilecektir.
+            Elde edilen kişisel verileriniz; yukarıda belirtilen amaçların gerçekleştirilmesi doğrultusunda, iş ortaklarımıza, tedarikçilerimize (kargo/lojistik firmaları, ödeme altyapısı sağlayıcıları, bulut ve yapay zekâ hizmeti sağlayıcıları vb.), kanunen yetkili kamu kurumlarına ve özel kişilere, KVKK&rsquo;nın 8. ve 9. maddelerinde belirtilen kişisel veri işleme şartları ve amaçları çerçevesinde aktarılabilecektir.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-ui-fg-base mb-3 border-b pb-2">2.1. Yapay Zekâ Destekli Otomatik Moderasyon ve Yurt Dışı Aktarım</h2>
+          <p className="mb-3">
+            Platform güvenliğini ve içerik kalitesini sağlamak amacıyla; tarafınızca paylaşılan ürün
+            yorumları, yüklediğiniz fotoğraflar ve (satıcıysanız) ürün ilanlarınız, uygunsuz, yanıltıcı,
+            hukuka aykırı veya spam içerikleri tespit etmek için yapay zekâ destekli otomatik
+            değerlendirme sistemlerinden geçirilebilmektedir.
+          </p>
+          <p className="mb-3">
+            Bu otomatik moderasyon, hizmet sağlayıcımız <strong>Google LLC (Gemini API)</strong> aracılığıyla
+            gerçekleştirilmektedir. Bu kapsamda ilgili içerikler (yorum metni, görseller ve ilan bilgileri),
+            değerlendirme amacıyla yurt dışında bulunan sunuculara aktarılabilmektedir. Söz konusu aktarım,
+            KVKK&rsquo;nın 9. maddesinde öngörülen şartlar çerçevesinde yapılır. Otomatik değerlendirme
+            yalnızca içerik uygunluğunun kontrolüne yöneliktir; nihai kararlarda gerektiğinde insan denetimi
+            uygulanır ve Kanun&rsquo;un 11. maddesi kapsamındaki haklarınız saklıdır.
           </p>
         </section>
 
