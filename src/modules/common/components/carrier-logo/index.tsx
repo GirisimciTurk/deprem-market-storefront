@@ -12,10 +12,10 @@ import React, { useState } from "react"
  * hepsijet.png dosyalarını koy.
  */
 
-type CarrierMeta = { label: string; bg: string; fg: string }
+type CarrierMeta = { label: string; bg: string; fg: string; file?: string }
 
 const CARRIERS: Record<string, CarrierMeta> = {
-  yurtici: { label: "Yurtiçi Kargo", bg: "#f37021", fg: "#ffffff" },
+  yurtici: { label: "Yurtiçi Kargo", bg: "#f37021", fg: "#ffffff", file: "yurtici.svg" },
   aras: { label: "Aras Kargo", bg: "#005ca9", fg: "#ffffff" },
   mng: { label: "MNG Kargo", bg: "#e2001a", fg: "#ffffff" },
   ptt: { label: "PTT Kargo", bg: "#005bab", fg: "#ffd200" },
@@ -73,7 +73,7 @@ export default function CarrierLogo({
   const img = (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`/cargo/${c}.png`}
+      src={`/cargo/${meta.file ?? `${c}.png`}`}
       alt={label}
       title={label}
       onError={() => setImgError(true)}
