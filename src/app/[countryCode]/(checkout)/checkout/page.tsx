@@ -18,14 +18,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Checkout() {
   // Ödeme adımından önce fiyatları güncelle → müşteri daima güncel fiyatı öder.
+  // (refreshCartPrices kasıtlı olarak önce/bloklayıcı; sonra cart+customer paralel.)
   await refreshCartPrices()
-  const cart = await retrieveCart(undefined, undefined, { fresh: true })
+  const [cart, customer] = await Promise.all([
+    retrieveCart(undefined, undefined, { fresh: true }),
+    retrieveCustomer(),
+  ])
 
   if (!cart) {
     return notFound()
   }
-
-  const customer = await retrieveCustomer()
 
   return (
     <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] content-container gap-x-40 py-12">

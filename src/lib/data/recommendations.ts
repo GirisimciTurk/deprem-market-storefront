@@ -11,7 +11,13 @@ export async function getBoughtTogetherIds(productId: string): Promise<string[]>
   try {
     const res = await sdk.client.fetch<{ product_ids: string[] }>(
       `/store/recommendations`,
-      { method: "GET", query: { product_id: productId, limit: 8 } }
+      {
+        method: "GET",
+        query: { product_id: productId, limit: 8 },
+        // Ürün-bazlı (kullanıcıya özel değil); sipariş geçmişinden türer, yavaş
+        // değişir → 30 dk önbellek. Her PDP görüntülemede backend'e gitmez.
+        next: { revalidate: 1800 },
+      }
     )
     return res?.product_ids ?? []
   } catch {

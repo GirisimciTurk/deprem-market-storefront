@@ -59,7 +59,7 @@ export default function ReviewsList({
                     className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border border-gray-250 cursor-pointer hover:border-orange-500 transition-all duration-200 flex-shrink-0"
                     onClick={() => onImageClick(img)}
                   >
-                    <img src={img} alt="Kullanıcı yüklemesi" className="w-full h-full object-cover" />
+                    <img src={img} alt="Kullanıcı yüklemesi" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>

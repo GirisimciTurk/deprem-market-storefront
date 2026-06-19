@@ -24,8 +24,9 @@ export default async function PageLayout(props: {
 }) {
   const params = await props.params
   const { countryCode } = params
-  const customer = await retrieveCustomer()
-  const cart = await retrieveCart()
+  // Bağımsız iki çağrı paralel — bu layout HER (main) sayfasını sarar, sıralı
+  // bekleme her sayfaya ~300-500ms ekliyordu.
+  const [customer, cart] = await Promise.all([retrieveCustomer(), retrieveCart()])
   let shippingOptions: StoreCartShippingOption[] = []
 
   if (cart) {
