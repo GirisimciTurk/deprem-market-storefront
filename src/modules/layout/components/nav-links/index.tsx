@@ -21,13 +21,21 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
       activeColorClass: "text-orange-600 border-orange-600"
     },
     {
+      // Yapay zekâ destekli "Deprem Hazırlık Asistanı" (kit kurucu) — öne çıkan özellik.
+      href: "/hazirlik-asistani",
+      label: t("assistant"),
+      active: strippedPathname === "/hazirlik-asistani",
+      colorClass: "hover:text-orange-600 hover:border-orange-600/30",
+      activeColorClass: "text-orange-600 border-orange-600"
+    },
+    {
       // Birinci-parti "Deprem Market" house mağazası (is_house). Handle backend'de
       // marketplace-setup sabitidir: HOUSE_HANDLE = "deprem-market".
       href: "/satici/deprem-market",
       label: t("ourStore"),
       active: strippedPathname === "/satici/deprem-market",
-      colorClass: "hover:text-brand-600 hover:border-brand-600/30 text-brand-600 font-bold",
-      activeColorClass: "text-brand-600 border-brand-600 font-bold"
+      colorClass: "hover:text-orange-600 hover:border-orange-600/30",
+      activeColorClass: "text-orange-600 border-orange-600"
     },
     {
       href: "/havar",

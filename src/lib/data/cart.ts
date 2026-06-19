@@ -192,6 +192,23 @@ export async function addToCart({
     .catch(medusaError)
 }
 
+/**
+ * Birden çok varyantı sırayla sepete ekler (Hazırlık Asistanı "Tümünü Sepete Ekle").
+ * Sıralı çağrı: aynı sepete eşzamanlı line-item eklemede yarış olmasın.
+ */
+export async function addMultipleToCart({
+  items,
+  countryCode,
+}: {
+  items: { variantId: string; quantity: number }[]
+  countryCode: string
+}) {
+  for (const it of items) {
+    if (!it.variantId) continue
+    await addToCart({ variantId: it.variantId, quantity: Math.max(1, it.quantity || 1), countryCode })
+  }
+}
+
 export async function updateLineItem({
   lineId,
   quantity,

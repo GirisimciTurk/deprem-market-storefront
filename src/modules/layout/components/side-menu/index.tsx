@@ -15,6 +15,7 @@ import LocaleSwitcher from "../locale-switcher"
 const SideMenuItems: { key: string; href: string }[] = [
   { key: "home", href: "/" },
   { key: "store", href: "/store" },
+  { key: "assistant", href: "/hazirlik-asistani" },
   // Birinci-parti house mağazası (is_house) — backend HOUSE_HANDLE = "deprem-market".
   { key: "ourStore", href: "/satici/deprem-market" },
   { key: "reseller", href: "/satici-ol" },
@@ -25,11 +26,14 @@ const SideMenuItems: { key: string; href: string }[] = [
 
 type SideMenuProps = {
   regions: HttpTypes.StoreRegion[] | null
+  categories?: HttpTypes.StoreProductCategory[] | null
 }
 
-const SideMenu = ({ regions }: SideMenuProps) => {
+const SideMenu = ({ regions, categories }: SideMenuProps) => {
   const countryToggleState = useToggleState()
   const t = useTranslations("sideMenu")
+  const tCat = useTranslations("categoryMenu")
+  const topCategories = (categories ?? []).filter((c) => !c.parent_category)
 
   return (
     <div className="h-full">
@@ -79,22 +83,56 @@ const SideMenu = ({ regions }: SideMenuProps) => {
                         <XMark />
                       </button>
                     </div>
-                    <ul className="flex flex-col gap-6 items-start justify-start">
-                      {SideMenuItems.map(({ key, href }) => {
-                        return (
-                          <li key={key}>
-                            <LocalizedClientLink
-                              href={href}
-                              className="text-3xl leading-10 hover:text-ui-fg-disabled"
-                              onClick={close}
-                              data-testid={`${key}-link`}
-                            >
-                              {t(`items.${key}`)}
-                            </LocalizedClientLink>
-                          </li>
-                        )
-                      })}
-                    </ul>
+                    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-8 py-4 pr-1">
+                      <ul className="flex flex-col gap-6 items-start justify-start">
+                        {SideMenuItems.map(({ key, href }) => {
+                          return (
+                            <li key={key}>
+                              <LocalizedClientLink
+                                href={href}
+                                className="text-3xl leading-10 hover:text-ui-fg-disabled"
+                                onClick={close}
+                                data-testid={`${key}-link`}
+                              >
+                                {t(`items.${key}`)}
+                              </LocalizedClientLink>
+                            </li>
+                          )
+                        })}
+                      </ul>
+
+                      {topCategories.length > 0 && (
+                        <div className="flex flex-col gap-3">
+                          <span className="text-xs uppercase tracking-[0.15em] text-ui-fg-on-color/50">
+                            {tCat("heading")}
+                          </span>
+                          <ul className="flex flex-col gap-3 items-start">
+                            {topCategories.map((cat) => (
+                              <li key={cat.id}>
+                                <LocalizedClientLink
+                                  href={`/categories/${cat.handle}`}
+                                  className="text-xl leading-8 hover:text-ui-fg-disabled"
+                                  onClick={close}
+                                  data-testid="side-category-link"
+                                >
+                                  {cat.name}
+                                </LocalizedClientLink>
+                              </li>
+                            ))}
+                            <li>
+                              <LocalizedClientLink
+                                href="/kategoriler"
+                                className="text-base font-semibold text-orange-300 hover:text-orange-200"
+                                onClick={close}
+                                data-testid="side-all-categories-link"
+                              >
+                                {tCat("all")} →
+                              </LocalizedClientLink>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                     <div className="flex flex-col gap-y-6">
                       <LocaleSwitcher />
                       <div

@@ -11,11 +11,14 @@ import SideMenu from "@modules/layout/components/side-menu"
 import Logo from "@modules/layout/components/logo"
 import FavoritesNavIcon from "@modules/layout/components/favorites-nav-icon"
 import NavLinks from "@modules/layout/components/nav-links"
+import CategoryMenu from "@modules/layout/components/category-menu"
+import { listCategories } from "@lib/data/categories"
 
 export default async function Nav({ countryCode }: { countryCode: string }) {
-  const [regions, t] = await Promise.all([
+  const [regions, t, categories] = await Promise.all([
     listRegions().then((regions: StoreRegion[]) => regions),
     getTranslations("nav"),
+    listCategories(),
   ])
 
   return (
@@ -26,7 +29,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
           {/* Left: Mobile Menu Trigger / Desktop Logo */}
           <div className="flex-1 basis-0 h-full flex items-center">
             <div className="block small:hidden">
-              <SideMenu regions={regions} />
+              <SideMenu regions={regions} categories={categories} />
             </div>
             <div className="hidden small:block">
               <LocalizedClientLink
@@ -40,7 +43,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
           </div>
 
           {/* Center: Mobile Logo / Desktop Horizontal Menu */}
-          <div className="flex items-center h-full">
+          <div className="flex items-center gap-x-8 h-full">
             <div className="block small:hidden">
               <LocalizedClientLink
                 href="/"
@@ -51,6 +54,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
               </LocalizedClientLink>
             </div>
 
+            <CategoryMenu categories={categories} />
             <NavLinks countryCode={countryCode} />
           </div>
 

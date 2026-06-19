@@ -26,6 +26,7 @@
     "items": {
       "home": "Home",
       "store": "Store",
+      "assistant": "Preparedness Assistant",
       "ourStore": "Our Services",
       "reseller": "Become Our Dealer",
       "faq": "FAQ",
@@ -83,7 +84,45 @@
     "trackOrder": "Track Order",
     "faq": "FAQ",
     "contact": "Contact",
-    "havar": "HavarTek"
+    "havar": "HavarTek",
+    "assistant": "Preparedness Assistant"
+  },
+  "categoryMenu": {
+    "heading": "Categories",
+    "all": "All Categories",
+    "indexTitle": "All Categories",
+    "indexSubtitle": "Browse all disaster-preparedness categories to find what you need.",
+    "productCount": "{count} products",
+    "empty": "No categories yet."
+  },
+  "preparedness": {
+    "title": "Earthquake Preparedness & Safety Assistant",
+    "subtitle": "Ask for a preparedness kit or any earthquake-safety question; our AI will help.",
+    "label": "Describe your need or question",
+    "placeholder": "e.g. '3-day kit for a family of 4' or 'How do I secure furniture at home?'",
+    "submit": "Send",
+    "searching": "Thinking...",
+    "resultsTitle": "Recommended Products ({count})",
+    "surveyTitle": "An expert inspection is recommended for your building",
+    "surveyCta": "Strengthening & Inspection Service",
+    "disclaimer": "These answers are general information only. Structural safety can only be determined by a licensed civil engineer's on-site assessment.",
+    "suggestedQty": "Suggested qty: {qty}",
+    "addAll": "Add All to Cart",
+    "adding": "Adding...",
+    "addedAll": "All Added to Cart",
+    "addError": "Something went wrong adding items to the cart.",
+    "noResults": "We couldn't suggest a kit for your needs. Add more detail and try again.",
+    "disabled": "The preparedness assistant is currently unavailable. You can browse products in the store.",
+    "error": "Something went wrong, please try again.",
+    "presets": {
+      "home2": "Home for 2",
+      "family4": "Family of 4",
+      "baby": "Family with a baby",
+      "elderly": "Elderly individual",
+      "pet": "Pet",
+      "car": "Car kit",
+      "office": "Office / workplace"
+    }
   },
   "cookieConsent": {
     "title": "Cookie Settings",

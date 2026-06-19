@@ -26,6 +26,7 @@
     "items": {
       "home": "Ana Sayfa",
       "store": "Mağaza",
+      "assistant": "Hazırlık Asistanı",
       "ourStore": "Hizmetlerimiz",
       "reseller": "Bayimiz Olun",
       "faq": "S.S.S.",
@@ -83,7 +84,45 @@
     "trackOrder": "Sipariş Takip",
     "faq": "S.S.S.",
     "contact": "İletişim",
-    "havar": "HavarTek"
+    "havar": "HavarTek",
+    "assistant": "Hazırlık Asistanı"
+  },
+  "categoryMenu": {
+    "heading": "Kategoriler",
+    "all": "Tüm Kategoriler",
+    "indexTitle": "Tüm Kategoriler",
+    "indexSubtitle": "İhtiyacınız olan afet hazırlık ürünlerini kategorilere göz atarak bulun.",
+    "productCount": "{count} ürün",
+    "empty": "Henüz kategori eklenmemiş."
+  },
+  "preparedness": {
+    "title": "Deprem Hazırlık & Güvenlik Asistanı",
+    "subtitle": "Hazırlık seti isteyin ya da deprem güvenliğiyle ilgili bir soru sorun; yapay zekâ yardımcı olsun.",
+    "label": "İhtiyacınızı veya sorunuzu yazın",
+    "placeholder": "Örn. '4 kişilik aile için 3 günlük set' ya da 'Evde eşyaları nasıl sabitlerim?'",
+    "submit": "Gönder",
+    "searching": "Yanıtlıyor...",
+    "resultsTitle": "Önerilen Ürünler ({count})",
+    "surveyTitle": "Yapınız için uzman keşfi önerilir",
+    "surveyCta": "Güçlendirme & Keşif Hizmeti",
+    "disclaimer": "Bu yanıtlar genel bilgilendirme amaçlıdır. Bina/yapı güvenliği ancak ruhsatlı bir inşaat mühendisinin yerinde değerlendirmesiyle belirlenebilir.",
+    "suggestedQty": "Önerilen adet: {qty}",
+    "addAll": "Tümünü Sepete Ekle",
+    "adding": "Ekleniyor...",
+    "addedAll": "Tümü Sepete Eklendi",
+    "addError": "Ürünler sepete eklenirken bir hata oluştu.",
+    "noResults": "İhtiyacınıza uygun bir set öneremedik. Daha fazla ayrıntı ekleyip tekrar deneyin.",
+    "disabled": "Hazırlık asistanı şu an kullanılamıyor. Ürünlere mağazadan göz atabilirsiniz.",
+    "error": "Bir sorun oluştu, lütfen tekrar deneyin.",
+    "presets": {
+      "home2": "2 kişilik ev",
+      "family4": "4 kişilik aile",
+      "baby": "Bebekli aile",
+      "elderly": "Yaşlı birey",
+      "pet": "Evcil hayvan",
+      "car": "Araç çantası",
+      "office": "Ofis / işyeri"
+    }
   },
   "cookieConsent": {
     "title": "Çerez Politikası ve KVKK",
