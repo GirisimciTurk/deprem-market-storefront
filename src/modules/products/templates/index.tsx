@@ -17,6 +17,8 @@ import ProductQuestions from "@modules/products/components/product-questions"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listProducts } from "@lib/data/products"
 import RecentlyViewed from "@modules/products/components/recently-viewed"
+import TrackView from "@modules/products/components/track-view"
+import BoughtTogether from "@modules/products/components/bought-together"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -46,6 +48,8 @@ const ProductTemplate = async ({
 
   return (
     <>
+      {/* Davranış izleme: ürün görüntüleme olayı (görsel çıktı yok) */}
+      <TrackView productId={product.id} handle={product.handle} />
       <div
         className="content-container flex flex-col md:flex-row md:items-start py-6 gap-y-8 md:gap-x-12 lg:gap-x-16 relative"
         data-testid="product-container"
@@ -99,6 +103,13 @@ const ProductTemplate = async ({
         currentHandle={product.handle}
         region={region}
       />
+
+      {/* Ticaret önerisi: gerçek sipariş geçmişinden "birlikte alınanlar" */}
+      <div className="content-container my-16 small:my-24" data-testid="bought-together-container">
+        <Suspense fallback={<SkeletonRelatedProducts />}>
+          <BoughtTogether product={product} countryCode={countryCode} />
+        </Suspense>
+      </div>
 
       <div
         className="content-container my-16 small:my-32"

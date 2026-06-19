@@ -13,6 +13,7 @@ import MobileActions from "./mobile-actions"
 import StockAlertButton from "../stock-alert-button"
 import { useRouter } from "next/navigation"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { track } from "@lib/util/analytics"
 import InstallmentCargoInfo from "../installment-cargo-info"
 
 type ProductActionsProps = {
@@ -139,6 +140,17 @@ export default function ProductActions({
       variantId: selectedVariant.id,
       quantity: 1,
       countryCode,
+    })
+
+    // Davranış izleme: sepete ekleme (fire-and-forget, hata yutulur)
+    track("add_to_cart", {
+      product_id: product.id,
+      variant_id: selectedVariant.id,
+      quantity: 1,
+      value: priceObj?.calculated_price_number
+        ? Math.round(priceObj.calculated_price_number * 100)
+        : null,
+      currency_code: priceObj?.currency_code ?? null,
     })
 
     setIsAdding(false)
