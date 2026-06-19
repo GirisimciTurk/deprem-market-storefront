@@ -85,8 +85,11 @@ const RefinementList = ({
     })
   }
 
-  const handleSortChange = (val: string) => {
-    updateQueryParams({ sortBy: val })
+  // SortProducts callback'i (name, value) imzasıyla çağırır → gerçek sıralama
+  // değeri İKİNCİ argümandır. Önceden ilk argüman ("sortBy") alınıyordu, bu yüzden
+  // URL'e sortBy=sortBy yazılıp sıralama hiç uygulanmıyordu.
+  const handleSortChange = (_name: string, value: string) => {
+    updateQueryParams({ sortBy: value })
   }
 
   return (
