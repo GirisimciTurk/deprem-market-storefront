@@ -23,14 +23,18 @@ export type StoreSellerResponse = {
 export const getSellerByHandle = async (
   handle: string
 ): Promise<StoreSellerResponse | null> => {
+  // Mağaza bilgisi/logo + ürün listesi güncellemeleri yansısın: ISR (≤30sn) + statik
+  // "sellers" tag (backend güncellemesinde revalidateTag ile anında tazelenir).
+  const cacheOpts = await getCacheOptions("sellers")
   const next = {
-    ...(await getCacheOptions("sellers")),
+    ...cacheOpts,
+    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "sellers"],
+    revalidate: 30,
   }
 
   return await sdk.client
     .fetch<StoreSellerResponse>(`/store/sellers/${handle}`, {
       next,
-      cache: "force-cache",
     })
     .catch(() => null)
 }

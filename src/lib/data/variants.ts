@@ -16,8 +16,13 @@ export const retrieveVariant = async (
     ...authHeaders,
   }
 
+  // Varyant resim/bilgi güncellemeleri yansısın: ISR (≤30sn) + statik "products"
+  // tag (backend güncellemesinde revalidateTag ile anında tazelenir).
+  const cacheOpts = await getCacheOptions("variants")
   const next = {
-    ...(await getCacheOptions("variants")),
+    ...cacheOpts,
+    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "products"],
+    revalidate: 30,
   }
 
   return await sdk.client
@@ -30,7 +35,6 @@ export const retrieveVariant = async (
         },
         headers,
         next,
-        cache: "force-cache",
       }
     )
     .then(({ variant }) => variant)

@@ -8,6 +8,10 @@ import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 import { getLocaleSafe, pickTranslation } from "@lib/util/localize"
 
+// Mağaza ürün verisinin tazelik aralığı (sn). Satıcı bir ürünü güncelleyince
+// değişiklik en geç bu süre içinde storefront'a yansır (ISR / stale-while-revalidate).
+const PRODUCT_REVALIDATE_SECONDS = 30
+
 // Ürün başlık/açıklamasını aktif locale için metadata.i18n'den overlay eder.
 // Çeviri yoksa orijinal (tr) alan korunur. Ham veri tek cache'te paylaşılır;
 // overlay request başına JS'de uygulanır (sayfalar cookie okuduğu için dynamic).
@@ -70,8 +74,17 @@ export const listProducts = async ({
     ...(await getAuthHeaders()),
   }
 
+  // Ürün verisi: force-cache + session-bazlı tag (products-{cache_id}) verisini
+  // SÜRESIZ donduruyordu → satıcı ürünü güncellese de mağazada eski resim/bilgi
+  // görünüyordu. Çözüm iki katman:
+  //  - revalidate: webhook yoksa ≤30 sn'de otomatik tazelik (ISR).
+  //  - statik "products" tag: backend ürün güncelleyince revalidateTag("products")
+  //    ile (/api/revalidate) ANINDA global tazeleme.
+  const cacheOpts = await getCacheOptions("products")
   const next = {
-    ...(await getCacheOptions("products")),
+    ...cacheOpts,
+    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "products"],
+    revalidate: PRODUCT_REVALIDATE_SECONDS,
   }
 
   // Locale'i fetch'ten ÖNCE (request scope'ta) oku — cache'li promise zincirinin
@@ -93,7 +106,6 @@ export const listProducts = async ({
         },
         headers,
         next,
-        cache: "force-cache",
       }
     )
     .then(({ products, count }) => {

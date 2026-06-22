@@ -3,8 +3,13 @@ import { HttpTypes } from "@medusajs/types"
 import { getCacheOptions } from "./cookies"
 
 export const listCategories = async (query?: Record<string, unknown>) => {
+  // Kategoriler `*products` gömüyor → ürün güncellemeleri yansısın: ISR (≤30sn) +
+  // statik "products"/"categories" tag (revalidateTag ile anında tazelenir).
+  const cacheOpts = await getCacheOptions("categories")
   const next = {
-    ...(await getCacheOptions("categories")),
+    ...cacheOpts,
+    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "categories", "products"],
+    revalidate: 30,
   }
 
   const limit = query?.limit || 100
@@ -20,7 +25,6 @@ export const listCategories = async (query?: Record<string, unknown>) => {
           ...query,
         },
         next,
-        cache: "force-cache",
       }
     )
     .then(({ product_categories }) => product_categories)
@@ -41,8 +45,11 @@ export const getCategoryByHandle = async (categoryHandle: string[]) => {
   }
   const handle = categoryHandle.map(safeDecode).join("/")
 
+  const cacheOpts = await getCacheOptions("categories")
   const next = {
-    ...(await getCacheOptions("categories")),
+    ...cacheOpts,
+    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "categories", "products"],
+    revalidate: 30,
   }
 
   return sdk.client
@@ -54,7 +61,6 @@ export const getCategoryByHandle = async (categoryHandle: string[]) => {
           handle,
         },
         next,
-        cache: "force-cache",
       }
     )
     .then(({ product_categories }) => product_categories[0])
