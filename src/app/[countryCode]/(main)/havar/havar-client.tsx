@@ -10,11 +10,12 @@ const emptyForm = {
   phone: "",
   city: "",
   buyer_type: "individual" as "individual" | "family",
-  usage: "both" as "cargo" | "human" | "both",
+  usage: "cargo" as "cargo" | "human" | "both",
   quantity: 1,
   want_door_mechanism: false,
   rental_duration: "",
   note: "",
+  ack: false,
 }
 
 export default function HavarClient() {
@@ -28,6 +29,10 @@ export default function HavarClient() {
     e.preventDefault()
     if (!form.full_name || !form.email || !form.phone) {
       alert("Lütfen ad soyad, e-posta ve telefon alanlarını doldurun.")
+      return
+    }
+    if (!form.ack) {
+      alert("Devam etmek için ön ilgi onayını işaretleyin.")
       return
     }
     setStatus("loading")
@@ -76,13 +81,22 @@ export default function HavarClient() {
           />
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold mb-3 max-w-2xl">
-          Drone tabanlı kargo ve insan taşıma — eve, aileye, afete hazır
+          Drone tabanlı kargo ve teslimat — eve ve aileye yeni nesil lojistik
         </h1>
         <p className="text-white/85 max-w-2xl text-sm sm:text-base leading-relaxed">
           HavarTek hava araçları; bireyler ve aileler için <strong>satın alma</strong> ve{" "}
-          <strong>kiralama</strong> modeliyle sunulur. Günlük alışveriş ve kargo taşımadan
-          afet anında apartmandan tahliyeye kadar geniş bir kullanım sağlar. Aşağıdan ön
-          alım veya ön kiralama talebinizi bırakın, ekibimiz sizinle iletişime geçsin.
+          <strong>kiralama</strong> modeliyle planlanıyor. Önceliğimiz{" "}
+          <strong>kargo ve paket taşıma</strong>: market alışverişi, kapıdan kapıya teslimat
+          ve günlük getir-götür.
+        </p>
+        <p className="text-white/85 max-w-2xl text-sm sm:text-base leading-relaxed mt-3">
+          İnsan taşıma ve afet anında tahliye gibi ileri kullanımlar geliştirme ve mevzuat
+          sürecindedir; bu sayfada şimdilik <strong>ön ilgi ölçme</strong> amacıyla yer alır,
+          herhangi bir tarih veya teslim taahhüdü içermez.
+        </p>
+        <p className="text-white/85 max-w-2xl text-sm sm:text-base leading-relaxed mt-3">
+          Aşağıdan ön alım veya ön kiralama talebinizi bırakın, ekibimiz sizinle iletişime
+          geçsin.
         </p>
         <a
           href="https://girisimciturk.com/ekyp/drone-teknolojileri/"
@@ -119,6 +133,15 @@ export default function HavarClient() {
                 {label}
               </button>
             ))}
+          </div>
+
+          {/* Form üstü kısa not — ön ilgi / ödemesiz */}
+          <div className="mb-6 border-l-4 border-brandblue-700 bg-brandblue-50 rounded-r-lg px-4 py-3">
+            <p className="text-sm text-ui-fg-base leading-relaxed">
+              Bu form <strong>ön ilgi ve talep toplama</strong> amaçlıdır. Ödeme alınmaz,
+              teslim tarihi taahhüdü verilmez. İnsan taşıma ve tahliye kullanımları, Sivil
+              Havacılık Genel Müdürlüğü (SHGM) mevzuatı ve fizibilite onayına bağlıdır.
+            </p>
           </div>
 
           {status === "success" ? (
@@ -183,8 +206,8 @@ export default function HavarClient() {
                   <label className={labelCls}>Kullanım Amacı</label>
                   <select className={inputCls} value={form.usage}
                     onChange={(e) => set("usage", e.target.value)}>
-                    <option value="both">Kargo + İnsan Taşıma</option>
                     <option value="cargo">Kargo Taşıma</option>
+                    <option value="both">Kargo + İnsan Taşıma</option>
                     <option value="human">İnsan Taşıma</option>
                   </select>
                 </div>
@@ -209,9 +232,8 @@ export default function HavarClient() {
                   checked={form.want_door_mechanism}
                   onChange={(e) => set("want_door_mechanism", e.target.checked)} />
                 <span className="text-sm text-ui-fg-base">
-                  <strong>Apartman kapı/çıkış mekanizması</strong> da istiyorum — drone
-                  yaklaşınca otomatik açılan, tahliye ve günlük kargo için özel kapı
-                  sistemi (bayi montaj hizmeti).
+                  <strong>Apartman kapı/çıkış mekanizması</strong> hakkında da bilgi almak
+                  istiyorum (kurulum yetkili bayi tarafından ücretlidir).
                 </span>
               </label>
 
@@ -222,11 +244,19 @@ export default function HavarClient() {
                   placeholder="İhtiyacınız, kullanım senaryonuz veya sorularınız..." />
               </div>
 
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input type="checkbox" className="mt-0.5 h-3.5 w-3.5 accent-brand-600"
+                  checked={form.ack}
+                  onChange={(e) => set("ack", e.target.checked)} />
+                <span className="text-xs text-ui-fg-subtle leading-relaxed">
+                  Bu talebin ön ilgi amaçlı olduğunu, ödeme veya teslim taahhüdü içermediğini
+                  anladım.
+                </span>
+              </label>
+
               <button type="submit" disabled={status === "loading"}
                 className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg text-sm transition-colors">
-                {status === "loading"
-                  ? "Gönderiliyor..."
-                  : tab === "rental" ? "Ön Kiralama Talebini Gönder" : "Ön Alım Talebini Gönder"}
+                {status === "loading" ? "Gönderiliyor..." : "Ön İlgi / Talep Bırak"}
               </button>
               {status === "error" && (
                 <p className="text-sm text-red-600 text-center">Talep gönderilemedi. Lütfen tekrar deneyin.</p>
@@ -240,21 +270,22 @@ export default function HavarClient() {
           <div className="border border-ui-border-base rounded-xl p-5">
             <h3 className="font-bold text-sm mb-2 text-brandblue-700">Apartman Kapı Mekanizması</h3>
             <p className="text-sm text-ui-fg-subtle leading-relaxed">
-              Apartmanlara monte edilen ek kapı, drone yaklaştığında otomatik açılır ve
-              hava aracına güvenli bağlanma sağlar. Afette anında tahliye; günlük
-              hayatta alışveriş ve kargo teslimi için kullanılır. Kurulum,{" "}
-              <strong>bayilerimiz tarafından ücret karşılığı</strong> yapılır.
+              Apartmanlara monte edilen ek kapı, drone yaklaştığında otomatik açılarak
+              hava aracına güvenli kargo bağlantısı sağlar. Birincil kullanım: günlük
+              alışveriş ve kapıdan kapıya kargo teslimi. İleride afet anında tahliye
+              senaryoları için de değerlendirilmektedir; bu kullanım geliştirme ve mevzuat
+              onayına bağlıdır. Kurulum,{" "}
+              <strong>yetkili bayilerimiz tarafından ücret karşılığı</strong> yapılır.
             </p>
           </div>
           <div className="border border-ui-border-base rounded-xl p-5">
             <h3 className="font-bold text-sm mb-2 text-brandblue-700">Neden HavarTek?</h3>
             <ul className="text-sm text-ui-fg-subtle space-y-1.5 list-disc pl-4">
-              <li>Bireysel ve aile kullanımı için satış + kiralama</li>
-              <li><strong>Günlük kullanım:</strong> market ve günlük alışveriş getir-götür</li>
               <li><strong>Paket & kargo taşıma:</strong> kapıdan kapıya hızlı teslimat</li>
-              <li>İnsan taşımacılığı</li>
-              <li>Afet anında hızlı tahliye</li>
+              <li><strong>Günlük kullanım:</strong> market ve günlük alışveriş getir-götür</li>
+              <li>Bireysel ve aile kullanımı için satış + kiralama seçeneği</li>
               <li>Şehir içi lojistiği hızlandırır</li>
+              <li><em>(Geliştirme ve mevzuat sürecinde)</em> İnsan taşıma ve afet anında hızlı tahliye</li>
             </ul>
           </div>
         </aside>

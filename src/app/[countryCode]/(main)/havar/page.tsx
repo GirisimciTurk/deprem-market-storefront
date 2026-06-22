@@ -2,9 +2,9 @@ import { Metadata } from "next"
 import HavarClient from "./havar-client"
 
 export const metadata: Metadata = {
-  title: "HavarTek — Drone Hava Aracı Satış & Kiralama | depremTek",
+  title: "HavarTek — Drone Tabanlı Kargo & Teslimat | depremTek",
   description:
-    "HavarTek drone hava araçları: bireyler ve aileler için satın alma ve kiralama. Kargo ve insan taşımacılığı, afet anında tahliye ve apartman kapı mekanizması. Ön alım / ön kiralama talebinizi bırakın.",
+    "HavarTek drone hava araçları: bireyler ve aileler için satın alma ve kiralama. Önceliğimiz kargo ve paket taşıma, kapıdan kapıya teslimat. İnsan taşıma ve afet tahliyesi geliştirme/mevzuat sürecindedir. Ön ilgi / talep bırakın.",
 }
 
 export default function HavarPage() {
