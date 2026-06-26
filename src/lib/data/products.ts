@@ -7,6 +7,26 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 import { getLocaleSafe, pickTranslation } from "@lib/util/localize"
+import { toReachableImageUrl } from "@lib/util/image-url"
+
+// Ürünün görsel URL'lerini (thumbnail + product.images) TR'den erişilemeyen
+// r2.dev'den /r2/ proxy'sine çevirir. Tek merkezde yapıldığı için her bileşen +
+// RSC hidrasyon verisi otomatik temiz URL alır (galeri product.images'ı kullanır).
+function normalizeProductImages(
+  product: HttpTypes.StoreProduct
+): HttpTypes.StoreProduct {
+  const out = { ...product }
+  if (product.thumbnail) {
+    out.thumbnail = toReachableImageUrl(product.thumbnail) ?? product.thumbnail
+  }
+  if (product.images) {
+    out.images = product.images.map((im) => ({
+      ...im,
+      url: toReachableImageUrl(im.url) ?? im.url,
+    }))
+  }
+  return out
+}
 
 // Mağaza ürün verisinin tazelik aralığı (sn). Satıcı bir ürünü güncelleyince
 // değişiklik en geç bu süre içinde storefront'a yansır (ISR / stale-while-revalidate).
@@ -110,8 +130,9 @@ export const listProducts = async ({
     )
     .then(({ products, count }) => {
       const nextPage = count > offset + limit ? pageParam + 1 : null
+      const reachable = products.map(normalizeProductImages)
       const localized =
-        locale === "tr" ? products : products.map((p) => localizeProduct(p, locale))
+        locale === "tr" ? reachable : reachable.map((p) => localizeProduct(p, locale))
 
       return {
         response: {
