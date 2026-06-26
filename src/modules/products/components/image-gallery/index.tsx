@@ -4,6 +4,8 @@ import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
 import React, { useState, useMemo } from "react"
 
+import { toReachableImageUrl } from "@lib/util/image-url"
+
 type ImageGalleryProps = {
   images: HttpTypes.StoreProductImage[]
   productHandle?: string
@@ -48,7 +50,11 @@ const ImageGallery = ({ images, productHandle }: ImageGalleryProps) => {
     }
     
     if (images && images.length > 0) {
-      return images
+      // r2.dev görsel URL'lerini TR'den erişilebilen /r2/ proxy'sine çevir.
+      return images.map((im) => ({
+        ...im,
+        url: toReachableImageUrl(im.url) ?? im.url,
+      }))
     }
 
     // Default emergency backpack fallback

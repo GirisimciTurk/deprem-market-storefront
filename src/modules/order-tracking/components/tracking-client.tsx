@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react"
 import { trackOrder } from "@lib/data/orders"
 import { convertToLocale } from "@lib/util/money"
 import { getCarrierName, getTrackingUrl } from "@lib/util/cargo"
+import { toReachableImageUrl } from "@lib/util/image-url"
 import {
   Button,
   Input,
@@ -606,7 +607,7 @@ export default function TrackingClient({
                     >
                       {item.thumbnail && (
                         <img
-                          src={item.thumbnail}
+                          src={toReachableImageUrl(item.thumbnail)}
                           alt={item.title}
                           className="w-16 h-16 object-cover rounded-lg bg-gray-100 border border-gray-200 shrink-0"
                         />

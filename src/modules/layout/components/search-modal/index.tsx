@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Search, X, Loader2 } from "lucide-react"
 import Image from "next/image"
+import { toReachableImageUrl } from "@lib/util/image-url"
 
 type SearchResult = {
   id: string
@@ -206,7 +207,7 @@ export default function SearchModal() {
                         <div className="w-12 h-12 rounded-lg bg-ui-bg-subtle flex-shrink-0 overflow-hidden relative">
                           {product.thumbnail ? (
                             <Image
-                              src={product.thumbnail}
+                              src={toReachableImageUrl(product.thumbnail)!}
                               alt={product.title}
                               fill
                               className="object-cover"
