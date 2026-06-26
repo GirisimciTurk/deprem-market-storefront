@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { Shield, Activity, CheckCircle, Video, Maximize2, Eye, X } from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
 import { getShowcaseContent, type ShowcaseContent } from "./showcase-content"
+import { toReachableImageUrl } from "@lib/util/image-url"
 
 interface ShowcaseProps {
   product: HttpTypes.StoreProduct
@@ -61,14 +62,18 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
     const contentHighlights = Array.isArray(blocks)
       ? blocks
           .filter((b) => (b?.text && b.text.trim()) || (b?.image && b.image.trim()))
-          .map((b) => ({ title: "", desc: (b.text || "").trim(), image: (b.image || "").trim() }))
+          .map((b) => ({
+            title: "",
+            desc: (b.text || "").trim(),
+            image: toReachableImageUrl((b.image || "").trim()) ?? "",
+          }))
       : []
 
     return {
       tagline: "ACİL DURUM VE AFET HAZIRLIĞI",
       title: product.title,
       subtitle: product.subtitle || product.description || "Afet sonrasında güvenliğinizi ve hazırlığınızı en üst seviyeye çıkarmak için üretilmiştir.",
-      videoUrl: (product.metadata as any)?.video_url || "",
+      videoUrl: toReachableImageUrl((product.metadata as any)?.video_url || "") ?? "",
       features: fallbackFeatures,
       specs: defaultSpecs,
       highlights: contentHighlights,
@@ -90,7 +95,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
     } else {
       return acc
     }
-  }, [])
+  }, []).map((im: any) => ({ ...im, url: toReachableImageUrl(im.url) ?? im.url }))
 
   return (
     <div className="bg-slate-50 border-t border-slate-200 py-16 sm:py-24">
