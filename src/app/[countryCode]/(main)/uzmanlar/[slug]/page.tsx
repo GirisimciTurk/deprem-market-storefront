@@ -78,6 +78,11 @@ export default async function ExpertProfilePage({
               <h1 className="text-2xl font-extrabold text-ui-fg-base tracking-tight">
                 {expert.full_name}
               </h1>
+              {expert.featured && (
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                  ★ Öne Çıkan
+                </span>
+              )}
               {expert.verified && <VerifiedBadge size="md" />}
             </div>
             {expert.title && (

@@ -27,6 +27,7 @@ const MENU_GROUPS: { titleKey: string; items: MobileItem[] }[] = [
   {
     titleKey: "info",
     items: [
+      { key: "educationCenter", href: "/bilgi-merkezi" },
       { key: "blog", href: "/blog" },
       { key: "assistant", href: "/hazirlik-asistani" },
     ],
@@ -43,6 +44,7 @@ const MENU_GROUPS: { titleKey: string; items: MobileItem[] }[] = [
     items: [
       { key: "becomeExpert", href: "/uzman-ol", highlight: true },
       { key: "becomeImplementer", href: "/uygulayici-ol", highlight: true },
+      { key: "packages", href: "/uzman-paketleri" },
     ],
   },
 ]

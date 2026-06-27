@@ -95,6 +95,7 @@
     "info": "Bilgi Merkezi",
     "blog": "Blog & Rehberler",
     "assistant": "Hazırlık Asistanı",
+    "educationCenter": "Bilgi & Eğitim Merkezi",
     "experts": "Uzman & Hizmet",
     "findEngineer": "Mühendis & Uygulayıcı Bul",
     "findEngineerDesc": "Doğrulanmış mühendis & uygulayıcı dizini",
@@ -104,6 +105,8 @@
     "becomeExpertDesc": "İnşaat mühendisiyim",
     "becomeImplementer": "Uygulayıcı Ol",
     "becomeImplementerDesc": "İnşaat & güçlendirme uygularım",
+    "packages": "Üyelik Paketleri",
+    "packagesDesc": "Uzman & uygulayıcı üyelik seçenekleri",
     "trackOrder": "Sipariş Takip",
     "faq": "S.S.S.",
     "contact": "İletişim"
@@ -143,6 +146,31 @@
       "pet": "Evcil hayvan",
       "car": "Araç çantası",
       "office": "Ofis / işyeri"
+    }
+  },
+  "mascot": {
+    "name": "Depremzede",
+    "role": "Deprem Hazırlık Asistanı",
+    "greeting": "Merhaba! Ben Depremzede 👷 Burada depremle ilgili aradığın her çözümü bulabilirsin. Peki sen ne arıyorsun?",
+    "bubble": "Merhaba! Ben Depremzede 👷 Depremle ilgili aradığın her çözümü bulmana yardım edeyim mi?",
+    "bubbleCta": "Hadi başlayalım",
+    "openAria": "Depremzede asistanını aç",
+    "closeAria": "Kapat",
+    "inputPlaceholder": "Bir şey sor ya da ürün ara...",
+    "send": "Gönder",
+    "error": "Şu an cevap veremedim, az sonra tekrar dener misin?",
+    "addAll": "Tümünü Sepete Ekle ({count})",
+    "adding": "Ekleniyor...",
+    "addedAll": "Sepete Eklendi ✓",
+    "suggestedQty": "Önerilen adet: {qty}",
+    "surveyTitle": "Yapınız için uzman keşfi önerilir",
+    "surveyCta": "Güçlendirme & Keşif Hizmeti",
+    "disclaimer": "Yapay zekâ yardımcısı; bina güvenliği ancak ruhsatlı mühendis keşfiyle belirlenir.",
+    "suggestions": {
+      "kit": "Bana hazırlık seti öner",
+      "bag": "Deprem çantası ürünleri",
+      "carbon": "Karbon fiber güçlendirme nedir?",
+      "store": "Mağazayı göster"
     }
   },
   "cookieConsent": {

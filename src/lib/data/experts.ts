@@ -16,6 +16,8 @@ export interface Expert {
   photo_url: string
   verified: boolean
   document_count: number
+  membership_tier: "none" | "basic" | "premium"
+  featured: boolean
   phone: string
   email: string
   whatsapp: string

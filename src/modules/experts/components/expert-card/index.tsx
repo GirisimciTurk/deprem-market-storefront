@@ -13,7 +13,11 @@ export default function ExpertCard({ expert }: { expert: Expert }) {
   return (
     <LocalizedClientLink
       href={`/uzmanlar/${expert.slug}`}
-      className="group block border border-ui-border-base rounded-2xl bg-ui-bg-base p-5 hover:border-brand-400 hover:shadow-md transition-all"
+      className={`group block border rounded-2xl bg-ui-bg-base p-5 hover:shadow-md transition-all ${
+        expert.featured
+          ? "border-amber-300 ring-1 ring-amber-200 hover:border-amber-400"
+          : "border-ui-border-base hover:border-brand-400"
+      }`}
     >
       <div className="flex items-start gap-4">
         <div className="shrink-0 w-16 h-16 rounded-xl bg-ui-bg-subtle border border-ui-border-base overflow-hidden flex items-center justify-center">
@@ -31,6 +35,11 @@ export default function ExpertCard({ expert }: { expert: Expert }) {
             <h3 className="font-bold text-ui-fg-base text-sm truncate group-hover:text-brand-700 transition-colors">
               {expert.full_name}
             </h3>
+            {expert.featured && (
+              <span className="inline-flex items-center gap-0.5 text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                ★ Öne Çıkan
+              </span>
+            )}
             {expert.verified && <VerifiedBadge />}
           </div>
           {expert.title && (

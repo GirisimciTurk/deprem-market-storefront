@@ -57,6 +57,56 @@ export function providerLabel(type: ProviderType | string): string {
   return PROVIDER_LABELS[type as ProviderType] ?? "İnşaat Mühendisi"
 }
 
+export type MembershipTier = "none" | "basic" | "premium"
+
+export const MEMBERSHIP_LABELS: Record<MembershipTier, string> = {
+  none: "Standart",
+  basic: "Temel",
+  premium: "Üst",
+}
+
+export function membershipLabel(key: string): string {
+  return MEMBERSHIP_LABELS[key as MembershipTier] ?? "Standart"
+}
+
+/** /uzman-paketleri sayfasının tanıtım içeriği (beta'da ücretsiz). */
+export type MembershipPlan = {
+  key: MembershipTier
+  name: string
+  tagline: string
+  priceLabel: string
+  featured?: boolean
+  features: string[]
+}
+
+export const MEMBERSHIP_PLANS: MembershipPlan[] = [
+  {
+    key: "basic",
+    name: "Temel Üyelik",
+    tagline: "Dizinde doğrulanmış profille yer alın.",
+    priceLabel: "Beta'da Ücretsiz",
+    features: [
+      "Doğrulanmış profil + “Doğrulanmış” rozeti",
+      "İl/ilçe ve uzmanlık filtrelerinde görünürlük",
+      "İletişim tercihleri (telefon/WhatsApp/e-posta)",
+      "Hakkında metni ve uzmanlık alanları",
+    ],
+  },
+  {
+    key: "premium",
+    name: "Üst Üyelik",
+    tagline: "Dizinde öne çıkın, daha fazla talebe ulaşın.",
+    priceLabel: "Beta'da Ücretsiz",
+    featured: true,
+    features: [
+      "Temel üyeliğin tüm avantajları",
+      "Dizinde “Öne Çıkan” rozeti ve üst sıralarda listelenme",
+      "Profilde öncelikli gösterim",
+      "Önümüzdeki dönemde: talep yönlendirme önceliği",
+    ],
+  },
+]
+
 export type ExpertBudgetTier = { key: string; label: string }
 
 export const EXPERT_BUDGET_TIERS: ExpertBudgetTier[] = [

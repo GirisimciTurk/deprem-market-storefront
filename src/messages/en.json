@@ -95,6 +95,7 @@
     "info": "Knowledge Center",
     "blog": "Blog & Guides",
     "assistant": "Preparedness Assistant",
+    "educationCenter": "Knowledge & Education Center",
     "experts": "Experts & Services",
     "findEngineer": "Find Engineer / Contractor",
     "findEngineerDesc": "Verified engineer & contractor directory",
@@ -104,6 +105,8 @@
     "becomeExpertDesc": "I am a civil engineer",
     "becomeImplementer": "Become a Contractor",
     "becomeImplementerDesc": "I do construction & retrofit work",
+    "packages": "Membership Plans",
+    "packagesDesc": "Expert & contractor membership options",
     "trackOrder": "Track Order",
     "faq": "FAQ",
     "contact": "Contact"
@@ -143,6 +146,31 @@
       "pet": "Pet",
       "car": "Car kit",
       "office": "Office / workplace"
+    }
+  },
+  "mascot": {
+    "name": "Depremzede",
+    "role": "Earthquake Prep Assistant",
+    "greeting": "Hi! I'm Depremzede 👷 You can find any earthquake-related solution you're looking for right here. So, what are you looking for?",
+    "bubble": "Hi! I'm Depremzede 👷 Want me to help you find any earthquake-related solution?",
+    "bubbleCta": "Let's start",
+    "openAria": "Open the Depremzede assistant",
+    "closeAria": "Close",
+    "inputPlaceholder": "Ask something or search products...",
+    "send": "Send",
+    "error": "I couldn't answer just now — could you try again shortly?",
+    "addAll": "Add All to Cart ({count})",
+    "adding": "Adding...",
+    "addedAll": "Added to Cart ✓",
+    "suggestedQty": "Suggested qty: {qty}",
+    "surveyTitle": "An expert survey is recommended for your building",
+    "surveyCta": "Strengthening & Survey Service",
+    "disclaimer": "AI assistant; building safety can only be determined by a licensed engineer's on-site survey.",
+    "suggestions": {
+      "kit": "Recommend a preparedness kit",
+      "bag": "Earthquake bag products",
+      "carbon": "What is carbon-fiber strengthening?",
+      "store": "Show the store"
     }
   },
   "cookieConsent": {

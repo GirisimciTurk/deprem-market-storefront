@@ -152,6 +152,7 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
       key: "info",
       label: t("info"),
       items: [
+        { href: "/bilgi-merkezi", label: t("educationCenter") },
         { href: "/blog", label: t("blog") },
         { href: "/hazirlik-asistani", label: t("assistant") },
       ],
@@ -179,6 +180,11 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
           label: t("becomeImplementer"),
           desc: t("becomeImplementerDesc"),
           highlight: true,
+        },
+        {
+          href: "/uzman-paketleri",
+          label: t("packages"),
+          desc: t("packagesDesc"),
         },
       ],
     },

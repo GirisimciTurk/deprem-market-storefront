@@ -156,6 +156,11 @@ export default async function Footer() {
                   </LocalizedClientLink>
                 </li>
                 <li>
+                  <LocalizedClientLink href="/uzman-paketleri" className="hover:text-ui-fg-base">
+                    Üyelik Paketleri
+                  </LocalizedClientLink>
+                </li>
+                <li>
                   <LocalizedClientLink href="/sikca-sorulan-sorular" className="hover:text-ui-fg-base">
                     Sıkça Sorulan Sorular
                   </LocalizedClientLink>
@@ -168,6 +173,11 @@ export default async function Footer() {
                 <li>
                   <LocalizedClientLink href="/iletisim" className="hover:text-ui-fg-base">
                     İletişim
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/bilgi-merkezi" className="hover:text-ui-fg-base">
+                    Bilgi & Eğitim Merkezi
                   </LocalizedClientLink>
                 </li>
                 <li>
