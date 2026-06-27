@@ -4,6 +4,7 @@ import { useState } from "react"
 import {
   EXPERT_BUDGET_TIERS,
   specializationsFor,
+  requiredDocLabels,
   type ProviderType,
 } from "@lib/expert-config"
 
@@ -484,6 +485,13 @@ export default function ExpertForm({
 
         <div>
           <label className={labelCls}>Doğrulama Belgeleri</label>
+          {specs.length > 0 && requiredDocLabels(specs).length > 0 && (
+            <div className="text-xs mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
+              Seçtiğiniz uzmanlıklar için <strong>gerekli belgeler</strong>:{" "}
+              {requiredDocLabels(specs).join(" · ")}. Her uzmanlık ilgili belgeyle ayrı
+              doğrulanır.
+            </div>
+          )}
           <p className="text-xs text-ui-fg-muted mb-2">
             Diploma, oda (İMO) kaydı veya yetki belgenizi yükleyin. Belgeler yalnız
             ekibimizce incelenir, profilinizde <strong>paylaşılmaz</strong>. Görsel
