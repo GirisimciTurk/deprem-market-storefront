@@ -69,6 +69,16 @@ export function membershipLabel(key: string): string {
   return MEMBERSHIP_LABELS[key as MembershipTier] ?? "Standart"
 }
 
+/** Hizmet bölgesi kapsamı üyelik paketine bağlı (ek bölge sayısı, ana konum hariç). */
+export const MEMBERSHIP_REGION_LIMITS: Record<MembershipTier, number> = {
+  none: 1,
+  basic: 3,
+  premium: 10,
+}
+export function regionLimitFor(tier: string): number {
+  return MEMBERSHIP_REGION_LIMITS[tier as MembershipTier] ?? 1
+}
+
 /** /uzman-paketleri sayfasının tanıtım içeriği (beta'da ücretsiz). */
 export type MembershipPlan = {
   key: MembershipTier
@@ -88,6 +98,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     features: [
       "Doğrulanmış profil + “Doğrulanmış” rozeti",
       "İl/ilçe ve uzmanlık filtrelerinde görünürlük",
+      "Ana konum + 3 ek hizmet bölgesi",
       "İletişim tercihleri (telefon/WhatsApp/e-posta)",
       "Hakkında metni ve uzmanlık alanları",
     ],
@@ -101,6 +112,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     features: [
       "Temel üyeliğin tüm avantajları",
       "Dizinde “Öne Çıkan” rozeti ve üst sıralarda listelenme",
+      "Ana konum + 10 ek hizmet bölgesi (geniş kapsam)",
       "Profilde öncelikli gösterim",
       "Önümüzdeki dönemde: talep yönlendirme önceliği",
     ],

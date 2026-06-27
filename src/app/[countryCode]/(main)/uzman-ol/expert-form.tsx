@@ -42,6 +42,15 @@ export default function ExpertForm({
     { type: string; url: string; name: string }[]
   >([])
   const [uploadingDoc, setUploadingDoc] = useState(false)
+  // Ek hizmet bölgeleri (ana konum hariç). Self-servis kayıtta 3 ile sınırlı (Temel paket).
+  const MAX_REGIONS = 3
+  const [regions, setRegions] = useState<{ city: string; district: string }[]>([])
+  const addRegion = () =>
+    setRegions((r) => (r.length < MAX_REGIONS ? [...r, { city: "", district: "" }] : r))
+  const updateRegion = (i: number, field: "city" | "district", v: string) =>
+    setRegions((r) => r.map((x, idx) => (idx === i ? { ...x, [field]: v } : x)))
+  const removeRegion = (i: number) =>
+    setRegions((r) => r.filter((_, idx) => idx !== i))
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
     "idle"
   )
@@ -122,6 +131,10 @@ export default function ExpertForm({
       alert("Lütfen ad soyad, e-posta ve telefon alanlarını doldurun.")
       return
     }
+    if (!form.city || !form.district) {
+      alert("Lütfen ana konumunuzu (il ve ilçe) girin.")
+      return
+    }
     if (specs.length === 0) {
       alert("Lütfen en az bir uzmanlık alanı seçin.")
       return
@@ -152,6 +165,9 @@ export default function ExpertForm({
           imo_member: imoMember,
           budget_tier: form.budget_tier || undefined,
           message: form.message,
+          service_regions: regions
+            .filter((r) => r.city.trim())
+            .map((r) => ({ city: r.city.trim(), district: r.district.trim() || undefined })),
           about: form.about || undefined,
           whatsapp: form.whatsapp || undefined,
           show_phone: showPhone,
@@ -209,6 +225,7 @@ export default function ExpertForm({
             setShowPhone(true)
             setShowEmail(false)
             setDocuments([])
+            setRegions([])
             setStatus("idle")
           }}
           className="mt-6 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
@@ -288,9 +305,12 @@ export default function ExpertForm({
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label className={labelCls}>Ana İl</label>
+          <label className={labelCls}>
+            Ana İl <span className="text-brand-500">*</span>
+          </label>
           <input
             type="text"
+            required
             disabled={loading}
             value={form.city}
             onChange={(e) => setForm({ ...form, city: e.target.value })}
@@ -299,9 +319,12 @@ export default function ExpertForm({
           />
         </div>
         <div>
-          <label className={labelCls}>İlçe</label>
+          <label className={labelCls}>
+            İlçe <span className="text-brand-500">*</span>
+          </label>
           <input
             type="text"
+            required
             disabled={loading}
             value={form.district}
             onChange={(e) => setForm({ ...form, district: e.target.value })}
@@ -357,38 +380,71 @@ export default function ExpertForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className={labelCls}>Ek Hizmet Bölgeleri</label>
-          <input
-            type="text"
-            disabled={loading}
-            value={form.service_areas}
-            onChange={(e) =>
-              setForm({ ...form, service_areas: e.target.value })
-            }
-            placeholder="Örn: Kocaeli, Bursa"
-            className={inputCls}
-          />
+      <div>
+        <label className={labelCls}>Ek Hizmet Bölgeleri</label>
+        <p className="text-xs text-ui-fg-muted mb-2">
+          Ana konumunuz dışında hizmet verdiğiniz il/ilçeleri ekleyin (opsiyonel, en
+          fazla {MAX_REGIONS}). Daha geniş kapsam Üst üyelikte açılır.
+        </p>
+        <div className="space-y-2">
+          {regions.map((r, i) => (
+            <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+              <input
+                type="text"
+                disabled={loading}
+                value={r.city}
+                onChange={(e) => updateRegion(i, "city", e.target.value)}
+                placeholder="İl (örn. Kocaeli)"
+                className={inputCls}
+              />
+              <input
+                type="text"
+                disabled={loading}
+                value={r.district}
+                onChange={(e) => updateRegion(i, "district", e.target.value)}
+                placeholder="İlçe (opsiyonel)"
+                className={inputCls}
+              />
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => removeRegion(i)}
+                className="text-ui-fg-muted hover:text-brand-600 text-sm font-semibold px-2"
+              >
+                Kaldır
+              </button>
+            </div>
+          ))}
+          {regions.length < MAX_REGIONS && (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={addRegion}
+              className="text-sm font-semibold text-brand-600 hover:text-brand-700"
+            >
+              + Bölge Ekle
+            </button>
+          )}
         </div>
-        <div>
-          <label className={labelCls}>
-            Böyle bir dizine aylık ne kadar öderdiniz?
-          </label>
-          <select
-            disabled={loading}
-            value={form.budget_tier}
-            onChange={(e) => setForm({ ...form, budget_tier: e.target.value })}
-            className={inputCls}
-          >
-            <option value="">Seçiniz (opsiyonel)</option>
-            {EXPERT_BUDGET_TIERS.map((b) => (
-              <option key={b.key} value={b.key}>
-                {b.label}
-              </option>
-            ))}
-          </select>
-        </div>
+      </div>
+
+      <div>
+        <label className={labelCls}>
+          Böyle bir dizine aylık ne kadar öderdiniz?
+        </label>
+        <select
+          disabled={loading}
+          value={form.budget_tier}
+          onChange={(e) => setForm({ ...form, budget_tier: e.target.value })}
+          className={inputCls}
+        >
+          <option value="">Seçiniz (opsiyonel)</option>
+          {EXPERT_BUDGET_TIERS.map((b) => (
+            <option key={b.key} value={b.key}>
+              {b.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <label className="flex items-start gap-2 cursor-pointer">

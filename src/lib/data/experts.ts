@@ -13,6 +13,7 @@ export interface Expert {
   experience_years: number | null
   imo_member: boolean
   service_areas: string
+  service_regions: { city: string; district?: string }[]
   about: string
   photo_url: string
   verified: boolean

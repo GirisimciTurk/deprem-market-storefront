@@ -164,10 +164,27 @@ export default async function ExpertProfilePage({
       )}
 
       {/* Hizmet bölgeleri */}
-      {expert.service_areas && (
+      {((expert.service_regions?.length ?? 0) > 0 || expert.service_areas || location) && (
         <section className="mt-6">
           <h2 className="text-base font-bold text-ui-fg-base mb-2">Hizmet Bölgeleri</h2>
-          <p className="text-sm text-ui-fg-subtle">{expert.service_areas}</p>
+          <div className="flex flex-wrap gap-2">
+            {location && (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-brand-200 bg-brand-50 text-brand-700">
+                <MapPin className="w-3.5 h-3.5" /> {location} (ana)
+              </span>
+            )}
+            {(expert.service_regions ?? []).map((r, i) => (
+              <span
+                key={i}
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-ui-border-base bg-ui-bg-subtle text-ui-fg-subtle"
+              >
+                {[r.city, r.district].filter(Boolean).join(" / ")}
+              </span>
+            ))}
+          </div>
+          {expert.service_areas && (
+            <p className="text-sm text-ui-fg-muted mt-2">{expert.service_areas}</p>
+          )}
         </section>
       )}
 
