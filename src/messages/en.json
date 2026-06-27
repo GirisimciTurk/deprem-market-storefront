@@ -87,6 +87,27 @@
     "havar": "HavarTek",
     "assistant": "Preparedness Assistant"
   },
+  "navMenu": {
+    "shop": "Shop",
+    "shopAll": "All Products",
+    "categories": "Categories",
+    "houseStore": "Deprem Market Store",
+    "info": "Knowledge Center",
+    "blog": "Blog & Guides",
+    "assistant": "Preparedness Assistant",
+    "experts": "Experts & Services",
+    "findEngineer": "Find Engineer / Contractor",
+    "findEngineerDesc": "Verified engineer & contractor directory",
+    "havar": "HavarTek",
+    "join": "Join the Platform",
+    "becomeExpert": "Become an Expert",
+    "becomeExpertDesc": "I am a civil engineer",
+    "becomeImplementer": "Become a Contractor",
+    "becomeImplementerDesc": "I do construction & retrofit work",
+    "trackOrder": "Track Order",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
   "categoryMenu": {
     "heading": "Categories",
     "all": "All Categories",

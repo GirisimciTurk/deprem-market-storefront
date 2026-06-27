@@ -11,17 +11,46 @@ import { useTranslations } from "next-intl"
 import CountrySelect from "../country-select"
 import LocaleSwitcher from "../locale-switcher"
 
-// key = çeviri anahtarı (sideMenu.<key>) + stabil testid; href = hedef.
-const SideMenuItems: { key: string; href: string }[] = [
-  { key: "home", href: "/" },
-  { key: "store", href: "/store" },
-  { key: "assistant", href: "/hazirlik-asistani" },
-  // Birinci-parti house mağazası (is_house) — backend HOUSE_HANDLE = "deprem-market".
-  { key: "ourStore", href: "/satici/deprem-market" },
-  { key: "reseller", href: "/satici-ol" },
+// Mobil menü — masaüstü üst menüyle aynı kategorizasyon (navMenu.<key>).
+// key = navMenu çeviri anahtarı + stabil testid; href = hedef; highlight = CTA.
+type MobileItem = { key: string; href: string; highlight?: boolean }
+const MENU_GROUPS: { titleKey: string; items: MobileItem[] }[] = [
+  {
+    titleKey: "shop",
+    items: [
+      { key: "shopAll", href: "/store" },
+      { key: "categories", href: "/kategoriler" },
+      // Birinci-parti house mağazası (is_house) — backend HOUSE_HANDLE = "deprem-market".
+      { key: "houseStore", href: "/satici/deprem-market" },
+    ],
+  },
+  {
+    titleKey: "info",
+    items: [
+      { key: "blog", href: "/blog" },
+      { key: "assistant", href: "/hazirlik-asistani" },
+    ],
+  },
+  {
+    titleKey: "experts",
+    items: [
+      { key: "findEngineer", href: "/uzmanlar" },
+      { key: "havar", href: "/havar" },
+    ],
+  },
+  {
+    titleKey: "join",
+    items: [
+      { key: "becomeExpert", href: "/uzman-ol", highlight: true },
+      { key: "becomeImplementer", href: "/uygulayici-ol", highlight: true },
+    ],
+  },
+]
+// Tekil yardım linkleri (grupsuz, altta).
+const SINGLE_LINKS: MobileItem[] = [
+  { key: "trackOrder", href: "/siparis-takip" },
   { key: "faq", href: "/sikca-sorulan-sorular" },
   { key: "contact", href: "/iletisim" },
-  { key: "blog", href: "/blog" },
 ]
 
 type SideMenuProps = {
@@ -32,6 +61,7 @@ type SideMenuProps = {
 const SideMenu = ({ regions, categories }: SideMenuProps) => {
   const countryToggleState = useToggleState()
   const t = useTranslations("sideMenu")
+  const tNav = useTranslations("navMenu")
   const tCat = useTranslations("categoryMenu")
   const topCategories = (categories ?? []).filter((c) => !c.parent_category)
 
@@ -83,23 +113,40 @@ const SideMenu = ({ regions, categories }: SideMenuProps) => {
                         <XMark />
                       </button>
                     </div>
-                    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-8 py-4 pr-1">
-                      <ul className="flex flex-col gap-6 items-start justify-start">
-                        {SideMenuItems.map(({ key, href }) => {
-                          return (
-                            <li key={key}>
-                              <LocalizedClientLink
-                                href={href}
-                                className="text-3xl leading-10 hover:text-ui-fg-disabled"
-                                onClick={close}
-                                data-testid={`${key}-link`}
-                              >
-                                {t(`items.${key}`)}
-                              </LocalizedClientLink>
-                            </li>
-                          )
-                        })}
-                      </ul>
+                    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-7 py-4 pr-1">
+                      <LocalizedClientLink
+                        href="/"
+                        className="text-2xl leading-9 hover:text-ui-fg-disabled"
+                        onClick={close}
+                        data-testid="home-link"
+                      >
+                        {t("items.home")}
+                      </LocalizedClientLink>
+
+                      {MENU_GROUPS.map((group) => (
+                        <div key={group.titleKey} className="flex flex-col gap-3">
+                          <span className="text-xs uppercase tracking-[0.15em] text-ui-fg-on-color/50">
+                            {tNav(group.titleKey)}
+                          </span>
+                          <ul className="flex flex-col gap-3 items-start justify-start">
+                            {group.items.map(({ key, href, highlight }) => (
+                              <li key={key}>
+                                <LocalizedClientLink
+                                  href={href}
+                                  className={clx(
+                                    "text-xl leading-8 hover:text-ui-fg-disabled",
+                                    highlight && "text-orange-300 font-semibold hover:text-orange-200"
+                                  )}
+                                  onClick={close}
+                                  data-testid={`${key}-link`}
+                                >
+                                  {tNav(key)}
+                                </LocalizedClientLink>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
 
                       {topCategories.length > 0 && (
                         <div className="flex flex-col gap-3">
@@ -132,6 +179,21 @@ const SideMenu = ({ regions, categories }: SideMenuProps) => {
                           </ul>
                         </div>
                       )}
+
+                      <ul className="flex flex-col gap-3 items-start justify-start pt-2 border-t border-white/10">
+                        {SINGLE_LINKS.map(({ key, href }) => (
+                          <li key={key}>
+                            <LocalizedClientLink
+                              href={href}
+                              className="text-base leading-7 text-ui-fg-on-color/80 hover:text-ui-fg-disabled"
+                              onClick={close}
+                              data-testid={`${key}-link`}
+                            >
+                              {tNav(key)}
+                            </LocalizedClientLink>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                     <div className="flex flex-col gap-y-6">
                       <LocaleSwitcher />

@@ -146,8 +146,13 @@ export default async function Footer() {
                   <CookieConsentTrigger />
                 </li>
                 <li>
-                  <LocalizedClientLink href="/satici-ol" className="hover:text-ui-fg-base">
-                    Bayimiz Olun
+                  <LocalizedClientLink href="/uzman-ol" className="hover:text-ui-fg-base">
+                    Uzman Olun (Mühendis)
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/uygulayici-ol" className="hover:text-ui-fg-base">
+                    Uygulayıcı Olun (Yüklenici)
                   </LocalizedClientLink>
                 </li>
                 <li>
