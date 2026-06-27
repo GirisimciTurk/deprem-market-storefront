@@ -39,6 +39,24 @@ export function specializationsFor(type: ProviderType): ExpertSpecialization[] {
     : ENGINEER_SPECIALIZATIONS
 }
 
+const ALL_SPECIALIZATIONS = [
+  ...ENGINEER_SPECIALIZATIONS,
+  ...IMPLEMENTER_SPECIALIZATIONS,
+]
+
+export function specializationLabel(key: string): string {
+  return ALL_SPECIALIZATIONS.find((s) => s.key === key)?.label ?? key
+}
+
+export const PROVIDER_LABELS: Record<ProviderType, string> = {
+  engineer: "İnşaat Mühendisi",
+  implementer: "Uygulayıcı / Yüklenici",
+}
+
+export function providerLabel(type: ProviderType | string): string {
+  return PROVIDER_LABELS[type as ProviderType] ?? "İnşaat Mühendisi"
+}
+
 export type ExpertBudgetTier = { key: string; label: string }
 
 export const EXPERT_BUDGET_TIERS: ExpertBudgetTier[] = [

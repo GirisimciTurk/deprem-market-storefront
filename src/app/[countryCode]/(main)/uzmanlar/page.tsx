@@ -1,158 +1,198 @@
 import { Metadata } from "next"
 import { getLocale } from "next-intl/server"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { listExperts } from "@lib/data/experts"
+import ExpertCard from "@modules/experts/components/expert-card"
+import ExpertFilters from "@modules/experts/components/expert-filters"
 import {
   ENGINEER_SPECIALIZATIONS,
   IMPLEMENTER_SPECIALIZATIONS,
 } from "@lib/expert-config"
 
 export const metadata: Metadata = {
-  title: "Uzman & Uygulayıcı Dizini — Doğrulanmış Mühendis ve Yükleniciler | Deprem Market",
+  title:
+    "Uzman & Uygulayıcı Dizini — Doğrulanmış Mühendis ve Yükleniciler | Deprem Market",
   description:
-    "İl/ilçe ve uzmanlık alanına göre doğrulanmış inşaat mühendislerini (tespit/proje) ve uygulayıcıları (güçlendirme/inşaat) bulun. Yakında.",
+    "İl/ilçe ve uzmanlık alanına göre doğrulanmış inşaat mühendislerini (tespit/proje) ve uygulayıcıları (güçlendirme/inşaat) bulun.",
 }
 
-const STEPS = [
-  {
-    no: "1",
-    title: "Ara & Filtrele",
-    desc: "İl/ilçe ve uzmanlık/uygulama alanına göre size en yakın mühendis veya uygulayıcıyı listeleyin.",
-  },
-  {
-    no: "2",
-    title: "Doğrulanmışı Seçin",
-    desc: "Belgesi incelenip onaylanmış “doğrulanmış” rozetli profilleri görün.",
-  },
-  {
-    no: "3",
-    title: "İletişime Geçin",
-    desc: "Mühendisten tespit/proje, uygulayıcıdan sahada uygulama; ihtiyacınıza göre doğrudan ulaşın.",
-  },
-]
+type SP = Record<string, string | string[] | undefined>
+const one = (v: string | string[] | undefined) =>
+  Array.isArray(v) ? v[0] : v
 
-export default async function UzmanlarPage() {
+export default async function UzmanlarPage({
+  searchParams,
+}: {
+  searchParams: Promise<SP>
+}) {
   const isTr = (await getLocale()) === "tr"
+  const sp = await searchParams
 
-  if (!isTr) {
-    return (
-      <div className="content-container max-w-4xl py-16 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-extrabold text-ui-fg-base tracking-tight mb-6">
-          Verified Engineer & Contractor Directory — Coming Soon
-        </h1>
-        <p className="text-ui-fg-subtle">
-          A directory of verified civil engineers (assessment/design) and
-          implementers/contractors (retrofitting/construction) is on the way.
-        </p>
-        <div className="pt-8">
-          <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
-            &larr; Return to Home Page
-          </LocalizedClientLink>
-        </div>
-      </div>
-    )
-  }
+  const type = one(sp.type)
+  const city = one(sp.city)
+  const district = one(sp.district)
+  const specialization = one(sp.specialization)
+  const q = one(sp.q)
+  const hasFilter = !!(type || city || district || specialization || q)
+
+  const { experts, count } = await listExperts({
+    type,
+    city,
+    district,
+    specialization,
+    q,
+  })
 
   return (
-    <div className="content-container max-w-5xl py-16 px-4 sm:px-6 lg:px-8">
+    <div className="content-container max-w-6xl py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
       {/* Hero */}
-      <div className="text-center max-w-3xl mx-auto mb-12">
+      <div className="text-center max-w-3xl mx-auto mb-10">
         <span className="inline-flex items-center gap-1.5 text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
-          <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" /> Yakında
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500" />{" "}
+          {isTr ? "Doğrulanmış Profiller" : "Verified Profiles"}
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
-          Doğrulanmış Uzman & Uygulayıcı Dizini
+          {isTr
+            ? "Uzman & Uygulayıcı Dizini"
+            : "Engineer & Contractor Directory"}
         </h1>
         <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed">
-          Deprem güvenliği için iki taraf: binayı değerlendirip projelendiren{" "}
-          <strong>inşaat mühendisleri</strong> ve bu işi sahada uygulayan{" "}
-          <strong>uygulayıcı/yükleniciler</strong>. İl/ilçe ve uzmanlık alanına
-          göre, belgesi onaylanmış profilleri bulabileceğiniz dizin çok yakında.
+          {isTr ? (
+            <>
+              Binayı değerlendirip projelendiren{" "}
+              <strong>inşaat mühendisleri</strong> ve bu işi sahada uygulayan{" "}
+              <strong>uygulayıcı/yükleniciler</strong>. İl/ilçe ve uzmanlık
+              alanına göre, belgesi onaylanmış profilleri bulun.
+            </>
+          ) : (
+            <>
+              Verified civil engineers (assessment/design) and
+              implementers/contractors (retrofitting/construction). Filter by
+              location and specialization.
+            </>
+          )}
         </p>
       </div>
 
-      {/* Nasıl çalışacak */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-14">
-        {STEPS.map((s) => (
-          <div key={s.no} className="border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6">
-            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-600 text-white font-extrabold text-lg mb-4">
-              {s.no}
-            </span>
-            <h3 className="font-bold text-ui-fg-base text-sm mb-1">{s.title}</h3>
-            <p className="text-xs text-ui-fg-muted leading-relaxed">{s.desc}</p>
-          </div>
-        ))}
-      </div>
+      {/* Filtreler */}
+      <ExpertFilters />
 
-      {/* İki rol + uzmanlık önizleme */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-14">
-        <div className="border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6">
-          <h2 className="font-extrabold text-ui-fg-base text-base mb-1">
-            🧠 İnşaat Mühendisi
-          </h2>
-          <p className="text-xs text-ui-fg-muted mb-4">
-            Tespit, proje ve danışmanlık (beyin).
+      {/* Sonuçlar */}
+      {experts.length > 0 ? (
+        <>
+          <p className="text-sm text-ui-fg-muted mb-4">
+            {count} {isTr ? "profil bulundu" : "profiles found"}
           </p>
-          <div className="flex flex-wrap gap-2">
-            {ENGINEER_SPECIALIZATIONS.map((s) => (
-              <span key={s.key} className="text-xs font-semibold px-3 py-1.5 rounded-full border border-ui-border-base bg-ui-bg-base text-ui-fg-subtle">
-                {s.label}
-              </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {experts.map((e) => (
+              <ExpertCard key={e.slug} expert={e} />
             ))}
           </div>
-        </div>
-        <div className="border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6">
-          <h2 className="font-extrabold text-ui-fg-base text-base mb-1">
-            🏗️ Uygulayıcı / Yüklenici
-          </h2>
-          <p className="text-xs text-ui-fg-muted mb-4">
-            Fiziki inşaat & güçlendirme uygulaması (eller).
+        </>
+      ) : hasFilter ? (
+        <div className="text-center py-16 border border-dashed border-ui-border-base rounded-2xl bg-ui-bg-subtle">
+          <p className="text-ui-fg-base font-semibold mb-1">
+            {isTr ? "Sonuç bulunamadı" : "No results found"}
           </p>
-          <div className="flex flex-wrap gap-2">
-            {IMPLEMENTER_SPECIALIZATIONS.map((s) => (
-              <span key={s.key} className="text-xs font-semibold px-3 py-1.5 rounded-full border border-ui-border-base bg-ui-bg-base text-ui-fg-subtle">
-                {s.label}
-              </span>
-            ))}
-          </div>
+          <p className="text-sm text-ui-fg-muted">
+            {isTr
+              ? "Farklı bir il/ilçe veya uzmanlık alanı deneyin."
+              : "Try a different location or specialization."}
+          </p>
         </div>
-      </div>
+      ) : (
+        <EmptyDirectory isTr={isTr} />
+      )}
 
-      {/* CTA'lar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+      {/* Kayıt CTA'ları */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto mt-14">
         <div className="border border-brand-100 bg-brand-50 rounded-2xl p-6 text-center">
           <h2 className="text-lg font-extrabold text-ui-fg-base mb-1">
-            İnşaat Mühendisi misiniz?
+            {isTr ? "İnşaat Mühendisi misiniz?" : "Are you a civil engineer?"}
           </h2>
           <p className="text-sm text-ui-fg-muted mb-4">
-            Dizine ön kayıt olun; doğrulanmış rozetiyle görünür olun.
+            {isTr
+              ? "Dizine ön kayıt olun; doğrulanmış rozetiyle görünür olun."
+              : "Pre-register; get listed with a verified badge."}
           </p>
           <LocalizedClientLink
             href="/uzman-ol"
             className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-colors shadow-sm"
           >
-            Uzman Ön Kaydı →
+            {isTr ? "Uzman Ön Kaydı →" : "Engineer Sign-up →"}
           </LocalizedClientLink>
         </div>
         <div className="border border-brand-100 bg-brand-50 rounded-2xl p-6 text-center">
           <h2 className="text-lg font-extrabold text-ui-fg-base mb-1">
-            Uygulayıcı / Yüklenici misiniz?
+            {isTr
+              ? "Uygulayıcı / Yüklenici misiniz?"
+              : "Are you an implementer/contractor?"}
           </h2>
           <p className="text-sm text-ui-fg-muted mb-4">
-            Güçlendirme/inşaat işlerinde sahada yer alın.
+            {isTr
+              ? "Güçlendirme/inşaat işlerinde sahada yer alın."
+              : "Get matched with retrofitting/construction jobs."}
           </p>
           <LocalizedClientLink
             href="/uygulayici-ol"
             className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-colors shadow-sm"
           >
-            Uygulayıcı Ön Kaydı →
+            {isTr ? "Uygulayıcı Ön Kaydı →" : "Implementer Sign-up →"}
           </LocalizedClientLink>
         </div>
       </div>
+    </div>
+  )
+}
 
-      <div className="pt-8 border-t mt-12">
-        <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">
-          &larr; Ana Sayfaya Dön
-        </LocalizedClientLink>
+/** Henüz yayınlanmış profil yokken gösterilen tanıtım (iki rol + uzmanlık önizleme). */
+function EmptyDirectory({ isTr }: { isTr: boolean }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6">
+        <h2 className="font-extrabold text-ui-fg-base text-base mb-1">
+          🧠 {isTr ? "İnşaat Mühendisi" : "Civil Engineer"}
+        </h2>
+        <p className="text-xs text-ui-fg-muted mb-4">
+          {isTr
+            ? "Tespit, proje ve danışmanlık (beyin)."
+            : "Assessment, design and consulting."}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {ENGINEER_SPECIALIZATIONS.map((s) => (
+            <span
+              key={s.key}
+              className="text-xs font-semibold px-3 py-1.5 rounded-full border border-ui-border-base bg-ui-bg-base text-ui-fg-subtle"
+            >
+              {s.label}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6">
+        <h2 className="font-extrabold text-ui-fg-base text-base mb-1">
+          🏗️ {isTr ? "Uygulayıcı / Yüklenici" : "Implementer / Contractor"}
+        </h2>
+        <p className="text-xs text-ui-fg-muted mb-4">
+          {isTr
+            ? "Fiziki inşaat & güçlendirme uygulaması (eller)."
+            : "Physical construction & retrofitting."}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {IMPLEMENTER_SPECIALIZATIONS.map((s) => (
+            <span
+              key={s.key}
+              className="text-xs font-semibold px-3 py-1.5 rounded-full border border-ui-border-base bg-ui-bg-base text-ui-fg-subtle"
+            >
+              {s.label}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="md:col-span-2 text-center text-sm text-ui-fg-muted pt-2">
+        {isTr
+          ? "İlk doğrulanmış profiller çok yakında burada listelenecek."
+          : "The first verified profiles will be listed here soon."}
       </div>
     </div>
   )

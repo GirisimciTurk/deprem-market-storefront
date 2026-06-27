@@ -30,13 +30,85 @@ export default function ExpertForm({
     experience_years: "",
     budget_tier: "",
     message: "",
+    about: "",
+    whatsapp: "",
   })
   const [specs, setSpecs] = useState<string[]>([])
   const [imoMember, setImoMember] = useState(false)
+  const [showPhone, setShowPhone] = useState(true)
+  const [showEmail, setShowEmail] = useState(false)
+  const [documents, setDocuments] = useState<
+    { type: string; url: string; name: string }[]
+  >([])
+  const [uploadingDoc, setUploadingDoc] = useState(false)
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
     "idle"
   )
   const [errorMsg, setErrorMsg] = useState("")
+
+  const backendUrl =
+    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+  const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
+
+  // Belge yükleme: dosyaları base64'e çevirip /store/expert-uploads'a gönderir.
+  const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files?.length) return
+    if (documents.length + files.length > 5) {
+      alert("En fazla 5 belge yükleyebilirsiniz.")
+      e.target.value = ""
+      return
+    }
+    setUploadingDoc(true)
+    try {
+      const payload = await Promise.all(
+        Array.from(files).map(
+          (file) =>
+            new Promise<{ filename: string; mime_type: string; data: string }>(
+              (resolve, reject) => {
+                const reader = new FileReader()
+                reader.onload = () => {
+                  const result = String(reader.result)
+                  resolve({
+                    filename: file.name,
+                    mime_type: file.type,
+                    data: result.split(",")[1] || "",
+                  })
+                }
+                reader.onerror = reject
+                reader.readAsDataURL(file)
+              }
+            )
+        )
+      )
+      const res = await fetch(`${backendUrl}/store/expert-uploads`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-publishable-api-key": publishableKey,
+        },
+        body: JSON.stringify({ files: payload }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data?.message || "Belge yüklenemedi.")
+      }
+      const { urls } = (await res.json()) as { urls: string[] }
+      setDocuments((prev) => [
+        ...prev,
+        ...urls.map((url, i) => ({
+          type: "diger",
+          url,
+          name: files[i]?.name || "Belge",
+        })),
+      ])
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Belge yüklenemedi.")
+    } finally {
+      setUploadingDoc(false)
+      e.target.value = ""
+    }
+  }
 
   const toggleSpec = (key: string) =>
     setSpecs((prev) =>
@@ -57,11 +129,6 @@ export default function ExpertForm({
     setStatus("loading")
     setErrorMsg("")
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const publishableKey =
-        process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-
       const res = await fetch(`${backendUrl}/store/expert-leads`, {
         method: "POST",
         headers: {
@@ -84,6 +151,13 @@ export default function ExpertForm({
           imo_member: imoMember,
           budget_tier: form.budget_tier || undefined,
           message: form.message,
+          about: form.about || undefined,
+          whatsapp: form.whatsapp || undefined,
+          show_phone: showPhone,
+          show_email: showEmail,
+          documents: documents.length
+            ? documents.map((d) => ({ type: d.type, url: d.url, name: d.name }))
+            : undefined,
         }),
       })
 
@@ -126,9 +200,14 @@ export default function ExpertForm({
               experience_years: "",
               budget_tier: "",
               message: "",
+              about: "",
+              whatsapp: "",
             })
             setSpecs([])
             setImoMember(false)
+            setShowPhone(true)
+            setShowEmail(false)
+            setDocuments([])
             setStatus("idle")
           }}
           className="mt-6 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
@@ -341,6 +420,113 @@ export default function ExpertForm({
           placeholder="Örn: Güçlendirme projeleri için ciddi müşteri arıyorum; telefonum gizli kalsın, talep formuyla iletişim isterim..."
           className={`${inputCls} resize-none`}
         />
+      </div>
+
+      {/* --- Dizin profili (opsiyonel; doğrulanınca /uzmanlar'da görünür) --- */}
+      <div className="border border-ui-border-base rounded-xl bg-ui-bg-subtle p-4 space-y-4">
+        <div>
+          <h4 className="text-sm font-bold text-ui-fg-base">
+            Dizin Profili{" "}
+            <span className="font-normal text-ui-fg-muted text-xs">
+              (opsiyonel — onaylandığınızda profilinizde görünür)
+            </span>
+          </h4>
+        </div>
+
+        <div>
+          <label className={labelCls}>Kısa Tanıtım (Hakkında)</label>
+          <textarea
+            rows={3}
+            disabled={loading}
+            value={form.about}
+            onChange={(e) => setForm({ ...form, about: e.target.value })}
+            placeholder="Deneyiminizi, öne çıkan projelerinizi, çalışma tarzınızı kısaca anlatın."
+            className={`${inputCls} resize-none`}
+            maxLength={2000}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>WhatsApp (opsiyonel)</label>
+            <input
+              type="text"
+              disabled={loading}
+              value={form.whatsapp}
+              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+              placeholder="Örn: 0532 000 0000"
+              className={inputCls}
+            />
+          </div>
+          <div className="flex flex-col justify-center gap-1.5 pt-1">
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-ui-fg-base">
+              <input
+                type="checkbox"
+                checked={showPhone}
+                disabled={loading}
+                onChange={(e) => setShowPhone(e.target.checked)}
+                className="h-4 w-4 accent-brand-600"
+              />
+              Telefonum profilimde görünsün
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-ui-fg-base">
+              <input
+                type="checkbox"
+                checked={showEmail}
+                disabled={loading}
+                onChange={(e) => setShowEmail(e.target.checked)}
+                className="h-4 w-4 accent-brand-600"
+              />
+              E-postam profilimde görünsün
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label className={labelCls}>Doğrulama Belgeleri</label>
+          <p className="text-xs text-ui-fg-muted mb-2">
+            Diploma, oda (İMO) kaydı veya yetki belgenizi yükleyin. Belgeler yalnız
+            ekibimizce incelenir, profilinizde <strong>paylaşılmaz</strong>. Görsel
+            veya PDF, en fazla 5 dosya.
+          </p>
+          {documents.length > 0 && (
+            <ul className="mb-2 space-y-1.5">
+              {documents.map((doc, idx) => (
+                <li
+                  key={idx}
+                  className="flex items-center justify-between gap-2 bg-ui-bg-base border border-ui-border-base rounded-lg px-3 py-2 text-xs"
+                >
+                  <span className="truncate text-ui-fg-subtle">📄 {doc.name}</span>
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() =>
+                      setDocuments((prev) => prev.filter((_, i) => i !== idx))
+                    }
+                    className="text-ui-fg-muted hover:text-brand-600 font-semibold shrink-0"
+                  >
+                    Kaldır
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {documents.length < 5 && (
+            <label className="inline-flex items-center gap-2 cursor-pointer text-sm font-semibold text-brand-600 hover:text-brand-700">
+              <span className="inline-block border border-brand-200 bg-brand-50 rounded-lg px-3 py-1.5">
+                {uploadingDoc ? "Yükleniyor..." : "+ Belge Yükle"}
+              </span>
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                multiple
+                hidden
+                disabled={loading || uploadingDoc}
+                onChange={handleDocUpload}
+              />
+            </label>
+          )}
+        </div>
       </div>
 
       <button
