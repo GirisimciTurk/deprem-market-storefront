@@ -9,6 +9,7 @@ export interface Expert {
   city: string
   district: string
   specializations: string[]
+  verified_specializations: string[]
   experience_years: number | null
   imo_member: boolean
   service_areas: string

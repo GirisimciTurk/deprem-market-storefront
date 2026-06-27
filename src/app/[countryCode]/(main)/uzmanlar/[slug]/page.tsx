@@ -138,15 +138,28 @@ export default async function ExpertProfilePage({
             {isImplementer ? "Uygulama Alanları" : "Uzmanlık Alanları"}
           </h2>
           <div className="flex flex-wrap gap-2">
-            {expert.specializations.map((s) => (
-              <span
-                key={s}
-                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-ui-border-base bg-ui-bg-subtle text-ui-fg-subtle"
-              >
-                {specializationLabel(s)}
-              </span>
-            ))}
+            {expert.specializations.map((s) => {
+              const verified = expert.verified_specializations?.includes(s)
+              return (
+                <span
+                  key={s}
+                  className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border ${
+                    verified
+                      ? "border-green-200 bg-green-50 text-green-700"
+                      : "border-ui-border-base bg-ui-bg-subtle text-ui-fg-muted"
+                  }`}
+                  title={verified ? "Bu uzmanlık belge ile doğrulanmıştır" : "Bu uzmanlık henüz doğrulanmadı"}
+                >
+                  {verified && <BadgeCheck className="w-3.5 h-3.5" />}
+                  {specializationLabel(s)}
+                  {!verified && <span className="text-[0.65rem] font-normal">· inceleniyor</span>}
+                </span>
+              )
+            })}
           </div>
+          <p className="text-[0.7rem] text-ui-fg-muted mt-2">
+            ✓ işaretli uzmanlıklar Deprem Market tarafından belge ile ayrı ayrı doğrulanmıştır.
+          </p>
         </section>
       )}
 
