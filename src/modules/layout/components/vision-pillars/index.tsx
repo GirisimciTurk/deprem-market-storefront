@@ -1,5 +1,5 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { BookOpen, ShoppingBag, ShieldCheck } from "lucide-react"
+import { BookOpen, ShoppingBag, ShieldCheck, Users, HardHat, Store } from "lucide-react"
 
 /**
  * Ana sayfa vizyon şeridi — PDF s.1/s.2: üç sütun (Bilgilen · Hazırlan · Koru)
@@ -30,6 +30,31 @@ const PILLARS = [
     desc: "Bina risk tespiti, güçlendirme ve daha fazlası için doğrulanmış inşaat mühendisleri.",
     href: "/uzmanlar",
     cta: "Uzman Bul",
+  },
+]
+
+// Üç taraflı ekosistem (PDF s.3): halk · inşaat mühendisi/uygulayıcı · bayi.
+const AUDIENCES = [
+  {
+    icon: Users,
+    title: "Halk",
+    desc: "Bilgi · ürün · doğrulanmış hizmet",
+    href: "/uzmanlar",
+    cta: "Keşfet",
+  },
+  {
+    icon: HardHat,
+    title: "Mühendis & Uygulayıcı",
+    desc: "Dijital vitrin, yeni müşteri, doğrulanmış rozet",
+    href: "/uzman-ol",
+    cta: "Dizine Katıl",
+  },
+  {
+    icon: Store,
+    title: "Bayiler",
+    desc: "Hazır satış kanalı, pazaryeri görünürlüğü, mağazada öne çıkma",
+    href: "/satici-ol",
+    cta: "Bayi Ol",
   },
 ]
 
@@ -76,6 +101,37 @@ export default function VisionPillars() {
             </LocalizedClientLink>
           )
         })}
+      </div>
+
+      {/* Üç taraflı ekosistem: halk · mühendis/uygulayıcı · bayi */}
+      <div className="mt-8 rounded-2xl border border-ui-border-base bg-ui-bg-base p-5">
+        <p className="text-center text-xs font-semibold tracking-wider uppercase text-ui-fg-muted mb-4">
+          Üç taraflı ekosistem — herkes için bir kazanç
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {AUDIENCES.map((a) => {
+            const Icon = a.icon
+            return (
+              <LocalizedClientLink
+                key={a.title}
+                href={a.href}
+                className="group flex items-center gap-3 rounded-xl border border-ui-border-base bg-ui-bg-subtle px-4 py-3 hover:border-brand-400 transition-colors"
+              >
+                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-brand-50 text-brand-600 shrink-0">
+                  <Icon className="w-4 h-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-bold text-ui-fg-base group-hover:text-brand-700 transition-colors">
+                    {a.title}
+                  </span>
+                  <span className="block text-[0.7rem] text-ui-fg-muted leading-snug">
+                    {a.desc}
+                  </span>
+                </span>
+              </LocalizedClientLink>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
