@@ -14,6 +14,7 @@ import { toReachableImageUrl } from "@lib/util/image-url"
 import { getExpert } from "@lib/data/experts"
 import { specializationLabel, providerLabel } from "@lib/expert-config"
 import VerifiedBadge from "@modules/experts/components/verified-badge"
+import ExpertRequestForm from "@modules/experts/components/request-form"
 
 type Params = Promise<{ countryCode: string; slug: string }>
 
@@ -161,39 +162,52 @@ export default async function ExpertProfilePage({
       <section className="mt-8 border-t border-ui-border-base pt-6">
         <h2 className="text-base font-bold text-ui-fg-base mb-3">İletişim</h2>
         {hasContact ? (
-          <div className="flex flex-wrap gap-3">
-            {expert.phone && (
-              <a
-                href={`tel:${expert.phone.replace(/\s/g, "")}`}
-                className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-colors shadow-sm"
-              >
-                <Phone className="w-4 h-4" /> {expert.phone}
-              </a>
-            )}
-            {waDigits && (
-              <a
-                href={`https://wa.me/${waDigits}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-colors shadow-sm"
-              >
-                <MessageCircle className="w-4 h-4" /> WhatsApp
-              </a>
-            )}
-            {expert.email && (
-              <a
-                href={`mailto:${expert.email}`}
-                className="inline-flex items-center gap-2 border border-ui-border-base bg-ui-bg-base hover:border-brand-400 text-ui-fg-base font-bold py-2.5 px-5 rounded-xl text-sm transition-colors"
-              >
-                <Mail className="w-4 h-4" /> E-posta
-              </a>
-            )}
-          </div>
+          <>
+            <div className="flex flex-wrap gap-3">
+              {expert.phone && (
+                <a
+                  href={`tel:${expert.phone.replace(/\s/g, "")}`}
+                  className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-colors shadow-sm"
+                >
+                  <Phone className="w-4 h-4" /> {expert.phone}
+                </a>
+              )}
+              {waDigits && (
+                <a
+                  href={`https://wa.me/${waDigits}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-colors shadow-sm"
+                >
+                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                </a>
+              )}
+              {expert.email && (
+                <a
+                  href={`mailto:${expert.email}`}
+                  className="inline-flex items-center gap-2 border border-ui-border-base bg-ui-bg-base hover:border-brand-400 text-ui-fg-base font-bold py-2.5 px-5 rounded-xl text-sm transition-colors"
+                >
+                  <Mail className="w-4 h-4" /> E-posta
+                </a>
+              )}
+            </div>
+            <p className="text-sm text-ui-fg-muted mt-5 mb-3">
+              Doğrudan ulaşamadınız mı? Talebinizi bırakın, size dönsün:
+            </p>
+            <ExpertRequestForm slug={expert.slug} expertName={expert.full_name} />
+          </>
         ) : (
-          <p className="text-sm text-ui-fg-muted">
-            Bu profil iletişim bilgilerini gizli tutuyor. Talep bırakma özelliği yakında
-            eklenecek.
-          </p>
+          <>
+            <p className="text-sm text-ui-fg-subtle mb-4">
+              Bu uzman, doğrudan iletişim yerine talep almayı tercih ediyor.
+              Bilgilerinizi bırakın; size dönsün.
+            </p>
+            <ExpertRequestForm
+              slug={expert.slug}
+              expertName={expert.full_name}
+              defaultOpen
+            />
+          </>
         )}
       </section>
 
