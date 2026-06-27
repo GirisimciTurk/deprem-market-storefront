@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server"
 import StoreTemplate from "@modules/store/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import VisionPillars from "@modules/layout/components/vision-pillars"
+import FeaturedSellers from "@modules/sellers/components/featured-sellers"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata")
@@ -35,6 +36,7 @@ export default async function Home(props: Params) {
   return (
     <>
       <VisionPillars />
+      <FeaturedSellers />
       <StoreTemplate
         sortBy={sortBy}
         page={page}

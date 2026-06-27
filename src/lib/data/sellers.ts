@@ -20,6 +20,34 @@ export type StoreSellerResponse = {
   count: number
 }
 
+export type FeaturedSeller = {
+  id: string
+  handle: string
+  name: string
+  logo?: string | null
+  description?: string | null
+  is_featured: boolean
+  rating_avg?: number | null
+  rating_count?: number | null
+}
+
+/** Öne çıkan (featured) aktif bayiler — mağazada öne çıkma vitrini (PDF Slayt 4). */
+export const listFeaturedSellers = async (): Promise<FeaturedSeller[]> => {
+  const cacheOpts = await getCacheOptions("sellers")
+  const next = {
+    ...cacheOpts,
+    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "sellers"],
+    revalidate: 60,
+  }
+  return await sdk.client
+    .fetch<{ sellers: FeaturedSeller[] }>(`/store/sellers`, {
+      query: { featured: "1" },
+      next,
+    })
+    .then((r) => r.sellers || [])
+    .catch(() => [])
+}
+
 export const getSellerByHandle = async (
   handle: string
 ): Promise<StoreSellerResponse | null> => {
