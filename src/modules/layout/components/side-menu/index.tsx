@@ -20,8 +20,8 @@ const MENU_GROUPS: { titleKey: string; items: MobileItem[] }[] = [
     items: [
       { key: "shopAll", href: "/store" },
       { key: "categories", href: "/kategoriler" },
-      // Birinci-parti house mağazası (is_house) — backend HOUSE_HANDLE = "deprem-market".
-      { key: "houseStore", href: "/satici/deprem-market" },
+      // Tüm bayi mağazaları index'i (/satici). Eskiden tek house handle'a sabit-kodluydu.
+      { key: "houseStore", href: "/satici" },
     ],
   },
   {
@@ -44,6 +44,7 @@ const MENU_GROUPS: { titleKey: string; items: MobileItem[] }[] = [
     items: [
       { key: "becomeExpert", href: "/uzman-ol", highlight: true },
       { key: "becomeImplementer", href: "/uygulayici-ol", highlight: true },
+      { key: "becomeDealer", href: "/satici-ol", highlight: true },
       { key: "packages", href: "/uzman-paketleri" },
     ],
   },

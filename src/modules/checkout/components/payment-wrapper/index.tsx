@@ -16,32 +16,43 @@ const stripeKey =
   process.env.NEXT_PUBLIC_MEDUSA_PAYMENTS_PUBLISHABLE_KEY
 
 const medusaAccountId = process.env.NEXT_PUBLIC_MEDUSA_PAYMENTS_ACCOUNT_ID
-const stripePromise = stripeKey
-  ? loadStripe(
+
+// Stripe.js'i yalnızca gerçekten bir Stripe ödeme oturumu varken yükle.
+// Eskiden modül yüklenir yüklenmez loadStripe çağrılıyordu → checkout'ta
+// js.stripe.com enjekte edilip CSP'ye takılıyordu (bu projede Stripe provider
+// yok; PayTR/Paynkolay kullanılır). Lazy çağrı bu gürültüyü kaldırır.
+let stripePromise: ReturnType<typeof loadStripe> | null = null
+const getStripePromise = () => {
+  if (!stripeKey) {
+    return null
+  }
+  if (!stripePromise) {
+    stripePromise = loadStripe(
       stripeKey,
       medusaAccountId ? { stripeAccount: medusaAccountId } : undefined
     )
-  : null
+  }
+  return stripePromise
+}
 
 const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
   const paymentSession = cart.payment_collection?.payment_sessions?.find(
     (s) => s.status === "pending"
   )
 
-  if (
-    isStripeLike(paymentSession?.provider_id) &&
-    paymentSession &&
-    stripePromise
-  ) {
-    return (
-      <StripeWrapper
-        paymentSession={paymentSession}
-        stripeKey={stripeKey}
-        stripePromise={stripePromise}
-      >
-        {children}
-      </StripeWrapper>
-    )
+  if (isStripeLike(paymentSession?.provider_id) && paymentSession) {
+    const stripePromiseValue = getStripePromise()
+    if (stripePromiseValue) {
+      return (
+        <StripeWrapper
+          paymentSession={paymentSession}
+          stripeKey={stripeKey}
+          stripePromise={stripePromiseValue}
+        >
+          {children}
+        </StripeWrapper>
+      )
+    }
   }
 
   return <div>{children}</div>

@@ -48,6 +48,22 @@ export const listFeaturedSellers = async (): Promise<FeaturedSeller[]> => {
     .catch(() => [])
 }
 
+/** Tüm aktif bayi/satıcı mağazaları (bayi vitrini index sayfası /satici). */
+export const listSellers = async (): Promise<FeaturedSeller[]> => {
+  const cacheOpts = await getCacheOptions("sellers")
+  const next = {
+    ...cacheOpts,
+    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "sellers"],
+    revalidate: 60,
+  }
+  return await sdk.client
+    .fetch<{ sellers: FeaturedSeller[] }>(`/store/sellers`, {
+      next,
+    })
+    .then((r) => r.sellers || [])
+    .catch(() => [])
+}
+
 export const getSellerByHandle = async (
   handle: string
 ): Promise<StoreSellerResponse | null> => {

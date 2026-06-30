@@ -18,7 +18,7 @@ const MENU_GROUPS: { titleKey: string; items: NavItem[] }[] = [
     titleKey: "shop",
     items: [
       { key: "shopAll", href: "/store" },
-      { key: "houseStore", href: "/satici/deprem-market" },
+      { key: "houseStore", href: "/satici" },
     ],
   },
   {
@@ -40,6 +40,7 @@ const MENU_GROUPS: { titleKey: string; items: NavItem[] }[] = [
     titleKey: "join",
     items: [
       { key: "becomeExpert", href: "/uzman-ol", highlight: true },
+      { key: "becomeDealer", href: "/satici-ol", highlight: true },
       { key: "packages", href: "/uzman-paketleri" },
     ],
   },

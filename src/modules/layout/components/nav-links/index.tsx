@@ -145,7 +145,7 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
       items: [
         { href: "/store", label: t("shopAll") },
         { href: "/kategoriler", label: t("categories") },
-        { href: "/satici/deprem-market", label: t("houseStore") },
+        { href: "/satici", label: t("houseStore") },
       ],
     },
     {
@@ -179,6 +179,12 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
           href: "/uygulayici-ol",
           label: t("becomeImplementer"),
           desc: t("becomeImplementerDesc"),
+          highlight: true,
+        },
+        {
+          href: "/satici-ol",
+          label: t("becomeDealer"),
+          desc: t("becomeDealerDesc"),
           highlight: true,
         },
         {
