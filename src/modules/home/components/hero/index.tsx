@@ -22,7 +22,7 @@ const Hero = async ({
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/deprem_market_hero_banner.png"
-          alt="EKYP Deprem Market Acil Durum Hazırlık Seti"
+          alt="depremTek Market Acil Durum Hazırlık Seti"
           fill
           priority
           sizes="100vw"

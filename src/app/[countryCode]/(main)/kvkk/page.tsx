@@ -59,7 +59,7 @@ export default async function KVKKPage(props: {
         <section className="bg-ui-bg-subtle p-6 rounded-lg border border-ui-border-base mb-6">
           <h2 className="text-lg font-bold text-ui-fg-base mb-3">Veri Sorumlusu Kimliği</h2>
           <p>
-            6698 sayılı Kişisel Verilerin Korunması Kanunu (&ldquo;KVKK&rdquo;) uyarınca, kişisel verileriniz veri sorumlusu sıfatıyla <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong> (&ldquo;EKYP Deprem Market&rdquo; veya &ldquo;Şirket&rdquo;) tarafından aşağıda açıklanan kapsamda işlenebilecektir.
+            6698 sayılı Kişisel Verilerin Korunması Kanunu (&ldquo;KVKK&rdquo;) uyarınca, kişisel verileriniz veri sorumlusu sıfatıyla <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong> (&ldquo;depremTek Market&rdquo; veya &ldquo;Şirket&rdquo;) tarafından aşağıda açıklanan kapsamda işlenebilecektir.
           </p>
         </section>
 

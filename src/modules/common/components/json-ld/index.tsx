@@ -34,7 +34,7 @@ export default function ProductJsonLd({ product, url }: ProductJsonLdProps) {
     sku: product.variants?.[0]?.sku || product.id,
     brand: {
       "@type": "Brand",
-      name: "EKYP Deprem Market",
+      name: "depremTek Market",
     },
     ...(cheapestVariant
       ? {
@@ -48,7 +48,7 @@ export default function ProductJsonLd({ product, url }: ProductJsonLdProps) {
               : "https://schema.org/OutOfStock",
             seller: {
               "@type": "Organization",
-              name: "EKYP Deprem Market",
+              name: "depremTek Market",
             },
           },
         }
@@ -67,8 +67,8 @@ export function OrganizationJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "EKYP Deprem Market",
-    alternateName: "EKYP Deprem Teknolojileri",
+    name: "depremTek Market",
+    alternateName: "Deprem Teknolojileri",
     url: "https://depremmarket.com",
     logo: "https://depremmarket.com/icon",
     description:

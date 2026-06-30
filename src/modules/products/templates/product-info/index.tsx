@@ -49,7 +49,7 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
             </span>
           ) : (
             <span className="font-bold text-orange-600 tracking-wide">
-              EKYP Deprem Market
+              depremTek Market
             </span>
           )}
           {product.collection && (

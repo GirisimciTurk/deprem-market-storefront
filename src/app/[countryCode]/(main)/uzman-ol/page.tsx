@@ -7,7 +7,7 @@ import FaqAccordion, {
 import ExpertForm from "./expert-form"
 
 export const metadata: Metadata = {
-  title: "Uzman Ağına Katıl — Doğrulanmış Mühendis Dizini | Deprem Market",
+  title: "Uzman Ağına Katıl — Doğrulanmış Mühendis Dizini | depremTek Market",
   description:
     "İnşaat mühendisleri için doğrulanmış uzman dizinine ön kayıt. Bina risk tespiti, güçlendirme, statik proje ve daha fazlasında halkla buluşun.",
 }
@@ -64,7 +64,7 @@ const BENEFITS = [
   {
     icon: "📈",
     title: "İtibar & Görünürlük",
-    desc: "Deprem Market'in güveni ve içerik motoruyla uzmanlığınızı geniş kitleye duyurun.",
+    desc: "depremTek Market'in güveni ve içerik motoruyla uzmanlığınızı geniş kitleye duyurun.",
   },
 ]
 
@@ -109,7 +109,7 @@ export default async function UzmanOlPage() {
           <p>
             We are building a directory of verified civil engineers for
             earthquake risk assessment, retrofitting, structural design and
-            more. To pre-register, please email us at destek@ekyp.com.
+            more. To pre-register, please email us at destek@depremtek.market.
           </p>
           <div className="pt-8">
             <LocalizedClientLink

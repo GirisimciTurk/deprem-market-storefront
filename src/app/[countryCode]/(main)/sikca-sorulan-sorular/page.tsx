@@ -28,7 +28,7 @@ const SHOPPING_FAQS: FaqItem[] = [
     question:
       "Ürünlerinizin kalitesi ve sertifikaları hakkında bilgi alabilir miyim?",
     answer:
-      "EKYP Deprem Market olarak satışa sunduğumuz tüm ilk yardım malzemeleri T.C. Sağlık Bakanlığı onaylıdır. Çantalarımız su geçirmez, yüksek mukavemetli yırtılmaz kumaşlardan üretilmekte olup; fener, düdük, radyo ve benzeri mekanik/teknolojik ürünlerimiz kalite sertifikalarına sahiptir.",
+      "depremTek Market olarak satışa sunduğumuz tüm ilk yardım malzemeleri T.C. Sağlık Bakanlığı onaylıdır. Çantalarımız su geçirmez, yüksek mukavemetli yırtılmaz kumaşlardan üretilmekte olup; fener, düdük, radyo ve benzeri mekanik/teknolojik ürünlerimiz kalite sertifikalarına sahiptir.",
   },
   {
     question: "İptal, iade ve değişim süreçleri nasıl işlemektedir?",
@@ -101,7 +101,7 @@ const IMPLEMENTER_FAQS: FaqItem[] = [
   {
     question: "Ürün de satabilir miyim?",
     answer:
-      "Bu dizin hizmet/uygulama içindir; ürün satışı platformda Deprem Market mağazası üzerinden yürür. Siz fiziki uygulama (işçilik/proje) tarafında yer alırsınız.",
+      "Bu dizin hizmet/uygulama içindir; ürün satışı platformda depremTek Market mağazası üzerinden yürür. Siz fiziki uygulama (işçilik/proje) tarafında yer alırsınız.",
   },
 ]
 
@@ -166,7 +166,7 @@ export default async function SikcaSorulanSorularPage() {
         <div className="prose prose-slate max-w-none text-ui-fg-subtle space-y-6">
           <p>
             Please check our FAQ in Turkish for detailed questions or contact us
-            directly at destek@ekyp.com.
+            directly at destek@depremtek.market.
           </p>
           <div className="pt-8">
             <LocalizedClientLink href="/" className="text-brand-600 hover:underline font-semibold">

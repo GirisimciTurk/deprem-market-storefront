@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // apple-icon.tsx'ten otomatik gelir.
     appleWebApp: {
       capable: true,
-      title: "Deprem Market",
+      title: "depremTek Market",
       statusBarStyle: "default",
     },
     // Next.js 15 yalnızca `mobile-web-app-capable` veriyor; iOS standalone +

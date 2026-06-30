@@ -5,7 +5,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { MEMBERSHIP_PLANS } from "@lib/expert-config"
 
 export const metadata: Metadata = {
-  title: "Üyelik Paketleri — Uzman (İnşaat Mühendisi) | Deprem Market",
+  title: "Üyelik Paketleri — Uzman (İnşaat Mühendisi) | depremTek Market",
   description:
     "İnşaat mühendisleri için üyelik paketleri: doğrulanmış dizin profili, öne çıkma ve daha fazlası. Beta döneminde ücretsiz.",
 }

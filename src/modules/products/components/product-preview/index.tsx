@@ -170,7 +170,7 @@ export default function ProductPreview({
         <div className="flex items-center gap-x-1 flex-wrap">
           {(() => {
             const s = (product as any).seller
-            const name = s?.name ?? "Deprem Market"
+            const name = s?.name ?? "depremTek Market"
             return s?.handle ? (
               <LocalizedClientLink
                 href={`/satici/${s.handle}`}

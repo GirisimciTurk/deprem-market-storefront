@@ -188,9 +188,9 @@ export default async function Footer() {
               </ul>
             </div>
 
-            {/* EKYP Corporate Links */}
+            {/* Corporate Links */}
             <div className="flex flex-col gap-y-2">
-              <span className="txt-small-plus txt-ui-fg-base">EKYP Deprem Teknolojileri</span>
+              <span className="txt-small-plus txt-ui-fg-base">Deprem Teknolojileri</span>
               <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
                 <li>
                   <a
@@ -199,7 +199,7 @@ export default async function Footer() {
                     rel="noreferrer"
                     className="hover:text-ui-fg-base"
                   >
-                    EKYP Hakkımızda
+                    Hakkımızda
                   </a>
                 </li>
                 <li>
@@ -231,7 +231,7 @@ export default async function Footer() {
         <div className="flex flex-col gap-y-4 md:flex-row w-full mb-8 justify-between items-center text-ui-fg-muted border-t border-ui-border-base pt-6">
           <div className="flex flex-col gap-y-1">
             <Text className="txt-compact-small">
-              © {new Date().getFullYear()} EKYP Deprem Market. Tüm hakları saklıdır.
+              © {new Date().getFullYear()} depremTek Market. Tüm hakları saklıdır.
             </Text>
             <span className="text-xs text-ui-fg-subtle">
               Bu e-ticaret sitesi bir <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong> iştirakidir.

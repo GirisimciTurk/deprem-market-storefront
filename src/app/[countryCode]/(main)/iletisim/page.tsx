@@ -26,7 +26,7 @@ export default async function IletisimPage(props: {
         </h1>
         <div className="prose prose-slate max-w-none text-ui-fg-subtle space-y-6">
           <p>
-            Please contact us via phone at +90 (539) 574 19 04 or email at destek@ekyp.com.
+            Please contact us via phone at +90 (539) 574 19 04 or email at destek@depremtek.market.
           </p>
           <p>
             Managed by <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong>.
@@ -94,8 +94,8 @@ export default async function IletisimPage(props: {
                 <p className="text-xs text-ui-fg-muted">En geç 24 saat içinde dönüş sağlanır</p>
               </div>
             </div>
-            <a href="mailto:destek@ekyp.com" className="text-ui-fg-base hover:text-blue-600 font-semibold block text-base">
-              destek@ekyp.com
+            <a href="mailto:destek@depremtek.market" className="text-ui-fg-base hover:text-blue-600 font-semibold block text-base">
+              destek@depremtek.market
             </a>
           </div>
 

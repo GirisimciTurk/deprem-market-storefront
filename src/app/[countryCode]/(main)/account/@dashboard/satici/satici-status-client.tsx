@@ -24,7 +24,7 @@ export default function SaticiStatusClient({
           🏪 Bayilik Başvurum
         </h1>
         <p className="text-xs text-ui-fg-muted mt-1">
-          Deprem Market bayilik başvurunuzun güncel durumu.
+          depremTek Market bayilik başvurunuzun güncel durumu.
         </p>
       </div>
 
@@ -114,7 +114,7 @@ export default function SaticiStatusClient({
         <div className="border border-ui-border-base bg-ui-bg-subtle rounded-2xl p-6 md:p-8 space-y-6 text-center max-w-2xl mx-auto py-12">
           <span className="text-5xl block animate-bounce">🏪</span>
           <h2 className="text-xl font-extrabold text-gray-900">
-            Deprem Market Bayimiz Olun
+            depremTek Market Bayimiz Olun
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
             Türkiye'nin afet ve acil durum hazırlık platformunda yerinizi alın.

@@ -26,11 +26,11 @@ export async function generateMetadata({
   const { slug } = await params
   const expert = await getExpert(slug)
   if (!expert) {
-    return { title: "Profil bulunamadı | Deprem Market" }
+    return { title: "Profil bulunamadı | depremTek Market" }
   }
   const loc = [expert.city, expert.district].filter(Boolean).join(", ")
   return {
-    title: `${expert.full_name}${expert.title ? ` — ${expert.title}` : ""} | Deprem Market`,
+    title: `${expert.full_name}${expert.title ? ` — ${expert.title}` : ""} | depremTek Market`,
     description:
       expert.about?.slice(0, 155) ||
       `${providerLabel(expert.provider_type)}${loc ? `, ${loc}` : ""}. Doğrulanmış profil.`,
@@ -158,7 +158,7 @@ export default async function ExpertProfilePage({
             })}
           </div>
           <p className="text-[0.7rem] text-ui-fg-muted mt-2">
-            ✓ işaretli uzmanlıklar Deprem Market tarafından belge ile ayrı ayrı doğrulanmıştır.
+            ✓ işaretli uzmanlıklar depremTek Market tarafından belge ile ayrı ayrı doğrulanmıştır.
           </p>
         </section>
       )}
@@ -243,7 +243,7 @@ export default async function ExpertProfilePage({
 
       {/* Güven notu */}
       <p className="mt-8 text-xs text-ui-fg-muted leading-relaxed border border-ui-border-base rounded-xl bg-ui-bg-subtle p-4">
-        Bu profil Deprem Market tarafından belge incelemesiyle{" "}
+        Bu profil depremTek Market tarafından belge incelemesiyle{" "}
         <strong className="text-ui-fg-subtle">doğrulanmıştır</strong>. Yine de
         sözleşme öncesi yetki belgelerini ve referansları teyit etmenizi öneririz.
       </p>

@@ -2,8 +2,8 @@ import { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "EKYP Deprem Market",
-    short_name: "Deprem Market",
+    name: "depremTek Market",
+    short_name: "depremTek Market",
     description:
       "Türkiye'nin öncü afet ve acil durum hazırlık marketi. Profesyonel deprem çantaları, ilk yardım setleri ve hayati acil durum ekipmanları.",
     id: "/tr",
@@ -51,14 +51,14 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: "1080x1920",
         type: "image/png",
         form_factor: "narrow",
-        label: "Deprem Market — afet hazırlık marketi",
+        label: "depremTek Market — afet hazırlık marketi",
       },
       {
         src: "/screenshots/wide",
         sizes: "1920x1080",
         type: "image/png",
         form_factor: "wide",
-        label: "Deprem Market — afet hazırlık marketi",
+        label: "depremTek Market — afet hazırlık marketi",
       },
     ],
     // Ana ekran ikonuna uzun basınca çıkan hızlı kısayollar (Android/desktop).

@@ -89,7 +89,7 @@ export async function GET(
             letterSpacing: -2,
           }}
         >
-          Deprem Market
+          depremTek Market
         </div>
 
         <div

@@ -21,10 +21,10 @@ const Register = ({ setCurrentView }: Props) => {
       data-testid="register-page"
     >
       <h1 className="text-large-semi uppercase mb-6">
-        EKYP Deprem Market Üyesi Olun
+        depremTek Market Üyesi Olun
       </h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-4">
-        EKYP Deprem Market üye profilinizi oluşturun, siparişlerinizi kolayca takip edin.
+        depremTek Market üye profilinizi oluşturun, siparişlerinizi kolayca takip edin.
       </p>
       <form className="w-full flex flex-col" action={formAction}>
         <div className="flex flex-col w-full gap-y-2">
@@ -68,7 +68,7 @@ const Register = ({ setCurrentView }: Props) => {
         </div>
         <ErrorMessage error={message} data-testid="register-error" />
         <span className="text-center text-ui-fg-base text-small-regular mt-6">
-          Hesap oluşturarak, EKYP Deprem Market{" "}
+          Hesap oluşturarak, depremTek Market{" "}
           <LocalizedClientLink
             href="/gizlilik-ve-guvenlik"
             className="underline"

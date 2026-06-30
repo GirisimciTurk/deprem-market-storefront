@@ -53,7 +53,7 @@ export default async function GizlilikGuvenlikPage(props: {
       <div className="text-ui-fg-subtle space-y-6 text-sm sm:text-base leading-relaxed">
         <section>
           <p>
-            <strong>EKYP Deprem Market</strong> (DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.) olarak, müşterilerimizin kişisel bilgilerinin gizliliği ve güvenliği bizler için en üst düzeyde önem taşımaktadır. Bu politika, sitemizi ziyaret ederken ve alışveriş yaparken verilerinizin nasıl korunduğunu açıklamaktadır.
+            <strong>depremTek Market</strong> (DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.) olarak, müşterilerimizin kişisel bilgilerinin gizliliği ve güvenliği bizler için en üst düzeyde önem taşımaktadır. Bu politika, sitemizi ziyaret ederken ve alışveriş yaparken verilerinizin nasıl korunduğunu açıklamaktadır.
           </p>
         </section>
 

@@ -552,7 +552,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                           href="/store"
                           className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs py-2.5 px-5 rounded-lg transition-colors inline-block shadow-sm"
                         >
-                          🛒 Eksikleri Deprem Market'ten Tamamla
+                          🛒 Eksikleri depremTek Market'ten Tamamla
                         </LocalizedClientLink>
                       </div>
                     </div>

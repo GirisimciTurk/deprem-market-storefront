@@ -61,7 +61,7 @@ const BENEFITS = [
   {
     icon: "📈",
     title: "Marka Gücü & Pazarlama",
-    desc: "Deprem Market markasının güveni, kampanyalar ve push bildirimlerle satışınızı büyütürsünüz.",
+    desc: "depremTek Market markasının güveni, kampanyalar ve push bildirimlerle satışınızı büyütürsünüz.",
   },
   {
     icon: "🤝",
@@ -72,7 +72,7 @@ const BENEFITS = [
 
 const FAQS: FaqItem[] = [
   {
-    question: "Deprem Market bayisi nasıl olurum?",
+    question: "depremTek Market bayisi nasıl olurum?",
     answer:
       "Bu sayfadaki başvuru formunu doldurmanız yeterli. Başvurunuz ekibimiz tarafından incelenir; uygun bulunduğunda bayilik paneliniz açılır, panelinizden ürünlerinizi ekleyip satışa başlarsınız.",
   },
@@ -99,7 +99,7 @@ const FAQS: FaqItem[] = [
   {
     question: "Siparişleri nasıl kargolarım?",
     answer:
-      "Gönderiyi siz yaparsınız ve iki seçeneğiniz olur: (1) Anlaşmalı Kargo — Deprem Market'in anlaşmalı kargosuyla gönderirsiniz, kargo ücreti hak edişinizden düşülür; (2) Kendi Kargonuz — kendi anlaştığınız kargo firmasıyla gönderirsiniz, bu durumda sizden kargo ücreti kesilmez. Her iki seçenekte de panelden kargo firmasını ve takip numarasını girersiniz; müşteri ve siz süreci takip edersiniz.",
+      "Gönderiyi siz yaparsınız ve iki seçeneğiniz olur: (1) Anlaşmalı Kargo — depremTek Market'in anlaşmalı kargosuyla gönderirsiniz, kargo ücreti hak edişinizden düşülür; (2) Kendi Kargonuz — kendi anlaştığınız kargo firmasıyla gönderirsiniz, bu durumda sizden kargo ücreti kesilmez. Her iki seçenekte de panelden kargo firmasını ve takip numarasını girersiniz; müşteri ve siz süreci takip edersiniz.",
   },
   {
     question: "Kendi kargo anlaşmamla gönderebilir miyim?",
@@ -124,9 +124,9 @@ export default async function SaticiOlPage() {
         </h1>
         <div className="prose prose-slate max-w-none text-ui-fg-subtle space-y-6">
           <p>
-            Join Deprem Market as an authorized dealer and offer engineered
+            Join depremTek Market as an authorized dealer and offer engineered
             earthquake-preparedness and emergency products to thousands of
-            customers. To apply, please email us at destek@ekyp.com.
+            customers. To apply, please email us at destek@depremtek.market.
           </p>
           <div className="pt-8">
             <LocalizedClientLink
@@ -146,15 +146,15 @@ export default async function SaticiOlPage() {
       {/* Hero */}
       <div className="text-center max-w-3xl mx-auto mb-14">
         <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
-          Deprem Market Yetkili Bayilik Programı
+          depremTek Market Yetkili Bayilik Programı
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
-          Deprem Market Bayimiz Olun
+          depremTek Market Bayimiz Olun
         </h1>
         <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed">
           Türkiye'nin afet ve acil durum hazırlık platformunda yerinizi alın.
           Bayiliğinizi açın, ürünlerinizi binlerce müşteriye ulaştırın ve
-          Deprem Market markasının gücüyle kazanmaya başlayın.
+          depremTek Market markasının gücüyle kazanmaya başlayın.
         </p>
         <div className="mt-6">
           <a

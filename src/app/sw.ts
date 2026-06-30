@@ -67,10 +67,10 @@ self.addEventListener("push", (event: PushEvent) => {
   try {
     payload = event.data?.json() ?? {}
   } catch {
-    payload = { title: "Deprem Market", body: event.data?.text() }
+    payload = { title: "depremTek Market", body: event.data?.text() }
   }
 
-  const title = payload.title || "Deprem Market"
+  const title = payload.title || "depremTek Market"
   // Aksiyon başına URL'leri data'ya gömeriz (NotificationAction tipi url taşımaz),
   // notificationclick'te tıklanan aksiyona göre hedefi çözeriz.
   const actions = (payload.actions || []).slice(0, 2) // tarayıcılar genelde 2 buton gösterir

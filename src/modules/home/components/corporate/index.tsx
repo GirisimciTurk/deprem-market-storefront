@@ -44,7 +44,7 @@ export default function CorporateSection({ countryCode }: { countryCode: string 
             </span>
           </div>
           <div className="flex flex-col col-span-2 md:col-span-1">
-            <span className="text-3xl text-brand-500 font-black">EKYP</span>
+            <span className="text-3xl text-brand-500 font-black">depremTek</span>
             <span className="text-xs text-slate-400 mt-1">
               {t("stat3Label")}
             </span>

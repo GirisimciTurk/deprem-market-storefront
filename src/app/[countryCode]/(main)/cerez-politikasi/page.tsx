@@ -54,7 +54,7 @@ export default async function CerezPolitikasiPage(props: {
       <div className="text-ui-fg-subtle space-y-6 text-sm sm:text-base leading-relaxed">
         <section>
           <p>
-            Bu Çerez Politikası, <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong> (&ldquo;EKYP Deprem Market&rdquo; veya &ldquo;Şirket&rdquo;) tarafından işletilen e-ticaret platformumuzda kullanılan çerezlerin (cookies) türlerini, amaçlarını ve çerez tercihlerinizi nasıl yönetebileceğinizi açıklamaktadır.
+            Bu Çerez Politikası, <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong> (&ldquo;depremTek Market&rdquo; veya &ldquo;Şirket&rdquo;) tarafından işletilen e-ticaret platformumuzda kullanılan çerezlerin (cookies) türlerini, amaçlarını ve çerez tercihlerinizi nasıl yönetebileceğinizi açıklamaktadır.
           </p>
         </section>
 

@@ -7,7 +7,7 @@ import ExpertFilters from "@modules/experts/components/expert-filters"
 import { ENGINEER_SPECIALIZATIONS } from "@lib/expert-config"
 
 export const metadata: Metadata = {
-  title: "İnşaat Mühendisi Dizini — Doğrulanmış Mühendisler | Deprem Market",
+  title: "İnşaat Mühendisi Dizini — Doğrulanmış Mühendisler | depremTek Market",
   description:
     "İl/ilçe ve uzmanlık alanına göre doğrulanmış inşaat mühendislerini (tespit/proje/danışmanlık) bulun.",
 }

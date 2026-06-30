@@ -183,7 +183,7 @@ export default function ExpertRequestForm({
         <p className="text-sm text-brand-600">{errorMsg || "Talep gönderilemedi."}</p>
       )}
       <p className="text-[0.7rem] text-ui-fg-muted">
-        Talebiniz yalnızca bu uzmanla ve Deprem Market ekibiyle paylaşılır.
+        Talebiniz yalnızca bu uzmanla ve depremTek Market ekibiyle paylaşılır.
       </p>
     </form>
   )
