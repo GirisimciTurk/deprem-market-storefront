@@ -11,7 +11,10 @@
   "nav": {
     "menu": "Menü",
     "account": "Hesabım",
-    "cart": "Sepet"
+    "cart": "Sepet",
+    "loginLabel": "Giriş Yap",
+    "favoritesLabel": "Favoriler",
+    "cartLabel": "Çanta"
   },
   "footer": {
     "affiliateLabel": "Bir Girişimci Türk Ekosistemi İştiraki",
@@ -70,6 +73,7 @@
     "triggerAriaLabel": "Ürün Ara",
     "triggerTitle": "Ürün Ara (Ctrl+K)",
     "placeholder": "Ürün, kategori veya marka ara...",
+    "clear": "Aramayı temizle",
     "noResults": "\"{query}\" için sonuç bulunamadı.",
     "tryDifferent": "Farklı anahtar kelimelerle tekrar deneyin.",
     "typeToSearch": "Aramaya başlamak için en az 2 karakter yazın.",
@@ -162,6 +166,7 @@
     "addAll": "Tümünü Sepete Ekle ({count})",
     "adding": "Ekleniyor...",
     "addedAll": "Sepete Eklendi ✓",
+    "addError": "Bazı ürünler sepete eklenemedi, lütfen tekrar deneyin.",
     "suggestedQty": "Önerilen adet: {qty}",
     "surveyTitle": "Yapınız için uzman keşfi önerilir",
     "surveyCta": "Güçlendirme & Keşif Hizmeti",
@@ -172,6 +177,23 @@
       "carbon": "Karbon fiber güçlendirme nedir?",
       "store": "Mağazayı göster"
     }
+  },
+  "drawer": {
+    "open": "Menü ve kategorileri aç",
+    "close": "Menüyü kapat",
+    "expand": "{name} alt kategorileri"
+  },
+  "dock": {
+    "openAria": "İletişim seçeneklerini aç",
+    "closeAria": "İletişim menüsünü kapat",
+    "chat": "Asistan",
+    "whatsapp": "WhatsApp",
+    "phone": "Çağrı Merkezi",
+    "phoneTitle": "Çağrı Merkezi",
+    "phoneHours": "Hafta içi 09:00 – 18:00",
+    "callNow": "Hemen Ara",
+    "copy": "Numarayı kopyala",
+    "copied": "Kopyalandı ✓"
   },
   "cookieConsent": {
     "title": "Çerez Politikası ve KVKK",

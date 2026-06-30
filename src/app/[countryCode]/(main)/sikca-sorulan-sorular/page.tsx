@@ -201,9 +201,6 @@ export default async function SikcaSorulanSorularPage() {
         <a href="#uzman" className="text-sm font-semibold px-4 py-1.5 rounded-full border border-ui-border-base hover:border-brand-400 hover:text-brand-600 transition-colors">
           Uzman (Mühendis) Olmak
         </a>
-        <a href="#uygulayici" className="text-sm font-semibold px-4 py-1.5 rounded-full border border-ui-border-base hover:border-brand-400 hover:text-brand-600 transition-colors">
-          Uygulayıcı Olmak
-        </a>
       </div>
 
       <div id="alisveris" className="scroll-mt-24">
@@ -222,16 +219,6 @@ export default async function SikcaSorulanSorularPage() {
           description="Doğrulanmış uzman dizinine katılım, belge doğrulama ve üyelik süreci."
           items={EXPERT_FAQS}
           cta={{ href: "/uzman-ol", label: "Uzman Ön Kaydı Yap" }}
-        />
-      </div>
-
-      <div id="uygulayici" className="scroll-mt-24">
-        <FaqSection
-          eyebrow="Uygulayıcılar · Yükleniciler"
-          title="Uygulayıcı (Yüklenici) Olmak"
-          description="İnşaat/güçlendirmenin fiziki uygulayıcıları için ön kayıt, doğrulama ve süreç."
-          items={IMPLEMENTER_FAQS}
-          cta={{ href: "/uygulayici-ol", label: "Uygulayıcı Ön Kaydı Yap" }}
         />
       </div>
 

@@ -11,7 +11,10 @@
   "nav": {
     "menu": "Menu",
     "account": "Account",
-    "cart": "Cart"
+    "cart": "Cart",
+    "loginLabel": "Sign In",
+    "favoritesLabel": "Favorites",
+    "cartLabel": "Cart"
   },
   "footer": {
     "affiliateLabel": "An Affiliate of the Girişimci Türk Ecosystem",
@@ -70,6 +73,7 @@
     "triggerAriaLabel": "Search Products",
     "triggerTitle": "Search (Ctrl+K)",
     "placeholder": "Search products, categories...",
+    "clear": "Clear search",
     "noResults": "No results found for \"{query}\".",
     "tryDifferent": "Try different keywords.",
     "typeToSearch": "Type at least 2 characters to search.",
@@ -162,6 +166,7 @@
     "addAll": "Add All to Cart ({count})",
     "adding": "Adding...",
     "addedAll": "Added to Cart ✓",
+    "addError": "Some items couldn't be added to the cart, please try again.",
     "suggestedQty": "Suggested qty: {qty}",
     "surveyTitle": "An expert survey is recommended for your building",
     "surveyCta": "Strengthening & Survey Service",
@@ -172,6 +177,23 @@
       "carbon": "What is carbon-fiber strengthening?",
       "store": "Show the store"
     }
+  },
+  "drawer": {
+    "open": "Open menu and categories",
+    "close": "Close menu",
+    "expand": "{name} subcategories"
+  },
+  "dock": {
+    "openAria": "Open contact options",
+    "closeAria": "Close contact menu",
+    "chat": "Assistant",
+    "whatsapp": "WhatsApp",
+    "phone": "Call Center",
+    "phoneTitle": "Call Center",
+    "phoneHours": "Weekdays 09:00 – 18:00",
+    "callNow": "Call Now",
+    "copy": "Copy number",
+    "copied": "Copied ✓"
   },
   "cookieConsent": {
     "title": "Cookie Settings",

@@ -2,6 +2,7 @@ import { Metadata } from "next"
 
 import { listCartOptions, retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
+import { getRegion } from "@lib/data/regions"
 import { getBaseURL } from "@lib/util/env"
 import { StoreCartShippingOption } from "@medusajs/types"
 import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
@@ -11,8 +12,7 @@ import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-p
 import CookieConsent from "@modules/layout/components/cookie-consent"
 import PushPrompt from "@modules/layout/components/push-prompt"
 import InstallPrompt from "@modules/layout/components/install-prompt"
-import WhatsAppButton from "@modules/layout/components/whatsapp-button"
-import ConstructionBanner from "@modules/layout/components/construction-banner"
+import ContactDock from "@modules/layout/components/contact-dock"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -26,7 +26,11 @@ export default async function PageLayout(props: {
   const { countryCode } = params
   // Bağımsız iki çağrı paralel — bu layout HER (main) sayfasını sarar, sıralı
   // bekleme her sayfaya ~300-500ms ekliyordu.
-  const [customer, cart] = await Promise.all([retrieveCustomer(), retrieveCart()])
+  const [customer, cart, region] = await Promise.all([
+    retrieveCustomer(),
+    retrieveCart(),
+    getRegion(countryCode),
+  ])
   let shippingOptions: StoreCartShippingOption[] = []
 
   if (cart) {
@@ -37,7 +41,6 @@ export default async function PageLayout(props: {
 
   return (
     <>
-      <ConstructionBanner />
       <Nav countryCode={countryCode} />
       {customer && cart && (
         <CartMismatchBanner customer={customer} cart={cart} />
@@ -55,7 +58,7 @@ export default async function PageLayout(props: {
       <CookieConsent countryCode={countryCode} />
       <PushPrompt />
       <InstallPrompt />
-      <WhatsAppButton />
+      <ContactDock countryCode={countryCode} region={region ?? null} />
     </>
   )
 }

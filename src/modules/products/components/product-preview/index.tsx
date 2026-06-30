@@ -60,6 +60,8 @@ export default function ProductPreview({
       : null
 
   const hasFreeShipping = (product.metadata as Record<string, unknown>)?.free_shipping === true
+  // Hizmet verilebilir ürün: kartta "Hizmet" rozeti + ürün sayfasında "Talep Oluştur".
+  const isServiceable = (product.metadata as Record<string, unknown>)?.is_serviceable === true
 
   // Yalnız GERÇEK metadata varsa rank/rating göster (uydurma fallback YOK).
   const rankInfo = (product.metadata as any)?.rank
@@ -120,6 +122,22 @@ export default function ProductPreview({
             </div>
           )}
 
+          {/* Top-Left: Hizmet (serviceable) Badge — rank/indirim rozetlerinin altına yığılır */}
+          {isServiceable && (
+            <div
+              className={`absolute z-10 left-2 bg-orange-600 text-white font-bold text-[9px] sm:text-[10px] px-2 py-1 rounded-md shadow-md flex items-center gap-x-1 border border-orange-500 ${
+                rankInfo && discountPercentage
+                  ? "top-[4.5rem] sm:top-20"
+                  : rankInfo || discountPercentage
+                  ? "top-10 sm:top-11"
+                  : "top-2"
+              }`}
+            >
+              <span>🛠️</span>
+              <span>Hizmet</span>
+            </div>
+          )}
+
           {/* Top-Right: Low Stock / Urgency Badge */}
           {isLowStock && (
             <div className="absolute top-12 right-2 z-10 bg-brand-600/90 text-white font-extrabold text-[9px] sm:text-[10px] px-2 py-1 rounded-full shadow-md animate-pulse border border-brand-500/50">
@@ -146,31 +164,46 @@ export default function ProductPreview({
 
       {/* Product info box */}
       <div className="p-3 flex flex-col flex-1 justify-between gap-y-2">
-        <LocalizedClientLink href={`/products/${product.handle}`} className="flex flex-col gap-y-1">
-          {/* Brand Title */}
-          <div className="flex items-center gap-x-1 flex-wrap">
-            <span className="text-xs font-bold text-orange-600 tracking-wide uppercase">
-              {(product as any).seller?.name ?? "Deprem Market"}
-            </span>
-            <svg
-              className="w-3.5 h-3.5 text-blue-500 fill-current"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-            </svg>
-            {(() => {
-              const s = (product as any).seller
-              const count = s?.rating_count ?? 0
-              if (!s || count <= 0) return null
-              const avg = Math.round(((s.rating_sum ?? 0) / count) * 10) / 10
-              return (
-                <span className="text-[10px] font-semibold text-yellow-500">
-                  ⭐ {avg.toFixed(1)}
-                </span>
-              )
-            })()}
-          </div>
+        {/* Marka / satıcı — mağaza (satıcı) sayfasına gider. Ürün linkinin DIŞINDA
+            (iç içe <a> geçersiz olur); böylece isme tıklayınca sırf o mağazanın
+            ürünlerini gösteren /satici/<handle> sayfası açılır. */}
+        <div className="flex items-center gap-x-1 flex-wrap">
+          {(() => {
+            const s = (product as any).seller
+            const name = s?.name ?? "Deprem Market"
+            return s?.handle ? (
+              <LocalizedClientLink
+                href={`/satici/${s.handle}`}
+                className="text-xs font-bold text-orange-600 tracking-wide uppercase transition-colors hover:text-orange-700 hover:underline"
+              >
+                {name}
+              </LocalizedClientLink>
+            ) : (
+              <span className="text-xs font-bold text-orange-600 tracking-wide uppercase">
+                {name}
+              </span>
+            )
+          })()}
+          <svg
+            className="w-3.5 h-3.5 text-blue-500 fill-current"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+          </svg>
+          {(() => {
+            const s = (product as any).seller
+            const count = s?.rating_count ?? 0
+            if (!s || count <= 0) return null
+            const avg = Math.round(((s.rating_sum ?? 0) / count) * 10) / 10
+            return (
+              <span className="text-[10px] font-semibold text-yellow-500">
+                ⭐ {avg.toFixed(1)}
+              </span>
+            )
+          })()}
+        </div>
 
+        <LocalizedClientLink href={`/products/${product.handle}`} className="flex flex-col gap-y-1">
           {/* Product Title */}
           <Text
             className="text-xs text-gray-700 line-clamp-2 leading-tight font-medium"

@@ -15,6 +15,7 @@ const StoreTemplate = async ({
   categoryId,
   inStock,
   countryCode,
+  showSeoContent = true,
 }: {
   sortBy?: SortOptions
   page?: string
@@ -44,19 +45,21 @@ const StoreTemplate = async ({
           categories={categories}
         />
         <div className="w-full">
-          <div className="mb-6">
-            <h1
-              data-testid="store-page-title"
-              className="text-2xl font-bold text-slate-800"
-            >
-              Tüm Deprem ve Afet Hazırlık Ürünleri
-            </h1>
-            <p className="mt-2 text-sm text-slate-500 max-w-2xl leading-relaxed">
-              Deprem çantalarından ilk yardım setlerine, aydınlatmadan ısınma ve
-              acil durum gıdasına kadar afet hazırlığı için ihtiyacınız olan tüm
-              ürünler tek sayfada.
-            </p>
-          </div>
+          {showSeoContent && (
+            <div className="mb-6">
+              <h1
+                data-testid="store-page-title"
+                className="text-2xl font-bold text-slate-800"
+              >
+                Tüm Deprem ve Afet Hazırlık Ürünleri
+              </h1>
+              <p className="mt-2 text-sm text-slate-500 max-w-2xl leading-relaxed">
+                Deprem çantalarından ilk yardım setlerine, aydınlatmadan ısınma ve
+                acil durum gıdasına kadar afet hazırlığı için ihtiyacınız olan tüm
+                ürünler tek sayfada.
+              </p>
+            </div>
+          )}
           <Suspense fallback={<SkeletonProductGrid />}>
             <PaginatedProducts
               sortBy={sort}

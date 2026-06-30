@@ -15,7 +15,7 @@ export default function Logo({ className = "", iconOnly = false }: LogoProps) {
     <img
       src="/images/depremtek-logo.webp"
       alt="depremTek"
-      className={`w-auto select-none object-contain ${iconOnly ? "h-9" : "h-11 sm:h-12"} ${className}`}
+      className={`w-auto select-none object-contain ${iconOnly ? "h-11" : "h-14 sm:h-16"} ${className}`}
       draggable={false}
     />
   )

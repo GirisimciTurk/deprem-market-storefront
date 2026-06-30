@@ -1,4 +1,5 @@
 import { listProducts } from "@lib/data/products"
+import { retrieveCustomer } from "@lib/data/customer"
 import { HttpTypes } from "@medusajs/types"
 import ProductActions from "@modules/products/components/product-actions"
 
@@ -12,14 +13,30 @@ export default async function ProductActionsWrapper({
   id: string
   region: HttpTypes.StoreRegion
 }) {
-  const product = await listProducts({
-    queryParams: { id: [id] },
-    regionId: region.id,
-  }).then(({ response }) => response.products[0])
+  const [product, customer] = await Promise.all([
+    listProducts({
+      queryParams: { id: [id] },
+      regionId: region.id,
+    }).then(({ response }) => response.products[0]),
+    // Hizmet verilebilir ürünlerde talep formunu ön-doldurmak için (request-cached).
+    retrieveCustomer().catch(() => null),
+  ])
 
   if (!product) {
     return null
   }
 
-  return <ProductActions product={product} region={region} />
+  const fullName = customer
+    ? [customer.first_name, customer.last_name].filter(Boolean).join(" ")
+    : undefined
+
+  return (
+    <ProductActions
+      product={product}
+      region={region}
+      defaultName={fullName || undefined}
+      defaultEmail={customer?.email || undefined}
+      defaultPhone={customer?.phone || undefined}
+    />
+  )
 }

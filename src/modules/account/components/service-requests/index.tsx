@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { decideServiceOffer } from "@lib/data/service-requests"
 import type { ServicePhase, StoreServiceRequest } from "@lib/data/service-requests"
+import ServiceAssessment from "./service-assessment"
 
 // ───────────────────────── Sabitler / yardımcılar ─────────────────────────
 
@@ -191,6 +192,10 @@ function RequestCard({ req }: { req: StoreServiceRequest }) {
           Bu talep iptal edildi veya teklif reddedildi. Yeni bir talep oluşturabilirsiniz.
         </div>
       )}
+
+      {/* Değerlendirme yöntemi (Ürün + Hizmet): pending ise seçim, seçildiyse özet.
+          Yalnız havuz (is_bidding) taleplerinde gösterilir. */}
+      {req.is_bidding && !canceled && <ServiceAssessment req={req} />}
 
       {/* Saha / detay özeti */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs">

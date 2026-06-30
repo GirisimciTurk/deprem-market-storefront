@@ -3,10 +3,7 @@
 import { useState } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Search, X } from "lucide-react"
-import {
-  ENGINEER_SPECIALIZATIONS,
-  IMPLEMENTER_SPECIALIZATIONS,
-} from "@lib/expert-config"
+import { ENGINEER_SPECIALIZATIONS } from "@lib/expert-config"
 
 const inputCls =
   "w-full border border-ui-border-base rounded-lg px-3 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
@@ -16,14 +13,13 @@ export default function ExpertFilters() {
   const pathname = usePathname()
   const sp = useSearchParams()
 
-  const [type, setType] = useState(sp.get("type") ?? "")
   const [city, setCity] = useState(sp.get("city") ?? "")
   const [district, setDistrict] = useState(sp.get("district") ?? "")
   const [specialization, setSpecialization] = useState(sp.get("specialization") ?? "")
   const [q, setQ] = useState(sp.get("q") ?? "")
 
   const apply = (overrides?: Record<string, string>) => {
-    const next = { type, city, district, specialization, q, ...overrides }
+    const next = { city, district, specialization, q, ...overrides }
     const params = new URLSearchParams()
     Object.entries(next).forEach(([k, v]) => {
       if (v && v.trim()) params.set(k, v.trim())
@@ -33,7 +29,6 @@ export default function ExpertFilters() {
   }
 
   const clearAll = () => {
-    setType("")
     setCity("")
     setDistrict("")
     setSpecialization("")
@@ -41,42 +36,10 @@ export default function ExpertFilters() {
     router.push(pathname)
   }
 
-  const setTypeAndApply = (t: string) => {
-    setType(t)
-    // Rol değişince uyumsuz uzmanlık seçimini sıfırla.
-    setSpecialization("")
-    apply({ type: t, specialization: "" })
-  }
-
-  const hasActive = !!(type || city || district || specialization || q)
-
-  const TYPES = [
-    { key: "", label: "Tümü" },
-    { key: "engineer", label: "🧠 Mühendis" },
-    { key: "implementer", label: "🏗️ Uygulayıcı" },
-  ]
+  const hasActive = !!(city || district || specialization || q)
 
   return (
     <div className="border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-4 sm:p-5 mb-8">
-      {/* Rol segmenti */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {TYPES.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setTypeAndApply(t.key)}
-            aria-pressed={type === t.key}
-            className={`text-xs font-semibold px-3.5 py-1.5 rounded-full border transition-colors ${
-              type === t.key
-                ? "bg-brand-600 text-white border-brand-600"
-                : "bg-ui-bg-base text-ui-fg-subtle border-ui-border-base hover:border-brand-400"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -107,20 +70,11 @@ export default function ExpertFilters() {
           className={inputCls}
         >
           <option value="">Tüm uzmanlıklar</option>
-          <optgroup label="Mühendis">
-            {ENGINEER_SPECIALIZATIONS.map((s) => (
-              <option key={s.key} value={s.key}>
-                {s.label}
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label="Uygulayıcı">
-            {IMPLEMENTER_SPECIALIZATIONS.map((s) => (
-              <option key={s.key} value={s.key}>
-                {s.label}
-              </option>
-            ))}
-          </optgroup>
+          {ENGINEER_SPECIALIZATIONS.map((s) => (
+            <option key={s.key} value={s.key}>
+              {s.label}
+            </option>
+          ))}
         </select>
         <div className="flex gap-2">
           <div className="relative flex-1">

@@ -79,7 +79,7 @@ const ChatIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 )
 
-const BuildingIcon = ({ size = 20 }: { size?: number }) => (
+const WrenchIcon = ({ size = 20 }: { size?: number }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
@@ -91,12 +91,7 @@ const BuildingIcon = ({ size = 20 }: { size?: number }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
-    <line x1="9" y1="22" x2="9" y2="16" />
-    <line x1="15" y1="22" x2="15" y2="16" />
-    <line x1="9" y1="16" x2="15" y2="16" />
-    <path d="M9 6h6" />
-    <path d="M9 10h6" />
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
   </svg>
 )
 
@@ -257,12 +252,12 @@ const AccountNav = ({
                 </li>
                 <li>
                   <LocalizedClientLink
-                    href="/account/satici"
+                    href="/account/hizmet-al"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
                   >
                     <div className="flex items-center gap-x-2">
-                      <BuildingIcon size={20} />
-                      <span>Satıcı Başvurum</span>
+                      <WrenchIcon size={20} />
+                      <span>Hizmet Al</span>
                     </div>
                     <ChevronDown className="transform -rotate-90" />
                   </LocalizedClientLink>
@@ -378,11 +373,11 @@ const AccountNav = ({
               </li>
               <li>
                 <AccountNavLink
-                  href="/account/satici"
-                  active={isActive("/account/satici")}
-                  icon={<BuildingIcon size={18} />}
+                  href="/account/hizmet-al"
+                  active={isActive("/account/hizmet-al")}
+                  icon={<WrenchIcon size={18} />}
                 >
-                  Satıcı Başvurum
+                  Hizmet Al
                 </AccountNavLink>
               </li>
 

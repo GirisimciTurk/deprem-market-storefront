@@ -5,9 +5,9 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { MEMBERSHIP_PLANS } from "@lib/expert-config"
 
 export const metadata: Metadata = {
-  title: "Üyelik Paketleri — Uzman & Uygulayıcı | Deprem Market",
+  title: "Üyelik Paketleri — Uzman (İnşaat Mühendisi) | Deprem Market",
   description:
-    "İnşaat mühendisleri ve uygulayıcılar için üyelik paketleri: doğrulanmış dizin profili, öne çıkma ve daha fazlası. Beta döneminde ücretsiz.",
+    "İnşaat mühendisleri için üyelik paketleri: doğrulanmış dizin profili, öne çıkma ve daha fazlası. Beta döneminde ücretsiz.",
 }
 
 export default async function UzmanPaketleriPage() {
@@ -23,8 +23,8 @@ export default async function UzmanPaketleriPage() {
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
           {isTr
-            ? "Uzman & Uygulayıcı Üyelik Paketleri"
-            : "Expert & Contractor Membership Plans"}
+            ? "Uzman (İnşaat Mühendisi) Üyelik Paketleri"
+            : "Civil Engineer Membership Plans"}
         </h1>
         <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed">
           {isTr ? (
@@ -81,22 +81,16 @@ export default async function UzmanPaketleriPage() {
                 </li>
               ))}
             </ul>
-            <div className="mt-6 grid grid-cols-2 gap-2">
+            <div className="mt-6">
               <LocalizedClientLink
                 href="/uzman-ol"
-                className={`text-center font-bold py-2.5 px-3 rounded-xl text-sm transition-colors ${
+                className={`block text-center font-bold py-2.5 px-3 rounded-xl text-sm transition-colors ${
                   plan.featured
                     ? "bg-amber-500 hover:bg-amber-600 text-white"
                     : "bg-brand-600 hover:bg-brand-700 text-white"
                 }`}
               >
                 {isTr ? "Uzman Ol" : "Engineer"}
-              </LocalizedClientLink>
-              <LocalizedClientLink
-                href="/uygulayici-ol"
-                className="text-center font-bold py-2.5 px-3 rounded-xl text-sm border border-ui-border-base bg-ui-bg-base hover:border-brand-400 text-ui-fg-base transition-colors"
-              >
-                {isTr ? "Uygulayıcı Ol" : "Contractor"}
               </LocalizedClientLink>
             </div>
           </div>

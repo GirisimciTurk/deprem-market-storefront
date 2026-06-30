@@ -20,8 +20,10 @@ import { Backpack } from "lucide-react"
 
 const CartDropdown = ({
   cart: cartState,
+  label,
 }: {
   cart?: HttpTypes.StoreCart | null
+  label?: string
 }) => {
   const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
     undefined
@@ -81,17 +83,24 @@ const CartDropdown = ({
       onMouseLeave={close}
     >
       <Popover className="relative h-full">
-        <PopoverButton className="h-full" aria-label="Sepetim">
+        <PopoverButton className="h-full" aria-label={label ?? "Sepetim"}>
           <LocalizedClientLink
-            className="hover:text-ui-fg-base flex items-center gap-x-1.5 p-2 relative"
+            className="hover:text-ui-fg-base flex items-center gap-x-1.5 p-2"
             href="/cart"
             data-testid="nav-cart-link"
-            aria-label="Sepetim"
+            aria-label={label ?? "Sepetim"}
           >
-            <Backpack className="w-5 h-5 text-slate-700 hover:text-slate-900 transition-colors" />
-            {totalItems > 0 && (
-              <span className="bg-brand-600 text-white rounded-full text-[10px] font-bold w-4 h-4 flex items-center justify-center -mt-2 -ml-2">
-                {totalItems}
+            <span className="relative flex items-center">
+              <Backpack className="w-5 h-5 shrink-0 text-slate-700 hover:text-slate-900 transition-colors" />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-brand-600 text-white rounded-full text-[10px] font-bold w-4 h-4 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </span>
+            {label && (
+              <span className="hidden small:inline text-sm font-medium text-slate-700 whitespace-nowrap">
+                {label}
               </span>
             )}
           </LocalizedClientLink>

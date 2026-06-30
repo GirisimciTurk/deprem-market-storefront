@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server"
 
 import StoreTemplate from "@modules/store/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import VisionPillars from "@modules/layout/components/vision-pillars"
 import FeaturedSellers from "@modules/sellers/components/featured-sellers"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -30,13 +29,15 @@ export default async function Home(props: Params) {
   const { countryCode } = await props.params
   const { sortBy, page, minPrice, maxPrice, categoryId, inStock } =
     await props.searchParams
+  const t = await getTranslations("metadata")
 
-  // Ana sayfa: üstte PDF vizyon şeridi (Bilgilen·Hazırlan·Koru) + doğrudan mağaza
-  // (sol filtreler + ürün gridi).
+  // Ana sayfa: ürünler EN ÜSTTE başlasın (sol filtreler + ürün gridi). İkincil
+  // içerik (öne çıkan satıcılar + PDF vizyon şeridi) gridin altına alındı; geri
+  // kalan gezinme sağdaki menü şeridinde (CategoryDrawer). Büyük "mağaza" başlığı
+  // yalnız /store'da; ana sayfada SEO/erişilebilirlik için görsel-gizli H1.
   return (
     <>
-      <VisionPillars />
-      <FeaturedSellers />
+      <h1 className="sr-only">{t("homeTitle")}</h1>
       <StoreTemplate
         sortBy={sortBy}
         page={page}
@@ -47,6 +48,7 @@ export default async function Home(props: Params) {
         countryCode={countryCode}
         showSeoContent={false}
       />
+      <FeaturedSellers />
     </>
   )
 }

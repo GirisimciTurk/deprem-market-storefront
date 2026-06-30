@@ -33,11 +33,14 @@ export default function CookieConsent({ countryCode }: { countryCode: string }) 
   const handleAccept = () => {
     localStorage.setItem("_deprem_market_cookie_consent", "accepted")
     setIsVisible(false)
+    // ContactDock gibi köşeyi paylaşan bileşenlere karar verildiğini bildir.
+    window.dispatchEvent(new Event("cookie-consent-resolved"))
   }
 
   const handleDecline = () => {
     localStorage.setItem("_deprem_market_cookie_consent", "declined")
     setIsVisible(false)
+    window.dispatchEvent(new Event("cookie-consent-resolved"))
   }
 
   if (!isVisible) return null
