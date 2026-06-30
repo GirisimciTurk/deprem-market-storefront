@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og"
 import { APPLE_SPLASH_DEVICES, splashVariant } from "@lib/util/apple-splash"
+import { SHIELD_ANY_DATAURL } from "@lib/brand-icons"
 
 // iOS PWA splash görselleri (apple-touch-startup-image). Cihaz başına piksel
 // boyutunda markalı (logo + isim) bir görsel üretir. Link'leri AppleSplash
@@ -44,41 +45,19 @@ export async function GET(
           background: "#ffffff",
         }}
       >
-        <svg
-          width={logo}
-          height={logo}
-          viewBox="0 0 36 36"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18 3L4 9V17C4 24.5 9.5 31.5 18 33C26.5 31.5 32 24.5 32 17V9L18 3Z"
-            stroke="#F08C1A"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="#FEF6EA"
-          />
-          <path
-            d="M9 19H13L16 12L20 24L23 16L25 19H27"
-            stroke="#F08C1A"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="18" cy="7" r="2" fill="#F08C1A" />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={SHIELD_ANY_DATAURL} width={logo} height={logo} alt="depremTek" />
         <div
           style={{
             display: "flex",
             marginTop: Math.round(logo * 0.14),
             fontSize: Math.round(logo * 0.13),
             fontWeight: 800,
-            color: "#F08C1A",
             letterSpacing: -1,
           }}
         >
-          Deprem Market
+          <span style={{ color: "#EE7F1A" }}>deprem</span>
+          <span style={{ color: "#1E2D50" }}>Tek</span>
         </div>
       </div>
     ),

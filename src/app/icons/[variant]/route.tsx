@@ -1,15 +1,15 @@
 import { ImageResponse } from "next/og"
+import { SHIELD_ANY_DATAURL, SHIELD_MASKABLE_DATAURL } from "@lib/brand-icons"
 
 // PWA ikon üretici route handler. manifest.ts'in referans verdiği boyut/amaç
-// varyantlarını next/og ile PNG olarak üretir. (any-512 zaten src/app/icon.tsx'te.)
+// varyantlarını next/og ile PNG olarak üretir (any-512 zaten src/app/icon.tsx'te).
+// İçerik: depremTek kalkan amblemi (lib/brand-icons data-URL).
 //
-// - "any": şeffaf arka plan, kalkan tuvali doldurur (favicon / klasik ikon).
-// - "maskable": Android adaptif ikonlar tuvali daire/squircle vb. KIRPAR; bu yüzden
-//   arka plan kenara kadar SOLİD dolu + ikon merkezde "güvenli alan" içinde (~%60)
-//   tutulur, kırpılınca logo kesilmez.
+// - "any": şeffaf zeminli amblem (favicon / klasik ikon).
+// - "maskable": Android adaptif ikon tuvali daire/squircle KIRPAR → beyaz-zeminli +
+//   güvenli-alan padding'li amblem (SHIELD_MASKABLE'da padding gömülü).
 //
-// generateStaticParams + force-static → build'de statik PNG'ye dönüşür (hızlı,
-// önbelleklenebilir). dynamicParams:false → listede olmayan varyant 404.
+// generateStaticParams + force-static → build'de statik PNG. dynamicParams:false → 404.
 export const dynamic = "force-static"
 export const dynamicParams = false
 export const contentType = "image/png"
@@ -28,9 +28,7 @@ export async function GET(
   const [purpose, sizeStr] = variant.split("-")
   const dim = Number(sizeStr) || 512
   const maskable = purpose === "maskable"
-
-  // maskable'da güvenli alan: logo merkezde ~%62 → kenarda kırpma payı kalır.
-  const shieldSize = maskable ? "62%" : "100%"
+  const src = maskable ? SHIELD_MASKABLE_DATAURL : SHIELD_ANY_DATAURL
 
   return new ImageResponse(
     (
@@ -44,30 +42,8 @@ export async function GET(
           background: maskable ? "#ffffff" : "transparent",
         }}
       >
-        <svg
-          width={shieldSize}
-          height={shieldSize}
-          viewBox="0 0 36 36"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18 3L4 9V17C4 24.5 9.5 31.5 18 33C26.5 31.5 32 24.5 32 17V9L18 3Z"
-            stroke="#F08C1A"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="#FEF6EA"
-          />
-          <path
-            d="M9 19H13L16 12L20 24L23 16L25 19H27"
-            stroke="#F08C1A"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="18" cy="7" r="2" fill="#F08C1A" />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} width={dim} height={dim} alt="depremTek" />
       </div>
     ),
     { width: dim, height: dim }

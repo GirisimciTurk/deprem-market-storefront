@@ -1,8 +1,9 @@
 import { ImageResponse } from "next/og"
+import { SHIELD_MASKABLE_DATAURL } from "@lib/brand-icons"
 
 // Apple touch icon — iOS "Ana Ekrana Ekle" ile kurulan PWA'nın ana ekran ikonu.
-// iOS önerilen boyut 180x180. DİKKAT: iOS şeffaf alanları SİYAH gösterir, bu yüzden
-// arka plan SOLİD (beyaz) + kalkan ortada padding'li. iOS köşeleri kendi yuvarlatır.
+// iOS önerilen boyut 180x180. iOS şeffaf alanları SİYAH gösterir → beyaz-zeminli,
+// güvenli-alan padding'li amblem (SHIELD_MASKABLE) kullanılır. iOS köşeleri yuvarlatır.
 export const size = {
   width: 180,
   height: 180,
@@ -22,30 +23,8 @@ export default function AppleIcon() {
           justifyContent: "center",
         }}
       >
-        <svg
-          width="74%"
-          height="74%"
-          viewBox="0 0 36 36"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18 3L4 9V17C4 24.5 9.5 31.5 18 33C26.5 31.5 32 24.5 32 17V9L18 3Z"
-            stroke="#F08C1A"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="#FEF6EA"
-          />
-          <path
-            d="M9 19H13L16 12L20 24L23 16L25 19H27"
-            stroke="#F08C1A"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="18" cy="7" r="2" fill="#F08C1A" />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={SHIELD_MASKABLE_DATAURL} width={180} height={180} alt="depremTek" />
       </div>
     ),
     {
