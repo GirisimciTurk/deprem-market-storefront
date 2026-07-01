@@ -29,15 +29,15 @@ export default async function SellersIndexPage() {
             Bayi Mağazaları
           </h1>
           <p className="text-sm text-ui-fg-subtle mt-2 max-w-xl">
-            Doğrulanmış bayilerimizin mağazalarını keşfedin. Siz de bayimiz olup
-            kendi dükkanınızı açabilirsiniz.
+            Doğrulanmış satıcılarımızın mağazalarını keşfedin. Siz de firmamız
+            olup kendi mağazanızı açabilirsiniz.
           </p>
         </div>
         <LocalizedClientLink
-          href="/satici-ol"
+          href="/firma-ol"
           className="inline-flex items-center justify-center rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-700 transition-colors whitespace-nowrap"
         >
-          Bayi Ol
+          Firmamız Ol
         </LocalizedClientLink>
       </div>
 

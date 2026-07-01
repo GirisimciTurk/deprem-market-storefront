@@ -13,6 +13,8 @@ export interface MyResellerApplication {
   message?: string
   date: string
   status: "pending" | "approved" | "rejected"
+  // "bayi" (hizmet ortağı) | "firma" (ürün satan mağaza)
+  applicationType: "bayi" | "firma"
 }
 
 interface BackendApplication {
@@ -25,6 +27,7 @@ interface BackendApplication {
   message?: string
   created_at: string
   status: "pending" | "approved" | "rejected"
+  application_type?: "bayi" | "firma"
 }
 
 /**
@@ -57,5 +60,6 @@ export const getMyResellerApplication = async (): Promise<MyResellerApplication 
     message: a.message,
     date: new Date(a.created_at).toLocaleDateString("tr-TR"),
     status: a.status,
+    applicationType: a.application_type === "firma" ? "firma" : "bayi",
   }
 }

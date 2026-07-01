@@ -10,6 +10,7 @@ type ResellerApplication = {
   message?: string
   date: string
   status: "pending" | "approved" | "rejected"
+  applicationType?: "bayi" | "firma"
 }
 
 export default function SaticiStatusClient({
@@ -17,14 +18,17 @@ export default function SaticiStatusClient({
 }: {
   application: ResellerApplication | null
 }) {
+  const isFirma = application?.applicationType === "firma"
   return (
     <div className="space-y-6">
       <div className="border-b pb-4">
         <h1 className="text-2xl font-extrabold text-ui-fg-base flex items-center gap-2">
-          🏪 Bayilik Başvurum
+          {isFirma ? "🏪 Firma Başvurum" : "🤝 Bayilik Başvurum"}
         </h1>
         <p className="text-xs text-ui-fg-muted mt-1">
-          depremTek Market bayilik başvurunuzun güncel durumu.
+          depremTek Market{" "}
+          {isFirma ? "firma (satıcı)" : "bayilik (hizmet ortağı)"} başvurunuzun
+          güncel durumu.
         </p>
       </div>
 
@@ -34,7 +38,7 @@ export default function SaticiStatusClient({
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-ui-border-base/50">
             <div>
               <span className="text-xs text-ui-fg-muted font-bold block uppercase tracking-wider">
-                FİRMA / MAĞAZA
+                {isFirma ? "FİRMA / MAĞAZA" : "HİZMET ORTAĞI"}
               </span>
               <h2 className="text-xl font-extrabold text-gray-900 mt-1">
                 {application.companyName}
@@ -68,11 +72,17 @@ export default function SaticiStatusClient({
             <h3 className="font-bold text-sm text-gray-900">Açıklama</h3>
             <p className="text-xs sm:text-sm text-gray-655 leading-relaxed">
               {application.status === "pending" &&
-                "Satıcı başvurunuz sistemimize ulaştı ve ekibimiz tarafından değerlendiriliyor. En kısa sürede başvuruda belirttiğiniz telefon numarası veya e-posta adresi üzerinden sizinle iletişime geçilecektir."}
+                `${
+                  isFirma ? "Firma" : "Bayilik (hizmet ortağı)"
+                } başvurunuz sistemimize ulaştı ve ekibimiz tarafından değerlendiriliyor. En kısa sürede başvuruda belirttiğiniz telefon numarası veya e-posta adresi üzerinden sizinle iletişime geçilecektir.`}
               {application.status === "approved" &&
-                "Tebrikler! Satıcı başvurunuz onaylandı. Artık mağazanızı açabilir, ürünlerinizi ekleyip satışa başlayabilirsiniz. Satıcı paneli erişiminiz ve sonraki adımlar için müşteri temsilcinize ulaşabilirsiniz."}
+                (isFirma
+                  ? "Tebrikler! Firma başvurunuz onaylandı. Artık mağazanızı açabilir, ürünlerinizi ekleyip satışa başlayabilirsiniz. Satıcı paneli erişiminiz ve sonraki adımlar için müşteri temsilcinize ulaşabilirsiniz."
+                  : "Tebrikler! Bayilik başvurunuz onaylandı. Hizmet ortağımız oldunuz; uygun müşteri taleplerini size yönlendirmeye başlayacağız. Panel erişiminiz ve sonraki adımlar için müşteri temsilcinize ulaşabilirsiniz.")}
               {application.status === "rejected" &&
-                "Satıcı başvurunuz yapılan ön inceleme sonucunda şu an için olumsuz sonuçlandı. Gerekli kriterleri sağladığınızı düşünüyorsanız ya da ek bilgi iletmek isterseniz müşteri hizmetlerimizle irtibata geçebilirsiniz."}
+                `${
+                  isFirma ? "Firma" : "Bayilik"
+                } başvurunuz yapılan ön inceleme sonucunda şu an için olumsuz sonuçlandı. Gerekli kriterleri sağladığınızı düşünüyorsanız ya da ek bilgi iletmek isterseniz müşteri hizmetlerimizle irtibata geçebilirsiniz.`}
             </p>
           </div>
 
@@ -112,38 +122,41 @@ export default function SaticiStatusClient({
         </div>
       ) : (
         <div className="border border-ui-border-base bg-ui-bg-subtle rounded-2xl p-6 md:p-8 space-y-6 text-center max-w-2xl mx-auto py-12">
-          <span className="text-5xl block animate-bounce">🏪</span>
+          <span className="text-5xl block animate-bounce">🤝</span>
           <h2 className="text-xl font-extrabold text-gray-900">
-            depremTek Market Bayimiz Olun
+            depremTek Market İş Ortağı Olun
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
-            Türkiye'nin afet ve acil durum hazırlık platformunda yerinizi alın.
-            Bayiliğinizi açın, ürünlerinizi ekleyin ve binlerce müşteriye
-            ulaşın.
+            Henüz bir başvurunuz yok. Size uygun modeli seçin:
           </p>
 
-          <div className="bg-white border border-gray-150 rounded-xl p-4 text-left max-w-md mx-auto space-y-2.5 text-xs text-gray-655">
-            <div className="flex items-center gap-2">
-              <span className="text-brand-600 font-bold">✓</span>
-              <span>Hazır müşteri kitlesine ilk günden ulaşım</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto text-left">
+            <div className="bg-white border border-gray-150 rounded-xl p-5 space-y-2.5 flex flex-col">
+              <h3 className="font-bold text-sm text-gray-900">🏪 Firmamız Ol</h3>
+              <p className="text-xs text-gray-655 leading-relaxed flex-1">
+                Kendi mağazanızı açıp ürünlerinizi satın; hizmeti kendiniz
+                yürütün. Biz yalnızca sattığınız ürünün komisyonunu alırız.
+              </p>
+              <LocalizedClientLink
+                href="/firma-ol"
+                className="mt-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs py-2.5 px-4 rounded-lg transition-all text-center"
+              >
+                Firma Başvurusu &rarr;
+              </LocalizedClientLink>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-brand-600 font-bold">✓</span>
-              <span>Tek panelden kolay ürün ve sipariş yönetimi</span>
+            <div className="bg-white border border-gray-150 rounded-xl p-5 space-y-2.5 flex flex-col">
+              <h3 className="font-bold text-sm text-gray-900">🤝 Bayimiz Ol</h3>
+              <p className="text-xs text-gray-655 leading-relaxed flex-1">
+                Hizmet verin, müşteriyi biz bulalım. Uzmanlığınıza uygun
+                talepleri size yönlendiririz; süreci birlikte yürütürüz.
+              </p>
+              <LocalizedClientLink
+                href="/satici-ol"
+                className="mt-2 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs py-2.5 px-4 rounded-lg transition-all text-center"
+              >
+                Bayilik Başvurusu &rarr;
+              </LocalizedClientLink>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-brand-600 font-bold">✓</span>
-              <span>Güvenli tahsilat ve düzenli hak ediş ödemeleri</span>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <LocalizedClientLink
-              href="/satici-ol"
-              className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs sm:text-sm py-3 px-8 rounded-xl transition-all shadow-md inline-block hover:-translate-y-0.5 duration-200"
-            >
-              Bayilik Başvurusu Yap &rarr;
-            </LocalizedClientLink>
           </div>
         </div>
       )}

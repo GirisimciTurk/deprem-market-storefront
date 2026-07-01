@@ -52,7 +52,7 @@ const AUDIENCES = [
   {
     icon: Store,
     title: "Bayiler",
-    desc: "Hazır satış kanalı, pazaryeri görünürlüğü, mağazada öne çıkma",
+    desc: "Hizmet ver, müşteriyi biz bulalım; uygun talepleri sana yönlendirelim",
     href: "/satici-ol",
     cta: "Bayi Ol",
   },
