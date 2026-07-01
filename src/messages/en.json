@@ -14,7 +14,13 @@
     "cart": "Cart",
     "loginLabel": "Sign In",
     "favoritesLabel": "Favorites",
-    "cartLabel": "Cart"
+    "cartLabel": "Cart",
+    "dealerMenu": "Become a Dealer",
+    "dealerJoin": "Become a Dealer",
+    "dealerJoinDesc": "Apply and open your own store",
+    "dealerFind": "Find a Dealer",
+    "dealerFindDesc": "Explore verified dealer stores",
+    "firmaMenu": "Become a Partner Firm"
   },
   "footer": {
     "affiliateLabel": "An Affiliate of the Girişimci Türk Ecosystem",

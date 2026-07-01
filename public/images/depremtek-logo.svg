@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1040" fill="none">
+  <!-- Kalkan gövdesi (lacivert) -->
+  <path d="M175 112
+           Q500 155 825 112
+           C880 118 902 158 904 232
+           C910 432 872 622 762 762
+           C682 860 586 936 500 976
+           C414 936 318 860 238 762
+           C128 622 90 432 96 232
+           C98 158 120 118 175 112 Z"
+        fill="#24344D"/>
+
+  <!-- İnce beyaz iç çerçeve (kalkan çizgisinden içeri kaydırılmış aynı biçim) -->
+  <g transform="translate(38 42) scale(0.924)">
+    <path d="M175 112
+             Q500 155 825 112
+             C880 118 902 158 904 232
+             C910 432 872 622 762 762
+             C682 860 586 936 500 976
+             C414 936 318 860 238 762
+             C128 622 90 432 96 232
+             C98 158 120 118 175 112 Z"
+          fill="none" stroke="#FFFFFF" stroke-width="15"/>
+  </g>
+
+  <!-- Turuncu nabız / EKG dalgası (en üstte, çerçeveyi keser) -->
+  <path d="M150 566
+           L360 566
+           L406 470
+           L448 556
+           L520 176
+           L606 858
+           L672 508
+           L710 588
+           L744 548
+           L780 590
+           L812 566
+           L862 566"
+        fill="none" stroke="#E8841F" stroke-width="46"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

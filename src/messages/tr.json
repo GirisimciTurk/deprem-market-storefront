@@ -14,7 +14,13 @@
     "cart": "Sepet",
     "loginLabel": "Giriş Yap",
     "favoritesLabel": "Favoriler",
-    "cartLabel": "Çanta"
+    "cartLabel": "Sepet",
+    "dealerMenu": "Bayimiz ol",
+    "dealerJoin": "Bayimiz ol",
+    "dealerJoinDesc": "Başvur, kendi mağazanı aç",
+    "dealerFind": "Bayi ara",
+    "dealerFindDesc": "Doğrulanmış bayi mağazalarını keşfet",
+    "firmaMenu": "Firmamız ol"
   },
   "footer": {
     "affiliateLabel": "Bir Girişimci Türk Ekosistemi İştiraki",

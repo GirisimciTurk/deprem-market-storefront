@@ -1,19 +1,23 @@
 import { Suspense } from "react"
-import { Backpack } from "lucide-react"
+import { Building2, ShoppingCart } from "lucide-react"
 import SearchModal from "@modules/layout/components/search-modal"
 
 import { getTranslations } from "next-intl/server"
 import { listRegions } from "@lib/data/regions"
+import { retrieveCustomer } from "@lib/data/customer"
 import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
 import Logo from "@modules/layout/components/logo"
 import FavoritesNavIcon from "@modules/layout/components/favorites-nav-icon"
 import CategoryDrawer from "@modules/layout/components/category-drawer"
+import DealerMenu from "@modules/layout/components/dealer-menu"
+import LocaleSelect from "@modules/layout/components/locale-select"
 
 export default async function Nav({ countryCode }: { countryCode: string }) {
-  const [regions, t] = await Promise.all([
+  const [regions, customer, t] = await Promise.all([
     listRegions().then((regions: StoreRegion[]) => regions),
+    retrieveCustomer().catch(() => null),
     getTranslations("nav"),
   ])
 
@@ -36,9 +40,14 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
             </LocalizedClientLink>
           </div>
 
+          {/* Logo ile arama arasında: dil seçici */}
+          <div className="flex items-center h-full shrink-0">
+            <LocaleSelect />
+          </div>
+
           {/* Orta: büyük arama çubuğu (Amazon tarzı) */}
           <div className="flex min-w-0 flex-1 justify-center">
-            <div className="w-full max-w-2xl">
+            <div className="w-full max-w-lg">
               <SearchModal />
             </div>
           </div>
@@ -46,6 +55,20 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
           {/* Sağ: temel aksiyonlar (etiketli) + tek menü (☰).
               Tüm kategori/bilgi/uzman gezinmesi CategoryDrawer'a taşındı. */}
           <div className="flex items-center gap-x-2 small:gap-x-5 h-full shrink-0">
+            {/* Bayimiz ol açılır menüsü (Giriş Yap'ın solunda) */}
+            <DealerMenu />
+
+            {/* Firmamız ol — ayrı öğe (/firma-ol kurumsal başvuru) */}
+            <LocalizedClientLink
+              className="hover:text-ui-fg-base flex items-center gap-x-1.5 p-2"
+              href="/firma-ol"
+              title={t("firmaMenu")}
+              aria-label={t("firmaMenu")}
+            >
+              <Building2 className="w-5 h-5 shrink-0 text-slate-700 hover:text-slate-900 transition-colors" />
+              <span className={labelCls}>{t("firmaMenu")}</span>
+            </LocalizedClientLink>
+
             <LocalizedClientLink
               className="hover:text-ui-fg-base flex items-center gap-x-1.5 p-2"
               href="/account"
@@ -76,7 +99,8 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
               <span className={labelCls}>{t("loginLabel")}</span>
             </LocalizedClientLink>
 
-            <FavoritesNavIcon label={t("favoritesLabel")} />
+            {/* Favoriler yalnızca giriş yapmış kullanıcıya gösterilir */}
+            {customer && <FavoritesNavIcon label={t("favoritesLabel")} />}
 
             <Suspense
               fallback={
@@ -87,7 +111,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
                   title={t("cartLabel")}
                   aria-label={t("cartLabel")}
                 >
-                  <Backpack className="w-5 h-5 shrink-0 text-slate-700" />
+                  <ShoppingCart className="w-5 h-5 shrink-0 text-slate-700" />
                   <span className={labelCls}>{t("cartLabel")}</span>
                 </LocalizedClientLink>
               }
