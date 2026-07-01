@@ -3,12 +3,10 @@
 import { useState } from "react"
 
 /**
- * Kurumsal/firma iş ortaklığı başvuru formu (/firma-ol).
+ * Firma (satıcı) başvuru formu (/firma-ol) — "Firmamız Ol": kendi mağazasında
+ * ÜRÜN satan, hizmeti kendi yürüten firma. Başvuru /store/reseller-applications
+ * ucuna application_type:"firma" ile gönderilir; onaylanınca satıcıya dönüşür.
  * Bayilik formundan (reseller-form) türetilmiştir; sözleşme adımı yoktur.
- * Başvuru, mevcut yapılandırılmış lead ucuna (/store/reseller-applications)
- * gönderilir ve mesaja "[FİRMA / KURUMSAL BAŞVURU]" etiketi eklenir; böylece
- * admin bunun bir firma başvurusu olduğunu ayırt eder. (İleride ayrı bir
- * backend hattına taşınabilir.)
  */
 export default function FirmaForm() {
   const [formData, setFormData] = useState({
@@ -47,7 +45,7 @@ export default function FirmaForm() {
       // Başvuru türü artık `application_type: "firma"` alanıyla ayrışıyor; mesaja
       // faaliyet alanı + serbest metin ekliyoruz.
       const composedMessage = [
-        formData.sector ? `Faaliyet alanı: ${formData.sector}` : null,
+        formData.sector ? `Ürün grupları / faaliyet alanı: ${formData.sector}` : null,
         formData.message || null,
       ]
         .filter(Boolean)
@@ -102,8 +100,8 @@ export default function FirmaForm() {
           Başvurunuz Alındı!
         </h3>
         <p className="text-sm text-ui-fg-subtle max-w-sm">
-          Firma iş ortaklığı başvurunuz tarafımıza ulaştı. Ekibimiz başvurunuzu
-          değerlendirip en kısa sürede sizinle iletişime geçecek.
+          Firma başvurunuz tarafımıza ulaştı. Ekibimiz değerlendirip mağaza
+          açılışı için en kısa sürede sizinle iletişime geçecek.
         </p>
         <button
           onClick={() => setStatus("idle")}
@@ -219,19 +217,19 @@ export default function FirmaForm() {
       </div>
 
       <div>
-        <label className={labelCls}>Faaliyet Alanı</label>
+        <label className={labelCls}>Ürün Grupları / Faaliyet Alanı</label>
         <input
           type="text"
           disabled={status === "loading"}
           value={formData.sector}
           onChange={(e) => setFormData({ ...formData, sector: e.target.value })}
-          placeholder="Örn: İnşaat / Mühendislik / Kurumsal tedarik"
+          placeholder="Örn: Afet çantası / İlk yardım / Aydınlatma"
           className={inputCls}
         />
       </div>
 
       <div>
-        <label className={labelCls}>İş Ortaklığı Talebiniz / Ek Bilgiler</label>
+        <label className={labelCls}>Ürünleriniz / Ek Bilgiler</label>
         <textarea
           rows={4}
           disabled={status === "loading"}
@@ -239,7 +237,7 @@ export default function FirmaForm() {
           onChange={(e) =>
             setFormData({ ...formData, message: e.target.value })
           }
-          placeholder="Firmanız, sunduğunuz çözümler/ürünler ve iş birliği beklentiniz hakkında kısaca bilgi verin (toplu alım, kurumsal tedarik, çözüm ortaklığı vb.)."
+          placeholder="Satmak istediğiniz ürün grupları, markanız ve aylık tahmini satış hacminiz; varsa ürüne bağlı sunduğunuz hizmet hakkında kısaca bilgi verin."
           className={`${inputCls} resize-none`}
         ></textarea>
       </div>

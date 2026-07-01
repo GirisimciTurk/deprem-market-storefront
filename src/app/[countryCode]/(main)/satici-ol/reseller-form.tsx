@@ -239,7 +239,7 @@ export default function ResellerForm() {
 
       <div>
         <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-          Ürünleriniz / Ek Bilgiler
+          Verdiğiniz Hizmetler / Ek Bilgiler
         </label>
         <textarea
           rows={4}
@@ -248,7 +248,7 @@ export default function ResellerForm() {
           onChange={(e) =>
             setFormData({ ...formData, message: e.target.value })
           }
-          placeholder="Satmak istediğiniz ürün grupları, markanız ve aylık tahmini satış hacminiz hakkında bilgi verebilirsiniz..."
+          placeholder="Verdiğiniz hizmetleri, uzmanlık alanınızı ve çalışma bölgenizi kısaca yazın (ör. karbon fiber güçlendirme, kurulum, keşif...)."
           className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all resize-none"
         ></textarea>
       </div>

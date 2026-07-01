@@ -18,98 +18,88 @@ const STEPS = [
   {
     no: "1",
     title: "Başvurun",
-    desc: "Aşağıdaki formu doldurun. Birkaç dakikada bayilik başvurunuzu tamamlayın.",
+    desc: "Aşağıdaki formu doldurun. Verdiğiniz hizmetleri ve çalışma bölgenizi birkaç dakikada iletin.",
   },
   {
     no: "2",
     title: "Onay & Bayilik",
-    desc: "Ekibimiz başvurunuzu inceler; onaylandığında bayilik paneliniz açılır.",
+    desc: "Ekibimiz başvurunuzu inceler; onaylandığında hizmet ortağımız olursunuz.",
   },
   {
     no: "3",
-    title: "Ürünlerinizi Ekleyin",
-    desc: "Panelinizden ürünlerinizi, fiyat ve stoklarınızı kolayca yükleyin.",
+    title: "Talepler Size Gelsin",
+    desc: "Uygun müşteri taleplerini biz buluruz ve size yönlendiririz; süreci birlikte yürütürüz.",
   },
   {
     no: "4",
-    title: "Satış & Kazanç",
-    desc: "Siparişleri hazırlayıp kargolayın; kazancınız periyodik olarak hesabınıza aktarılsın.",
+    title: "Hizmeti Verin & Kazanın",
+    desc: "Hizmeti siz sunarsınız; tahsilat altyapısı bizde, hak edişiniz düzenli olarak hesabınıza aktarılır.",
   },
 ]
 
 const BENEFITS = [
   {
-    icon: "🛒",
-    title: "Hazır Müşteri Kitlesi",
-    desc: "Afet ve acil durum hazırlığı arayan binlerce müşteriye ilk günden ulaşırsınız.",
+    icon: "🤝",
+    title: "Müşteriyi Biz Buluruz",
+    desc: "Pazarlama ve talep toplama işini biz üstleniriz; siz uzmanlık ve hizmete odaklanırsınız.",
   },
   {
-    icon: "🏪",
-    title: "Kolay Bayilik Yönetimi",
-    desc: "Ürün, fiyat, stok ve siparişlerinizi tek panelden dakikalar içinde yönetirsiniz.",
+    icon: "📋",
+    title: "Ortak Yürütme",
+    desc: "Süreci sizinle ortak yürütürüz; keşiften teslime kadar altyapı ve koordinasyon desteği veririz.",
+  },
+  {
+    icon: "📍",
+    title: "Bölgesel Talep Akışı",
+    desc: "Çalışma bölgenize ve uzmanlığınıza uygun hizmet taleplerini size düzenli olarak yönlendiririz.",
   },
   {
     icon: "🔒",
-    title: "Güvenli & Zamanında Ödeme",
-    desc: "Tahsilat altyapısı bizde; hak edişleriniz düzenli olarak hesabınıza aktarılır.",
-  },
-  {
-    icon: "🚚",
-    title: "Kargo & Lojistik Kolaylığı",
-    desc: "Anlaşmalı kargo ile siparişlerinizi hızlıca gönderir, panelden takip edersiniz.",
+    title: "Güvenli Ödeme",
+    desc: "Tahsilat ve ödeme güvenliği bizde; hizmet hak edişleriniz düzenli olarak hesabınıza aktarılır.",
   },
   {
     icon: "📈",
-    title: "Marka Gücü & Pazarlama",
-    desc: "depremTek Market markasının güveni, kampanyalar ve push bildirimlerle satışınızı büyütürsünüz.",
+    title: "Marka Gücü & Güven",
+    desc: "depremTek Market markasının güveniyle daha fazla müşteriye ve işe ulaşırsınız.",
   },
   {
-    icon: "🤝",
+    icon: "🛟",
     title: "Bayi Desteği",
-    desc: "Başvurudan ilk satışınıza kadar her adımda ekibimiz yanınızda.",
+    desc: "Başvurudan ilk işinize kadar her adımda ekibimiz yanınızda.",
   },
 ]
 
 const FAQS: FaqItem[] = [
   {
-    question: "depremTek Market bayisi nasıl olurum?",
+    question: "'Bayimiz Ol' ile 'Firmamız Ol' arasındaki fark nedir?",
     answer:
-      "Bu sayfadaki başvuru formunu doldurmanız yeterli. Başvurunuz ekibimiz tarafından incelenir; uygun bulunduğunda bayilik paneliniz açılır, panelinizden ürünlerinizi ekleyip satışa başlarsınız.",
+      "Bayimiz Ol; ürün satmaktan çok HİZMET veren, bunu bizimle ortak yürüten iş ortakları içindir — müşteriyi biz bulur, size yönlendiririz. Firmamız Ol ise kendi mağazasını açıp ÜRÜN satan, hizmeti de kendi yürüten firmalar içindir (biz yalnızca ürün komisyonu alırız). Hizmet veriyorsanız Bayimiz Ol doğru seçenektir.",
   },
   {
-    question: "Bayi olmak için neye ihtiyacım var?",
+    question: "Bayi (hizmet ortağı) olmak için neye ihtiyacım var?",
     answer:
-      "Vergi mükellefiyeti (şahıs ya da limited/anonim şirket), geçerli bir vergi numarası ve iletişim bilgileriniz yeterli. Onay sürecinde gerekli evraklar tarafınıza ayrıca iletilir.",
+      "Vergi mükellefiyeti (şahıs ya da limited/anonim şirket), geçerli bir vergi numarası, verdiğiniz hizmet alanı ve iletişim bilgileriniz yeterli. Onay sürecinde gerekli evraklar tarafınıza ayrıca iletilir.",
   },
   {
-    question: "Bayilik komisyon oranı nedir?",
+    question: "Müşteriyi gerçekten siz mi buluyorsunuz?",
     answer:
-      "Komisyon oranı ürün kategorisine göre değişir ve başvurunuz onaylanırken net olarak sizinle paylaşılır. Başvuru ve bayilik açılışı için herhangi bir ücret alınmaz.",
+      "Evet. Pazarlama ve talep toplama tarafını biz üstleniriz; uzmanlığınıza ve bölgenize uygun hizmet taleplerini size yönlendiririz. Siz hizmeti vermeye odaklanırsınız.",
+  },
+  {
+    question: "Komisyon/kazanç nasıl işliyor?",
+    answer:
+      "Yönlendirdiğimiz ve tamamladığınız hizmetlerden, başvurunuz onaylanırken netleştirilen koşullara göre komisyon alınır. Başvuru ve bayilik açılışı için ücret alınmaz.",
   },
   {
     question: "Ödemelerim ne zaman yapılır?",
     answer:
-      "Siparişler müşteriye teslim edilip yasal iade süresi tamamlandıktan sonra, komisyon kesintisi düşülerek hak edişleriniz periyodik olarak banka hesabınıza aktarılır.",
-  },
-  {
-    question: "Hangi ürünleri satabilirim?",
-    answer:
-      "Deprem çantaları, ilk yardım, aydınlatma, ısınma, güvenlik ve afet/outdoor hazırlığına uygun ürünleri satabilirsiniz. Mevzuata aykırı ve yasaklı ürünler platformda satılamaz.",
-  },
-  {
-    question: "Siparişleri nasıl kargolarım?",
-    answer:
-      "Gönderiyi siz yaparsınız ve iki seçeneğiniz olur: (1) Anlaşmalı Kargo — depremTek Market'in anlaşmalı kargosuyla gönderirsiniz, kargo ücreti hak edişinizden düşülür; (2) Kendi Kargonuz — kendi anlaştığınız kargo firmasıyla gönderirsiniz, bu durumda sizden kargo ücreti kesilmez. Her iki seçenekte de panelden kargo firmasını ve takip numarasını girersiniz; müşteri ve siz süreci takip edersiniz.",
-  },
-  {
-    question: "Kendi kargo anlaşmamla gönderebilir miyim?",
-    answer:
-      "Evet. 'Kendi Kargom' seçeneğiyle kendi anlaştığınız kargo firmasını kullanabilir, panele kargo firmasını ve takip numaranızı girebilirsiniz. Listede olmayan bir firmayla gönderiyorsanız takip bağlantısını elle de ekleyebilirsiniz; müşteri yine 'Kargom Nerede?' bağlantısından gönderisini takip eder.",
+      "Hizmet tamamlanıp müşteri onayı alındıktan sonra, komisyon kesintisi düşülerek hak edişleriniz periyodik olarak banka hesabınıza aktarılır.",
   },
   {
     question: "Başvurum ne kadar sürede sonuçlanır?",
     answer:
-      "Başvurular genellikle birkaç iş günü içinde değerlendirilir. Sonuç, başvuruda belirttiğiniz telefon veya e-posta üzerinden iletilir; durumu hesabınızdaki 'Bayilik Başvurum' sayfasından da takip edebilirsiniz.",
+      "Başvurular genellikle birkaç iş günü içinde değerlendirilir. Sonuç, başvuruda belirttiğiniz telefon veya e-posta üzerinden iletilir.",
   },
 ]
 
@@ -120,13 +110,13 @@ export default async function SaticiOlPage() {
     return (
       <div className="content-container max-w-4xl py-16 px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-extrabold text-ui-fg-base tracking-tight mb-8">
-          Become Our Dealer
+          Become Our Service Partner
         </h1>
         <div className="prose prose-slate max-w-none text-ui-fg-subtle space-y-6">
           <p>
-            Join depremTek Market as an authorized dealer and offer engineered
-            earthquake-preparedness and emergency products to thousands of
-            customers. To apply, please email us at destek@depremtek.market.
+            Join depremTek Market as a service partner: you provide the service,
+            we find you customers and route matching requests to you. To apply,
+            please email us at destek@depremtek.market.
           </p>
           <div className="pt-8">
             <LocalizedClientLink
@@ -146,15 +136,15 @@ export default async function SaticiOlPage() {
       {/* Hero */}
       <div className="text-center max-w-3xl mx-auto mb-14">
         <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
-          depremTek Market Yetkili Bayilik Programı
+          depremTek Market Hizmet Ortaklığı (Bayilik) Programı
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
           depremTek Market Bayimiz Olun
         </h1>
         <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed">
-          Türkiye'nin afet ve acil durum hazırlık platformunda yerinizi alın.
-          Bayiliğinizi açın, ürünlerinizi binlerce müşteriye ulaştırın ve
-          depremTek Market markasının gücüyle kazanmaya başlayın.
+          Hizmetinizi bizimle ortak sunun. Siz uzmanlığınızı ve hizmetinizi
+          sağlayın; uygun müşteri taleplerini biz bulup size yönlendirelim.
+          Süreci birlikte yürütür, kazanmaya birlikte başlarız.
         </p>
         <div className="mt-6">
           <a
@@ -219,10 +209,11 @@ export default async function SaticiOlPage() {
         <div className="max-w-2xl mx-auto border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6 sm:p-8">
           <div className="text-center mb-6">
             <h2 className="text-xl font-extrabold text-ui-fg-base">
-              Bayilik Başvuru Formu
+              Bayilik (Hizmet Ortaklığı) Başvuru Formu
             </h2>
             <p className="text-xs text-ui-fg-muted mt-1">
-              Bilgilerinizi bırakın, ekibimiz en kısa sürede dönüş yapsın.
+              Bilgilerinizi bırakın, hizmet ortaklığı için ekibimiz en kısa
+              sürede dönüş yapsın.
             </p>
           </div>
           <ResellerForm />
@@ -235,7 +226,8 @@ export default async function SaticiOlPage() {
           Sıkça Sorulan Sorular
         </h2>
         <p className="text-center text-sm text-ui-fg-muted mb-8">
-          Bayilik sürecinin nasıl işlediğine dair en çok merak edilenler.
+          Hizmet ortaklığı (bayilik) sürecinin nasıl işlediğine dair en çok
+          merak edilenler.
         </p>
         <FaqAccordion items={FAQS} defaultOpen={0} />
       </div>

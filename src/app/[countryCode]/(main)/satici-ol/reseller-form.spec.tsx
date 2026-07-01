@@ -32,7 +32,7 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
     ).toBeInTheDocument()
     expect(
       screen.getByPlaceholderText(
-        "Satmak istediğiniz ürün grupları, markanız ve aylık tahmini satış hacminiz hakkında bilgi verebilirsiniz..."
+        "Verdiğiniz hizmetleri, uzmanlık alanınızı ve çalışma bölgenizi kısaca yazın (ör. karbon fiber güçlendirme, kurulum, keşif...)."
       )
     ).toBeInTheDocument()
 
@@ -85,7 +85,7 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
     })
     fireEvent.change(
       screen.getByPlaceholderText(
-        "Satmak istediğiniz ürün grupları, markanız ve aylık tahmini satış hacminiz hakkında bilgi verebilirsiniz..."
+        "Verdiğiniz hizmetleri, uzmanlık alanınızı ve çalışma bölgenizi kısaca yazın (ör. karbon fiber güçlendirme, kurulum, keşif...)."
       ),
       {
         target: { value: "Outdoor ve afet ekipmanları satmak istiyoruz." },

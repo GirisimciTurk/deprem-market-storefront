@@ -9,62 +9,62 @@ import FirmaForm from "./firma-form"
 export const metadata: Metadata = {
   title: "Firmamız Olun | depremTek Market",
   description:
-    "Firmanızla depremTek Market kurumsal iş ortaklığı programına katılın: kurumsal tedarik, toplu alım ve çözüm ortaklığı fırsatları.",
+    "Firmanızla depremTek Market'te kendi mağazanızı açın, ürünlerinizi satın. Hizmeti baştan sona siz yürütürsünüz; biz yalnızca sattığınız ürünün komisyonunu alırız.",
 }
 
 const STEPS = [
   {
     no: "1",
     title: "Başvurun",
-    desc: "Aşağıdaki formu doldurun. Firma bilgilerinizi ve iş birliği talebinizi birkaç dakikada iletin.",
+    desc: "Aşağıdaki formu doldurun. Firma bilgilerinizi ve satmak istediğiniz ürünleri birkaç dakikada iletin.",
   },
   {
     no: "2",
-    title: "Değerlendirme",
-    desc: "Kurumsal ekibimiz başvurunuzu inceler ve size en uygun iş birliği modelini belirler.",
+    title: "Onay & Mağaza",
+    desc: "Başvurunuz onaylandığında kendi satıcı panelize erişim açılır; mağazanız kurulur.",
   },
   {
     no: "3",
-    title: "Görüşme & Anlaşma",
-    desc: "Karşılıklı görüşüp iş birliği kapsamını, koşulları ve ticari şartları netleştiririz.",
+    title: "Ürünlerinizi Ekleyin",
+    desc: "Panelinizden ürünlerinizi, fiyat ve stoklarınızı kolayca yükleyip satışa çıkarın.",
   },
   {
     no: "4",
-    title: "İş Ortaklığı Başlar",
-    desc: "Anlaşma sonrası firma iş ortaklığınız devreye alınır; birlikte çalışmaya başlarız.",
+    title: "Sat & Hizmeti Kendin Yürüt",
+    desc: "Siparişleri siz hazırlayıp gönderirsiniz, varsa hizmeti baştan sona siz yönetirsiniz. Biz yalnızca ürün komisyonunu alırız.",
   },
 ]
 
 const BENEFITS = [
   {
-    icon: "🏢",
-    title: "Kurumsal İş Ortaklığı",
-    desc: "Firmanızı depremTek Market ekosistemine kurumsal iş ortağı olarak dahil edin.",
+    icon: "🛒",
+    title: "Hazır Müşteri Kitlesi",
+    desc: "Afet ve acil durum hazırlığı arayan binlerce müşteriye ilk günden mağazanızla ulaşırsınız.",
   },
   {
-    icon: "📦",
-    title: "Kurumsal Tedarik & Toplu Alım",
-    desc: "Kurumsal tedarik, toplu alım ve özel fiyatlandırma modelleriyle ölçekli çalışın.",
+    icon: "🏪",
+    title: "Kendi Mağazan, Tam Kontrol",
+    desc: "Ürün, fiyat, stok ve siparişlerinizi kendi satıcı panelinizden yönetir; süreci baştan sona siz yürütürsünüz.",
   },
   {
-    icon: "🤝",
-    title: "Çözüm Ortaklığı",
-    desc: "Ürün ve mühendislik çözümlerinizi platformun müşteri kitlesiyle buluşturun.",
+    icon: "💸",
+    title: "Sadece Ürün Komisyonu",
+    desc: "Sizden yalnızca mağazanızda sattığınız ürünün komisyonunu alırız; başvuru ve mağaza açılışı ücretsizdir.",
   },
   {
-    icon: "📈",
-    title: "Marka Gücü & Erişim",
-    desc: "depremTek Market markasının güveni ve erişimiyle kurumsal görünürlüğünüzü artırın.",
+    icon: "🛠️",
+    title: "Hizmeti Kendiniz Yönetirsiniz",
+    desc: "Ürününüze bağlı kurulum/hizmeti kendiniz taahhüt eder, müşteriyle süreci doğrudan siz yürütürsünüz.",
   },
   {
     icon: "🔒",
-    title: "Güvenli & Şeffaf Süreç",
-    desc: "Sözleşme, faturalandırma ve ödeme süreçleri şeffaf ve güvenli şekilde yürütülür.",
+    title: "Güvenli & Zamanında Ödeme",
+    desc: "Tahsilat altyapısı bizde; ürün satış hak edişleriniz düzenli olarak hesabınıza aktarılır.",
   },
   {
-    icon: "🎯",
-    title: "Kurumsal Destek",
-    desc: "Başvurudan iş birliğine kadar her adımda kurumsal ekibimiz yanınızda.",
+    icon: "📈",
+    title: "Marka Gücü & Pazarlama",
+    desc: "depremTek Market markasının güveni, kampanyalar ve bildirimlerle mağazanızın satışını büyütürsünüz.",
   },
 ]
 
@@ -72,17 +72,27 @@ const FAQS: FaqItem[] = [
   {
     question: "'Firmamız Ol' ile 'Bayimiz Ol' arasındaki fark nedir?",
     answer:
-      "Bayilik programı, ürünlerini platformda satmak isteyen satıcılar içindir. Firma iş ortaklığı ise kurumsal tedarik, toplu alım, çözüm/hizmet ortaklığı gibi daha geniş kurumsal iş birlikleri içindir. Hangisinin size uygun olduğundan emin değilseniz bu formu doldurun; ekibimiz doğru modele yönlendirir.",
+      "Firmamız Ol; kendi mağazasını açıp ÜRÜN satan, varsa hizmeti de baştan sona kendi yürüten firmalar içindir — biz yalnızca sattığınız ürünün komisyonunu alırız. Bayimiz Ol ise ürün satmaktan çok HİZMET veren, bunu bizimle ortak yürüten ve müşterisini bizim yönlendirdiğimiz iş ortakları içindir. Ürün satmak istiyorsanız Firmamız Ol doğru seçenektir.",
   },
   {
-    question: "Firma iş ortaklığı için neye ihtiyacım var?",
+    question: "Firma olmak için neye ihtiyacım var?",
     answer:
-      "Geçerli bir vergi mükellefiyeti (şahıs/limited/anonim şirket), firma iletişim bilgileri ve iş birliği talebinizin kısa bir özeti yeterlidir. Gerekli evraklar değerlendirme sürecinde tarafınıza ayrıca iletilir.",
+      "Vergi mükellefiyeti (şahıs ya da limited/anonim şirket), geçerli bir vergi numarası ve iletişim bilgileriniz yeterli. Onay sürecinde gerekli evraklar tarafınıza ayrıca iletilir.",
   },
   {
-    question: "Başvuru için ücret alınıyor mu?",
+    question: "Komisyon nasıl işliyor?",
     answer:
-      "Hayır. Başvuru ve değerlendirme süreci ücretsizdir. Ticari şartlar, iş birliği kapsamı netleştikten sonra karşılıklı olarak belirlenir.",
+      "Sizden yalnızca mağazanızda sattığınız ürünün komisyonunu keseriz. Komisyon oranı ürün kategorisine göre değişir ve başvurunuz onaylanırken net olarak paylaşılır. Başvuru ve mağaza açılışı için ücret alınmaz.",
+  },
+  {
+    question: "Ürünüme bağlı hizmeti/kurulumu kim yürütür?",
+    answer:
+      "Hizmeti/kurulumu baştan sona siz taahhüt eder ve müşteriyle süreci doğrudan siz yönetirsiniz. Biz bu hizmet sürecine karışmayız; yalnızca ürün satışından komisyon alırız.",
+  },
+  {
+    question: "Siparişleri nasıl kargolarım?",
+    answer:
+      "Gönderiyi siz yaparsınız: (1) Anlaşmalı Kargo — depremTek Market'in anlaşmalı kargosuyla gönderirsiniz, ücreti hak edişinizden düşülür; (2) Kendi Kargonuz — kendi anlaştığınız firmayla gönderirsiniz. Her iki durumda da panelden kargo firmasını ve takip numarasını girersiniz.",
   },
   {
     question: "Başvurum ne kadar sürede sonuçlanır?",
@@ -98,13 +108,14 @@ export default async function FirmaOlPage() {
     return (
       <div className="content-container max-w-4xl py-16 px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-extrabold text-ui-fg-base tracking-tight mb-8">
-          Become a Partner Firm
+          Open Your Store
         </h1>
         <div className="prose prose-slate max-w-none text-ui-fg-subtle space-y-6">
           <p>
-            Partner your company with depremTek Market: corporate supply, bulk
-            purchasing and solution partnership opportunities. To apply, please
-            email us at destek@depremtek.market.
+            Open your own store on depremTek Market and sell your products to
+            thousands of customers. You run any related service end-to-end
+            yourself; we only take a commission on the products you sell. To
+            apply, please email us at destek@depremtek.market.
           </p>
           <div className="pt-8">
             <LocalizedClientLink
@@ -124,15 +135,15 @@ export default async function FirmaOlPage() {
       {/* Hero */}
       <div className="text-center max-w-3xl mx-auto mb-14">
         <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
-          depremTek Market Kurumsal İş Ortaklığı Programı
+          depremTek Market Satıcı Firma Programı
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
           Firmamız Olun
         </h1>
         <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed">
-          Firmanızı Türkiye'nin afet ve acil durum hazırlık platformuyla
-          buluşturun. Kurumsal tedarik, toplu alım ve çözüm ortaklığı
-          modelleriyle depremTek Market ekosistemine katılın.
+          Kendi mağazanızı açın, ürünlerinizi binlerce müşteriye satın.
+          Ürününüze bağlı hizmeti baştan sona siz yürütürsünüz; biz yalnızca
+          mağazanızda sattığınız ürünün komisyonunu alırız.
         </p>
         <div className="mt-6">
           <a
@@ -172,7 +183,7 @@ export default async function FirmaOlPage() {
       {/* Avantajlar */}
       <div className="mb-16">
         <h2 className="text-center text-xl font-extrabold text-ui-fg-base mb-8">
-          Firma İş Ortağımız Olursanız Ne Kazanırsınız?
+          Firmamız Olursanız Ne Kazanırsınız?
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {BENEFITS.map((b) => (
@@ -197,11 +208,11 @@ export default async function FirmaOlPage() {
         <div className="max-w-2xl mx-auto border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6 sm:p-8">
           <div className="text-center mb-6">
             <h2 className="text-xl font-extrabold text-ui-fg-base">
-              Firma İş Ortaklığı Başvuru Formu
+              Firma (Satıcı) Başvuru Formu
             </h2>
             <p className="text-xs text-ui-fg-muted mt-1">
-              Firma bilgilerinizi bırakın, kurumsal ekibimiz en kısa sürede
-              dönüş yapsın.
+              Firma bilgilerinizi bırakın, ekibimiz mağaza açılışı için en kısa
+              sürede dönüş yapsın.
             </p>
           </div>
           <FirmaForm />
@@ -214,7 +225,7 @@ export default async function FirmaOlPage() {
           Sıkça Sorulan Sorular
         </h2>
         <p className="text-center text-sm text-ui-fg-muted mb-8">
-          Firma iş ortaklığı süreci hakkında en çok merak edilenler.
+          Firma (satıcı) süreci hakkında en çok merak edilenler.
         </p>
         <FaqAccordion items={FAQS} defaultOpen={0} />
       </div>
