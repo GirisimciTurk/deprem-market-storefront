@@ -3,6 +3,35 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
 import ResellerForm from "./reseller-form"
 
+// Zorunlu alanları doldurur (sade form: alt alta alanlar, ülke kodlu telefon).
+function fillRequiredFields() {
+  fireEvent.change(
+    screen.getByPlaceholderText("Örn: Demir Outdoor Ekipmanları"),
+    { target: { value: "Afet Tedarik A.Ş." } }
+  )
+  fireEvent.change(screen.getByPlaceholderText("Örn: Hakan Demir"), {
+    target: { value: "Mehmet Yılmaz" },
+  })
+  fireEvent.change(screen.getByPlaceholderText("bayi@example.com"), {
+    target: { value: "mehmet@afettedarik.com" },
+  })
+  fireEvent.change(screen.getByPlaceholderText("Örn: 532 000 00 00"), {
+    target: { value: "555 555 5555" },
+  })
+  fireEvent.change(
+    screen.getByPlaceholderText(
+      "Örn: Cumhuriyet Mah. Deprem Cad. No:1 Kadıköy / İstanbul"
+    ),
+    { target: { value: "Antakya Merkez, Hatay" } }
+  )
+  fireEvent.change(
+    screen.getByPlaceholderText(
+      "Örn: Karbon fiber güçlendirme, kurulum, keşif hizmeti; çalışma bölgeniz"
+    ),
+    { target: { value: "Outdoor ve afet ekipmanları kurulum hizmeti." } }
+  )
+}
+
 describe("ResellerForm Component (Bayimiz Olun)", () => {
   beforeEach(() => {
     // Component backend'e fetch ile POST ediyor (/store/reseller-applications).
@@ -19,26 +48,27 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
     expect(
       screen.getByPlaceholderText("Örn: Demir Outdoor Ekipmanları")
     ).toBeInTheDocument()
-    expect(
-      screen.getByPlaceholderText("Örn: Kadıköy V.D / 1234567890")
-    ).toBeInTheDocument()
     expect(screen.getByPlaceholderText("Örn: Hakan Demir")).toBeInTheDocument()
-    expect(screen.getByPlaceholderText("Örn: İstanbul")).toBeInTheDocument()
     expect(
-      screen.getByPlaceholderText("bayi@example.com")
+      screen.getByPlaceholderText("Örn: 532 000 00 00")
     ).toBeInTheDocument()
+    expect(screen.getByLabelText("Ülke kodu")).toBeInTheDocument()
+    expect(screen.getByPlaceholderText("bayi@example.com")).toBeInTheDocument()
     expect(
-      screen.getByPlaceholderText("Örn: 0532 000 0000")
+      screen.getByPlaceholderText(
+        "Örn: Cumhuriyet Mah. Deprem Cad. No:1 Kadıköy / İstanbul"
+      )
     ).toBeInTheDocument()
     expect(
       screen.getByPlaceholderText(
-        "Verdiğiniz hizmetleri, uzmanlık alanınızı ve çalışma bölgenizi kısaca yazın (ör. karbon fiber güçlendirme, kurulum, keşif...)."
+        "Örn: Karbon fiber güçlendirme, kurulum, keşif hizmeti; çalışma bölgeniz"
       )
     ).toBeInTheDocument()
-
     expect(
-      screen.getByRole("button", { name: /Bayilik Başvurusunu Gönder/i })
+      screen.getByPlaceholderText("Örn: www.firma.com (opsiyonel)")
     ).toBeInTheDocument()
+
+    expect(screen.getByRole("button", { name: /Gönder/i })).toBeInTheDocument()
   })
 
   it("should allow typing into inputs", () => {
@@ -64,37 +94,13 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
     vi.stubGlobal("fetch", fetchMock)
 
     render(<ResellerForm />)
-
+    fillRequiredFields()
     fireEvent.change(
-      screen.getByPlaceholderText("Örn: Demir Outdoor Ekipmanları"),
-      {
-        target: { value: "Afet Tedarik A.Ş." },
-      }
-    )
-    fireEvent.change(screen.getByPlaceholderText("Örn: Hakan Demir"), {
-      target: { value: "Mehmet Yılmaz" },
-    })
-    fireEvent.change(screen.getByPlaceholderText("bayi@example.com"), {
-      target: { value: "mehmet@afettedarik.com" },
-    })
-    fireEvent.change(screen.getByPlaceholderText("Örn: 0532 000 0000"), {
-      target: { value: "0555 555 5555" },
-    })
-    fireEvent.change(screen.getByPlaceholderText("Örn: İstanbul"), {
-      target: { value: "Hatay" },
-    })
-    fireEvent.change(
-      screen.getByPlaceholderText(
-        "Verdiğiniz hizmetleri, uzmanlık alanınızı ve çalışma bölgenizi kısaca yazın (ör. karbon fiber güçlendirme, kurulum, keşif...)."
-      ),
-      {
-        target: { value: "Outdoor ve afet ekipmanları satmak istiyoruz." },
-      }
+      screen.getByPlaceholderText("Örn: www.firma.com (opsiyonel)"),
+      { target: { value: "www.afettedarik.com" } }
     )
 
-    fireEvent.click(
-      screen.getByRole("button", { name: /Bayilik Başvurusunu Gönder/i })
-    )
+    fireEvent.click(screen.getByRole("button", { name: /Gönder/i }))
 
     // Loading durumuna geçer
     expect(screen.getByText(/Başvuru Alınıyor.../i)).toBeInTheDocument()
@@ -118,10 +124,13 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
     expect(body.company_name).toBe("Afet Tedarik A.Ş.")
     expect(body.applicant_name).toBe("Mehmet Yılmaz")
     expect(body.email).toBe("mehmet@afettedarik.com")
-    expect(body.phone).toBe("0555 555 5555")
-    expect(body.city).toBe("Hatay")
+    // Telefon, seçili ülke koduyla birlikte gönderilir (varsayılan +90).
+    expect(body.phone).toBe("+90 555 555 5555")
+    // Adres / hizmet / web sitesi message içinde etiketli satırlar olarak gider.
     expect(body.message).toBe(
-      "Outdoor ve afet ekipmanları satmak istiyoruz."
+      "Adres: Antakya Merkez, Hatay\n" +
+        "Satış / Hizmet: Outdoor ve afet ekipmanları kurulum hizmeti.\n" +
+        "Web sitesi: www.afettedarik.com"
     )
   })
 
@@ -132,32 +141,13 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
     vi.spyOn(console, "error").mockImplementation(() => {})
 
     render(<ResellerForm />)
+    fillRequiredFields()
 
-    fireEvent.change(
-      screen.getByPlaceholderText("Örn: Demir Outdoor Ekipmanları"),
-      {
-        target: { value: "Afet Tedarik A.Ş." },
-      }
-    )
-    fireEvent.change(screen.getByPlaceholderText("Örn: Hakan Demir"), {
-      target: { value: "Mehmet Yılmaz" },
-    })
-    fireEvent.change(screen.getByPlaceholderText("bayi@example.com"), {
-      target: { value: "mehmet@afettedarik.com" },
-    })
-    fireEvent.change(screen.getByPlaceholderText("Örn: 0532 000 0000"), {
-      target: { value: "0555 555 5555" },
-    })
-
-    fireEvent.click(
-      screen.getByRole("button", { name: /Bayilik Başvurusunu Gönder/i })
-    )
+    fireEvent.click(screen.getByRole("button", { name: /Gönder/i }))
 
     // Başarısız istek sonrası form tekrar görünür olmalı (success ekranına geçmez)
     expect(
-      await screen.findByRole("button", {
-        name: /Bayilik Başvurusunu Gönder/i,
-      })
+      await screen.findByRole("button", { name: /Gönder/i })
     ).toBeInTheDocument()
     expect(screen.queryByText("Başvurunuz Alındı!")).not.toBeInTheDocument()
   })

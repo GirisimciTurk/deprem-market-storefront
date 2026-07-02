@@ -4,6 +4,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import FaqAccordion, {
   type FaqItem,
 } from "@modules/common/components/faq-accordion"
+import CollapsibleSection from "@modules/common/components/collapsible-section"
 import FirmaForm from "./firma-form"
 
 export const metadata: Metadata = {
@@ -132,102 +133,82 @@ export default async function FirmaOlPage() {
 
   return (
     <div className="content-container max-w-6xl py-16 px-4 sm:px-6 lg:px-8">
-      {/* Hero */}
-      <div className="text-center max-w-3xl mx-auto mb-14">
-        <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
-          depremTek Market Satıcı Firma Programı
-        </span>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
-          Firmamız Olun
+      {/* Hero (sade) */}
+      <div className="text-center max-w-3xl mx-auto mb-10">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-ui-fg-base tracking-tight">
+          Türkiye Deprem Sektörü Firma Rehberimize
+          <span className="block mt-2 font-serif italic font-medium text-brand-600 text-3xl sm:text-4xl">
+            Hoş Geldiniz
+          </span>
         </h1>
-        <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed">
-          Kendi mağazanızı açın, ürünlerinizi binlerce müşteriye satın.
-          Ürününüze bağlı hizmeti baştan sona siz yürütürsünüz; biz yalnızca
-          mağazanızda sattığınız ürünün komisyonunu alırız.
+        <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed mt-4">
+          Deprem ile ilgili her türlü ürün ve hizmet üreten, satan veya hizmet
+          veren işletmenizi tek tıkla ücretsiz kaydedin. Türkiye&apos;nin en
+          kapsamlı deprem firma rehberinde yerinizi alın.
         </p>
-        <div className="mt-6">
-          <a
-            href="#basvuru"
-            className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5 duration-200"
-          >
-            Hemen Başvurun
-          </a>
-        </div>
       </div>
 
-      {/* Nasıl çalışır? */}
-      <div className="mb-16">
-        <h2 className="text-center text-xl font-extrabold text-ui-fg-base mb-8">
-          Nasıl Çalışır?
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {STEPS.map((s) => (
-            <div
-              key={s.no}
-              className="relative border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6"
-            >
-              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-600 text-white font-extrabold text-lg mb-4">
-                {s.no}
-              </span>
-              <h3 className="font-bold text-ui-fg-base text-sm mb-1">
-                {s.title}
-              </h3>
-              <p className="text-xs text-ui-fg-muted leading-relaxed">
-                {s.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Avantajlar */}
-      <div className="mb-16">
-        <h2 className="text-center text-xl font-extrabold text-ui-fg-base mb-8">
-          Firmamız Olursanız Ne Kazanırsınız?
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {BENEFITS.map((b) => (
-            <div
-              key={b.title}
-              className="border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6 hover:shadow-md transition-shadow"
-            >
-              <span className="text-2xl">{b.icon}</span>
-              <h3 className="font-bold text-ui-fg-base text-sm mt-3 mb-1">
-                {b.title}
-              </h3>
-              <p className="text-xs text-ui-fg-muted leading-relaxed">
-                {b.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Başvuru formu */}
-      <div id="basvuru" className="scroll-mt-24 mb-16">
+      {/* Başvuru formu — en üstte */}
+      <div id="basvuru" className="scroll-mt-24 mb-10">
         <div className="max-w-2xl mx-auto border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6 sm:p-8">
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-extrabold text-ui-fg-base">
-              Firma (Satıcı) Başvuru Formu
-            </h2>
-            <p className="text-xs text-ui-fg-muted mt-1">
-              Firma bilgilerinizi bırakın, ekibimiz mağaza açılışı için en kısa
-              sürede dönüş yapsın.
-            </p>
-          </div>
           <FirmaForm />
         </div>
       </div>
 
-      {/* SSS */}
-      <div className="max-w-3xl mx-auto mb-12">
-        <h2 className="text-center text-xl font-extrabold text-ui-fg-base mb-2">
-          Sıkça Sorulan Sorular
-        </h2>
-        <p className="text-center text-sm text-ui-fg-muted mb-8">
-          Firma (satıcı) süreci hakkında en çok merak edilenler.
-        </p>
-        <FaqAccordion items={FAQS} defaultOpen={0} />
+      {/* Bilgi bölümleri — açılır kartlar */}
+      <div className="max-w-3xl mx-auto space-y-4 mb-12">
+        <CollapsibleSection
+          title="Nasıl Çalışır?"
+          subtitle="4 adımda mağazanızı açın"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {STEPS.map((s) => (
+              <div
+                key={s.no}
+                className="relative border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6"
+              >
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-600 text-white font-extrabold text-lg mb-4">
+                  {s.no}
+                </span>
+                <h3 className="font-bold text-ui-fg-base text-sm mb-1">
+                  {s.title}
+                </h3>
+                <p className="text-xs text-ui-fg-muted leading-relaxed">
+                  {s.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Firmamız Olursanız Ne Kazanırsınız?"
+          subtitle="Avantajlarınız"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {BENEFITS.map((b) => (
+              <div
+                key={b.title}
+                className="border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6 hover:shadow-md transition-shadow"
+              >
+                <span className="text-2xl">{b.icon}</span>
+                <h3 className="font-bold text-ui-fg-base text-sm mt-3 mb-1">
+                  {b.title}
+                </h3>
+                <p className="text-xs text-ui-fg-muted leading-relaxed">
+                  {b.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Sıkça Sorulan Sorular"
+          subtitle="Firma (satıcı) süreci hakkında en çok merak edilenler"
+        >
+          <FaqAccordion items={FAQS} defaultOpen={null} />
+        </CollapsibleSection>
       </div>
 
       <div className="pt-8 border-t">

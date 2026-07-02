@@ -10,16 +10,36 @@ type SellerContract = {
   required?: boolean
 }
 
+/**
+ * Bayilik (hizmet ortaklığı) başvuru formu (/satici-ol). Firma formuyla aynı
+ * sade yapı: alanlar alt alta, telefon ülke koduyla gönderilir; adres/hizmet/
+ * web sitesi backend şemasında ayrı alan olmadığından message içinde etiketli
+ * satırlar olarak iletilir. Bayiliğe özgü sözleşme onayı bölümü korunur.
+ */
+
+const DIAL_CODES = [
+  { code: "+90", label: "🇹🇷 +90" },
+  { code: "+49", label: "🇩🇪 +49" },
+  { code: "+44", label: "🇬🇧 +44" },
+  { code: "+1", label: "🇺🇸 +1" },
+  { code: "+33", label: "🇫🇷 +33" },
+  { code: "+31", label: "🇳🇱 +31" },
+  { code: "+994", label: "🇦🇿 +994" },
+  { code: "+966", label: "🇸🇦 +966" },
+  { code: "+971", label: "🇦🇪 +971" },
+]
+
 export default function ResellerForm() {
   const [formData, setFormData] = useState({
     companyName: "",
-    taxOfficeNumber: "",
     contactName: "",
-    email: "",
     phone: "",
-    city: "",
-    message: "",
+    email: "",
+    address: "",
+    offering: "",
+    website: "",
   })
+  const [dialCode, setDialCode] = useState("+90")
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle")
@@ -47,7 +67,9 @@ export default function ResellerForm() {
       !formData.companyName ||
       !formData.contactName ||
       !formData.email ||
-      !formData.phone
+      !formData.phone ||
+      !formData.address ||
+      !formData.offering
     ) {
       alert("Lütfen zorunlu alanları doldurun.")
       return
@@ -66,6 +88,16 @@ export default function ResellerForm() {
       const publishableKey =
         process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
 
+      const composedMessage = [
+        `Adres: ${formData.address.trim()}`,
+        `Satış / Hizmet: ${formData.offering.trim()}`,
+        formData.website.trim()
+          ? `Web sitesi: ${formData.website.trim()}`
+          : null,
+      ]
+        .filter(Boolean)
+        .join("\n")
+
       const res = await fetch(`${backendUrl}/store/reseller-applications`, {
         method: "POST",
         headers: {
@@ -76,10 +108,8 @@ export default function ResellerForm() {
           company_name: formData.companyName,
           applicant_name: formData.contactName,
           email: formData.email,
-          phone: formData.phone,
-          city: formData.city,
-          tax_number: formData.taxOfficeNumber,
-          message: formData.message,
+          phone: `${dialCode} ${formData.phone.trim()}`,
+          message: composedMessage,
           // Başvuru anında sözleşmelerin okunup kabul edildiği beyanı + sürümleri.
           contracts_accepted: contracts.length > 0 ? accepted : undefined,
           contracts_versions: contracts.map((c) => ({
@@ -97,13 +127,14 @@ export default function ResellerForm() {
       setStatus("success")
       setFormData({
         companyName: "",
-        taxOfficeNumber: "",
         contactName: "",
-        email: "",
         phone: "",
-        city: "",
-        message: "",
+        email: "",
+        address: "",
+        offering: "",
+        website: "",
       })
+      setDialCode("+90")
     } catch (err) {
       console.error("Failed to submit seller application", err)
       setStatus("error")
@@ -133,96 +164,66 @@ export default function ResellerForm() {
     )
   }
 
+  const inputCls =
+    "w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+  const labelCls =
+    "block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1"
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Firma / İşletme Adı <span className="text-brand-500">*</span>
-          </label>
-          <input
-            type="text"
-            required
-            disabled={status === "loading"}
-            value={formData.companyName}
-            onChange={(e) =>
-              setFormData({ ...formData, companyName: e.target.value })
-            }
-            placeholder="Örn: Demir Outdoor Ekipmanları"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Vergi Dairesi / No
-          </label>
-          <input
-            type="text"
-            disabled={status === "loading"}
-            value={formData.taxOfficeNumber}
-            onChange={(e) =>
-              setFormData({ ...formData, taxOfficeNumber: e.target.value })
-            }
-            placeholder="Örn: Kadıköy V.D / 1234567890"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
-          />
-        </div>
+      <div>
+        <label className={labelCls}>
+          Firma / İşletme Adı <span className="text-brand-500">*</span>
+        </label>
+        <input
+          type="text"
+          required
+          disabled={status === "loading"}
+          value={formData.companyName}
+          onChange={(e) =>
+            setFormData({ ...formData, companyName: e.target.value })
+          }
+          placeholder="Örn: Demir Outdoor Ekipmanları"
+          className={inputCls}
+        />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Yetkili Adı Soyadı <span className="text-brand-500">*</span>
-          </label>
-          <input
-            type="text"
-            required
-            disabled={status === "loading"}
-            value={formData.contactName}
-            onChange={(e) =>
-              setFormData({ ...formData, contactName: e.target.value })
-            }
-            placeholder="Örn: Hakan Demir"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Şehir <span className="text-brand-500">*</span>
-          </label>
-          <input
-            type="text"
-            required
-            disabled={status === "loading"}
-            value={formData.city}
-            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-            placeholder="Örn: İstanbul"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
-          />
-        </div>
+      <div>
+        <label className={labelCls}>
+          Firma Sahibi / Yetkili Kişi Adı Soyadı{" "}
+          <span className="text-brand-500">*</span>
+        </label>
+        <input
+          type="text"
+          required
+          disabled={status === "loading"}
+          value={formData.contactName}
+          onChange={(e) =>
+            setFormData({ ...formData, contactName: e.target.value })
+          }
+          placeholder="Örn: Hakan Demir"
+          className={inputCls}
+        />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            E-Posta Adresi <span className="text-brand-500">*</span>
-          </label>
-          <input
-            type="email"
-            required
+      <div>
+        <label className={labelCls}>
+          Telefon Numarası <span className="text-brand-500">*</span>
+        </label>
+        <div className="flex gap-2">
+          <select
             disabled={status === "loading"}
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            placeholder="bayi@example.com"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-            Telefon Numarası <span className="text-brand-500">*</span>
-          </label>
+            value={dialCode}
+            onChange={(e) => setDialCode(e.target.value)}
+            aria-label="Ülke kodu"
+            className="border border-ui-border-base rounded-lg px-2 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all shrink-0"
+          >
+            {DIAL_CODES.map((d) => (
+              <option key={d.code} value={d.code}>
+                {d.label}
+              </option>
+            ))}
+          </select>
           <input
             type="tel"
             required
@@ -231,26 +232,74 @@ export default function ResellerForm() {
             onChange={(e) =>
               setFormData({ ...formData, phone: e.target.value })
             }
-            placeholder="Örn: 0532 000 0000"
-            className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+            placeholder="Örn: 532 000 00 00"
+            className={inputCls}
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1">
-          Verdiğiniz Hizmetler / Ek Bilgiler
+        <label className={labelCls}>
+          E-Posta Adresi <span className="text-brand-500">*</span>
+        </label>
+        <input
+          type="email"
+          required
+          disabled={status === "loading"}
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          placeholder="bayi@example.com"
+          className={inputCls}
+        />
+      </div>
+
+      <div>
+        <label className={labelCls}>
+          Adres <span className="text-brand-500">*</span>
         </label>
         <textarea
-          rows={4}
+          rows={2}
+          required
           disabled={status === "loading"}
-          value={formData.message}
+          value={formData.address}
           onChange={(e) =>
-            setFormData({ ...formData, message: e.target.value })
+            setFormData({ ...formData, address: e.target.value })
           }
-          placeholder="Verdiğiniz hizmetleri, uzmanlık alanınızı ve çalışma bölgenizi kısaca yazın (ör. karbon fiber güçlendirme, kurulum, keşif...)."
-          className="w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all resize-none"
+          placeholder="Örn: Cumhuriyet Mah. Deprem Cad. No:1 Kadıköy / İstanbul"
+          className={`${inputCls} resize-none`}
         ></textarea>
+      </div>
+
+      <div>
+        <label className={labelCls}>
+          Ne Satıyor / Ne Hizmeti Veriyor{" "}
+          <span className="text-brand-500">*</span>
+        </label>
+        <textarea
+          rows={3}
+          required
+          disabled={status === "loading"}
+          value={formData.offering}
+          onChange={(e) =>
+            setFormData({ ...formData, offering: e.target.value })
+          }
+          placeholder="Örn: Karbon fiber güçlendirme, kurulum, keşif hizmeti; çalışma bölgeniz"
+          className={`${inputCls} resize-none`}
+        ></textarea>
+      </div>
+
+      <div>
+        <label className={labelCls}>Web Sitesi Linki</label>
+        <input
+          type="text"
+          disabled={status === "loading"}
+          value={formData.website}
+          onChange={(e) =>
+            setFormData({ ...formData, website: e.target.value })
+          }
+          placeholder="Örn: www.firma.com (opsiyonel)"
+          className={inputCls}
+        />
       </div>
 
       {contracts.length > 0 && (
@@ -363,7 +412,7 @@ export default function ResellerForm() {
             Başvuru Alınıyor...
           </>
         ) : (
-          "Bayilik Başvurusunu Gönder"
+          "Gönder"
         )}
       </button>
 
