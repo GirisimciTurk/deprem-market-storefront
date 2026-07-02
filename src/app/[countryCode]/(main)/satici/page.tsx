@@ -5,9 +5,9 @@ import { toReachableImageUrl } from "@lib/util/image-url"
 import { listSellers } from "@lib/data/sellers"
 
 export const metadata: Metadata = {
-  title: "Bayi Mağazaları | depremTek Market",
+  title: "Mağazalar | depremTek Market",
   description:
-    "depremTek Market bayilerinin mağazaları. Doğrulanmış bayilerden deprem hazırlık ve güvenlik ürünleri.",
+    "depremTek Market satıcı mağazaları. Doğrulanmış firmalardan deprem hazırlık ve güvenlik ürünleri.",
 }
 
 /**
@@ -23,10 +23,10 @@ export default async function SellersIndexPage() {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <div>
           <span className="text-xs font-semibold tracking-wider text-brand-600 uppercase">
-            Bayilerimiz
+            Mağazalarımız
           </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-ui-fg-base tracking-tight mt-1">
-            Bayi Mağazaları
+            Satıcı Mağazaları
           </h1>
           <p className="text-sm text-ui-fg-subtle mt-2 max-w-xl">
             Doğrulanmış satıcılarımızın mağazalarını keşfedin. Siz de firmamız
@@ -44,16 +44,16 @@ export default async function SellersIndexPage() {
       {sellers.length === 0 ? (
         <div className="flex flex-col items-center text-center border border-dashed border-ui-border-base rounded-2xl py-16 px-6">
           <Store className="w-10 h-10 text-ui-fg-muted mb-3" />
-          <h2 className="font-bold text-ui-fg-base">Henüz bayi mağazası yok</h2>
+          <h2 className="font-bold text-ui-fg-base">Henüz mağaza yok</h2>
           <p className="text-sm text-ui-fg-muted mt-1 max-w-sm">
-            İlk bayimiz siz olun. Başvurun, onaylandığında kendi mağazanızı açıp
+            İlk firmamız siz olun. Başvurun, onaylandığında kendi mağazanızı açıp
             ürünlerinizi satmaya başlayın.
           </p>
           <LocalizedClientLink
-            href="/satici-ol"
+            href="/firma-ol"
             className="mt-5 inline-flex items-center justify-center rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-700 transition-colors"
           >
-            Bayilik Başvurusu
+            Firma Başvurusu
           </LocalizedClientLink>
         </div>
       ) : (

@@ -8,6 +8,7 @@ import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 import { getLocaleSafe, pickTranslation } from "@lib/util/localize"
 import { toReachableImageUrl } from "@lib/util/image-url"
+import { matchesPriceRange } from "@lib/util/price-filter"
 
 // Ürünün görsel URL'lerini (thumbnail + product.images) TR'den erişilemeyen
 // r2.dev'den /r2/ proxy'sine çevirir. Tek merkezde yapıldığı için her bileşen +
@@ -157,6 +158,7 @@ export const listProductsWithSort = async ({
   minPrice,
   maxPrice,
   inStock,
+  showcase,
 }: {
   page?: number
   queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
@@ -165,6 +167,8 @@ export const listProductsWithSort = async ({
   minPrice?: string
   maxPrice?: string
   inStock?: string
+  /** Sabit vitrin kategorisi key'i — ürün metadata.showcase içermeli. */
+  showcase?: string
 }): Promise<{
   response: { products: HttpTypes.StoreProduct[]; count: number }
   nextPage: number | null
@@ -192,23 +196,17 @@ export const listProductsWithSort = async ({
     })
   }
 
-  // Filter by price range
-  const minPriceNum = minPrice ? parseFloat(minPrice) : null
-  const maxPriceNum = maxPrice ? parseFloat(maxPrice) : null
+  // Fiyat aralığı filtresi. Birim uyumu (TL girdi → kuruş karşılaştırma) ve boş/geçersiz
+  // sınır davranışı @lib/util/price-filter içinde (saf + birim-testli).
+  if (minPrice || maxPrice) {
+    products = products.filter((product) => matchesPriceRange(product, minPrice, maxPrice))
+  }
 
-  if (minPriceNum !== null || maxPriceNum !== null) {
-    products = products.filter((product) => {
-      const minPriceOfProduct = product.variants && product.variants.length > 0
-        ? Math.min(...product.variants.map((v) => v?.calculated_price?.calculated_amount || 0))
-        : 0
-      
-      if (minPriceNum !== null && minPriceOfProduct < minPriceNum) {
-        return false
-      }
-      if (maxPriceNum !== null && minPriceOfProduct > maxPriceNum) {
-        return false
-      }
-      return true
+  // Vitrin (sabit) kategori filtresi: ürün metadata.showcase key'i içermeli.
+  if (showcase) {
+    products = products.filter((p) => {
+      const s = (p.metadata as Record<string, unknown> | null)?.showcase
+      return Array.isArray(s) && s.includes(showcase)
     })
   }
 

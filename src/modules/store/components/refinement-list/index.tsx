@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useState, useEffect } from "react"
 import SortProducts, { SortOptions } from "./sort-products"
+import { SHOWCASE_CATEGORIES } from "@lib/showcase"
 
 type RefinementListProps = {
   sortBy: SortOptions
@@ -10,6 +11,7 @@ type RefinementListProps = {
   minPrice?: string
   maxPrice?: string
   inStock?: string
+  showcase?: string
   categories?: any[]
   'data-testid'?: string
 }
@@ -20,6 +22,7 @@ const RefinementList = ({
   minPrice,
   maxPrice,
   inStock,
+  showcase,
   categories = [],
   'data-testid': dataTestId,
 }: RefinementListProps) => {
@@ -85,6 +88,10 @@ const RefinementList = ({
     })
   }
 
+  const handleShowcaseToggle = (key: string) => {
+    updateQueryParams({ showcase: showcase === key ? null : key })
+  }
+
   // SortProducts callback'i (name, value) imzasıyla çağırır → gerçek sıralama
   // değeri İKİNCİ argümandır. Önceden ilk argüman ("sortBy") alınıyordu, bu yüzden
   // URL'e sortBy=sortBy yazılıp sıralama hiç uygulanmıyordu.
@@ -127,6 +134,33 @@ const RefinementList = ({
           </div>
         </div>
       )}
+
+      {/* Vitrin Kategorileri (sabit) — tekli seç/kaldır → ?showcase=<key> */}
+      <div className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60 flex flex-col gap-y-3">
+        <span className="text-xs font-bold text-slate-600 tracking-wider uppercase">Vitrin Kategorileri</span>
+        <div className="flex flex-col gap-y-1">
+          {SHOWCASE_CATEGORIES.map((sc) => {
+            const isSelected = showcase === sc.key
+            return (
+              <button
+                key={sc.key}
+                onClick={() => handleShowcaseToggle(sc.key)}
+                className={`flex items-center gap-x-2 text-left text-sm py-2 px-3 rounded-xl transition-all duration-200 select-none ${
+                  isSelected
+                    ? "bg-brand-600 text-white font-semibold shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                }`}
+              >
+                <span>{sc.emoji}</span>
+                <span className="flex-1">{sc.label}</span>
+                {isSelected && (
+                  <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-bold">Aktif</span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
       {/* 3. Fiyat Filtresi */}
       <div className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60 flex flex-col gap-y-3">

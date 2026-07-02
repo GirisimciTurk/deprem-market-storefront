@@ -17,6 +17,7 @@ type InfiniteProductsProps = {
   minPrice?: string
   maxPrice?: string
   inStock?: string
+  showcase?: string
   initialCount: number
 }
 
@@ -31,6 +32,7 @@ export default function InfiniteProducts({
   minPrice,
   maxPrice,
   inStock,
+  showcase,
   initialCount,
 }: InfiniteProductsProps) {
   const [products, setProducts] = useState<HttpTypes.StoreProduct[]>(initialProducts)
@@ -69,6 +71,7 @@ export default function InfiniteProducts({
         minPrice,
         maxPrice,
         inStock,
+        showcase,
       })
 
       if (newProducts.length > 0) {
@@ -111,7 +114,7 @@ export default function InfiniteProducts({
     return () => {
       observer.unobserve(currentLoader)
     }
-  }, [hasMore, isLoading, page, sortBy, collectionId, categoryId, productsIds, minPrice, maxPrice, inStock, products.length])
+  }, [hasMore, isLoading, page, sortBy, collectionId, categoryId, productsIds, minPrice, maxPrice, inStock, showcase, products.length])
 
   if (products.length === 0) {
     return (

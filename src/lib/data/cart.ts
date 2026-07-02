@@ -428,7 +428,10 @@ export async function placeOrder(cartId?: string) {
     const orderCacheTag = await getCacheTag("orders")
     revalidateTag(orderCacheTag)
 
-    removeCartId()
+    // Çerez silme redirect'ten ÖNCE await edilmeli; redirect() NEXT_REDIRECT fırlattığından
+    // await'siz bırakılırsa cookie temizliği yarışa girip yetişmeyebilir → sonraki
+    // yüklemelerde tamamlanmış cart id'siyle bayat sepet çekilir.
+    await removeCartId()
     redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
   }
 

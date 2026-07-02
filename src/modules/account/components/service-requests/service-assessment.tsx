@@ -147,11 +147,20 @@ export default function ServiceAssessment({ req }: { req: StoreServiceRequest })
   }
 
   const submitSurvey = async () => {
+    const dates = [date1, date2].filter(Boolean)
+    if (!city.trim() || !district.trim() || !address.trim()) {
+      setError("Keşif için il, ilçe ve adres bilgisini girin.")
+      return
+    }
+    if (dates.length === 0) {
+      setError("En az bir tercih ettiğiniz keşif tarihi seçin.")
+      return
+    }
     setBusy(true)
     setError(null)
     const res = await setServiceAssessment(req.id, {
       assessment_mode: "survey",
-      preferred_dates: [date1, date2].filter(Boolean),
+      preferred_dates: dates,
       city: city.trim(),
       district: district.trim(),
       address: address.trim(),

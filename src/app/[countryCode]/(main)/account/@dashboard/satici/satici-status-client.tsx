@@ -9,7 +9,7 @@ type ResellerApplication = {
   city: string
   message?: string
   date: string
-  status: "pending" | "approved" | "rejected"
+  status: "pending" | "approved" | "rejected" | "suspended"
   applicationType?: "bayi" | "firma"
 }
 
@@ -64,6 +64,11 @@ export default function SaticiStatusClient({
                   ✕ Reddedildi
                 </span>
               )}
+              {application.status === "suspended" && (
+                <span className="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
+                  ⏸ Askıya Alındı
+                </span>
+              )}
             </div>
           </div>
 
@@ -83,6 +88,10 @@ export default function SaticiStatusClient({
                 `${
                   isFirma ? "Firma" : "Bayilik"
                 } başvurunuz yapılan ön inceleme sonucunda şu an için olumsuz sonuçlandı. Gerekli kriterleri sağladığınızı düşünüyorsanız ya da ek bilgi iletmek isterseniz müşteri hizmetlerimizle irtibata geçebilirsiniz.`}
+              {application.status === "suspended" &&
+                `${
+                  isFirma ? "Firma" : "Bayilik (hizmet ortağı)"
+                } hesabınız geçici olarak askıya alınmıştır. Durumun netleşmesi ve hesabınızın yeniden etkinleştirilmesi için müşteri hizmetlerimizle irtibata geçmenizi rica ederiz.`}
             </p>
           </div>
 

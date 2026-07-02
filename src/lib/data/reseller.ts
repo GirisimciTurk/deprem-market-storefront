@@ -12,7 +12,7 @@ export interface MyResellerApplication {
   city: string
   message?: string
   date: string
-  status: "pending" | "approved" | "rejected"
+  status: "pending" | "approved" | "rejected" | "suspended"
   // "bayi" (hizmet ortağı) | "firma" (ürün satan mağaza)
   applicationType: "bayi" | "firma"
 }
@@ -26,7 +26,7 @@ interface BackendApplication {
   city?: string
   message?: string
   created_at: string
-  status: "pending" | "approved" | "rejected"
+  status: "pending" | "approved" | "rejected" | "suspended"
   application_type?: "bayi" | "firma"
 }
 

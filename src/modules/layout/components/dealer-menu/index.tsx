@@ -14,7 +14,7 @@ import { Fragment, useEffect, useRef, useState } from "react"
 /**
  * Header "Bayimiz ol" açılır menüsü — hesap (Giriş Yap) bağlantısının soluna
  * yerleşir. Masaüstünde hover, mobilde tıklama ile açılır.
- * Üstte "Bayimiz ol" (/satici-ol başvuru formu), altta "Bayi ara" (/satici
+ * Üstte "Bayimiz ol" (/satici-ol başvuru formu), altta "Bayi bul" (/satici
  * bayi mağazaları). cart-dropdown ile aynı Popover/hover desenini kullanır.
  */
 export default function DealerMenu() {

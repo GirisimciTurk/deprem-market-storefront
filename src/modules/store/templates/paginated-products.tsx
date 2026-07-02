@@ -23,6 +23,7 @@ export default async function PaginatedProducts({
   minPrice,
   maxPrice,
   inStock,
+  showcase,
 }: {
   sortBy?: SortOptions
   page: number
@@ -33,6 +34,7 @@ export default async function PaginatedProducts({
   minPrice?: string
   maxPrice?: string
   inStock?: string
+  showcase?: string
 }) {
   const queryParams: PaginatedProductsParams = {
     limit: PRODUCT_LIMIT,
@@ -70,6 +72,7 @@ export default async function PaginatedProducts({
     minPrice,
     maxPrice,
     inStock,
+    showcase,
   })
 
   return (
@@ -84,6 +87,7 @@ export default async function PaginatedProducts({
       minPrice={minPrice}
       maxPrice={maxPrice}
       inStock={inStock}
+      showcase={showcase}
       initialCount={count}
     />
   )

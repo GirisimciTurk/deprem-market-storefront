@@ -6,6 +6,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { listCategories } from "@lib/data/categories"
 
 import PaginatedProducts from "./paginated-products"
+import { isShowcaseKey, showcaseLabel } from "@lib/showcase"
 
 const StoreTemplate = async ({
   sortBy,
@@ -14,6 +15,7 @@ const StoreTemplate = async ({
   maxPrice,
   categoryId,
   inStock,
+  showcase,
   countryCode,
   showSeoContent = true,
 }: {
@@ -23,11 +25,15 @@ const StoreTemplate = async ({
   maxPrice?: string
   categoryId?: string
   inStock?: string
+  showcase?: string
   countryCode: string
   showSeoContent?: boolean
 }) => {
-  const pageNumber = page ? parseInt(page) : 1
+  const parsedPage = page ? parseInt(page, 10) : 1
+  const pageNumber = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1
   const sort = sortBy || "created_at"
+  // Geçersiz showcase key'i yok say (filtre uygulanmaz).
+  const activeShowcase = isShowcaseKey(showcase) ? showcase : undefined
   const categories = await listCategories().catch(() => [])
 
   return (
@@ -42,10 +48,21 @@ const StoreTemplate = async ({
           minPrice={minPrice}
           maxPrice={maxPrice}
           inStock={inStock}
+          showcase={activeShowcase}
           categories={categories}
         />
         <div className="w-full">
-          {showSeoContent && (
+          {activeShowcase && (
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-slate-800">
+                {showcaseLabel(activeShowcase)}
+              </h1>
+              <p className="mt-2 text-sm text-slate-500">
+                Bu vitrin kategorisindeki tüm ürünler.
+              </p>
+            </div>
+          )}
+          {showSeoContent && !activeShowcase && (
             <div className="mb-6">
               <h1
                 data-testid="store-page-title"
@@ -68,6 +85,7 @@ const StoreTemplate = async ({
               maxPrice={maxPrice}
               categoryId={categoryId}
               inStock={inStock}
+              showcase={activeShowcase}
               countryCode={countryCode}
             />
           </Suspense>

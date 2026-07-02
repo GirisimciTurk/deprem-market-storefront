@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl"
 import { Search, X, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { toReachableImageUrl } from "@lib/util/image-url"
+import { convertToLocale } from "@lib/util/money"
 
 type SearchResult = {
   id: string
@@ -90,8 +91,13 @@ export default function SearchModal() {
           title: p.title,
           handle: p.handle,
           thumbnail: p.thumbnail,
+          // calculated_amount minor birimdir (kuruş) → convertToLocale 100'e böler;
+          // site genelindeki fiyat gösterimiyle tutarlı olması için burada da kullanılır.
           price: p.variants?.[0]?.calculated_price?.calculated_amount
-            ? `${(p.variants[0].calculated_price.calculated_amount / 1).toLocaleString(isTr ? "tr-TR" : "en-US", { minimumFractionDigits: 2 })} ${(p.variants[0].calculated_price.currency_code || "TRY").toUpperCase()}`
+            ? convertToLocale({
+                amount: p.variants[0].calculated_price.calculated_amount,
+                currency_code: p.variants[0].calculated_price.currency_code || "TRY",
+              })
             : undefined,
         }))
         setResults(mapped)

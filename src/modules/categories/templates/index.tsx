@@ -20,7 +20,8 @@ export default function CategoryTemplate({
   page?: string
   countryCode: string
 }) {
-  const pageNumber = page ? parseInt(page) : 1
+  const parsedPage = page ? parseInt(page, 10) : 1
+  const pageNumber = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1
   const sort = sortBy || "created_at"
 
   if (!category || !countryCode) notFound()
