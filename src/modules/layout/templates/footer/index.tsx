@@ -25,7 +25,7 @@ export default async function Footer() {
               href="/"
               className="hover:opacity-90 transition-opacity"
             >
-              <Logo className="!h-20 sm:!h-24" />
+              <Logo className="!h-12 sm:!h-14" />
             </LocalizedClientLink>
           </div>
           <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-4">

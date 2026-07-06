@@ -117,8 +117,9 @@ export default function FirmaForm() {
           Başvurunuz Alındı!
         </h3>
         <p className="text-sm text-ui-fg-subtle max-w-sm">
-          Firma başvurunuz tarafımıza ulaştı. Ekibimiz değerlendirip mağaza
-          açılışı için en kısa sürede sizinle iletişime geçecek.
+          Firma başvurunuz tarafımıza ulaştı. Size en iyi hizmeti sunabilmek
+          için başvurunuzu olabildiğince dikkatli değerlendirecek, mağaza
+          açılışı için en kısa sürede sizinle iletişime geçeceğiz.
         </p>
         <button
           onClick={() => setStatus("idle")}

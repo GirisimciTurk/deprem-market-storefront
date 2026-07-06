@@ -151,8 +151,9 @@ export default function ResellerForm() {
           Başvurunuz Alındı!
         </h3>
         <p className="text-sm text-ui-fg-subtle max-w-sm">
-          Bayilik başvurunuz başarıyla tarafımıza ulaştı. Ekibimiz başvurunuzu
-          değerlendirip en kısa sürede sizinle iletişime geçecek.
+          Bayilik başvurunuz başarıyla tarafımıza ulaştı. Size en iyi hizmeti
+          sunabilmek için başvurunuzu olabildiğince dikkatli değerlendirecek, en
+          kısa sürede sizinle iletişime geçeceğiz.
         </p>
         <button
           onClick={() => setStatus("idle")}
