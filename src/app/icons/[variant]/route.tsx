@@ -1,13 +1,14 @@
 import { ImageResponse } from "next/og"
-import { SHIELD_ANY_DATAURL, SHIELD_MASKABLE_DATAURL } from "@lib/brand-icons"
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
 
 // PWA ikon üretici route handler. manifest.ts'in referans verdiği boyut/amaç
 // varyantlarını next/og ile PNG olarak üretir (any-512 zaten src/app/icon.tsx'te).
-// İçerik: depremTek kalkan amblemi (lib/brand-icons data-URL).
+// İçerik: Depremtek kalp amblemi (public/images/depremtek-heart.png) beyaz zeminde.
 //
-// - "any": şeffaf zeminli amblem (favicon / klasik ikon).
+// - "any": beyaz zeminli amblem (favicon / klasik ikon; koyu tuvalde de okunur).
 // - "maskable": Android adaptif ikon tuvali daire/squircle KIRPAR → beyaz-zeminli +
-//   güvenli-alan padding'li amblem (SHIELD_MASKABLE'da padding gömülü).
+//   fazladan güvenli-alan padding'i.
 //
 // generateStaticParams + force-static → build'de statik PNG. dynamicParams:false → 404.
 export const dynamic = "force-static"
@@ -20,6 +21,10 @@ export function generateStaticParams() {
   return VARIANTS.map((variant) => ({ variant }))
 }
 
+const heartDataUrl = `data:image/png;base64,${readFileSync(
+  join(process.cwd(), "public/images/depremtek-heart.png"),
+).toString("base64")}`
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ variant: string }> }
@@ -28,7 +33,8 @@ export async function GET(
   const [purpose, sizeStr] = variant.split("-")
   const dim = Number(sizeStr) || 512
   const maskable = purpose === "maskable"
-  const src = maskable ? SHIELD_MASKABLE_DATAURL : SHIELD_ANY_DATAURL
+  // maskable: adaptif tuval kırptığı için daha çok güvenli-alan padding'i.
+  const imgSize = Math.round(dim * (maskable ? 0.6 : 0.78))
 
   return new ImageResponse(
     (
@@ -39,11 +45,16 @@ export async function GET(
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: maskable ? "#ffffff" : "transparent",
+          background: "#ffffff",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} width={dim} height={dim} alt="depremTek" />
+        <img
+          src={heartDataUrl}
+          width={imgSize}
+          height={imgSize}
+          alt="Depremtek market"
+        />
       </div>
     ),
     { width: dim, height: dim }
