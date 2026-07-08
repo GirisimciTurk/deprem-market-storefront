@@ -1,9 +1,14 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata, Viewport } from "next"
+import Script from "next/script"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getTranslations } from "next-intl/server"
 import AppleSplash from "@modules/layout/components/apple-splash"
 import "styles/globals.css"
+
+// Google Analytics 4 ölçüm kimliği (depremtek.market). Kök layout'ta tek yerde
+// yüklenir → tüm sayfalarda (tüm ülke/dil rotalarında) otomatik aktiftir.
+const GA_MEASUREMENT_ID = "G-BY6LLHW7GJ"
 
 // theme-color: tarayıcı/PWA adres çubuğu ve iOS standalone üst bar rengi
 // (manifest theme_color ile aynı marka rengi).
@@ -47,6 +52,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} data-mode="light" suppressHydrationWarning>
       <body suppressHydrationWarning>
+        {/* Google Analytics (gtag.js) — yalnızca production build'de yüklenir;
+            lokal/dev trafiği GA property'sine karışmasın diye. afterInteractive:
+            sayfa etkileşimli olduktan sonra yüklenir, ilk boyamayı bloklamaz. */}
+        {process.env.NODE_ENV === "production" && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}');
+              `}
+            </Script>
+          </>
+        )}
         {/* React 19 bu <link rel="apple-touch-startup-image"> etiketlerini head'e taşır. */}
         <AppleSplash />
         <NextIntlClientProvider>
