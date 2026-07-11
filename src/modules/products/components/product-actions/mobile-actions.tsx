@@ -8,6 +8,7 @@ import X from "@modules/common/icons/x"
 
 import { getProductPrice } from "@lib/util/get-product-price"
 import OptionSelect from "./option-select"
+import StockAlertButton from "../stock-alert-button"
 import { HttpTypes } from "@medusajs/types"
 import { isSimpleProduct } from "@lib/util/product"
 
@@ -118,19 +119,24 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                   <ChevronDown />
                 </div>
               </Button>}
-              <Button
-                onClick={handleAddToCart}
-                disabled={!inStock || !variant}
-                className="w-full"
-                isLoading={isAdding}
-                data-testid="mobile-cart-button"
-              >
-                {!variant
-                  ? "Varyant seçin"
-                  : !inStock
-                  ? "Stokta yok"
-                  : "Sepete ekle"}
-              </Button>
+              {variant && !inStock ? (
+                <StockAlertButton
+                  variantId={variant.id}
+                  productId={product.id}
+                  productHandle={product.handle ?? undefined}
+                  productTitle={product.title}
+                />
+              ) : (
+                <Button
+                  onClick={handleAddToCart}
+                  disabled={!inStock || !variant}
+                  className="w-full"
+                  isLoading={isAdding}
+                  data-testid="mobile-cart-button"
+                >
+                  {!variant ? "Varyant seçin" : "Sepete ekle"}
+                </Button>
+              )}
             </div>
           </div>
         </Transition>

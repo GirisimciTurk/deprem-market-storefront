@@ -223,34 +223,36 @@ export default function ProductActions({
           )}
         </div>
 
-        <Button
-          onClick={handleAddToCart}
-          disabled={
-            !inStock ||
-            !selectedVariant ||
-            !!disabled ||
-            isAdding ||
-            !isValidVariant
-          }
-          variant="primary"
-          className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg shadow-md transition-colors"
-          isLoading={isAdding}
-          data-testid="add-product-button"
-        >
-          {!selectedVariant
-            ? "Seçenek Belirleyin"
-            : !inStock || !isValidVariant
-            ? "Tükendi"
-            : "Sepete Ekle"}
-        </Button>
-        {/* Tükendiyse: stoğa gelince haber ver */}
-        {selectedVariant && isValidVariant && !inStock && (
+        {/* Geçerli varyant seçili ve tükendiyse: "Sepete Ekle" yerine doğrudan
+            "Stoğa gelince haber ver" butonu göster. */}
+        {selectedVariant && isValidVariant && !inStock ? (
           <StockAlertButton
             variantId={selectedVariant.id}
             productId={product.id}
             productHandle={product.handle ?? undefined}
             productTitle={product.title}
           />
+        ) : (
+          <Button
+            onClick={handleAddToCart}
+            disabled={
+              !inStock ||
+              !selectedVariant ||
+              !!disabled ||
+              isAdding ||
+              !isValidVariant
+            }
+            variant="primary"
+            className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg shadow-md transition-colors"
+            isLoading={isAdding}
+            data-testid="add-product-button"
+          >
+            {!selectedVariant
+              ? "Seçenek Belirleyin"
+              : !inStock || !isValidVariant
+              ? "Tükendi"
+              : "Sepete Ekle"}
+          </Button>
         )}
         {/* Hizmet verilebilir ürün: "Ürün + Hizmet Al" — ürünü sepete ekler ve hizmet
             talebi açar (havuz). Müşteri hesaptan foto/video yükler ya da keşif ister. */}

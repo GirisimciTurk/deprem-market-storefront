@@ -7,6 +7,7 @@ import PreviewPrice from "./price"
 import React from "react"
 import FavoriteButton from "@modules/products/components/favorite-button"
 import AddToCartButton from "./add-to-cart-button"
+import StockAlertButton from "@modules/products/components/stock-alert-button"
 
 // NOT: Eskiden burada handle-bazlı SAHTE rank/rating haritaları + "4.8/Son 4 Ürün/
 // Son 10 Günün En Düşük Fiyatı" uydurma sosyal-kanıt/aciliyet rozetleri vardı.
@@ -84,6 +85,15 @@ export default function ProductPreview({
   const manageInventory = product.variants?.some((v) => v.manage_inventory) ?? false
   const isLowStock = manageInventory && totalInventory > 0 && totalInventory <= 10
   const displayStock = totalInventory
+
+  // Karttaki hızlı "Sepete Ekle" ilk varyantı ekler; bu yüzden stok kararını da
+  // ilk varyanta göre veriyoruz. Stok yoksa buton yerine "Gelince haber ver".
+  const firstVariant = product.variants?.[0]
+  const firstVariantInStock =
+    !!firstVariant &&
+    (!firstVariant.manage_inventory ||
+      firstVariant.allow_backorder ||
+      (firstVariant.inventory_quantity || 0) > 0)
 
   return (
     <div
@@ -243,7 +253,17 @@ export default function ProductPreview({
         {/* Price & Add to Cart Area */}
         <div className="pt-2 border-t border-slate-100 mt-auto flex flex-col gap-y-2">
           {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
-          <AddToCartButton variantId={product.variants?.[0]?.id} />
+          {firstVariant && !firstVariantInStock ? (
+            <StockAlertButton
+              compact
+              variantId={firstVariant.id}
+              productId={product.id}
+              productHandle={product.handle ?? undefined}
+              productTitle={product.title}
+            />
+          ) : (
+            <AddToCartButton variantId={firstVariant?.id} />
+          )}
         </div>
       </div>
     </div>
