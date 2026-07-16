@@ -36,7 +36,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
             month: "long",
             year: "numeric",
           }),
-          verified: !!r.customer_id,
+          verified: !!r.verified_purchase,
           approved: true,
           images: r.images ?? undefined,
         }))

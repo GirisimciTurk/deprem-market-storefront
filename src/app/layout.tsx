@@ -4,6 +4,7 @@ import Script from "next/script"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getTranslations } from "next-intl/server"
 import AppleSplash from "@modules/layout/components/apple-splash"
+import { OrganizationJsonLd } from "@modules/common/components/json-ld"
 import "styles/globals.css"
 
 // Google Analytics 4 ölçüm kimliği (depremtek.market). Kök layout'ta tek yerde
@@ -28,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: t("ogLocale"),
-      url: "https://depremmarket.com",
+      url: getBaseURL(),
       siteName: t("siteName"),
     },
     // iOS "Ana Ekrana Ekle" → standalone PWA. capable:true ŞART; iOS web push
@@ -71,6 +72,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </Script>
           </>
         )}
+        {/* Site geneli Organization schema (marka bilgi paneli / SEO). */}
+        <OrganizationJsonLd baseUrl={getBaseURL()} />
         {/* React 19 bu <link rel="apple-touch-startup-image"> etiketlerini head'e taşır. */}
         <AppleSplash />
         <NextIntlClientProvider>

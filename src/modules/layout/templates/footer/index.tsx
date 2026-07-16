@@ -7,6 +7,7 @@ import Logo from "@modules/layout/components/logo";
 import CookieConsentTrigger from "@modules/layout/components/cookie-consent-trigger";
 import LocaleSwitcher from "@modules/layout/components/locale-switcher";
 import TrustBadges from "@modules/layout/components/trust-badges";
+import NewsletterSignup from "@modules/layout/components/newsletter-signup";
 import { getTranslations } from "next-intl/server";
 
 export default async function Footer() {
@@ -19,6 +20,9 @@ export default async function Footer() {
   return (
     <footer className="border-t border-ui-border-base w-full">
       <div className="content-container flex flex-col w-full">
+        <div className="pt-12">
+          <NewsletterSignup />
+        </div>
         <div className="flex flex-col gap-y-6 xsmall:flex-row xsmall:gap-x-12 md:gap-x-24 items-start justify-between py-16">
           <div>
             <LocalizedClientLink

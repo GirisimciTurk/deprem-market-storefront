@@ -176,16 +176,41 @@ export const listProductsWithSort = async ({
 }> => {
   const limit = queryParams?.limit || 12
 
-  let {
-    response: { products },
-  } = await listProducts({
-    pageParam: 0,
-    queryParams: {
-      ...queryParams,
-      limit: 100,
-    },
+  // Fiyat/stok/vitrin filtreleri ve fiyat sıralaması calculated_price / envanter /
+  // metadata gerektirdiğinden bellekte uygulanır. Bu yüzden çalışma kümesi katalogun
+  // tamamını (sınırlı) kapsamalı; aksi halde 100. üründen sonrası "sessizce" düşer.
+  const CHUNK = 100
+  const MAX_WORKING_SET = 480
+
+  const first = await listProducts({
+    pageParam: 1,
+    queryParams: { ...queryParams, limit: CHUNK },
     countryCode,
   })
+  let products = first.response.products
+  const totalCount = first.response.count
+
+  // Katalog 100'ü aşıyorsa kalan sayfaları (sınırlı) paralel çek — böylece filtre,
+  // sıralama ve sayfalama ilk 100 değil gerçek katalog üzerinde çalışır.
+  if (totalCount > CHUNK) {
+    const target = Math.min(totalCount, MAX_WORKING_SET)
+    const rest = await Promise.all(
+      Array.from({ length: Math.ceil(target / CHUNK) - 1 }, (_, i) =>
+        listProducts({
+          pageParam: i + 2,
+          queryParams: { ...queryParams, limit: CHUNK },
+          countryCode,
+        })
+      )
+    )
+    for (const r of rest) products = products.concat(r.response.products)
+    if (totalCount > MAX_WORKING_SET) {
+      // Sessiz kırpma yok: bu boyutta backend-seviyesi filtre/sıralama gerekir.
+      console.warn(
+        `[products] Katalog ${totalCount} ürün — filtre/sıralama ilk ${MAX_WORKING_SET} ürün üzerinde uygulandı.`
+      )
+    }
+  }
 
   // Filter by stock status if requested
   if (inStock === "true") {

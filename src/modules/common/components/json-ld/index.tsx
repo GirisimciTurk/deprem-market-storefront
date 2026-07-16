@@ -1,11 +1,14 @@
 import { HttpTypes } from "@medusajs/types"
+import { SITE_CONTACT } from "@lib/config/contact"
 
 type ProductJsonLdProps = {
   product: HttpTypes.StoreProduct
   url: string
+  /** Onaylı yorumlardan hesaplanan ortalama/sayı. reviewCount>0 ise schema'ya eklenir. */
+  aggregateRating?: { ratingValue: number; reviewCount: number }
 }
 
-export default function ProductJsonLd({ product, url }: ProductJsonLdProps) {
+export default function ProductJsonLd({ product, url, aggregateRating }: ProductJsonLdProps) {
   const cheapestVariant = product.variants?.reduce(
     (min, v) => {
       const price = (v as any).calculated_price?.calculated_amount
@@ -36,6 +39,17 @@ export default function ProductJsonLd({ product, url }: ProductJsonLdProps) {
       "@type": "Brand",
       name: "depremTek Market",
     },
+    ...(aggregateRating && aggregateRating.reviewCount > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: aggregateRating.ratingValue,
+            reviewCount: aggregateRating.reviewCount,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
     ...(cheapestVariant
       ? {
           offers: {
@@ -63,14 +77,15 @@ export default function ProductJsonLd({ product, url }: ProductJsonLdProps) {
   )
 }
 
-export function OrganizationJsonLd() {
+export function OrganizationJsonLd({ baseUrl }: { baseUrl: string }) {
+  const site = baseUrl.replace(/\/$/, "")
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "depremTek Market",
     alternateName: "Deprem Teknolojileri",
-    url: "https://depremmarket.com",
-    logo: "https://depremmarket.com/icon",
+    url: site,
+    logo: `${site}/icon`,
     description:
       "Türkiye'nin öncü afet ve acil durum hazırlık marketi. Profesyonel deprem çantaları, ilk yardım setleri ve hayati acil durum ekipmanları.",
     address: {
@@ -79,7 +94,7 @@ export function OrganizationJsonLd() {
     },
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+90-539-574-1904",
+      telephone: SITE_CONTACT.schemaTelephone,
       contactType: "customer service",
       availableLanguage: ["Turkish", "English"],
     },

@@ -18,6 +18,7 @@ const MENU_GROUPS: { titleKey: string; items: NavItem[] }[] = [
     titleKey: "shop",
     items: [
       { key: "shopAll", href: "/store" },
+      { key: "categories", href: "/kategoriler" },
       { key: "houseStore", href: "/satici" },
     ],
   },

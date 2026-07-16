@@ -21,7 +21,7 @@ type SearchResult = {
  * hemen ALTINDA açılır liste olarak gelir (modal/popup yok). Amazon tarzı:
  * solda metin alanı, sağda turuncu arama düğmesi.
  */
-export default function SearchModal() {
+export default function SearchModal({ regionId }: { regionId?: string }) {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -76,8 +76,11 @@ export default function SearchModal() {
         const publishableKey =
           process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
 
+        // region_id ŞART: calculated_price yalnız bölge bağlamında hesaplanır;
+        // yoksa açılır listedeki fiyatlar null/yanlış gelir.
+        const regionParam = regionId ? `&region_id=${regionId}` : ""
         const res = await fetch(
-          `${backendUrl}/store/products?q=${encodeURIComponent(query)}&limit=8&fields=id,title,handle,thumbnail,*variants.calculated_price`,
+          `${backendUrl}/store/products?q=${encodeURIComponent(query)}&limit=8${regionParam}&fields=id,title,handle,thumbnail,*variants.calculated_price`,
           {
             headers: {
               "x-publishable-api-key": publishableKey,
@@ -110,15 +113,27 @@ export default function SearchModal() {
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [query, countryCode, isTr])
+  }, [query, countryCode, isTr, regionId])
 
-  const navigateToProduct = (handle: string) => {
+  const resetSearch = () => {
     setOpen(false)
-    setQuery("")
     setResults([])
     setSelectedIndex(-1)
     inputRef.current?.blur()
+  }
+
+  const navigateToProduct = (handle: string) => {
+    resetSearch()
+    setQuery("")
     router.push(`/${countryCode}/products/${handle}`)
+  }
+
+  // Tüm sonuçları göster: paylaşılabilir/indekslenebilir arama sonuç sayfası.
+  const goToSearchResults = (term: string) => {
+    const q = term.trim()
+    if (q.length < 2) return
+    resetSearch()
+    router.push(`/${countryCode}/search?q=${encodeURIComponent(q)}`)
   }
 
   // Açılır liste klavye gezinmesi (oklar + Escape). Enter form submit'te işlenir.
@@ -141,9 +156,13 @@ export default function SearchModal() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Seçili varsa ona, yoksa ilk sonuca git.
-    const target = selectedIndex >= 0 ? results[selectedIndex] : results[0]
-    if (target) navigateToProduct(target.handle)
+    // Açılır listede bir ürün SEÇİLİYSE doğrudan o ürüne git; aksi halde
+    // (Enter/arama düğmesi) tüm sonuçları listeleyen arama sayfasına git.
+    if (selectedIndex >= 0 && results[selectedIndex]) {
+      navigateToProduct(results[selectedIndex].handle)
+    } else {
+      goToSearchResults(query)
+    }
   }
 
   const showDropdown = open && query.length >= 2
@@ -265,6 +284,19 @@ export default function SearchModal() {
               </div>
             )}
           </div>
+
+          {/* Tüm sonuçları listeleyen arama sayfasına git */}
+          {results.length > 0 && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => goToSearchResults(query)}
+              className="flex w-full items-center justify-center gap-2 border-t border-ui-border-base bg-slate-50 px-4 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-slate-100"
+            >
+              <Search className="h-4 w-4" />
+              “{query}” için tüm sonuçları gör
+            </button>
+          )}
         </div>
       )}
     </div>

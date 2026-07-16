@@ -33,6 +33,24 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 
+// Backend/nginx host'u (r2.dev görselleri buradaki `/r2/` reverse-proxy'sinden
+// sunulur — bkz. toReachableImageUrl). next/image optimizasyonu için remotePatterns'e
+// eklenmeli, aksi halde proxied ürün görselleri optimize edilemez.
+const backendImagePattern = (() => {
+  try {
+    const u = new URL(BACKEND_URL)
+    return [
+      {
+        protocol: u.protocol.replace(":", ""),
+        hostname: u.hostname,
+        ...(u.port ? { port: u.port } : {}),
+      },
+    ]
+  } catch {
+    return []
+  }
+})()
+
 // 'unsafe-eval' is only needed by the dev/HMR runtime. Drop it in production so
 // the script-src CSP is meaningfully tighter there.
 const SCRIPT_SRC_EVAL = process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"
@@ -61,10 +79,10 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   images: {
-    // NOT: Optimizasyonu açmak (unoptimized'i kaldırmak) için uygulamadaki TÜM
-    // görsel host'ları (ör. Unsplash, S3) remotePatterns'e eklenmeli; aksi halde
-    // next/image tanımsız host'ta 500 atıyor. Bu yüzden şimdilik kapalı bırakıldı.
-    unoptimized: true,
+    // Görsel optimizasyonu AÇIK. next/image tanımsız host'ta hata verir; bu yüzden
+    // uygulamadaki tüm görsel kaynakları remotePatterns'te olmalı: backend/nginx
+    // (/r2 proxy), Unsplash (mock/showcase), r2.dev bucket, S3, localhost (dev).
+    // Yeni bir dış host eklenirse buraya da eklenmeli.
     // next/image quality={50} kullanıyor; Next.js 16 izin verilen kaliteleri açıkça ister.
     qualities: [50, 75, 100],
     remotePatterns: [
@@ -79,6 +97,18 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "*.s3.amazonaws.com",
+      },
+      // Ürün/blog/yorum görsellerinin sunulduğu backend/nginx host'u (env'den).
+      ...backendImagePattern,
+      // Öne çıkan ürünlerin mock/showcase görselleri.
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      // Cloudflare R2 public bucket (toReachableImageUrl normalize etmezse doğrudan).
+      {
+        protocol: "https",
+        hostname: "pub-972575e25eda4755b1250ca6be181153.r2.dev",
       },
       ...(S3_HOSTNAME && S3_PATHNAME
         ? [

@@ -1,9 +1,12 @@
 "use client"
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useState, useEffect, Fragment } from "react"
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
+import { SlidersHorizontal, X } from "lucide-react"
 import SortProducts, { SortOptions } from "./sort-products"
 import { SHOWCASE_CATEGORIES } from "@lib/showcase"
+import { clx } from "@modules/common/components/ui"
 
 type RefinementListProps = {
   sortBy: SortOptions
@@ -32,6 +35,14 @@ const RefinementList = ({
 
   const [minInput, setMinInput] = useState(minPrice || "")
   const [maxInput, setMaxInput] = useState(maxPrice || "")
+  // Mobil filtre çekmecesi açık/kapalı + aktif filtre rozeti.
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const activeCount =
+    (minPrice ? 1 : 0) +
+    (maxPrice ? 1 : 0) +
+    (inStock === "true" ? 1 : 0) +
+    (categoryId ? 1 : 0) +
+    (showcase ? 1 : 0)
 
   useEffect(() => {
     setMinInput(minPrice || "")
@@ -99,9 +110,8 @@ const RefinementList = ({
     updateQueryParams({ sortBy: value })
   }
 
-  return (
-    <div className="flex flex-col gap-y-6 py-4 mb-8 pl-4 pr-4 small:pr-0 small:pl-6 small:min-w-[280px] w-full small:w-[280px] shrink-0">
-      
+  const filters = (
+    <>
       {/* 1. Sıralama Seçenekleri */}
       <div className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60">
         <SortProducts sortBy={sortBy} setQueryParams={handleSortChange} data-testid={dataTestId} />
@@ -217,8 +227,93 @@ const RefinementList = ({
           <span className="w-4 h-4 rounded-full bg-white shadow-sm" />
         </button>
       </div>
+    </>
+  )
 
-    </div>
+  return (
+    <>
+      {/* Mobil: "Filtrele" butonu (yalnız mobilde; masaüstünde panel inline) */}
+      <div className="small:hidden px-4 pt-4 pb-2">
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          className="w-full flex items-center justify-center gap-2 py-2.5 border border-slate-300 rounded-xl bg-white text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+          data-testid="mobile-filter-button"
+        >
+          <SlidersHorizontal className="w-4 h-4" /> Filtrele ve Sırala
+          {activeCount > 0 && (
+            <span className="ml-1 bg-brand-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+              {activeCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Masaüstü: inline panel */}
+      <div className="hidden small:flex flex-col gap-y-6 py-4 mb-8 pl-6 pr-0 min-w-[280px] w-[280px] shrink-0">
+        {filters}
+      </div>
+
+      {/* Mobil: soldan açılan filtre çekmecesi */}
+      <Transition show={mobileOpen} as={Fragment}>
+        <Dialog onClose={setMobileOpen} className="relative z-[70] small:hidden">
+          <TransitionChild
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" />
+          </TransitionChild>
+
+          <div className="fixed inset-0 overflow-hidden">
+            <div className="absolute inset-y-0 left-0 flex max-w-full">
+              <TransitionChild
+                as={Fragment}
+                enter="transform transition ease-out duration-300"
+                enterFrom="-translate-x-full"
+                enterTo="translate-x-0"
+                leave="transform transition ease-in duration-200"
+                leaveFrom="translate-x-0"
+                leaveTo="-translate-x-full"
+              >
+                <DialogPanel className="flex h-full w-screen max-w-sm flex-col bg-white shadow-2xl">
+                  <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                    <DialogTitle className="text-base font-bold text-slate-800">
+                      Filtrele &amp; Sırala
+                    </DialogTitle>
+                    <button
+                      onClick={() => setMobileOpen(false)}
+                      aria-label="Kapat"
+                      className="rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-100"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto overscroll-contain">
+                    <div className="flex flex-col gap-y-6 p-4">{filters}</div>
+                  </div>
+                  <div className="border-t border-slate-200 p-4">
+                    <button
+                      onClick={() => setMobileOpen(false)}
+                      className={clx(
+                        "w-full rounded-xl bg-brand-600 py-2.5 text-sm font-bold text-white",
+                        "transition-colors hover:bg-brand-700"
+                      )}
+                    >
+                      Sonuçları Gör
+                    </button>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+    </>
   )
 }
 

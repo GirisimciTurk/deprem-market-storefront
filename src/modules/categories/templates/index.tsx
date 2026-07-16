@@ -13,11 +13,17 @@ export default function CategoryTemplate({
   category,
   sortBy,
   page,
+  minPrice,
+  maxPrice,
+  inStock,
   countryCode,
 }: {
   category: HttpTypes.StoreProductCategory
   sortBy?: SortOptions
   page?: string
+  minPrice?: string
+  maxPrice?: string
+  inStock?: string
   countryCode: string
 }) {
   const parsedPage = page ? parseInt(page, 10) : 1
@@ -42,7 +48,13 @@ export default function CategoryTemplate({
       className="flex flex-col small:flex-row small:items-start py-6 content-container"
       data-testid="category-container"
     >
-      <RefinementList sortBy={sort} data-testid="sort-by-container" />
+      <RefinementList
+        sortBy={sort}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        inStock={inStock}
+        data-testid="sort-by-container"
+      />
       <div className="w-full">
         <div className="flex flex-row mb-8 text-2xl-semi gap-4">
           {parents &&

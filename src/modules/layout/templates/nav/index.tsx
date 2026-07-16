@@ -21,6 +21,11 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
     getTranslations("nav"),
   ])
 
+  // Aktif ülkenin region_id'si — arama açılır listesinde doğru fiyat (calculated_price) için.
+  const region = regions?.find((r) =>
+    r.countries?.some((c) => c.iso_2 === countryCode)
+  )
+
   // Etiket: masaüstünde (≥small) ikon yanında metin; mobilde yalnız ikon.
   const labelCls =
     "hidden small:inline text-sm font-medium text-slate-700 whitespace-nowrap"
@@ -48,7 +53,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
           {/* Orta: büyük arama çubuğu (Amazon tarzı) */}
           <div className="flex min-w-0 flex-1 justify-center">
             <div className="w-full max-w-lg">
-              <SearchModal />
+              <SearchModal regionId={region?.id} />
             </div>
           </div>
 

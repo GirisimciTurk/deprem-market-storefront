@@ -6,6 +6,7 @@ import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 import ProductJsonLd, { BreadcrumbJsonLd } from "@modules/common/components/json-ld"
+import { listProductReviews } from "@lib/data/reviews"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -96,6 +97,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     title,
     description,
+    alternates: {
+      canonical: `/${params.countryCode}/products/${handle}`,
+      // Dil cookie-tabanlı (URL'de değil); bölgesel URL'ler aynı Türkçe içeriği sunar.
+      // Bu yüzden yalnız doğru olan tr + x-default emit edilir (fr/de vb. YANLIŞ olurdu).
+      languages: {
+        tr: `/tr/products/${handle}`,
+        "x-default": `/tr/products/${handle}`,
+      },
+    },
     openGraph: {
       title,
       description,
@@ -129,9 +139,21 @@ export default async function ProductPage(props: Props) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://depremmarket.com"
   const productUrl = `${baseUrl}/${params.countryCode}/products/${params.handle}`
 
+  // Onaylı yorumlardan AggregateRating (Google yıldızları). Yorum yoksa eklenmez.
+  const reviews = await listProductReviews(params.handle)
+  const reviewCount = reviews.length
+  const ratingValue =
+    reviewCount > 0
+      ? Math.round((reviews.reduce((a, r) => a + r.rating, 0) / reviewCount) * 10) / 10
+      : 0
+
   return (
     <>
-      <ProductJsonLd product={pricedProduct} url={productUrl} />
+      <ProductJsonLd
+        product={pricedProduct}
+        url={productUrl}
+        aggregateRating={reviewCount > 0 ? { ratingValue, reviewCount } : undefined}
+      />
       <BreadcrumbJsonLd
         items={[
           { name: "Ana Sayfa", url: `${baseUrl}/${params.countryCode}` },

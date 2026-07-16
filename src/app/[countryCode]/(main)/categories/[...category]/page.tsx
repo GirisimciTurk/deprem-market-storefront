@@ -13,6 +13,9 @@ type Props = {
   searchParams: Promise<{
     sortBy?: SortOptions
     page?: string
+    minPrice?: string
+    maxPrice?: string
+    inStock?: string
   }>
 }
 
@@ -65,7 +68,13 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       title: title,
       description,
       alternates: {
-        canonical: `${params.category.join("/")}`,
+        // Tam yol (ülke öneki + /categories/…) — metadataBase'e göre çözülür.
+        canonical: `/${params.countryCode}/categories/${params.category.join("/")}`,
+        // Dil cookie-tabanlı; bölgesel URL'ler aynı Türkçe içerik → yalnız tr + x-default.
+        languages: {
+          tr: `/tr/categories/${params.category.join("/")}`,
+          "x-default": `/tr/categories/${params.category.join("/")}`,
+        },
       },
     }
   } catch {
@@ -76,7 +85,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function CategoryPage(props: Props) {
   const searchParams = await props.searchParams
   const params = await props.params
-  const { sortBy, page } = searchParams
+  const { sortBy, page, minPrice, maxPrice, inStock } = searchParams
 
   const productCategory = await getCategoryByHandle(params.category)
 
@@ -89,6 +98,9 @@ export default async function CategoryPage(props: Props) {
       category={productCategory}
       sortBy={sortBy}
       page={page}
+      minPrice={minPrice}
+      maxPrice={maxPrice}
+      inStock={inStock}
       countryCode={params.countryCode}
     />
   )

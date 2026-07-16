@@ -61,7 +61,7 @@ const SHOWCASE_ENTRIES: ShowcaseEntry[] = [
       tagline: "72 SAAT BOYUNCA 4 KİŞİLİK YAŞAM DESTEĞİ",
       title: "Profesyonel Deprem Çantası (4 Kişilik)",
       subtitle:
-        "Afet sonrasındaki ilk kritik 72 saatte 4 kişilik bir ailenin tüm hayati ihtiyaçlarını karşılamak üzere uzmanlar tarafından AFAD ve Kızılay standartlarında tasarlanmıştır.",
+        "Afet sonrasındaki ilk kritik 72 saatte 4 kişilik bir ailenin tüm hayati ihtiyaçlarını karşılamak üzere, afet hazırlığı uzmanlarının önerileri ve 72 saat hayatta kalma ilkeleri doğrultusunda hazırlanmıştır.",
       videoUrl: "https://www.youtube.com/embed/Yt7aUepwF4w",
       features: [
         {
@@ -89,7 +89,7 @@ const SHOWCASE_ENTRIES: ShowcaseEntry[] = [
         { label: "Kişi Kapasitesi", value: "4 Kişilik" },
         { label: "Toplam Ekipman", value: "98 Parça" },
         { label: "Çanta Hacmi", value: "40 Litre" },
-        { label: "Raf Ömrü (Gıda/Su)", value: "5 Yıl (TÜBİTAK Onaylı)" },
+        { label: "Raf Ömrü (Gıda/Su)", value: "5 Yıl" },
         { label: "Malzeme", value: "1000D Cordura Naylon" },
         { label: "Toplam Ağırlık", value: "5.2 Kg" },
       ],
@@ -101,7 +101,7 @@ const SHOWCASE_ENTRIES: ShowcaseEntry[] = [
             "https://images.unsplash.com/photo-1609587312208-cea54be969e7?auto=format&fit=crop&w=600&q=80",
         },
         {
-          title: "TÜBİTAK Onaylı Dayanıklı Gıdalar",
+          title: "Uzun Raf Ömürlü Dayanıklı Gıdalar",
           desc: "Pişirme gerektirmeyen, yüksek kalori ve vitamin içeren özel vakumlu ambalajlı acil durum gıdaları ve temiz içme suları.",
           image:
             "https://images.unsplash.com/photo-1563822249366-3efb23b8e0c9?auto=format&fit=crop&w=600&q=80",
@@ -167,7 +167,7 @@ const SHOWCASE_ENTRIES: ShowcaseEntry[] = [
       tagline: "ANINDA ACİL TIBBİ MÜDAHALE GÜCÜ",
       title: "Kapsamlı İlk Yardım Çantası (120 Parça)",
       subtitle:
-        "Ev kazalarından büyük doğal afetlere kadar her türlü yaralanmada hızlı, doğru ve steril müdahale yapabilmeniz için Sağlık Bakanlığı onaylı tıbbi malzemelerle doldurulmuş profesyonel ilk yardım seti.",
+        "Ev kazalarından büyük doğal afetlere kadar her türlü yaralanmada hızlı, doğru ve steril müdahale yapabilmeniz için tıbbi standartlara uygun, steril malzemelerle donatılmış profesyonel ilk yardım seti.",
       videoUrl: "https://www.youtube.com/embed/Yt7aUepwF4w",
       features: [
         {
@@ -177,8 +177,8 @@ const SHOWCASE_ENTRIES: ShowcaseEntry[] = [
         },
         {
           icon: <CheckCircle className="w-8 h-8 text-emerald-600" />,
-          title: "TSE ve CE Standartlarında",
-          desc: "Set içerisindeki tüm tıbbi sarf malzemeleri CE sertifikalı ve uluslararası standartlara uygundur.",
+          title: "Tıbbi Standartlara Uygun",
+          desc: "Set içerisindeki tıbbi sarf malzemeleri, ilgili kalite ve güvenlik standartlarına uygun olarak seçilmiştir.",
         },
         {
           icon: <Crosshair className="w-8 h-8 text-blue-500" />,

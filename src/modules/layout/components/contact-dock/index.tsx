@@ -7,16 +7,14 @@ import { HttpTypes } from "@medusajs/types"
 import { Headset, X, Phone, PhoneCall, MessageCircle, Copy, Check } from "lucide-react"
 import { clx } from "@modules/common/components/ui"
 import AiMascot from "@modules/layout/components/ai-mascot"
+import { SITE_CONTACT, whatsappUrl } from "@lib/config/contact"
 
-// ── Geçici iletişim bilgileri ────────────────────────────────────────────────
-// TODO: Gerçek çağrı merkezi numarasıyla değiştirin (şimdilik geçici).
-const CALL_CENTER_DISPLAY = "0 (850) 123 45 67"
-const CALL_CENTER_TEL = "+908501234567"
-// TODO: Gerçek WhatsApp numarasıyla doğrulayın (whatsapp-button ile aynı).
-const WHATSAPP_NUMBER = "905395741904"
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+// İletişim bilgileri merkezi config'ten (env). Çağrı merkezi ayarlı değilse
+// (SITE_CONTACT.callCenter === null) telefon öğesi ve kartı gizlenir.
+const CALL_CENTER = SITE_CONTACT.callCenter
+const WHATSAPP_URL = whatsappUrl(
   "Merhaba, deprem hazırlık ürünleri hakkında bilgi almak istiyorum."
-)}`
+)
 
 const COOKIE_KEY = "_deprem_market_cookie_consent"
 
@@ -158,8 +156,9 @@ export default function ContactDock({
   }
 
   const copyNumber = async () => {
+    if (!CALL_CENTER) return
     try {
-      await navigator.clipboard?.writeText(CALL_CENTER_DISPLAY)
+      await navigator.clipboard?.writeText(CALL_CENTER.display)
       setCopied(true)
       window.setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -217,23 +216,23 @@ export default function ContactDock({
           {/* Açılan yığın (numara kartı + yelpaze): kısa/yatay ekranlarda taşmasın
               diye yükseklik sınırlı ve kaydırılabilir; FAB sabit kalır. */}
           <div className="flex max-h-[calc(100svh-7rem)] flex-col items-end overflow-y-auto">
-            {/* Numara kartı (telefon öğesi açıkken) */}
-            {open && phoneOpen && (
+            {/* Numara kartı (telefon öğesi açıkken; yalnız çağrı merkezi ayarlıysa) */}
+            {open && phoneOpen && CALL_CENTER && (
               <div className="mb-3 w-[230px] rounded-2xl border border-ui-border-base bg-white p-4 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200 motion-reduce:animate-none">
                 <div className="flex items-center gap-2 text-brand-800">
                   <PhoneCall className="h-4 w-4" />
                   <span className="text-sm font-bold">{t("phoneTitle")}</span>
                 </div>
                 <a
-                  href={`tel:${CALL_CENTER_TEL}`}
+                  href={`tel:${CALL_CENTER.tel}`}
                   className="mt-2 block text-center text-lg font-extrabold tracking-wide text-slate-900 hover:text-brand-700"
                 >
-                  {CALL_CENTER_DISPLAY}
+                  {CALL_CENTER.display}
                 </a>
                 <p className="mt-0.5 text-center text-[11px] text-ui-fg-muted">{t("phoneHours")}</p>
                 <div className="mt-3 flex gap-2">
                   <a
-                    href={`tel:${CALL_CENTER_TEL}`}
+                    href={`tel:${CALL_CENTER.tel}`}
                     className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-700 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-brand-800"
                   >
                     <Phone className="h-3.5 w-3.5" />
@@ -284,16 +283,18 @@ export default function ContactDock({
                 <WhatsAppIcon className="h-5 w-5" />
               </FanItem>
 
-              <FanItem
-                show={open}
-                index={0}
-                label={t("phone")}
-                active={phoneOpen}
-                onClick={() => setPhoneOpen((v) => !v)}
-                className="bg-slate-800 text-white"
-              >
-                <Phone className="h-5 w-5" />
-              </FanItem>
+              {CALL_CENTER && (
+                <FanItem
+                  show={open}
+                  index={0}
+                  label={t("phone")}
+                  active={phoneOpen}
+                  onClick={() => setPhoneOpen((v) => !v)}
+                  className="bg-slate-800 text-white"
+                >
+                  <Phone className="h-5 w-5" />
+                </FanItem>
+              )}
             </div>
           </div>
 

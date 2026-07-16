@@ -3,12 +3,13 @@
 import React from "react"
 import { usePathname } from "next/navigation"
 import { clx } from "@modules/common/components/ui"
+import { whatsappUrl as buildWhatsappUrl } from "@lib/config/contact"
 
 export default function WhatsAppButton() {
-  // Lütfen aşağıdaki telefon numarasını kendi WhatsApp numaranızla güncelleyin.
-  // Ülke kodu ile birlikte (örn: 905XXXXXXXXX) yazılmalıdır.
-  const whatsappNumber = "905395741904"
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Merhaba,%20deprem%20hazırlık%20ürünleri%20hakkında%20bilgi%20almak%20istiyorum.`
+  // Numara merkezi config'ten (env: NEXT_PUBLIC_WHATSAPP_NUMBER).
+  const whatsappUrl = buildWhatsappUrl(
+    "Merhaba, deprem hazırlık ürünleri hakkında bilgi almak istiyorum."
+  )
 
   // Ürün detay sayfalarında mobilde alt sabit "Sepete ekle" çubuğu var;
   // butonu onunla çakışmaması için yukarı kaydır (masaüstünde normal konum).

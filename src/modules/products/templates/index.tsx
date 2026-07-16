@@ -6,6 +6,8 @@ import ProductOnboardingCta from "@modules/products/components/product-onboardin
 import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
+import ProductCertifications from "@modules/products/components/product-certifications"
+import Breadcrumb from "@modules/common/components/breadcrumb"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
@@ -46,10 +48,26 @@ const ProductTemplate = async ({
     countryCode,
   })
 
+  // Görünür kırıntı navigasyonu. Varsa ürünün ilk kategorisi araya eklenir.
+  const primaryCategory = (product as any).categories?.[0] as
+    | { name?: string; handle?: string }
+    | undefined
+  const breadcrumbItems = [
+    { label: "Ana Sayfa", href: "/" },
+    { label: "Mağaza", href: "/store" },
+    ...(primaryCategory?.handle && primaryCategory?.name
+      ? [{ label: primaryCategory.name, href: `/categories/${primaryCategory.handle}` }]
+      : []),
+    { label: product.title || "Ürün" },
+  ]
+
   return (
     <>
       {/* Davranış izleme: ürün görüntüleme olayı (görsel çıktı yok) */}
       <TrackView productId={product.id} handle={product.handle} />
+      <div className="content-container pt-4 pb-1">
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
       <div
         className="content-container flex flex-col md:flex-row md:items-start py-6 gap-y-8 md:gap-x-12 lg:gap-x-16 relative"
         data-testid="product-container"
@@ -74,6 +92,9 @@ const ProductTemplate = async ({
           >
             <ProductActionsWrapper id={product.id} region={region} />
           </Suspense>
+
+          {/* Satın alma anında güven: yapılandırılmış sertifikalar (varsa) */}
+          <ProductCertifications product={product} />
 
           <ProductOnboardingCta />
         </div>

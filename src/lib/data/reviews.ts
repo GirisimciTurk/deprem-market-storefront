@@ -8,12 +8,15 @@ export type StoreReview = {
   product_id: string
   product_handle: string
   product_title: string
-  customer_id: string | null
+  customer_id?: string | null
   customer_name: string
   rating: number
   comment: string
-  status: "pending" | "approved" | "spam"
+  status?: "pending" | "approved" | "spam"
   images: string[] | null
+  // "Satın Almış Müşteri" rozeti: müşteri bu ürünü gerçekten satın aldıysa true.
+  // (Yalnız giriş yapmış olmak değil — backend siparişten doğrular.)
+  verified_purchase?: boolean
   created_at: string
 }
 

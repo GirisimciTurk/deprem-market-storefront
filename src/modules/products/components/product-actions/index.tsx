@@ -135,6 +135,20 @@ export default function ProductActions({
     return false
   }, [selectedVariant])
 
+  // "Son X adet" aciliyeti — yalnız stok yönetilen ve backorder'sız varyantta anlamlı.
+  const remainingStock = useMemo(() => {
+    if (selectedVariant?.manage_inventory && !selectedVariant?.allow_backorder) {
+      return selectedVariant?.inventory_quantity ?? 0
+    }
+    return null
+  }, [selectedVariant])
+  const LOW_STOCK_THRESHOLD = 10
+  const isLowStock =
+    inStock &&
+    remainingStock !== null &&
+    remainingStock > 0 &&
+    remainingStock <= LOW_STOCK_THRESHOLD
+
   const actionsRef = useRef<HTMLDivElement>(null)
 
   const inView = useIntersection(actionsRef, "0px")
@@ -222,6 +236,20 @@ export default function ProductActions({
             </div>
           )}
         </div>
+
+        {/* Aciliyet: stok azaldıysa "son X adet" uyarısı (deprem nişinde dönüşüm). */}
+        {isLowStock && (
+          <div
+            className="flex items-center gap-x-2 text-sm font-bold text-orange-700 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2"
+            role="status"
+          >
+            <span className="relative flex h-2 w-2 flex-shrink-0">
+              <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-600"></span>
+            </span>
+            Son {remainingStock} adet — stoklar tükenmek üzere!
+          </div>
+        )}
 
         {/* Geçerli varyant seçili ve tükendiyse: "Sepete Ekle" yerine doğrudan
             "Stoğa gelince haber ver" butonu göster. */}
