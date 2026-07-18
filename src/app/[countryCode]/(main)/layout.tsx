@@ -13,6 +13,7 @@ import CookieConsent from "@modules/layout/components/cookie-consent"
 import PushPrompt from "@modules/layout/components/push-prompt"
 import InstallPrompt from "@modules/layout/components/install-prompt"
 import ContactDock from "@modules/layout/components/contact-dock"
+import PromoVideoPopup from "@modules/layout/components/promo-video-popup"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -59,6 +60,7 @@ export default async function PageLayout(props: {
       <PushPrompt />
       <InstallPrompt />
       <ContactDock countryCode={countryCode} region={region ?? null} />
+      <PromoVideoPopup />
     </>
   )
 }

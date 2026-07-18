@@ -380,5 +380,10 @@
     "gotIt": "Got it",
     "share": "Share",
     "linkCopied": "Link copied"
+  },
+  "promoVideo": {
+    "closeAria": "Close video",
+    "unmute": "Unmute",
+    "mute": "Mute"
   }
 }

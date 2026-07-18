@@ -380,5 +380,10 @@
     "gotIt": "Anladım",
     "share": "Paylaş",
     "linkCopied": "Bağlantı kopyalandı"
+  },
+  "promoVideo": {
+    "closeAria": "Videoyu kapat",
+    "unmute": "Sesi aç",
+    "mute": "Sesi kapat"
   }
 }
