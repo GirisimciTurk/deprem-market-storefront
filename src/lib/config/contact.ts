@@ -2,21 +2,20 @@
  * Merkezi iletişim bilgileri. Tüm bileşenler (ContactDock, WhatsApp butonu,
  * Organization JSON-LD) buradan okur — numaralar tek yerde yönetilir.
  *
- * Gerçek değerler ENV'den gelir. Çağrı merkezi numarası YALNIZ env ile ayarlanınca
- * gösterilir; ayarlı değilse ilgili UI gizlenir (canlıya asla placeholder/sahte
- * numara düşmesin diye). WhatsApp için makul bir fallback korunur.
+ * Varsayılanlar gerçek işletme numaralarıdır; ENV ile override edilebilir.
+ * Çağrı merkezi env ile boşaltılırsa (DISPLAY="") ilgili UI gizlenir.
  *
- *   NEXT_PUBLIC_WHATSAPP_NUMBER        e.g. 905395741904  (+ ve boşluksuz)
- *   NEXT_PUBLIC_CALL_CENTER_DISPLAY    e.g. 0 (850) 000 00 00
- *   NEXT_PUBLIC_CALL_CENTER_TEL        e.g. +908500000000  (E.164)
+ *   NEXT_PUBLIC_WHATSAPP_NUMBER        e.g. 905446943278  (+ ve boşluksuz)
+ *   NEXT_PUBLIC_CALL_CENTER_DISPLAY    e.g. 0850 241 70 00
+ *   NEXT_PUBLIC_CALL_CENTER_TEL        e.g. +908502417000  (E.164)
  */
-const whatsappNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "905395741904").replace(
+const whatsappNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "905446943278").replace(
   /\D/g,
   ""
 )
 
-const callDisplay = (process.env.NEXT_PUBLIC_CALL_CENTER_DISPLAY || "").trim()
-const callTelEnv = (process.env.NEXT_PUBLIC_CALL_CENTER_TEL || "").trim()
+const callDisplay = (process.env.NEXT_PUBLIC_CALL_CENTER_DISPLAY || "0850 241 70 00").trim()
+const callTelEnv = (process.env.NEXT_PUBLIC_CALL_CENTER_TEL || "+908502417000").trim()
 
 export const SITE_CONTACT = {
   whatsappNumber,

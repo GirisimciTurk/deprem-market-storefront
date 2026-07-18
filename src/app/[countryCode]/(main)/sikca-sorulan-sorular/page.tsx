@@ -237,7 +237,7 @@ export default async function SikcaSorulanSorularPage() {
             Bize Yazın
           </LocalizedClientLink>
           <a
-            href="https://api.whatsapp.com/send?phone=905395741904"
+            href="https://api.whatsapp.com/send?phone=905446943278"
             target="_blank"
             rel="noreferrer"
             className="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-colors shadow-sm"

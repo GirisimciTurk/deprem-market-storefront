@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { getLocale, getTranslations } from "next-intl/server"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { SITE_CONTACT, whatsappUrl } from "@lib/config/contact"
 import ContactForm from "./contact-form"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,6 +18,7 @@ export default async function IletisimPage(props: {
   const params = await props.params
   const { countryCode } = params
   const isTr = (await getLocale()) === "tr"
+  const callCenter = SITE_CONTACT.callCenter
 
   if (!isTr) {
     return (
@@ -26,7 +28,7 @@ export default async function IletisimPage(props: {
         </h1>
         <div className="prose prose-slate max-w-none text-ui-fg-subtle space-y-6">
           <p>
-            Please contact us via phone at +90 (539) 574 19 04 or email at destek@depremtek.market.
+            Please contact us via phone at {callCenter?.display} or email at destek@depremtek.market.
           </p>
           <p>
             Managed by <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong>.
@@ -63,8 +65,8 @@ export default async function IletisimPage(props: {
                 <p className="text-xs text-ui-fg-muted">Hafta içi 09:00 - 18:00</p>
               </div>
             </div>
-            <a href="tel:+905395741904" className="text-ui-fg-base hover:text-brand-600 font-semibold block text-base">
-              +90 (539) 574 19 04
+            <a href={`tel:${callCenter?.tel ?? ""}`} className="text-ui-fg-base hover:text-brand-600 font-semibold block text-base">
+              {callCenter?.display}
             </a>
           </div>
 
@@ -76,9 +78,9 @@ export default async function IletisimPage(props: {
                 <p className="text-xs text-ui-fg-muted">7/24 Mesaj Gönderebilirsiniz</p>
               </div>
             </div>
-            <a 
-              href="https://api.whatsapp.com/send?phone=905395741904" 
-              target="_blank" 
+            <a
+              href={whatsappUrl()}
+              target="_blank"
               rel="noreferrer"
               className="text-ui-fg-base hover:text-green-600 font-semibold block text-base"
             >
