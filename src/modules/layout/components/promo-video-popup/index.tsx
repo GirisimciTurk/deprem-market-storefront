@@ -9,8 +9,9 @@ const SHOWN_KEY = "_dm_promo_video_shown"
 
 /**
  * Site açılışında bir kez çıkan tanıtım videosu popup'ı (merkez modal).
- * Video sessiz otomatik oynar (tarayıcı politikası); "Sesi aç" ile ses açılır.
- * Kapat / Esc / arka plana tıklama ile kapanır. Video same-origin
+ * Tarayıcı politikası gereği video SESSİZ otomatik oynar; ses ancak bir kullanıcı
+ * etkileşimiyle açılabilir → videoya (veya "Sesi Aç" göstergesine) dokununca ses
+ * açılır. Kapat / Esc / arka plana tıklama ile kapanır. Video same-origin
  * (/videos/tanitim.mp4) olduğu için CSP default-src 'self' ile uyumlu.
  */
 const PromoVideoPopup = () => {
@@ -56,19 +57,28 @@ const PromoVideoPopup = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
+  // `muted` state'i DOM ile senkron tut (React'in muted prop'unu güvenilir
+  // uygulamaması ihtimaline karşı belt-and-suspenders).
+  useEffect(() => {
+    const v = videoRef.current
+    if (v) v.muted = muted
+  }, [muted, open])
+
   const close = () => {
     videoRef.current?.pause()
     setOpen(false)
   }
 
+  // Sesi aç/kapat — kullanıcı jesti İÇİNDE senkron uygula (yoksa tarayıcı
+  // ses açmayı engelleyebilir), sonra state'i güncelle.
   const toggleMute = () => {
     const v = videoRef.current
-    if (!v) return
-    const next = !v.muted
-    v.muted = next
+    const next = !muted
+    if (v) {
+      v.muted = next
+      if (!next) v.play().catch(() => {})
+    }
     setMuted(next)
-    // Sesi açmak bir kullanıcı jesti → oynatmayı garantiye al.
-    if (!next) v.play().catch(() => {})
   }
 
   if (!open) return null
@@ -89,26 +99,38 @@ const PromoVideoPopup = () => {
           src="/videos/tanitim.mp4"
           poster="/videos/tanitim-poster.jpg"
           autoPlay
-          muted
+          muted={muted}
           loop
           playsInline
-          className="h-full w-full object-cover"
+          onClick={toggleMute}
+          className="h-full w-full cursor-pointer object-cover"
         />
+
+        {/* Sessizken büyük "Sesi Aç" göstergesi — videoya dokunmak da ses açar
+            (bu katman pointer-events-none, tık videoya geçer). */}
+        {muted && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <span className="flex items-center gap-2 rounded-full bg-black/60 px-5 py-3 text-base font-bold text-white shadow-lg backdrop-blur-md animate-pulse">
+              <Volume2 className="h-5 w-5" />
+              {t("tapForSound")}
+            </span>
+          </div>
+        )}
 
         {/* Kapat */}
         <button
           onClick={close}
           aria-label={t("closeAria")}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-md transition-colors hover:bg-black/75"
+          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-md transition-colors hover:bg-black/75"
         >
           <X className="h-5 w-5" />
         </button>
 
-        {/* Sesi aç / kapat */}
+        {/* Kalıcı sesi aç/kapat kontrolü */}
         <button
           onClick={toggleMute}
           aria-label={muted ? t("unmute") : t("mute")}
-          className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full bg-black/55 px-3.5 py-2 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-black/75"
+          className="absolute bottom-3 left-3 z-10 flex items-center gap-2 rounded-full bg-black/55 px-3.5 py-2 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-black/75"
         >
           {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           {muted ? t("unmute") : t("mute")}

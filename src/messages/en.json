@@ -384,6 +384,7 @@
   "promoVideo": {
     "closeAria": "Close video",
     "unmute": "Unmute",
-    "mute": "Mute"
+    "mute": "Mute",
+    "tapForSound": "Tap for sound"
   }
 }

@@ -384,6 +384,7 @@
   "promoVideo": {
     "closeAria": "Videoyu kapat",
     "unmute": "Sesi aç",
-    "mute": "Sesi kapat"
+    "mute": "Sesi kapat",
+    "tapForSound": "Ses için dokun"
   }
 }
