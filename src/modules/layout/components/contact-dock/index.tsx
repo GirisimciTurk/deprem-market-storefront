@@ -213,9 +213,11 @@ export default function ContactDock({
             </div>
           )}
 
-          {/* Açılan yığın (numara kartı + yelpaze): kısa/yatay ekranlarda taşmasın
-              diye yükseklik sınırlı ve kaydırılabilir; FAB sabit kalır. */}
-          <div className="flex max-h-[calc(100svh-7rem)] flex-col items-end overflow-y-auto">
+          {/* Açılan yığın (numara kartı + yelpaze). Kaydırma YOK: eskiden burada
+              max-h + overflow-y-auto vardı, ama overflow-y spec gereği overflow-x'i de
+              auto'ya çekiyor ve öğeler sağa yapışık olduğu için hover:scale-110 birkaç
+              piksel taşıp istenmeyen yatay scrollbar doğuruyordu. */}
+          <div className="flex flex-col items-end">
             {/* Numara kartı (telefon öğesi açıkken; yalnız çağrı merkezi ayarlıysa) */}
             {open && phoneOpen && CALL_CENTER && (
               <div className="mb-3 w-[230px] rounded-2xl border border-ui-border-base bg-white p-4 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200 motion-reduce:animate-none">
