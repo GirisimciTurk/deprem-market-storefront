@@ -161,12 +161,12 @@
     }
   },
   "mascot": {
-    "name": "Depremzede",
+    "name": "Deprem Savaşçısı",
     "role": "Earthquake Prep Assistant",
-    "greeting": "Hi! I'm Depremzede 👷 You can find any earthquake-related solution you're looking for right here. So, what are you looking for?",
-    "bubble": "Hi! I'm Depremzede 👷 Want me to help you find any earthquake-related solution?",
+    "greeting": "Hi! I'm Deprem Savaşçısı 👷 You can find any earthquake-related solution you're looking for right here. So, what are you looking for?",
+    "bubble": "Hi! I'm Deprem Savaşçısı 👷 Want me to help you find any earthquake-related solution?",
     "bubbleCta": "Let's start",
-    "openAria": "Open the Depremzede assistant",
+    "openAria": "Open the Deprem Savaşçısı assistant",
     "closeAria": "Close",
     "inputPlaceholder": "Ask something or search products...",
     "send": "Send",
@@ -198,7 +198,7 @@
     "whatsapp": "WhatsApp",
     "phone": "Call Center",
     "phoneTitle": "Call Center",
-    "phoneHours": "Weekdays 09:00 – 18:00",
+    "phoneHours": "Weekdays 09:00 – 17:00",
     "callNow": "Call Now",
     "copy": "Copy number",
     "copied": "Copied ✓"

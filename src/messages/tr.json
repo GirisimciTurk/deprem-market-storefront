@@ -161,12 +161,12 @@
     }
   },
   "mascot": {
-    "name": "Depremzede",
+    "name": "Deprem Savaşçısı",
     "role": "Deprem Hazırlık Asistanı",
-    "greeting": "Merhaba! Ben Depremzede 👷 Burada depremle ilgili aradığın her çözümü bulabilirsin. Peki sen ne arıyorsun?",
-    "bubble": "Merhaba! Ben Depremzede 👷 Depremle ilgili aradığın her çözümü bulmana yardım edeyim mi?",
+    "greeting": "Merhaba! Ben Deprem Savaşçısı 👷 Burada depremle ilgili aradığın her çözümü bulabilirsin. Peki sen ne arıyorsun?",
+    "bubble": "Merhaba! Ben Deprem Savaşçısı 👷 Depremle ilgili aradığın her çözümü bulmana yardım edeyim mi?",
     "bubbleCta": "Hadi başlayalım",
-    "openAria": "Depremzede asistanını aç",
+    "openAria": "Deprem Savaşçısı asistanını aç",
     "closeAria": "Kapat",
     "inputPlaceholder": "Bir şey sor ya da ürün ara...",
     "send": "Gönder",
@@ -198,7 +198,7 @@
     "whatsapp": "WhatsApp",
     "phone": "Çağrı Merkezi",
     "phoneTitle": "Çağrı Merkezi",
-    "phoneHours": "Hafta içi 09:00 – 18:00",
+    "phoneHours": "Hafta içi 09:00 – 17:00",
     "callNow": "Hemen Ara",
     "copy": "Numarayı kopyala",
     "copied": "Kopyalandı ✓"

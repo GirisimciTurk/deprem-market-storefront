@@ -21,7 +21,7 @@ const COOKIE_KEY = "_deprem_market_cookie_consent"
 /**
  * ContactDock — sağ-alt "speed-dial" iletişim merkezi.
  * Tek genel FAB (kulaklık/destek ikonu) → dokununca 3 öğe yelpazelenir:
- * Asistan (Depremzede sohbeti), WhatsApp, Çağrı Merkezi (numara kartı).
+ * Asistan (Deprem Savaşçısı sohbeti), WhatsApp, Çağrı Merkezi (numara kartı).
  * Önceki üç ayrı yüzen buton (WhatsApp + maskot) bu tek butonda toplanır.
  */
 export default function ContactDock({

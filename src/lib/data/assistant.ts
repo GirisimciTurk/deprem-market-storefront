@@ -44,7 +44,7 @@ type RawAgent = {
 }
 
 /**
- * Maskot "Depremzede" site asistanı. Kullanıcı mesajı + kısa geçmiş + bulunduğu sayfa →
+ * Maskot "Deprem Savaşçısı" site asistanı. Kullanıcı mesajı + kısa geçmiş + bulunduğu sayfa →
  * (1) backend /store/assistant'tan ham agent yanıtı (reply + ürün id'leri + yönlendirme);
  * (2) id'lerle tam ürünler (fiyat/region/görsel) çekilir; (3) yönlendirme hedefi çözülür.
  *
