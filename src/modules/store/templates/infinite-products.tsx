@@ -57,7 +57,7 @@ export default function InfiniteProducts({
       const nextPageNum = page + 1
       const queryParams: any = { limit: 12 }
       if (collectionId) queryParams["collection_id"] = [collectionId]
-      if (categoryId) queryParams["category_id"] = [categoryId]
+      if (categoryId) queryParams["category_id"] = categoryId.split(",").filter(Boolean)
       if (productsIds) queryParams["id"] = productsIds
       if (sortBy === "created_at") queryParams["order"] = "created_at"
 

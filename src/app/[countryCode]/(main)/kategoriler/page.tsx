@@ -49,7 +49,7 @@ export default async function CategoriesIndexPage() {
               >
                 <div className="flex items-baseline justify-between gap-3">
                   <LocalizedClientLink
-                    href={`/categories/${cat.handle}`}
+                    href={`/store?categoryId=${cat.id}`}
                     className="text-lg font-bold text-slate-800 hover:text-brand-600 transition-colors"
                   >
                     {cat.name}
@@ -65,7 +65,7 @@ export default async function CategoriesIndexPage() {
                     {children.map((ch) => (
                       <li key={ch.id}>
                         <LocalizedClientLink
-                          href={`/categories/${ch.handle}`}
+                          href={`/store?categoryId=${ch.id}`}
                           className="text-sm text-slate-500 hover:text-brand-600 transition-colors"
                         >
                           {ch.name}

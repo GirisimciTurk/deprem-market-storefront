@@ -36,6 +36,12 @@ const StoreTemplate = async ({
   const activeShowcase = isShowcaseKey(showcase) ? showcase : undefined
   const categories = await listCategories().catch(() => [])
 
+  // /kategoriler sayfasından ?categoryId=<id> ile gelindiğinde başlıkta seçili
+  // kategori ad(lar)ını göster (jenerik "Tüm ürünler" yerine bağlam ver).
+  const selectedCategoryNames = (categoryId ? categoryId.split(",").filter(Boolean) : [])
+    .map((id) => categories.find((c) => c.id === id)?.name)
+    .filter(Boolean) as string[]
+
   return (
     <>
       <div
@@ -62,7 +68,19 @@ const StoreTemplate = async ({
               </p>
             </div>
           )}
-          {showSeoContent && !activeShowcase && (
+          {!activeShowcase && selectedCategoryNames.length > 0 && (
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-slate-800">
+                {selectedCategoryNames.join(", ")}
+              </h1>
+              <p className="mt-2 text-sm text-slate-500">
+                {selectedCategoryNames.length > 1
+                  ? "Seçili kategorilerdeki ürünler."
+                  : "Bu kategorideki tüm ürünler."}
+              </p>
+            </div>
+          )}
+          {showSeoContent && !activeShowcase && selectedCategoryNames.length === 0 && (
             <div className="mb-6">
               <h1
                 data-testid="store-page-title"

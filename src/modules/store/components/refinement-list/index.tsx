@@ -1,9 +1,9 @@
 "use client"
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useState, useEffect, Fragment } from "react"
+import { useCallback, useMemo, useState, useEffect, Fragment } from "react"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
-import { SlidersHorizontal, X } from "lucide-react"
+import { ChevronDown, SlidersHorizontal, X } from "lucide-react"
 import SortProducts, { SortOptions } from "./sort-products"
 import { SHOWCASE_CATEGORIES } from "@lib/showcase"
 import { clx } from "@modules/common/components/ui"
@@ -37,11 +37,43 @@ const RefinementList = ({
   const [maxInput, setMaxInput] = useState(maxPrice || "")
   // Mobil filtre çekmecesi açık/kapalı + aktif filtre rozeti.
   const [mobileOpen, setMobileOpen] = useState(false)
+  // Kategori çoklu seçim: URL'de virgülle ayrılmış id listesi (cat_1,cat_2).
+  const selectedCategoryIds = categoryId ? categoryId.split(",").filter(Boolean) : []
+
+  // Kategori ağacı: parent_category_id ile kökler + çocuk haritası. Parent'ı
+  // listede olmayan kategori (ör. limit dışı) de kök sayılır ki kaybolmasın.
+  const { rootCategories, childrenMap } = useMemo(() => {
+    const byId = new Map(categories.map((c) => [c.id, c]))
+    const childrenMap = new Map<string, any[]>()
+    const roots: any[] = []
+    for (const c of categories) {
+      const pid = c.parent_category_id ?? c.parent_category?.id
+      if (pid && byId.has(pid)) {
+        const arr = childrenMap.get(pid) ?? []
+        arr.push(c)
+        childrenMap.set(pid, arr)
+      } else {
+        roots.push(c)
+      }
+    }
+    return { rootCategories: roots, childrenMap }
+  }, [categories])
+
+  // Kullanıcının açtığı dallar. Seçili bir alt kategori içeren dal her zaman açık
+  // görünür (aşağıdaki hasSelectedDescendant), böylece seçim gizli kalmaz.
+  const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set())
+  const toggleExpand = (id: string) =>
+    setExpandedCats((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   const activeCount =
     (minPrice ? 1 : 0) +
     (maxPrice ? 1 : 0) +
     (inStock === "true" ? 1 : 0) +
-    (categoryId ? 1 : 0) +
+    selectedCategoryIds.length +
     (showcase ? 1 : 0)
 
   useEffect(() => {
@@ -86,11 +118,10 @@ const RefinementList = ({
   }
 
   const handleCategoryToggle = (id: string) => {
-    if (categoryId === id) {
-      updateQueryParams({ categoryId: null })
-    } else {
-      updateQueryParams({ categoryId: id })
-    }
+    const next = selectedCategoryIds.includes(id)
+      ? selectedCategoryIds.filter((c) => c !== id)
+      : [...selectedCategoryIds, id]
+    updateQueryParams({ categoryId: next.length ? next.join(",") : null })
   }
 
   const handleStockToggle = () => {
@@ -103,6 +134,19 @@ const RefinementList = ({
     updateQueryParams({ showcase: showcase === key ? null : key })
   }
 
+  // Tüm filtre seçimlerini tek seferde kaldır (sıralama korunur).
+  const handleClearAll = () => {
+    setMinInput("")
+    setMaxInput("")
+    updateQueryParams({
+      categoryId: null,
+      showcase: null,
+      minPrice: null,
+      maxPrice: null,
+      inStock: null,
+    })
+  }
+
   // SortProducts callback'i (name, value) imzasıyla çağırır → gerçek sıralama
   // değeri İKİNCİ argümandır. Önceden ilk argüman ("sortBy") alınıyordu, bu yüzden
   // URL'e sortBy=sortBy yazılıp sıralama hiç uygulanmıyordu.
@@ -110,8 +154,82 @@ const RefinementList = ({
     updateQueryParams({ sortBy: value })
   }
 
+  // Bir kategorinin altında (herhangi bir derinlikte) seçili kategori var mı?
+  const hasSelectedDescendant = (id: string): boolean => {
+    const kids = childrenMap.get(id) ?? []
+    return kids.some(
+      (k) => selectedCategoryIds.includes(k.id) || hasSelectedDescendant(k.id)
+    )
+  }
+
+  // Kategori ağacını özyinelemeli çiz. İsim = filtre seç/kaldır; chevron = dal aç/kapa.
+  const renderCategoryNodes = (nodes: any[], depth: number): React.ReactNode =>
+    nodes.map((cat) => {
+      const kids = childrenMap.get(cat.id) ?? []
+      const hasKids = kids.length > 0
+      const isSelected = selectedCategoryIds.includes(cat.id)
+      const isOpen = expandedCats.has(cat.id) || hasSelectedDescendant(cat.id)
+      return (
+        <div key={cat.id}>
+          <div
+            className={`flex items-center rounded-xl transition-all duration-200 ${
+              isSelected
+                ? "bg-brand-600 text-white font-semibold shadow-sm"
+                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            }`}
+            style={{ paddingLeft: depth * 14 }}
+          >
+            <button
+              onClick={() => handleCategoryToggle(cat.id)}
+              className="flex-1 flex items-center justify-between text-left text-sm py-2 px-3 select-none"
+            >
+              <span>{cat.name}</span>
+              {isSelected && (
+                <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-bold">
+                  Aktif
+                </span>
+              )}
+            </button>
+            {hasKids && (
+              <button
+                type="button"
+                onClick={() => toggleExpand(cat.id)}
+                aria-label={isOpen ? "Alt kategorileri gizle" : "Alt kategorileri göster"}
+                aria-expanded={isOpen}
+                className="p-2 mr-1 shrink-0 rounded-lg hover:bg-black/5"
+              >
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-200 ${
+                    isOpen ? "rotate-180" : ""
+                  } ${isSelected ? "text-white" : "text-slate-400"}`}
+                />
+              </button>
+            )}
+          </div>
+          {hasKids && isOpen && (
+            <div className="mt-1 flex flex-col gap-y-1">
+              {renderCategoryNodes(kids, depth + 1)}
+            </div>
+          )}
+        </div>
+      )
+    })
+
   const filters = (
     <>
+      {/* 0. Seçimleri Temizle — en üstte, yalnız aktif filtre varken. Ne seçildiği
+          burada ÖZETLENMEZ; seçili durum ilgili bölümlerde zaten vurgulanıyor. */}
+      {activeCount > 0 && (
+        <button
+          type="button"
+          onClick={handleClearAll}
+          className="flex items-center justify-center gap-x-2 w-full py-2.5 rounded-2xl border border-brand-200 bg-brand-50/60 text-sm font-semibold text-brand-700 hover:bg-brand-100/60 transition-all duration-200"
+        >
+          <X className="w-4 h-4" />
+          Seçimleri Temizle
+        </button>
+      )}
+
       {/* 1. Sıralama Seçenekleri */}
       <div className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60">
         <SortProducts sortBy={sortBy} setQueryParams={handleSortChange} data-testid={dataTestId} />
@@ -121,51 +239,33 @@ const RefinementList = ({
       {categories.length > 0 && (
         <div className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60 flex flex-col gap-y-3">
           <span className="text-xs font-bold text-slate-600 tracking-wider uppercase">Kategoriler</span>
-          <div className="flex flex-col gap-y-1 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
-            {categories.map((cat) => {
-              const isSelected = categoryId === cat.id
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryToggle(cat.id)}
-                  className={`flex items-center justify-between text-left text-sm py-2 px-3 rounded-xl transition-all duration-200 select-none ${
-                    isSelected
-                      ? "bg-brand-600 text-white font-semibold shadow-sm"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  }`}
-                >
-                  <span>{cat.name}</span>
-                  {isSelected && (
-                    <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-bold">Aktif</span>
-                  )}
-                </button>
-              )
-            })}
+          <div className="flex flex-col gap-y-1 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin">
+            {renderCategoryNodes(rootCategories, 0)}
           </div>
         </div>
       )}
 
-      {/* Vitrin Kategorileri (sabit) — tekli seç/kaldır → ?showcase=<key> */}
+      {/* Hızlı Filtreler (sabit vitrin etiketleri) — gerçek kategori değil, pazarlama
+          rozeti. Kategori listesiyle karışmasın diye yatay "chip" olarak gösterilir.
+          Tekli seç/kaldır → ?showcase=<key> */}
       <div className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60 flex flex-col gap-y-3">
-        <span className="text-xs font-bold text-slate-600 tracking-wider uppercase">Vitrin Kategorileri</span>
-        <div className="flex flex-col gap-y-1">
+        <span className="text-xs font-bold text-slate-600 tracking-wider uppercase">Hızlı Filtreler</span>
+        <div className="flex flex-wrap gap-2">
           {SHOWCASE_CATEGORIES.map((sc) => {
             const isSelected = showcase === sc.key
             return (
               <button
                 key={sc.key}
                 onClick={() => handleShowcaseToggle(sc.key)}
-                className={`flex items-center gap-x-2 text-left text-sm py-2 px-3 rounded-xl transition-all duration-200 select-none ${
+                aria-pressed={isSelected}
+                className={`flex items-center gap-x-1.5 text-sm py-1.5 px-3 rounded-full border transition-all duration-200 select-none ${
                   isSelected
-                    ? "bg-brand-600 text-white font-semibold shadow-sm"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    ? "bg-brand-600 border-brand-600 text-white font-semibold shadow-sm"
+                    : "bg-white border-slate-200 text-slate-600 hover:border-brand-300 hover:text-brand-700"
                 }`}
               >
                 <span>{sc.emoji}</span>
-                <span className="flex-1">{sc.label}</span>
-                {isSelected && (
-                  <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-bold">Aktif</span>
-                )}
+                <span>{sc.label}</span>
               </button>
             )
           })}

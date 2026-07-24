@@ -45,7 +45,8 @@ export default async function PaginatedProducts({
   }
 
   if (categoryId) {
-    queryParams["category_id"] = [categoryId]
+    // categoryId virgülle ayrılmış çoklu seçim olabilir (cat_1,cat_2).
+    queryParams["category_id"] = categoryId.split(",").filter(Boolean)
   }
 
   if (productsIds) {
