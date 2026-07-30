@@ -51,12 +51,61 @@ export function getPaymentLabel(status: string): { text: string; color: StatusCo
   }
 }
 
+/** Backend'in ürettiği satıcı-bazlı aşama (bkz. backend/src/lib/order-stage.ts). */
+export type OrderStage = "received" | "preparing" | "shipped" | "canceled"
+
+export type SellerShipment = {
+  seller_order_id: string
+  seller_name?: string
+  seller_handle?: string
+  stage: OrderStage
+  stage_label?: string
+  fulfillment_status?: string
+  preparing_at?: string | null
+  fulfilled_at?: string | null
+  carrier?: string | null
+  tracking_number?: string | null
+  tracking_url?: string | null
+}
+
+/** Aşamanın çizelgedeki adım indeksi. */
+const STAGE_STEP: Record<Exclude<OrderStage, "canceled">, number> = {
+  received: 0,
+  preparing: 1,
+  shipped: 2,
+}
+
+export function getStageLabel(stage: OrderStage): { text: string; color: StatusColor } {
+  switch (stage) {
+    case "received":
+      return { text: "Sipariş Alındı", color: "grey" }
+    case "preparing":
+      return { text: "Hazırlanıyor", color: "orange" }
+    case "shipped":
+      return { text: "Kargoya Verildi", color: "green" }
+    case "canceled":
+      return { text: "İptal Edildi", color: "red" }
+  }
+}
+
+/** Aktif (iptal olmayan) paketler arasında en GEÇ damgayı bul — o aşamanın tamamlanma anı. */
+function latestDate(shipments: SellerShipment[], field: "preparing_at" | "fulfilled_at") {
+  const times = shipments
+    .filter((s) => s.stage !== "canceled")
+    .map((s) => s[field])
+    .filter((v): v is string => !!v)
+    .map((v) => new Date(v).getTime())
+    .filter((t) => Number.isFinite(t))
+  if (!times.length) return null
+  return new Date(Math.max(...times)).toLocaleDateString("tr-TR")
+}
+
 export function getStatusSteps(orderObj: any): {
   currentStep: number
   isCanceled: boolean
   steps: TrackingStep[]
 } {
-  const isCanceled = orderObj.status === "canceled"
+  const isCanceled = orderObj.status === "canceled" || orderObj.stage === "canceled"
   const fStatus = orderObj.fulfillment_status
 
   const steps: TrackingStep[] = [
@@ -113,6 +162,34 @@ export function getStatusSteps(orderObj: any): {
       ] as TrackingStep[],
     }
   }
+
+  // ── BİRİNCİL KAYNAK: satıcı alt-siparişlerinden türetilen aşama ───────────
+  // Neden: çekirdek Medusa order.fulfillment_status bu sistemde HİÇ ilerlemiyor
+  // (core fulfillment yaratılmıyor), o yüzden aşağıdaki eski mantık her siparişi
+  // sonsuza kadar "Hazırlanıyor"da tutuyordu. Gerçek aşama seller_order'da.
+  // Backend `stage` alanını /store/order-tracking yanıtında gönderir.
+  const shipments: SellerShipment[] = Array.isArray(orderObj.seller_shipments)
+    ? orderObj.seller_shipments
+    : []
+  const stage: OrderStage | null = orderObj.stage ?? null
+
+  if (stage && stage !== "canceled") {
+    const current = STAGE_STEP[stage]
+    for (let i = 1; i <= current; i++) steps[i].completed = true
+    steps[current].completed = true
+    steps[current].active = true
+
+    // Tarihler: her aşamanın en GEÇ damgası (tüm paketler o aşamayı geçtiği an).
+    steps[1].date = latestDate(shipments, "preparing_at")
+    steps[2].date = latestDate(shipments, "fulfilled_at")
+    // "Sipariş Alındı" her zaman tamamlanmış ve tarihi sipariş tarihidir (yukarıda set edildi).
+
+    return { currentStep: current, isCanceled: false, steps }
+  }
+
+  // ── YEDEK: eski çekirdek-durum mantığı ────────────────────────────────────
+  // Alt-sipariş yoksa (stage null) buraya düşer: pazaryeri bölünmesi yapılmamış
+  // eski siparişler ve /store/order-tracking dışından beslenen ekranlar.
 
   // Mark Preparing
   if (fStatus === "not_fulfilled") {

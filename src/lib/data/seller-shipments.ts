@@ -12,7 +12,13 @@ export type StoreSellerShipment = {
   seller_order_id: string
   seller_name: string
   seller_handle: string
+  /** Türetilmiş aşama — 4 aşamalı takip çizelgesiyle aynı dil (backend/lib/order-stage.ts). */
+  stage?: "received" | "preparing" | "shipped" | "canceled"
+  stage_label?: string
+  /** Ham enum. Backend `stage` göndermezse buradan türetiliyor (geriye dönük uyum). */
   fulfillment_status: string
+  preparing_at?: string | null
+  fulfilled_at?: string | null
   carrier?: string | null
   tracking_number?: string | null
   tracking_url?: string | null

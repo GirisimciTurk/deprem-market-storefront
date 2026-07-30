@@ -13,7 +13,12 @@ import {
   Badge,
 } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { getFulfillmentLabel, getPaymentLabel, getStatusSteps } from "./tracking-utils"
+import {
+  getFulfillmentLabel,
+  getPaymentLabel,
+  getStageLabel,
+  getStatusSteps,
+} from "./tracking-utils"
 
 type TrackingClientProps = {
   customer: any | null
@@ -242,13 +247,15 @@ export default function TrackingClient({
                     <span className="text-xl font-bold text-gray-900">
                       Sipariş #{order.display_id}
                     </span>
-                    <Badge
-                      color={
-                        getFulfillmentLabel(order.fulfillment_status).color
-                      }
-                    >
-                      {getFulfillmentLabel(order.fulfillment_status).text}
-                    </Badge>
+                    {/* Rozet ile hemen altındaki çizelge AYNI şeyi söylemeli:
+                        ikisi de satıcı aşamasından beslenir. `stage` yoksa
+                        (alt-siparişi olmayan eski sipariş) eski etikete düşer. */}
+                    {(() => {
+                      const badge = order.stage
+                        ? getStageLabel(order.stage)
+                        : getFulfillmentLabel(order.fulfillment_status)
+                      return <Badge color={badge.color}>{badge.text}</Badge>
+                    })()}
                     <Badge color={getPaymentLabel(order.payment_status).color}>
                       {getPaymentLabel(order.payment_status).text}
                     </Badge>

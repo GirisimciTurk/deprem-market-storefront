@@ -12,28 +12,31 @@ type Props = {
   orderId: string
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: "Hazırlanıyor",
-  not_fulfilled: "Hazırlanıyor",
-  fulfilled: "Kargoda",
-  shipped: "Kargoda",
-  partially_shipped: "Kargoda",
-  delivered: "Teslim Edildi",
+// Aşama etiketleri backend'den `stage_label` olarak GELİYOR; buradaki tablo
+// yalnızca stil eşlemesi ve `stage` göndermeyen eski backend için yedek.
+// 4 aşamanın adları takip çizelgesiyle birebir aynı olmalı — eskiden burada
+// "Kargoda" yazıyordu, çizelgede "Kargoya Verildi"; iki ekran farklı konuşuyordu.
+const STAGE_LABELS: Record<string, string> = {
+  received: "Sipariş Alındı",
+  preparing: "Hazırlanıyor",
+  shipped: "Kargoya Verildi",
   canceled: "İptal",
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-gray-100 text-gray-600",
-  not_fulfilled: "bg-gray-100 text-gray-600",
-  fulfilled: "bg-blue-50 text-blue-600",
-  shipped: "bg-blue-50 text-blue-600",
-  partially_shipped: "bg-blue-50 text-blue-600",
-  delivered: "bg-green-50 text-green-600",
+const STAGE_STYLES: Record<string, string> = {
+  received: "bg-gray-100 text-gray-600",
+  preparing: "bg-amber-50 text-amber-700",
+  shipped: "bg-green-50 text-green-600",
   canceled: "bg-brand-50 text-brand-600",
 }
 
-const statusLabel = (status: string) =>
-  STATUS_LABELS[status] ?? "Hazırlanıyor"
+/** Backend `stage` göndermiyorsa ham enum'dan aşamaya düş (geriye dönük uyum). */
+const stageOf = (s: StoreSellerShipment): string => {
+  if (s.stage) return s.stage
+  if (s.fulfillment_status === "canceled") return "canceled"
+  if (s.fulfillment_status === "fulfilled") return "shipped"
+  return s.preparing_at ? "preparing" : "received"
+}
 
 const SellerShipments = ({ orderId }: Props) => {
   const [shipments, setShipments] = useState<StoreSellerShipment[]>([])
@@ -52,11 +55,11 @@ const SellerShipments = ({ orderId }: Props) => {
     }
   }, [orderId])
 
-  // Hiç shipment yoksa veya hepsi pending+takipsizse bölümü gizle.
+  // "Sipariş Alındı"da olan ve takip numarası da olmayan paketler gösterilecek
+  // bir şey taşımaz → bölümü gizle. Ama "Hazırlanıyor" ARTIK gösterilir:
+  // satıcının bastığı gerçek bir aşama, müşterinin görmesi gereken bilgi.
   const hasVisible = shipments.some(
-    (s) =>
-      !["pending", "not_fulfilled"].includes(s.fulfillment_status) ||
-      !!s.tracking_number
+    (s) => stageOf(s) !== "received" || !!s.tracking_number
   )
 
   if (!loaded || shipments.length === 0 || !hasVisible) {
@@ -68,9 +71,9 @@ const SellerShipments = ({ orderId }: Props) => {
       <h2 className="text-xl-semi">Kargo Takibi</h2>
       <div className="flex flex-col gap-y-3">
         {shipments.map((s) => {
-          const label = statusLabel(s.fulfillment_status)
-          const style =
-            STATUS_STYLES[s.fulfillment_status] ?? "bg-gray-100 text-gray-600"
+          const stage = stageOf(s)
+          const label = s.stage_label ?? STAGE_LABELS[stage] ?? "Hazırlanıyor"
+          const style = STAGE_STYLES[stage] ?? "bg-gray-100 text-gray-600"
           return (
             <div
               key={s.seller_order_id}
