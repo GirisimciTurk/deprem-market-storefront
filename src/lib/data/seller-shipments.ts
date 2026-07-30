@@ -43,3 +43,36 @@ export async function getSellerShipments(
     .then((r) => r.shipments ?? [])
     .catch(() => [])
 }
+
+export type StoreOrderStage = {
+  order_id: string
+  stage: "received" | "preparing" | "shipped" | "canceled"
+  stage_label: string
+}
+
+/**
+ * Birden çok sipariş için aşamayı TEK istekte getirir (sipariş listesi ekranları).
+ * Liste, çekirdek order.fulfillment_status'u gösteriyordu; o alan bu sistemde hiç
+ * ilerlemediği için her sipariş "Hazırlanıyor" görünüyordu.
+ *
+ * Alt-siparişi olmayan ve sahibi olmadığınız siparişler yanıtta yer almaz →
+ * çağıran o siparişler için eski etikete düşer. Hata durumunda boş harita döner,
+ * yani liste hiçbir zaman patlamaz.
+ */
+export async function getOrderStages(
+  orderIds: string[]
+): Promise<Record<string, StoreOrderStage>> {
+  if (!orderIds.length) return {}
+  const headers = { ...(await getAuthHeaders()) }
+  return sdk.client
+    .fetch<{ stages: StoreOrderStage[] }>(`/store/order-stages`, {
+      method: "GET",
+      headers,
+      query: { order_ids: orderIds.join(",") },
+      cache: "no-store",
+    })
+    .then((r) =>
+      Object.fromEntries((r.stages ?? []).map((s) => [s.order_id, s]))
+    )
+    .catch(() => ({}))
+}

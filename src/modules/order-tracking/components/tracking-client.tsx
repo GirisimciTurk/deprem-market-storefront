@@ -18,16 +18,20 @@ import {
   getPaymentLabel,
   getStageLabel,
   getStatusSteps,
+  type OrderStage,
 } from "./tracking-utils"
 
 type TrackingClientProps = {
   customer: any | null
   initialOrders: any[]
+  /** Sipariş id → türetilmiş aşama. Sunucuda hazırlanır; eksikse eski etikete düşülür. */
+  orderStages?: Record<string, { stage: OrderStage; stage_label: string }>
 }
 
 export default function TrackingClient({
   customer,
   initialOrders,
+  orderStages = {},
 }: TrackingClientProps) {
   const [displayId, setDisplayId] = useState("")
   const [email, setEmail] = useState("")
@@ -713,7 +717,12 @@ export default function TrackingClient({
               {initialOrders.length > 0 ? (
                 <div className="flex flex-col gap-3">
                   {initialOrders.map((ord) => {
-                    const fLabel = getFulfillmentLabel(ord.fulfillment_status)
+                    // Aşama varsa onu kullan; yoksa (alt-siparişi olmayan eski
+                    // sipariş) eski çekirdek-durum etiketine düş.
+                    const stage = orderStages[ord.id]?.stage
+                    const fLabel = stage
+                      ? getStageLabel(stage)
+                      : getFulfillmentLabel(ord.fulfillment_status)
                     return (
                       <div
                         key={ord.id}
