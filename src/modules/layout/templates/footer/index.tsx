@@ -17,6 +17,14 @@ export default async function Footer() {
   const productCategories = await listCategories();
   const t = await getTranslations("footer");
 
+  // Footer'da en fazla 5 bağlantı: yalnız üst düzey kategoriler, alt kategoriler yok.
+  // listCategories düz liste döndürür (alt kategoriler dahil), o yüzden ÖNCE süzüp
+  // SONRA kesiyoruz — tersi, ilk 5'in çoğu alt kategori olduğunda neredeyse hiçbir
+  // kategori kalmamasına yol açıyordu.
+  const footerCategories = (productCategories ?? [])
+    .filter((c) => !c.parent_category)
+    .slice(0, 5);
+
   return (
     <footer className="border-t border-ui-border-base w-full">
       <div className="content-container flex flex-col w-full">
@@ -33,7 +41,7 @@ export default async function Footer() {
             </LocalizedClientLink>
           </div>
           <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-4">
-            {productCategories && productCategories?.length > 0 && (
+            {footerCategories.length > 0 && (
               <div className="flex flex-col gap-y-2">
                 <span className="txt-small-plus txt-ui-fg-base">
                   Kategoriler
@@ -42,52 +50,20 @@ export default async function Footer() {
                   className="grid grid-cols-1 gap-2"
                   data-testid="footer-categories"
                 >
-                  {productCategories?.slice(0, 6).map((c) => {
-                    if (c.parent_category) {
-                      return;
-                    }
-
-                    const children =
-                      c.category_children?.map((child) => ({
-                        name: child.name,
-                        handle: child.handle,
-                        id: child.id,
-                      })) || null;
-
-                    return (
-                      <li
-                        className="flex flex-col gap-2 text-ui-fg-subtle txt-small"
-                        key={c.id}
+                  {footerCategories.map((c) => (
+                    <li
+                      className="flex flex-col gap-2 text-ui-fg-subtle txt-small"
+                      key={c.id}
+                    >
+                      <LocalizedClientLink
+                        className="hover:text-ui-fg-base"
+                        href={`/categories/${c.handle}`}
+                        data-testid="category-link"
                       >
-                        <LocalizedClientLink
-                          className={clx(
-                            "hover:text-ui-fg-base",
-                            children && "txt-small-plus"
-                          )}
-                          href={`/categories/${c.handle}`}
-                          data-testid="category-link"
-                        >
-                          {c.name}
-                        </LocalizedClientLink>
-                        {children && (
-                          <ul className="grid grid-cols-1 ml-3 gap-2">
-                            {children &&
-                              children.map((child) => (
-                                <li key={child.id}>
-                                  <LocalizedClientLink
-                                    className="hover:text-ui-fg-base"
-                                    href={`/categories/${child.handle}`}
-                                    data-testid="category-link"
-                                  >
-                                    {child.name}
-                                  </LocalizedClientLink>
-                                </li>
-                              ))}
-                          </ul>
-                        )}
-                      </li>
-                    );
-                  })}
+                        {c.name}
+                      </LocalizedClientLink>
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
@@ -117,7 +93,9 @@ export default async function Footer() {
                 </ul>
               </div>
             )}
-            {/* Legal Policies */}
+            {/* Legal Policies — en fazla 5 bağlantı. Çerez politikası/tercihleri
+                alt yasal banda taşındı; kalanlar (SSS, Blog, Bilgi Merkezi,
+                Uzman/Bayi Olun, Üyelik Paketleri) yalnız header/sayfa içinden erişilir. */}
             <div className="flex flex-col gap-y-2">
               <span className="txt-small-plus txt-ui-fg-base">Destek & Bilgi</span>
               <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
@@ -142,51 +120,8 @@ export default async function Footer() {
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/cerez-politikasi" className="hover:text-ui-fg-base">
-                    Çerez Politikası
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <CookieConsentTrigger />
-                </li>
-                <li>
-                  <LocalizedClientLink href="/uzman-ol" className="hover:text-ui-fg-base">
-                    Uzman Olun (Mühendis)
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/satici-ol" className="hover:text-ui-fg-base">
-                    Bayi / Satıcı Olun
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/uzman-paketleri" className="hover:text-ui-fg-base">
-                    Üyelik Paketleri
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/sikca-sorulan-sorular" className="hover:text-ui-fg-base">
-                    Sıkça Sorulan Sorular
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/hakkimizda" className="hover:text-ui-fg-base">
-                    Hakkımızda
-                  </LocalizedClientLink>
-                </li>
-                <li>
                   <LocalizedClientLink href="/iletisim" className="hover:text-ui-fg-base">
                     İletişim
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/bilgi-merkezi" className="hover:text-ui-fg-base">
-                    Bilgi & Eğitim Merkezi
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/blog" className="hover:text-ui-fg-base">
-                    Blog
                   </LocalizedClientLink>
                 </li>
               </ul>
@@ -240,6 +175,14 @@ export default async function Footer() {
             <span className="text-xs text-ui-fg-subtle">
               Bu e-ticaret sitesi bir <strong>DEV YAPIMCILIK YAYINCILIK SAN. TİC. LTD. ŞTİ.</strong> iştirakidir.
             </span>
+            {/* Çerez bağlantıları burada: CookieConsentTrigger sitedeki TEK çerez
+                tercihi giriş noktası, kolon 5'e indirilirken düşürülemezdi. */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ui-fg-subtle">
+              <LocalizedClientLink href="/cerez-politikasi" className="hover:text-ui-fg-base">
+                Çerez Politikası
+              </LocalizedClientLink>
+              <CookieConsentTrigger />
+            </div>
           </div>
           <div className="w-full md:w-auto">
             <LocaleSwitcher />
