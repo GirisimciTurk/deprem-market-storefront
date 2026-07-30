@@ -178,6 +178,14 @@ export default async function Footer() {
             {/* Çerez bağlantıları burada: CookieConsentTrigger sitedeki TEK çerez
                 tercihi giriş noktası, kolon 5'e indirilirken düşürülemezdi. */}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ui-fg-subtle">
+              {/* Hakkımızda burada: Destek kolonu beşe indirilirken düştü ve
+                  /hakkimizda sitedeki TEK bağlantısını kaybetti (header, side-menu
+                  ve category-drawer'da yok; "Deprem Teknolojileri" kolonundaki
+                  Hakkımızda dış siteye gidiyor). Kolonu altıya çıkarmadan
+                  erişilebilirliği geri veriyor. */}
+              <LocalizedClientLink href="/hakkimizda" className="hover:text-ui-fg-base">
+                Hakkımızda
+              </LocalizedClientLink>
               <LocalizedClientLink href="/cerez-politikasi" className="hover:text-ui-fg-base">
                 Çerez Politikası
               </LocalizedClientLink>
