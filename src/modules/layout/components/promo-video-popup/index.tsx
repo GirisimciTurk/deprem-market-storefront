@@ -3,12 +3,17 @@
 import { useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { X, Volume2, VolumeX } from "lucide-react"
-
-// Oturumda bir kez göster (aynı oturumda sayfa gezinince tekrar açılmaz).
-const SHOWN_KEY = "_dm_promo_video_shown"
+import {
+  hasSeenPromoVideo,
+  markPromoVideoSeen,
+  whenVisible,
+} from "@lib/util/promo-video"
 
 /**
- * Site açılışında bir kez çıkan tanıtım videosu popup'ı (merkez modal).
+ * Kişinin İLK ziyaretinde bir kez çıkan tanıtım videosu popup'ı (merkez modal).
+ * "Gösterildi" işareti kalıcı çerezde tutulur (bkz. @lib/util/promo-video) — sonraki
+ * sayfalarda, yeni sekmede ve sonraki günlerde bir daha açılmaz.
+ *
  * Tarayıcı politikası gereği video SESSİZ otomatik oynar; ses ancak bir kullanıcı
  * etkileşimiyle açılabilir → videoya (veya "Sesi Aç" göstergesine) dokununca ses
  * açılır. Kapat / Esc / arka plana tıklama ile kapanır. Video same-origin
@@ -20,25 +25,26 @@ const PromoVideoPopup = () => {
   const [muted, setMuted] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  // Mount'ta: bu oturumda gösterilmediyse kısa gecikmeyle aç.
+  // Mount'ta: bu kişiye daha önce hiç gösterilmediyse kısa gecikmeyle aç.
+  // Zamanlayıcı SAYFA GÖRÜNÜR OLMADAN kurulmaz — arka plan sekmesinde (Ctrl+tık)
+  // veya prerender'da açılan sayfa da hydrate olur, kurulsaydı kullanıcı videoyu
+  // hiç görmediği hâlde "gösterildi" damgası basılır ve bir yıl açılmazdı.
   useEffect(() => {
     if (typeof window === "undefined") return
-    let shown = false
-    try {
-      shown = !!window.sessionStorage.getItem(SHOWN_KEY)
-    } catch {
-      shown = false
+    if (hasSeenPromoVideo()) return
+
+    let timer: number | undefined
+    const cancelWait = whenVisible(() => {
+      timer = window.setTimeout(() => {
+        markPromoVideoSeen()
+        setOpen(true)
+      }, 600)
+    })
+
+    return () => {
+      cancelWait()
+      if (timer !== undefined) window.clearTimeout(timer)
     }
-    if (shown) return
-    const timer = window.setTimeout(() => {
-      try {
-        window.sessionStorage.setItem(SHOWN_KEY, "1")
-      } catch {
-        /* sessionStorage yoksa sessiz geç */
-      }
-      setOpen(true)
-    }, 600)
-    return () => window.clearTimeout(timer)
   }, [])
 
   // Açıkken Esc ile kapat + arka plan kaydırmasını kilitle.
