@@ -49,14 +49,19 @@ const ProductTemplate = async ({
   })
 
   // Görünür kırıntı navigasyonu. Varsa ürünün ilk kategorisi araya eklenir.
+  // NOT: listProducts `categories` alanını istemiyor, bu yüzden kategori adımı
+  // şu an hiç oluşmuyor; alan sorguya eklenirse kendiliğinden görünür.
+  // Hedef `/categories/<handle>` DEĞİL `/store?categoryId=<id>` — footer'la aynı
+  // gerekçe: kategori seçimi mağazanın sol kategori menüsünden yapılmış gibi
+  // davranmalı, ayrı bir kategori şablonu açmamalı.
   const primaryCategory = (product as any).categories?.[0] as
-    | { name?: string; handle?: string }
+    | { id?: string; name?: string }
     | undefined
   const breadcrumbItems = [
     { label: "Ana Sayfa", href: "/" },
     { label: "Mağaza", href: "/store" },
-    ...(primaryCategory?.handle && primaryCategory?.name
-      ? [{ label: primaryCategory.name, href: `/categories/${primaryCategory.handle}` }]
+    ...(primaryCategory?.id && primaryCategory?.name
+      ? [{ label: primaryCategory.name, href: `/store?categoryId=${primaryCategory.id}` }]
       : []),
     { label: product.title || "Ürün" },
   ]
