@@ -53,7 +53,17 @@ const backendImagePattern = (() => {
 
 // 'unsafe-eval' is only needed by the dev/HMR runtime. Drop it in production so
 // the script-src CSP is meaningfully tighter there.
-const SCRIPT_SRC_EVAL = process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"
+const IS_PROD = process.env.NODE_ENV === "production"
+const SCRIPT_SRC_EVAL = IS_PROD ? "" : " 'unsafe-eval'"
+
+// Görseller: üretimde yalnız https. Yerelde backend http://localhost:9000
+// üzerinden görsel sunduğu için http: yalnızca dev'de açık kalır.
+const IMG_SRC_HTTP = IS_PROD ? "" : " http:"
+
+// http:// alt kaynakları https'e yükselt (karışık içerik kapanır). Yerelde her
+// şey http olduğu için BİLEREK yalnız üretimde: dev'de açılsa backend çağrıları
+// https'e yükseltilip kırılırdı.
+const UPGRADE_INSECURE = IS_PROD ? " upgrade-insecure-requests;" : ""
 
 /**
  * @type {import('next').NextConfig}
@@ -133,11 +143,19 @@ const nextConfig = {
               `script-src 'self' 'unsafe-inline'${SCRIPT_SRC_EVAL} https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
               "font-src 'self' data: https://fonts.gstatic.com; " +
-              "img-src 'self' data: blob: https: http:; " +
+              `img-src 'self' data: blob: https:${IMG_SRC_HTTP}; ` +
               `connect-src 'self' ${BACKEND_URL} https://images.unsplash.com https://pub-972575e25eda4755b1250ca6be181153.r2.dev https://cdn.jsdelivr.net https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
               "frame-src 'self' https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; " +
               `form-action 'self' ${BACKEND_URL} https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
-              "object-src 'none';",
+              "object-src 'none'; " +
+              // <base href> enjeksiyonunu engeller: aksi halde bir XSS, sayfadaki
+              // TÜM göreli script/form hedeflerini saldırganın sunucusuna
+              // çevirebilir. default-src bu direktifi kapsamaz, ayrıca yazılmalı.
+              "base-uri 'self'; " +
+              // Clickjacking — X-Frame-Options'ın CSP karşılığı; modern
+              // tarayıcılarda o değil bu geçerlidir. Site hiçbir yere gömülmüyor.
+              "frame-ancestors 'self';" +
+              UPGRADE_INSECURE,
           },
           {
             key: "X-Frame-Options",
