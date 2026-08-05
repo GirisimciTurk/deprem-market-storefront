@@ -7,6 +7,7 @@ import { listRegions } from "@lib/data/regions"
 import { HttpTypes, StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { seoAlternates } from "@lib/util/seo"
 
 type Props = {
   params: Promise<{ category: string[]; countryCode: string }>
@@ -67,15 +68,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     return {
       title: title,
       description,
-      alternates: {
-        // Tam yol (ülke öneki + /categories/…) — metadataBase'e göre çözülür.
-        canonical: `/${params.countryCode}/categories/${params.category.join("/")}`,
-        // Dil cookie-tabanlı; bölgesel URL'ler aynı Türkçe içerik → yalnız tr + x-default.
-        languages: {
-          tr: `/tr/categories/${params.category.join("/")}`,
-          "x-default": `/tr/categories/${params.category.join("/")}`,
-        },
-      },
+      // Canonical birincil bölgeye sabit (bkz. @lib/util/seo): bölgesel önekler
+      // aynı Türkçe içeriği sunduğu için ayrı ayrı indekslenmemeli.
+      alternates: seoAlternates(`/categories/${params.category.join("/")}`),
     }
   } catch {
     notFound()
