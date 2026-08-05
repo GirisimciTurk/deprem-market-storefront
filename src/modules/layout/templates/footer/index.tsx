@@ -21,6 +21,12 @@ export default async function Footer() {
   // listCategories düz liste döndürür (alt kategoriler dahil), o yüzden ÖNCE süzüp
   // SONRA kesiyoruz — tersi, ilk 5'in çoğu alt kategori olduğunda neredeyse hiçbir
   // kategori kalmamasına yol açıyordu.
+  //
+  // Bağlantılar `/categories/<handle>` DEĞİL `/store?categoryId=<id>`: eski hedef
+  // ayrı bir şablon (CategoryTemplate) açıyordu — sol panelde kategori ağacı yok,
+  // farklı başlık/breadcrumb düzeni. Artık mağazanın kendi sol kategori menüsünden
+  // seçim yapılmış gibi davranıyor (kategori seçili gelir, diğer filtreler yerinde).
+  // /kategoriler indeks sayfası da aynı formatı kullanıyor.
   const footerCategories = (productCategories ?? [])
     .filter((c) => !c.parent_category)
     .slice(0, 5);
@@ -57,7 +63,7 @@ export default async function Footer() {
                     >
                       <LocalizedClientLink
                         className="hover:text-ui-fg-base"
-                        href={`/categories/${c.handle}`}
+                        href={`/store?categoryId=${c.id}`}
                         data-testid="category-link"
                       >
                         {c.name}
