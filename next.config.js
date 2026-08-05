@@ -155,6 +155,32 @@ const nextConfig = {
             key: "Strict-Transport-Security",
             value: "max-age=31536000; includeSubDomains; preload",
           },
+          {
+            // Kullanılmayan güçlü tarayıcı yeteneklerini kapat. Bir XSS ya da
+            // kötü niyetli üçüncü taraf iframe'i bunlara erişemesin.
+            // Not: bildirim (push) ve ödeme akışı için gerekli olanlar AÇIK
+            // bırakıldı — kapatılırsa "stoğa gelince haber ver" ve cüzdan
+            // tabanlı ödeme çalışmaz.
+            key: "Permissions-Policy",
+            value: [
+              "camera=()",
+              "microphone=()",
+              "geolocation=()",
+              "usb=()",
+              "magnetometer=()",
+              "accelerometer=()",
+              "gyroscope=()",
+              "interest-cohort=()",
+              "payment=(self)",
+            ].join(", "),
+          },
+          {
+            // Pencereyi açan/açılan sayfalardan yalıtır (cross-window saldırıları
+            // ve Spectre sınıfı sızıntılar). PayTR ödeme sayfası iframe ile
+            // gömülüyor, ayrı pencere açmıyor → "same-origin" güvenli.
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin",
+          },
         ],
       },
     ]
