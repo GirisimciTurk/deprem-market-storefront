@@ -1,23 +1,25 @@
 import { MetadataRoute } from "next"
 import { listProducts } from "@lib/data/products"
 import { listCategories } from "@lib/data/categories"
-import { listRegions } from "@lib/data/regions"
+import { PRIMARY_REGION } from "@lib/util/seo"
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://depremmarket.com"
 
+/**
+ * Sitemap YALNIZ birincil bölge önekini listeler.
+ *
+ * Önceden her Medusa bölgesinin her ülke kodu için ayrı URL üretiliyordu
+ * (canlıda dk/fr/de/it/es/se/gb/tr → 8 kopya, 14 ürün için 112 URL, toplam 649).
+ * Ülke öneki DİL değil bölge; hepsi aynı Türkçe içeriği sunuyor. Google'a
+ * 8 ayrı kopya göndermek sıralama sinyallerini böler ve tarama bütçesini
+ * harcar. Canonical'lar da aynı bölgeye sabitlendi (bkz. @lib/util/seo).
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Fetch regions and categories in parallel
-  const [regions, categories] = await Promise.all([
-    listRegions().catch(() => []),
-    listCategories().catch(() => []),
-  ])
+  const categories = await listCategories().catch(() => [])
 
-  const countryCodes = (regions
-    .flatMap((r) => r.countries?.map((c) => c.iso_2) || [])
-    .filter(Boolean) as string[])
-    .map((code) => code.toLowerCase())
+  const countryCodes = [PRIMARY_REGION]
 
-  // Fetch products for all regions in parallel
+  // Ürünleri birincil bölge bağlamında bir kez çek.
   const regionProductsList = await Promise.all(
     countryCodes.map((code) =>
       listProducts({ countryCode: code, queryParams: { limit: 100 } })

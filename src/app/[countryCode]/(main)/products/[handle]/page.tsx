@@ -7,6 +7,7 @@ import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 import ProductJsonLd, { BreadcrumbJsonLd } from "@modules/common/components/json-ld"
 import { listProductReviews } from "@lib/data/reviews"
+import { seoAlternates } from "@lib/util/seo"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -97,15 +98,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: {
-      canonical: `/${params.countryCode}/products/${handle}`,
-      // Dil cookie-tabanlı (URL'de değil); bölgesel URL'ler aynı Türkçe içeriği sunar.
-      // Bu yüzden yalnız doğru olan tr + x-default emit edilir (fr/de vb. YANLIŞ olurdu).
-      languages: {
-        tr: `/tr/products/${handle}`,
-        "x-default": `/tr/products/${handle}`,
-      },
-    },
+    // Canonical BİRİNCİL bölgeye sabit: /de, /fr … aynı Türkçe içeriği sunuyor.
+    // Önceden canonical kendi bölgesini gösteriyordu; hreflang ise /tr diyordu —
+    // iki sinyal birbirini yalanlıyor, her ülke öneki ayrı özgün sayfa sanılıyordu.
+    alternates: seoAlternates(`/products/${handle}`),
     openGraph: {
       title,
       description,
