@@ -1,9 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { Shield, Activity, CheckCircle, Video, Maximize2, Eye, X } from "lucide-react"
+import { Video, Maximize2, Eye, X } from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
-import { getShowcaseContent, type ShowcaseContent } from "./showcase-content"
 import { toReachableImageUrl } from "@lib/util/image-url"
 
 interface ShowcaseProps {
@@ -11,133 +10,107 @@ interface ShowcaseProps {
   images?: HttpTypes.StoreProductImage[]
 }
 
+type Spec = { label: string; value: string }
+type Highlight = { desc: string; image: string }
+/** Satıcının ürün formunda eklediği ham blok (metadata serbest biçimlidir). */
+type RawContentBlock = { image?: unknown; text?: unknown }
+type GalleryImage = { url: string }
+
+/** Metadata'dan gelen değerleri güvenle metne çevirir (sayı/null/eksik olabilir). */
+const asTrimmedString = (v: unknown): string =>
+  typeof v === "string" ? v.trim() : ""
+
+/**
+ * Ürün detay sayfasının geniş tanıtım bölümü.
+ *
+ * KURAL: Burada YALNIZCA satıcının panelde girdiği veriler gösterilir. Sayfada
+ * satıcının yazmadığı hiçbir metin, özellik ya da görsel olmamalı.
+ *
+ * Öncesinde bu bileşen `showcase-content.tsx` adlı elle yazılmış bir listeye
+ * bakıyordu: ürün handle'ında bir alt dize geçiyorsa (ör. "battaniyesi") o ürüne
+ * hazır bir tanıtım metni, teknik özellik tablosu, stok fotoğrafı ve video
+ * basılıyordu. Bu, "yangın battaniyesi"ne hipotermi için üretilen termal
+ * battaniyenin içeriğini (NASA/Mylar, 210x160 cm, 5'li paket) giydirdi — üstelik
+ * eşleşme olduğunda satıcının kendi `content_blocks` içeriği hiç okunmuyordu.
+ * Ayrıca eşleşme olmayan ürünlere de uydurma tanıtım blokları ("Güvenilir
+ * Kalite", "Durum: Stokta Var / Orijinal" vb.) basılıyordu. Liste tamamen
+ * kaldırıldı; kaldırıldığı sırada 10 kaydın 9'u zaten hiçbir ürüne uymuyordu ve
+ * tek aktif eşleşme yanlıştı.
+ *
+ * Gösterilecek gerçek veri yoksa bölüm hiç render edilmez.
+ */
 export default function ProductShowcase({ product, images }: ShowcaseProps) {
   const [activeImage, setActiveImage] = useState<string | null>(null)
 
   if (!product) return null
 
-  // Öne çıkan ürünlerin elle hazırlanmış tanıtım içeriği `showcase-content`
-  // dosyasındadır; eşleşme yoksa ürün alanlarından dinamik fallback üretilir.
-  const getProductData = (): ShowcaseContent => {
-    const handle = product.handle || ""
-    const matched = getShowcaseContent(handle)
-    if (matched) return matched
+  const meta = (product.metadata ?? {}) as Record<string, unknown>
 
-    // --- Dynamic Fallback Generator ---
-    const categoryNames = product.categories?.map((c: any) => c.name).join(", ") || "Deprem Hazırlığı"
-    const parsedWeight = product.weight ? (product.weight >= 1000 ? (product.weight / 1000).toFixed(1) + " kg" : product.weight + " g") : ""
-    const defaultSpecs = [
-      { label: "Ürün Adı", value: product.title },
-      ...(product.material ? [{ label: "Malzeme", value: product.material }] : []),
-      ...(parsedWeight ? [{ label: "Ağırlık", value: parsedWeight }] : []),
-      { label: "Kategori", value: categoryNames },
-      { label: "Durum", value: "Stokta Var / Orijinal" }
-    ]
-
-    const fallbackFeatures = [
-      {
-        icon: <Shield className="w-8 h-8 text-brand-600" />,
-        title: "Güvenilir Kalite",
-        desc: "Afet ve acil durum koşulları göz önüne alınarak test edilmiş, dayanıklı malzemeden üretilmiştir."
-      },
-      {
-        icon: <Activity className="w-8 h-8 text-emerald-600" />,
-        title: "Afet Uyumlu Tasarım",
-        desc: "Enkaz, deprem ve diğer acil durumlarda pratik, hızlı ve kolay kullanım sunacak şekilde tasarlanmıştır."
-      },
-      {
-        icon: <CheckCircle className="w-8 h-8 text-amber-500" />,
-        title: "Temel Yaşam Desteği",
-        desc: "Afet sonrasındaki ilk kritik saatlerde güvenliğinizi ve hazırlığınızı artırmak için ideal bir yardımcıdır."
+  // 1) Satıcının detaylı anlatım blokları: her biri bir foto + yazı.
+  const rawBlocks: RawContentBlock[] = Array.isArray(meta.content_blocks)
+    ? (meta.content_blocks as RawContentBlock[])
+    : []
+  const highlights: Highlight[] = rawBlocks
+    .map((b) => {
+      const image = asTrimmedString(b?.image)
+      return {
+        desc: asTrimmedString(b?.text),
+        image: image ? toReachableImageUrl(image) ?? "" : "",
       }
-    ]
+    })
+    .filter((b) => b.desc || b.image)
 
-    // Detaylı anlatım blokları (foto + yazı) — satıcının ürün formunda eklediği
-    // metadata.content_blocks'tan gelir. Her blok bir foto + yazıdır. Blok yoksa
-    // bu bölüm gizlenir (eski "Görsel 1/2/3 + tekrar eden açıklama" davranışı kaldırıldı).
-    const blocks = ((product.metadata as any)?.content_blocks ?? []) as {
-      image?: string | null
-      text?: string | null
-    }[]
-    const contentHighlights = Array.isArray(blocks)
-      ? blocks
-          .filter((b) => (b?.text && b.text.trim()) || (b?.image && b.image.trim()))
-          .map((b) => ({
-            title: "",
-            desc: (b.text || "").trim(),
-            image: toReachableImageUrl((b.image || "").trim()) ?? "",
-          }))
-      : []
+  // 2) Satıcının yüklediği tanıtım videosu.
+  const rawVideo = asTrimmedString(meta.video_url)
+  const videoUrl = rawVideo ? toReachableImageUrl(rawVideo) ?? "" : ""
 
-    return {
-      tagline: "ACİL DURUM VE AFET HAZIRLIĞI",
-      title: product.title,
-      subtitle: product.subtitle || product.description || "Afet sonrasında güvenliğinizi ve hazırlığınızı en üst seviyeye çıkarmak için üretilmiştir.",
-      videoUrl: toReachableImageUrl((product.metadata as any)?.video_url || "") ?? "",
-      features: fallbackFeatures,
-      specs: defaultSpecs,
-      highlights: contentHighlights,
-    }
-  }
+  // 3) Teknik özellikler — SADECE ürün üzerinde gerçekten dolu olan alanlar.
+  //    Boş alan "-" ile doldurulmaz, satır hiç basılmaz; uydurma değer yok.
+  const weightLabel = product.weight
+    ? product.weight >= 1000
+      ? `${(product.weight / 1000).toFixed(1)} kg`
+      : `${product.weight} g`
+    : ""
+  const dimensions =
+    product.length && product.width && product.height
+      ? `${product.length} x ${product.width} x ${product.height} cm`
+      : ""
 
-  const data = getProductData()
-  if (!data) return null
+  const specs: Spec[] = [
+    { label: "Malzeme", value: product.material ?? "" },
+    { label: "Ağırlık", value: weightLabel },
+    { label: "Boyutlar", value: dimensions },
+    { label: "Üretim Ülkesi", value: product.origin_country ?? "" },
+    { label: "Tür", value: product.type?.value ?? "" },
+  ].filter((s): s is Spec => Boolean(s.value && String(s.value).trim()))
 
-  // Collect all images for the dynamic high-res gallery (product.images and images combined, filter duplicates)
-  const allProductImages = [
+  // 4) Galeri — ürünün gerçek görselleri (thumbnail + varyant/ürün görselleri).
+  const gallery: GalleryImage[] = [
     ...(product.thumbnail ? [{ url: product.thumbnail }] : []),
-    ...(images || []),
-    ...(product.images || [])
-  ].reduce((acc: any[], current: any) => {
-    const x = acc.find(item => item.url === current.url)
-    if (!x && current.url) {
-      return acc.concat([current])
-    } else {
+    ...(images ?? []),
+    ...(product.images ?? []),
+  ]
+    .reduce((acc: GalleryImage[], current) => {
+      const url = current?.url
+      if (url && !acc.some((i) => i.url === url)) {
+        acc.push({ url })
+      }
       return acc
-    }
-  }, []).map((im: any) => ({ ...im, url: toReachableImageUrl(im.url) ?? im.url }))
+    }, [])
+    .map((im) => ({ url: toReachableImageUrl(im.url) ?? im.url }))
+
+  // Gösterilecek gerçek bir şey yoksa bölümü hiç açma.
+  const hasContent =
+    highlights.length > 0 || Boolean(videoUrl) || specs.length > 0 || gallery.length > 0
+  if (!hasContent) return null
 
   return (
     <div className="bg-slate-50 border-t border-slate-200 py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Banner Section */}
-        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
-          <span className="text-xs font-bold text-brand-600 tracking-widest uppercase block mb-3">
-            {data.tagline}
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mb-6 uppercase">
-            {data.title}
-          </h2>
-          <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-            {data.subtitle}
-          </p>
-        </div>
-
-        {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-20">
-          {data.features.map((feature, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md hover:border-slate-200 transition-all duration-200"
-            >
-              <div className="mb-5 inline-block bg-slate-50 p-3 rounded-xl">
-                {feature.icon}
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-sm text-slate-500 leading-relaxed">
-                {feature.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Image / Text Highlights Section */}
-        {data.highlights && data.highlights.length > 0 && (
+        {/* Satıcının detaylı anlatımı (foto + yazı blokları) */}
+        {highlights.length > 0 && (
           <div className="space-y-12 sm:space-y-16 mb-20">
-            {data.highlights.map((item, idx) => (
+            {highlights.map((item, idx) => (
               <div
                 key={idx}
                 className={`flex flex-col lg:flex-row items-center gap-8 lg:gap-16 ${
@@ -149,7 +122,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
                     <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm relative group">
                       <img
                         src={item.image}
-                        alt={item.title || `İçerik görseli ${idx + 1}`}
+                        alt={`${product.title} içerik görseli ${idx + 1}`}
                         className="w-full h-[300px] sm:h-[400px] object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div
@@ -163,48 +136,46 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
                     </div>
                   </div>
                 )}
-                <div className={`w-full ${item.image ? "lg:w-1/2" : ""} space-y-4 text-center lg:text-left`}>
-                  {item.title && (
-                    <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 uppercase">
-                      {item.title}
-                    </h3>
-                  )}
-                  <p className="text-slate-600 leading-relaxed text-base sm:text-lg whitespace-pre-line">
-                    {item.desc}
-                  </p>
-                  <div className="pt-2 flex justify-center lg:justify-start gap-x-2">
-                    <div className="h-1 w-12 bg-brand-600 rounded-full" />
+                {item.desc && (
+                  <div
+                    className={`w-full ${
+                      item.image ? "lg:w-1/2" : ""
+                    } space-y-4 text-center lg:text-left`}
+                  >
+                    <p className="text-slate-600 leading-relaxed text-base sm:text-lg whitespace-pre-line">
+                      {item.desc}
+                    </p>
+                    <div className="pt-2 flex justify-center lg:justify-start gap-x-2">
+                      <div className="h-1 w-12 bg-brand-600 rounded-full" />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ))}
           </div>
         )}
 
-        {/* Video Presentation Section */}
-        {data.videoUrl && (
+        {/* Satıcının yüklediği tanıtım videosu. Başlık ÜRÜNE göre kuruluyor;
+            eskiden buradaki metin her üründe "deprem çantasının kullanımı"ndan
+            bahsediyordu (kask, yangın söndürücü fark etmeksizin). */}
+        {videoUrl && (
           <div className="mb-20 bg-slate-900 rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-xl">
-            {/* Background pattern */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(244,63,94,0.08),transparent)] pointer-events-none" />
-
             <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 relative z-10">
               <div className="w-full lg:w-5/12 space-y-6 text-center lg:text-left">
                 <div className="inline-flex items-center gap-x-2 bg-brand-500/10 border border-brand-500/20 text-brand-400 px-3 py-1 rounded-full text-xs font-semibold">
-                  <Video className="w-3.5 h-3.5" /> GÖRSEL ANLATIM VE REHBER
+                  <Video className="w-3.5 h-3.5" /> ÜRÜN VİDEOSU
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">
-                  Nasıl Kullanılır ve Hazırlanır?
+                  {product.title}
                 </h3>
-                <p className="text-slate-400 leading-relaxed">
-                  Deprem ve afet çantasının doğru kullanımı, acil durumlarda saniyeler kazandırır. Uzmanlarımızın hazırladığı detaylı video rehberimizi izleyin.
-                </p>
               </div>
               <div className="w-full lg:w-7/12">
                 <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-black">
                   <iframe
                     className="w-full h-full"
-                    src={data.videoUrl}
-                    title="Ürün Kullanım Videosu"
+                    src={videoUrl}
+                    title={`${product.title} ürün videosu`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
@@ -214,20 +185,20 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
           </div>
         )}
 
-        {/* Interactive Image Gallery Grid (farklı büyük resimlerini oluşturabilecek) */}
-        {allProductImages.length > 0 && (
+        {/* Ürünün gerçek görselleri */}
+        {gallery.length > 0 && (
           <div className="mb-20">
             <div className="text-center max-w-xl mx-auto mb-10">
               <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tight mb-2">
                 DETAYLI ÜRÜN GALERİSİ
               </h3>
               <p className="text-sm text-slate-500">
-                Ekipman kalitesini, dikiş ve malzeme detaylarını yakından incelemek için resimlere tıklayarak büyütebilirsiniz.
+                Görselleri büyütmek için üzerlerine tıklayabilirsiniz.
               </p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {allProductImages.map((img: any, idx: number) => (
+              {gallery.map((img, idx) => (
                 <div
                   key={idx}
                   onClick={() => setActiveImage(img.url)}
@@ -235,7 +206,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
                 >
                   <img
                     src={img.url}
-                    alt={`${product.title} galeri görsel ${idx}`}
+                    alt={`${product.title} galeri görseli ${idx + 1}`}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
@@ -249,27 +220,30 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
           </div>
         )}
 
-        {/* Technical Specs Table */}
-        <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
-          <h3 className="text-xl sm:text-2xl font-black text-slate-950 uppercase tracking-tight mb-6 pb-4 border-b border-slate-100">
-            TEKNİK ÖZELLİKLER VE DETAYLAR
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-            {data.specs.map((spec, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between py-3 border-b border-slate-100 text-sm sm:text-base"
-              >
-                <span className="font-semibold text-slate-500">{spec.label}</span>
-                <span className="font-bold text-slate-900 text-right">{spec.value}</span>
-              </div>
-            ))}
+        {/* Teknik özellikler — yalnız dolu alanlar */}
+        {specs.length > 0 && (
+          <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-950 uppercase tracking-tight mb-6 pb-4 border-b border-slate-100">
+              TEKNİK ÖZELLİKLER VE DETAYLAR
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+              {specs.map((spec, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-3 border-b border-slate-100 text-sm sm:text-base"
+                >
+                  <span className="font-semibold text-slate-500">{spec.label}</span>
+                  <span className="font-bold text-slate-900 text-right">
+                    {spec.value}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-
+        )}
       </div>
 
-      {/* Lightbox / Modal for Large Images */}
+      {/* Büyük görsel için lightbox */}
       {activeImage && (
         <div
           className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300"
@@ -278,6 +252,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
           <div className="absolute top-4 right-4 z-50">
             <button
               onClick={() => setActiveImage(null)}
+              aria-label="Kapat"
               className="bg-white/10 hover:bg-white/20 text-white p-2.5 rounded-full transition-colors"
             >
               <X className="w-6 h-6" />
@@ -289,7 +264,7 @@ export default function ProductShowcase({ product, images }: ShowcaseProps) {
           >
             <img
               src={activeImage}
-              alt="Büyük ürün görseli"
+              alt={`${product.title} büyük görsel`}
               className="max-w-full max-h-full object-contain rounded-xl shadow-2xl animate-fade-in"
             />
           </div>
