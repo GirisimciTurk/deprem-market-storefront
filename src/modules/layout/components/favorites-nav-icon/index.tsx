@@ -1,37 +1,17 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { Heart } from "lucide-react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { useWishlist } from "@lib/context/wishlist-context"
 
+/**
+ * Üst bardaki favori ikonu + sayaç. Sayı artık localStorage'dan değil, hesaba
+ * bağlı wishlist context'inden okunur → kalp butonuyla anında senkron.
+ * Giriş yoksa sayaç görünmez (rozet 0'da zaten gizli).
+ */
 export default function FavoritesNavIcon({ label }: { label?: string }) {
-  const [favoritesCount, setFavoritesCount] = useState(0)
-
-  const updateCount = () => {
-    try {
-      const saved = localStorage.getItem("deprem_market_favorites")
-      if (saved) {
-        const parsed = JSON.parse(saved)
-        setFavoritesCount(Array.isArray(parsed) ? parsed.length : 0)
-      } else {
-        setFavoritesCount(0)
-      }
-    } catch {
-      setFavoritesCount(0)
-    }
-  }
-
-  useEffect(() => {
-    // Initial count load
-    updateCount()
-
-    // Listen for custom events when favorites change
-    window.addEventListener("favorites-updated", updateCount)
-
-    return () => {
-      window.removeEventListener("favorites-updated", updateCount)
-    }
-  }, [])
+  const { count } = useWishlist()
 
   return (
     <LocalizedClientLink
@@ -42,9 +22,9 @@ export default function FavoritesNavIcon({ label }: { label?: string }) {
     >
       <span className="relative flex items-center">
         <Heart className="w-5 h-5 shrink-0 text-slate-700 hover:text-brand-600 transition-colors group-hover:scale-105 duration-200" />
-        {favoritesCount > 0 && (
+        {count > 0 && (
           <span className="absolute -top-2 -right-2 bg-brand-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white shadow-xs animate-in fade-in zoom-in duration-200">
-            {favoritesCount}
+            {count}
           </span>
         )}
       </span>
