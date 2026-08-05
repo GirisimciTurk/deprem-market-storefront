@@ -1,145 +1,106 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
-import { getFavorites } from "@lib/util/favorites"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { sdk } from "@lib/config"
+import { useWishlist } from "@lib/context/wishlist-context"
 
 type FavoritesTemplateProps = {
   region: HttpTypes.StoreRegion
   countryCode: string
 }
 
+/**
+ * "Beğendiklerim" sayfası. Favori ürün id'leri hesaba bağlı wishlist
+ * context'inden gelir; ürünlerin kendisi bölge/fiyat bağlamıyla canlı çekilir.
+ *
+ * Eskiden id'ler localStorage'dan okunuyor ve ürün bulunamazsa orada saklanan
+ * eski anlık görüntü (başlık/fiyat) gösteriliyordu. Artık snapshot tutulmuyor:
+ * silinmiş/yayından kaldırılmış ürün listede hayalet olarak durmaz.
+ */
 export default function FavoritesTemplate({
   region,
   countryCode: _countryCode,
 }: FavoritesTemplateProps) {
+  const { productIds, isLoggedIn } = useWishlist()
   const [products, setProducts] = useState<HttpTypes.StoreProduct[]>([])
   const [loading, setLoading] = useState(true)
 
-  const loadFavoriteProducts = async () => {
-    const favorites = getFavorites()
-    if (favorites.length === 0) {
+  const loadFavoriteProducts = useCallback(async () => {
+    if (productIds.length === 0) {
       setProducts([])
       setLoading(false)
       return
     }
 
     try {
-      const ids = favorites.map((item) => item.id)
-      console.info(
-        `[FavoritesTemplate] Initialized fetch for ${favorites.length} user favorites from localStorage`
-      )
-      console.debug(
-        `[FavoritesTemplate] Outgoing query product IDs: ${ids.join(", ")}`
-      )
-
       const queryParams = new URLSearchParams()
-      ids.forEach((id) => queryParams.append("id", id))
+      productIds.forEach((id) => queryParams.append("id", id))
       queryParams.append("region_id", region.id)
       queryParams.append(
         "fields",
         "*variants.calculated_price,+variants.inventory_quantity,+variants.metadata,*variants.images,+metadata,+tags,"
       )
 
-      // Fetch up-to-date prices, inventory and metadata from Medusa
       const response = await sdk.client.fetch<{
         products: HttpTypes.StoreProduct[]
-      }>(`/store/products?${queryParams.toString()}`, {
-        method: "GET",
-      })
+      }>(`/store/products?${queryParams.toString()}`, { method: "GET" })
 
       const apiProducts = response?.products || []
-      console.info(
-        `[FavoritesTemplate] API returned ${apiProducts.length} matching products from store database`
-      )
+      // Favori sırasını koru (backend en yeni önce döndürüyor); artık satılmayan
+      // ürünler listeden düşer.
+      const ordered = productIds
+        .map((id) => apiProducts.find((p) => p.id === id))
+        .filter((p): p is HttpTypes.StoreProduct => Boolean(p))
 
-      // Self-healing merge: map each stored favorite. If in API response, use live data.
-      // Otherwise, gracefully fall back to localStorage cached snapshot so nothing is blank!
-      const mergedProducts = favorites.map((fav) => {
-        const liveProduct = apiProducts.find((p) => p.id === fav.id)
-        if (liveProduct) {
-          console.debug(
-            `[FavoritesTemplate] Synced live data from DB for product: "${liveProduct.title}" (ID: ${fav.id})`
-          )
-          return liveProduct
-        }
-
-        console.warn(
-          `[FavoritesTemplate] Product with ID ${fav.id} ("${fav.title}") not returned by API. Invoking self-healing cache recovery fallback.`
-        )
-
-        // Clean numeric parsed price
-        const parsedPrice = parseFloat(fav.price.replace(/[^\d]/g, "")) || 0
-
-        return {
-          id: fav.id,
-          title: fav.title,
-          handle: fav.handle,
-          thumbnail: fav.image,
-          description: fav.description,
-          variants: [
-            {
-              id: `var_${fav.id}`,
-              title: "Default",
-              calculated_price: {
-                calculated_amount: parsedPrice,
-                original_amount: parsedPrice,
-                currency_code: "try",
-                calculated_price: { price_list_type: "default" },
-              },
-            },
-          ],
-        } as any
-      })
-
-      setProducts(mergedProducts)
+      setProducts(ordered)
     } catch (e) {
-      console.error(
-        "[FavoritesTemplate] Error querying products endpoint. Rendering complete fallback list from local storage cache.",
-        e
-      )
-
-      const fallbackProducts = favorites.map((fav) => {
-        const parsedPrice = parseFloat(fav.price.replace(/[^\d]/g, "")) || 0
-        return {
-          id: fav.id,
-          title: fav.title,
-          handle: fav.handle,
-          thumbnail: fav.image,
-          description: fav.description,
-          variants: [
-            {
-              id: `var_${fav.id}`,
-              title: "Default",
-              calculated_price: {
-                calculated_amount: parsedPrice,
-                original_amount: parsedPrice,
-                currency_code: "try",
-                calculated_price: { price_list_type: "default" },
-              },
-            },
-          ],
-        }
-      }) as any[]
-
-      setProducts(fallbackProducts)
+      console.error("[FavoritesTemplate] Ürünler çekilemedi", e)
+      setProducts([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [productIds, region.id])
 
   useEffect(() => {
     loadFavoriteProducts()
+  }, [loadFavoriteProducts])
 
-    // Listen for favorite item changes to update the grid reactively
-    window.addEventListener("favorites-updated", loadFavoriteProducts)
-    return () => {
-      window.removeEventListener("favorites-updated", loadFavoriteProducts)
-    }
-  }, [region.id])
+  // Giriş yoksa favori de yok — listeyi boş göstermek yerine ne yapması
+  // gerektiğini söyle.
+  if (!isLoggedIn) {
+    return (
+      <div className="content-container py-10">
+        <div className="border-b border-gray-150 pb-5 mb-8">
+          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-x-2">
+            <span>❤️</span> Beğendiklerim
+          </h1>
+        </div>
+        <div
+          className="text-center py-20 bg-slate-50/50 rounded-2xl border border-dashed border-gray-200 max-w-xl mx-auto px-6 shadow-3xs"
+          data-testid="favorites-login-required"
+        >
+          <span className="text-6xl mb-6 block">🔒</span>
+          <h3 className="font-extrabold text-slate-700 text-lg mb-2">
+            Favorileriniz hesabınıza bağlı
+          </h3>
+          <p className="text-sm text-gray-400 max-w-sm mx-auto mb-8 leading-relaxed font-medium">
+            Giriş yaptığınızda beğendiğiniz ürünler hesabınıza kaydedilir ve
+            telefon, tablet ya da bilgisayar — hangi cihazdan girerseniz girin
+            aynı liste sizi karşılar.
+          </p>
+          <LocalizedClientLink
+            href="/account"
+            className="bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm py-3 px-8 rounded-lg shadow-md transition-all duration-300 inline-block hover:-translate-y-0.5"
+          >
+            Giriş Yap
+          </LocalizedClientLink>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
