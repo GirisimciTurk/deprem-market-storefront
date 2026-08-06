@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useRouter, useParams, useSearchParams } from "next/navigation"
 import { validateGoogleCallback } from "@lib/data/customer"
+import { safeInternalPath, GOOGLE_RETURN_KEY } from "@lib/util/safe-redirect"
 
 export default function GoogleCallbackPage() {
   const router = useRouter()
@@ -28,7 +29,16 @@ export default function GoogleCallbackPage() {
           // Hard navigation so the account page is server-rendered fresh with the
           // newly set auth cookie. router.replace can serve a stale (logged-out)
           // RSC payload, leaving the spinner stuck even though login succeeded.
-          window.location.replace(`/${countryCode}/account`)
+          // Kullanıcı "giriş yapın" uyarısından geldiyse baktığı sayfaya dön;
+          // e-posta ile giriş yolundaki davranışın Google karşılığı.
+          let target: string | null = null
+          try {
+            target = safeInternalPath(sessionStorage.getItem(GOOGLE_RETURN_KEY))
+            sessionStorage.removeItem(GOOGLE_RETURN_KEY)
+          } catch {
+            target = null
+          }
+          window.location.replace(target ?? `/${countryCode}/account`)
         } else {
           setError(res.error || "Google ile giriş doğrulanamadı.")
         }

@@ -7,22 +7,33 @@ import PaginatedProducts from "@modules/store/templates/paginated-products"
 import { StoreSellerResponse } from "@lib/data/sellers"
 import SellerReviews from "@modules/sellers/components/seller-reviews"
 import SellerContact from "@modules/sellers/components/seller-contact"
+import { isShowcaseKey } from "@lib/showcase"
 
 export default function SellerTemplate({
   sortBy,
   seller,
   productIds,
   page,
+  minPrice,
+  maxPrice,
+  inStock,
+  showcase,
   countryCode,
 }: {
   sortBy?: SortOptions
   seller: StoreSellerResponse["seller"]
   productIds: string[]
   page?: string
+  minPrice?: string
+  maxPrice?: string
+  inStock?: string
+  showcase?: string
   countryCode: string
 }) {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
+  // Geçersiz vitrin key'i yok say (StoreTemplate ile aynı davranış).
+  const activeShowcase = isShowcaseKey(showcase) ? showcase : undefined
   const hasProducts = productIds.length > 0
   const ratingCount = seller.rating_count ?? 0
   const ratingAvg = seller.rating_avg ?? 0
@@ -30,7 +41,13 @@ export default function SellerTemplate({
 
   return (
     <div className="flex flex-col small:flex-row small:items-start py-6 content-container">
-      <RefinementList sortBy={sort} />
+      <RefinementList
+        sortBy={sort}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        inStock={inStock}
+        showcase={activeShowcase}
+      />
       <div className="w-full">
         <div className="mb-8 flex items-center gap-x-4">
           {seller.logo && (
@@ -76,6 +93,10 @@ export default function SellerTemplate({
         </div>
         {hasProducts ? (
           <Suspense
+            // Filtre değişince sınır yeniden mount olsun → iskelet gerçekten görünür.
+            key={[sort, pageNumber, minPrice, maxPrice, inStock, activeShowcase]
+              .map((v) => v ?? "")
+              .join("|")}
             fallback={
               <SkeletonProductGrid numberOfProducts={productIds.length} />
             }
@@ -84,6 +105,10 @@ export default function SellerTemplate({
               sortBy={sort}
               page={pageNumber}
               productsIds={productIds}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              inStock={inStock}
+              showcase={activeShowcase}
               countryCode={countryCode}
             />
           </Suspense>

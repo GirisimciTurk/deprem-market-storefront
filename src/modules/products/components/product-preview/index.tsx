@@ -98,11 +98,14 @@ export default function ProductPreview({
   return (
     <div
       data-testid="product-wrapper"
-      className="relative bg-white rounded-xl border border-gray-150 overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full"
+      /* overflow-hidden BİLEREK yok: kalp butonunun "giriş yapın" baloncuğu
+         kart sınırını aşıyor ve kırpılıyordu. Görsel kendi sarmalayıcısında
+         zaten kırpılıp üst köşeleri yuvarlanıyor. */
+      className="relative bg-white rounded-xl border border-gray-150 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full"
     >
       <LocalizedClientLink href={`/products/${product.handle}`} className="group block">
         {/* Image wrapper */}
-        <div className="relative overflow-hidden aspect-[9/12] w-full">
+        <div className="relative overflow-hidden rounded-t-xl aspect-[9/12] w-full">
           <Thumbnail
             thumbnail={product.thumbnail}
             images={product.images}
@@ -177,19 +180,21 @@ export default function ProductPreview({
         {/* Marka / satıcı — mağaza (satıcı) sayfasına gider. Ürün linkinin DIŞINDA
             (iç içe <a> geçersiz olur); böylece isme tıklayınca sırf o mağazanın
             ürünlerini gösteren /satici/<handle> sayfası açılır. */}
-        <div className="flex items-center gap-x-1 flex-wrap">
+        {/* min-w-0 + truncate: kart kökünde artık overflow-hidden yok (kalp
+            baloncuğu kırpılmasın diye), uzun satıcı adı kart dışına taşmasın. */}
+        <div className="flex min-w-0 items-center gap-x-1 flex-wrap">
           {(() => {
             const s = (product as any).seller
             const name = s?.name ?? "depremTek Market"
             return s?.handle ? (
               <LocalizedClientLink
                 href={`/satici/${s.handle}`}
-                className="text-xs font-bold text-orange-600 tracking-wide uppercase transition-colors hover:text-orange-700 hover:underline"
+                className="min-w-0 truncate text-xs font-bold text-orange-600 tracking-wide uppercase transition-colors hover:text-orange-700 hover:underline"
               >
                 {name}
               </LocalizedClientLink>
             ) : (
-              <span className="text-xs font-bold text-orange-600 tracking-wide uppercase">
+              <span className="min-w-0 truncate text-xs font-bold text-orange-600 tracking-wide uppercase">
                 {name}
               </span>
             )

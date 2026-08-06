@@ -1,5 +1,6 @@
 "use client"
 
+import { useLocale } from "next-intl"
 import { useEffect, useState } from "react"
 import { clx } from "@modules/common/components/ui"
 import {
@@ -28,6 +29,10 @@ const PushToggle = () => {
     getExistingSubscription().then((sub) => setEnabled(!!sub))
   }, [])
 
+  // Abonelik kaydına dili yaz: bildirim metni backend'de buna göre kurulur
+  // (locale hiç gönderilmediği için tüm bildirimler Türkçe gidiyordu).
+  const locale = useLocale()
+
   const toggle = async () => {
     if (busy) return
     setBusy(true)
@@ -36,7 +41,7 @@ const PushToggle = () => {
         await unsubscribeFromPush()
         setEnabled(false)
       } else {
-        const sub = await subscribeToPush()
+        const sub = await subscribeToPush(locale)
         if (sub) {
           setEnabled(true)
           setDenied(false)

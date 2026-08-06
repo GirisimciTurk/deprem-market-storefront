@@ -1,5 +1,6 @@
 "use client"
 
+import { useLocale } from "next-intl"
 import { useEffect, useState } from "react"
 import {
   isPushSupported,
@@ -15,6 +16,10 @@ const OVERLAY_KEY = "_dm_overlay_shown"
  * Site geneli "Bildirimlere izin ver" istemi (çerez bandı stilinde, sol-altta).
  * Sadece: push destekleniyorsa + izin "default" ise + daha önce kapatılmadıysa
  * + çerez kararı verilmişse (iki bandın çakışmaması için) gösterilir.
+ *
+ * Giriş DURUMUNA BAKMAZ: genel push (sipariş + kampanya) misafirde de çalışır
+ * (backend /store/push/* allowUnauthenticated). Bu yüzden metin stok bildirimi
+ * VAAT ETMEZ — stok uyarısı hesaba bağlıdır (bkz. stock-alert-button).
  */
 const PushPrompt = () => {
   const [visible, setVisible] = useState(false)
@@ -43,6 +48,9 @@ const PushPrompt = () => {
     return () => clearTimeout(timer)
   }, [])
 
+  // Abonelik kaydına dili yaz (bkz. push-toggle).
+  const locale = useLocale()
+
   const dismiss = () => {
     localStorage.setItem(DISMISS_KEY, "dismissed")
     setVisible(false)
@@ -51,7 +59,7 @@ const PushPrompt = () => {
   const allow = async () => {
     setBusy(true)
     try {
-      const sub = await subscribeToPush()
+      const sub = await subscribeToPush(locale)
       // İzin verilse de verilmese de bandı kapat ve bir daha gösterme.
       localStorage.setItem(DISMISS_KEY, sub ? "granted" : "decided")
       setVisible(false)
@@ -84,9 +92,13 @@ const PushPrompt = () => {
             <h4 className="font-bold text-ui-fg-base text-sm">
               Bildirimlere izin verin
             </h4>
+            {/* "Stoğa gelen ürünler" vaadi BİLEREK çıkarıldı: bu bant misafire
+                de gösteriliyor, stok uyarısı ise girişe bağlı (backend
+                /store/push/stock-alert giriş yoksa 401). Tutulamayacak söz
+                verilmemeli — stok bildirimi ürün sayfasındaki butondan kurulur. */}
             <p className="text-xs text-ui-fg-subtle leading-relaxed">
-              Sipariş durumunuz (kargo & teslimat), stoğa gelen ürünler ve özel
-              kampanyalardan anında haberdar olun.
+              Sipariş durumunuz (kargo &amp; teslimat) ve özel kampanyalardan
+              anında haberdar olun.
             </p>
           </div>
         </div>

@@ -1,11 +1,18 @@
 "use client"
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useMemo, useState, useEffect, Fragment } from "react"
+import {
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+  useTransition,
+  Fragment,
+} from "react"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
-import { ChevronDown, SlidersHorizontal, X } from "lucide-react"
+import { ChevronDown, Loader2, SlidersHorizontal, X } from "lucide-react"
 import SortProducts, { SortOptions } from "./sort-products"
-import { SHOWCASE_CATEGORIES } from "@lib/showcase"
+import { SHOWCASE_CATEGORIES, isShowcaseKey } from "@lib/showcase"
 import { clx } from "@modules/common/components/ui"
 
 type RefinementListProps = {
@@ -33,12 +40,52 @@ const RefinementList = ({
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
+  // Panelin görsel durumu SUNUCU prop'undan geliyordu; sunucu turu bitene kadar
+  // tıklamanın hiçbir izi görünmüyor, "sayfa cevap vermiyor" hissi doğuyordu.
+  // Çözüm: gezinme uçuştayken URL'in İYİMSER (optimistic) hâlini göster.
+  //  - pendingQuery: router.push'a verilen son query string (commit'te bırakılır)
+  //  - isPending: gezinme sürüyor mu (bekleme göstergeleri için)
+  const [isPending, startTransition] = useTransition()
+  const [pendingQuery, setPendingQuery] = useState<string | null>(null)
+  const urlQuery = searchParams.toString()
+
+  useEffect(() => {
+    if (pendingQuery === null) return
+    // Gezinme commit oldu (URL yetişti) ya da transition bitti → iyimser durumu bırak.
+    if (!isPending || urlQuery === pendingQuery) setPendingQuery(null)
+  }, [isPending, urlQuery, pendingQuery])
+
+  // Ekranda gösterilecek filtre durumu: bekleyen gezinme varsa onun query'si,
+  // yoksa sunucudan gelen (commit edilmiş) prop'lar.
+  const view = useMemo(() => {
+    if (pendingQuery === null) {
+      return {
+        categoryIds: categoryId ? categoryId.split(",").filter(Boolean) : [],
+        showcase: showcase,
+        inStock: inStock,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        sortBy: sortBy,
+      }
+    }
+    const p = new URLSearchParams(pendingQuery)
+    const nextShowcase = p.get("showcase") ?? undefined
+    return {
+      categoryIds: (p.get("categoryId") ?? "").split(",").filter(Boolean),
+      showcase: isShowcaseKey(nextShowcase) ? nextShowcase : undefined,
+      inStock: p.get("inStock") ?? undefined,
+      minPrice: p.get("minPrice") ?? undefined,
+      maxPrice: p.get("maxPrice") ?? undefined,
+      sortBy: (p.get("sortBy") as SortOptions) || sortBy,
+    }
+  }, [pendingQuery, categoryId, showcase, inStock, minPrice, maxPrice, sortBy])
+
   const [minInput, setMinInput] = useState(minPrice || "")
   const [maxInput, setMaxInput] = useState(maxPrice || "")
   // Mobil filtre çekmecesi açık/kapalı + aktif filtre rozeti.
   const [mobileOpen, setMobileOpen] = useState(false)
   // Kategori çoklu seçim: URL'de virgülle ayrılmış id listesi (cat_1,cat_2).
-  const selectedCategoryIds = categoryId ? categoryId.split(",").filter(Boolean) : []
+  const selectedCategoryIds = view.categoryIds
 
   // Kategori ağacı: parent_category_id ile kökler + çocuk haritası. Parent'ı
   // listede olmayan kategori (ör. limit dışı) de kök sayılır ki kaybolmasın.
@@ -70,23 +117,26 @@ const RefinementList = ({
       return next
     })
   const activeCount =
-    (minPrice ? 1 : 0) +
-    (maxPrice ? 1 : 0) +
-    (inStock === "true" ? 1 : 0) +
+    (view.minPrice ? 1 : 0) +
+    (view.maxPrice ? 1 : 0) +
+    (view.inStock === "true" ? 1 : 0) +
     selectedCategoryIds.length +
-    (showcase ? 1 : 0)
+    (view.showcase ? 1 : 0)
 
   useEffect(() => {
-    setMinInput(minPrice || "")
-  }, [minPrice])
+    setMinInput(view.minPrice || "")
+  }, [view.minPrice])
 
   useEffect(() => {
-    setMaxInput(maxPrice || "")
-  }, [maxPrice])
+    setMaxInput(view.maxPrice || "")
+  }, [view.maxPrice])
 
   const updateQueryParams = useCallback(
     (updates: Record<string, string | null>) => {
-      const params = new URLSearchParams(searchParams)
+      // Temel HER ZAMAN en son push edilen query — bekleyen gezinme varken
+      // `searchParams` bayat kalıyor ve ikinci tıklama ilkini geri alıyordu
+      // (ör. "Seçimleri Temizle" → hemen kategori seç → silinen filtreler geri gelirdi).
+      const params = new URLSearchParams(pendingQuery ?? searchParams.toString())
       Object.entries(updates).forEach(([key, value]) => {
         if (value === null) {
           params.delete(key)
@@ -95,9 +145,18 @@ const RefinementList = ({
         }
       })
       params.delete("page")
-      router.push(`${pathname}?${params.toString()}`)
+      const nextQuery = params.toString()
+      setPendingQuery(nextQuery)
+      startTransition(() => {
+        // scroll:false → panel sayfanın altındayken (ana sayfa) her filtre
+        // tıklamasında belge en üste zıplıyordu; kullanıcı hem paneli hem
+        // sonucu kaybediyordu.
+        router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, {
+          scroll: false,
+        })
+      })
     },
-    [searchParams, pathname, router]
+    [pendingQuery, searchParams, pathname, router]
   )
 
   const handlePriceApply = (e: React.FormEvent) => {
@@ -126,18 +185,22 @@ const RefinementList = ({
 
   const handleStockToggle = () => {
     updateQueryParams({
-      inStock: inStock === "true" ? null : "true",
+      inStock: view.inStock === "true" ? null : "true",
     })
   }
 
   const handleShowcaseToggle = (key: string) => {
-    updateQueryParams({ showcase: showcase === key ? null : key })
+    updateQueryParams({ showcase: view.showcase === key ? null : key })
   }
 
   // Tüm filtre seçimlerini tek seferde kaldır (sıralama korunur).
+  // Mobilde çekmece de kapanır: sonuç zaten güncelleniyordu ama tam ekran
+  // çekmecenin arkasında kalıyordu; kullanıcı ancak boşluğa dokunup çekmeceyi
+  // kapatınca "cevap verdi" sanıyordu.
   const handleClearAll = () => {
     setMinInput("")
     setMaxInput("")
+    setMobileOpen(false)
     updateQueryParams({
       categoryId: null,
       showcase: null,
@@ -223,16 +286,22 @@ const RefinementList = ({
         <button
           type="button"
           onClick={handleClearAll}
-          className="flex items-center justify-center gap-x-2 w-full py-2.5 rounded-2xl border border-brand-200 bg-brand-50/60 text-sm font-semibold text-brand-700 hover:bg-brand-100/60 transition-all duration-200"
+          disabled={isPending}
+          aria-busy={isPending}
+          className="flex items-center justify-center gap-x-2 w-full py-2.5 rounded-2xl border border-brand-200 bg-brand-50/60 text-sm font-semibold text-brand-700 hover:bg-brand-100/60 transition-all duration-200 disabled:cursor-progress"
         >
-          <X className="w-4 h-4" />
-          Seçimleri Temizle
+          {isPending ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <X className="w-4 h-4" />
+          )}
+          {isPending ? "Güncelleniyor…" : "Seçimleri Temizle"}
         </button>
       )}
 
       {/* 1. Sıralama Seçenekleri */}
       <div className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60">
-        <SortProducts sortBy={sortBy} setQueryParams={handleSortChange} data-testid={dataTestId} />
+        <SortProducts sortBy={view.sortBy} setQueryParams={handleSortChange} data-testid={dataTestId} />
       </div>
 
       {/* 2. Kategoriler */}
@@ -252,7 +321,7 @@ const RefinementList = ({
         <span className="text-xs font-bold text-slate-600 tracking-wider uppercase">Hızlı Filtreler</span>
         <div className="flex flex-wrap gap-2">
           {SHOWCASE_CATEGORIES.map((sc) => {
-            const isSelected = showcase === sc.key
+            const isSelected = view.showcase === sc.key
             return (
               <button
                 key={sc.key}
@@ -300,7 +369,7 @@ const RefinementList = ({
             >
               Uygula
             </button>
-            {(minPrice || maxPrice) && (
+            {(view.minPrice || view.maxPrice) && (
               <button
                 type="button"
                 onClick={handlePriceClear}
@@ -313,20 +382,25 @@ const RefinementList = ({
         </form>
       </div>
 
-      {/* 4. Stok Durumu */}
-      <div
-        className="bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60 flex items-center justify-between cursor-pointer select-none"
+      {/* 4. Stok Durumu — tek bir switch buton (önceden onClick'li div içinde
+          pointer-events-none buton vardı: klavye/ekran okuyucuyla kullanılamıyordu). */}
+      <button
+        type="button"
+        role="switch"
+        aria-checked={view.inStock === "true"}
         onClick={handleStockToggle}
+        className="w-full bg-slate-50/40 p-5 rounded-2xl border border-slate-200/60 flex items-center justify-between select-none text-left"
       >
         <span className="text-sm font-semibold text-slate-700">Sadece Stoktakiler</span>
-        <button
-          className={`w-9 h-5 flex items-center rounded-full p-0.5 transition-all duration-300 pointer-events-none ${
-            inStock === "true" ? "bg-brand-600 justify-end" : "bg-slate-300 justify-start"
+        <span
+          aria-hidden="true"
+          className={`w-9 h-5 flex items-center rounded-full p-0.5 transition-all duration-300 ${
+            view.inStock === "true" ? "bg-brand-600 justify-end" : "bg-slate-300 justify-start"
           }`}
         >
           <span className="w-4 h-4 rounded-full bg-white shadow-sm" />
-        </button>
-      </div>
+        </span>
+      </button>
     </>
   )
 
@@ -350,7 +424,14 @@ const RefinementList = ({
       </div>
 
       {/* Masaüstü: inline panel */}
-      <div className="hidden small:flex flex-col gap-y-6 py-4 mb-8 pl-6 pr-0 min-w-[280px] w-[280px] shrink-0">
+      <div
+        aria-busy={isPending}
+        className={clx(
+          "hidden small:flex flex-col gap-y-6 py-4 mb-8 pl-6 pr-0 min-w-[280px] w-[280px] shrink-0",
+          "transition-opacity duration-200",
+          isPending && "opacity-70"
+        )}
+      >
         {filters}
       </div>
 
@@ -393,18 +474,25 @@ const RefinementList = ({
                       <X className="h-5 w-5" />
                     </button>
                   </div>
-                  <div className="flex-1 overflow-y-auto overscroll-contain">
+                  <div
+                    aria-busy={isPending}
+                    className={clx(
+                      "flex-1 overflow-y-auto overscroll-contain transition-opacity duration-200",
+                      isPending && "opacity-70"
+                    )}
+                  >
                     <div className="flex flex-col gap-y-6 p-4">{filters}</div>
                   </div>
                   <div className="border-t border-slate-200 p-4">
                     <button
                       onClick={() => setMobileOpen(false)}
                       className={clx(
-                        "w-full rounded-xl bg-brand-600 py-2.5 text-sm font-bold text-white",
+                        "flex w-full items-center justify-center gap-x-2 rounded-xl bg-brand-600 py-2.5 text-sm font-bold text-white",
                         "transition-colors hover:bg-brand-700"
                       )}
                     >
-                      Sonuçları Gör
+                      {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                      {isPending ? "Güncelleniyor…" : "Sonuçları Gör"}
                     </button>
                   </div>
                 </DialogPanel>

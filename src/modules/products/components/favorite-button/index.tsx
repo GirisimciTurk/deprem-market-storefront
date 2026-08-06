@@ -1,8 +1,9 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { HttpTypes } from "@medusajs/types"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import LoginHint from "@modules/common/components/login-hint"
 import { useWishlist } from "@lib/context/wishlist-context"
 
 type FavoriteButtonProps = {
@@ -26,11 +27,17 @@ export default function FavoriteButton({
   cheapestPrice: _cheapestPrice,
   className,
 }: FavoriteButtonProps) {
+  const t = useTranslations("loginGate")
   const { isFavorite, toggle, isLoggedIn, pendingId } = useWishlist()
   const [isAnimating, setIsAnimating] = useState(false)
   const [showLoginHint, setShowLoginHint] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
+  const hintRef = useRef<HTMLDivElement>(null)
+  // Baloncuk varsayılan olarak sağa hizalı (kalp kartın sağ üstünde). Dar
+  // telefon kartlarında bu, baloncuğu ekranın soluna taşırıyordu; ölçüp
+  // gerekirse sola hizalıyoruz.
+  const [alignLeft, setAlignLeft] = useState(false)
 
   const favorite = isFavorite(product.id)
   const busy = pendingId === product.id
@@ -49,6 +56,41 @@ export default function FavoriteButton({
     return () => {
       document.removeEventListener("mousedown", onDown)
       document.removeEventListener("keydown", onKey)
+    }
+  }, [showLoginHint])
+
+  // Baloncuk ekranın dışına taşıyorsa hizayı çevir (boyama öncesi ölç →
+  // kullanıcı yanlış konumda bir kare görmez).
+  //
+  // Ölçüm BALONCUĞUN değil ÇAPANIN (buton) konumundan yapılır: baloncuğun kendi
+  // rect'ine bakmak mevcut hizaya bağlı olurdu, yani bir kez çevrildikten sonra
+  // ölçüm bir daha aynı sonucu vermez (tek atışlık, geri dönüşsüz). Çapa
+  // ölçümü idempotenttir; her yeniden değerlendirmede aynı kararı üretir.
+  useLayoutEffect(() => {
+    if (!showLoginHint) return
+
+    const decide = () => {
+      const anchor = wrapRef.current
+      if (!anchor) return
+      const a = anchor.getBoundingClientRect()
+      const width = Math.min(224, window.innerWidth - 24) // w-56 / max-w
+      // Sağa hizalı: sol kenar = çapanın sağı - genişlik.
+      const wouldOverflowLeft = a.right - width < 8
+      // Sola hizalı: sağ kenar = çapanın solu + genişlik.
+      const wouldOverflowRight = a.left + width > window.innerWidth - 8
+      // İkisi de taşıyorsa (çok dar ekran) sağ hizada kal; max-w devreye girer.
+      setAlignLeft(wouldOverflowLeft && !wouldOverflowRight)
+    }
+
+    decide()
+    // role="dialog" koşullu mount edildiği için ekran okuyucu kendiliğinden
+    // duyurmaz; odağı kutuya taşımak hem duyurur hem Escape'i anlamlı kılar.
+    hintRef.current?.focus()
+    window.addEventListener("resize", decide)
+    window.addEventListener("orientationchange", decide)
+    return () => {
+      window.removeEventListener("resize", decide)
+      window.removeEventListener("orientationchange", decide)
     }
   }, [showLoginHint])
 
@@ -77,7 +119,7 @@ export default function FavoriteButton({
       // Oturum arada düşmüş olabilir (cookie süresi doldu).
       setShowLoginHint(true)
     } else if (res.error) {
-      setErrorMsg("Favori kaydedilemedi, tekrar deneyin.")
+      setErrorMsg(t("favoriteError"))
     }
   }
 
@@ -88,7 +130,7 @@ export default function FavoriteButton({
         onClick={onClick}
         disabled={busy}
         aria-pressed={favorite}
-        aria-label={favorite ? "Favorilerden çıkar" : "Favorilere ekle"}
+        aria-label={favorite ? t("removeFavorite") : t("addFavorite")}
         className={`flex items-center justify-center p-2 rounded-full border border-gray-150 bg-white/95 hover:bg-white hover:border-brand-200 transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer disabled:opacity-60 disabled:cursor-wait ${className} ${
           isAnimating ? "scale-125" : "scale-100"
         }`}
@@ -114,10 +156,17 @@ export default function FavoriteButton({
 
       {showLoginHint && (
         <div
+          ref={hintRef}
           role="dialog"
-          aria-label="Giriş gerekli"
-          // Kart ızgarasında sağa taşmasın diye sağa hizalı ve dar tutuldu.
-          className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-gray-200 bg-white p-3 text-left shadow-xl"
+          aria-modal="false"
+          tabIndex={-1}
+          aria-label={t("ariaLabel")}
+          // Genişlik ekrana göre sınırlı, hiza taşmaya göre çevriliyor: sabit
+          // w-56 + right-0 dar telefon kartlarında baloncuğu ekran dışına
+          // taşırıyordu (kart kökündeki overflow-hidden de kırpıyordu).
+          className={`absolute top-full z-50 mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-gray-200 bg-white p-3 text-left text-xs leading-relaxed text-slate-600 shadow-xl outline-none ${
+            alignLeft ? "left-0" : "right-0"
+          }`}
           data-testid="favorite-login-hint"
           onClick={(e) => {
             // Ürün kartının link'ine tıklama olarak sayılmasın.
@@ -125,22 +174,18 @@ export default function FavoriteButton({
             e.stopPropagation()
           }}
         >
-          <p className="text-xs leading-relaxed text-slate-600">
-            Favorilere eklemek için giriş yapmanız gerekiyor.
-          </p>
-          <LocalizedClientLink
-            href="/account"
-            className="mt-2.5 block rounded-lg bg-brand-600 px-3 py-2 text-center text-xs font-bold text-white transition-colors hover:bg-brand-700"
-          >
-            Giriş Yap
-          </LocalizedClientLink>
+          <LoginHint messageKey="favorite" />
         </div>
       )}
 
       {errorMsg && (
         <div
           role="alert"
-          className="absolute right-0 top-full z-50 mt-2 w-52 rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-700 shadow-lg"
+          // Giriş baloncuğuyla AYNI taşma koruması: sabit right-0 + genişlik
+          // dar kartlarda bu kutuyu da ekran dışına taşırıyordu.
+          className={`absolute top-full z-50 mt-2 w-52 max-w-[calc(100vw-1.5rem)] rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-700 shadow-lg ${
+            alignLeft ? "left-0" : "right-0"
+          }`}
         >
           {errorMsg}
         </div>

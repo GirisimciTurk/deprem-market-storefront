@@ -10,6 +10,7 @@ import {
   savePushSubscription,
   removePushSubscription,
   saveStockAlert,
+  unbindPushSubscription,
 } from "@lib/data/push"
 
 // VAPID PUBLIC anahtarı gizli DEĞİLDİR (tarayıcıya gönderilir). Üretim public
@@ -51,11 +52,26 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return out
 }
 
-async function getReadyRegistration(): Promise<ServiceWorkerRegistration | null> {
+/** p verilen sürede çözülmezse null döner (askıda kalmayı engeller). */
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T | null> {
+  return Promise.race([
+    p,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), ms)),
+  ])
+}
+
+async function getReadyRegistration(
+  timeoutMs = 5000
+): Promise<ServiceWorkerRegistration | null> {
   if (!isPushSupported()) return null
   try {
-    // Üretimde serwist SW'yi otomatik kaydeder; hazır olmasını bekle.
-    return await navigator.serviceWorker.ready
+    // DİKKAT: `navigator.serviceWorker.ready` kayıtlı SW YOKSA reddetmez —
+    // HİÇ ÇÖZÜLMEZ (spec). Bu yüzden try/catch de kurtarmaz; çağıran sonsuza
+    // kadar bekler (dev'de serwist kapalı olduğu için tipik durum budur).
+    // Önce askıda kalmayan getRegistration()'a bak, sonra ready'yi süreye bağla.
+    const existing = await navigator.serviceWorker.getRegistration()
+    if (!existing) return null
+    return await withTimeout(navigator.serviceWorker.ready, timeoutMs)
   } catch {
     return null
   }
@@ -131,9 +147,24 @@ export async function unsubscribeFromPush(): Promise<boolean> {
   return await sub.unsubscribe()
 }
 
+export type StockAlertResult = {
+  ok: boolean
+  /** Bildirim izni verilmedi / tarayıcı aboneliği kurulamadı. */
+  denied: boolean
+  /** Oturum yok veya arada düşmüş → giriş uyarısı gösterilmeli. */
+  unauthorized: boolean
+  /** Sunucu/ağ hatası (5xx, bağlantı yok). İzin reddiyle KARIŞTIRILMAMALI. */
+  failed: boolean
+}
+
 /**
  * "Stoğa gelince haber ver": önce push aboneliği sağlar, sonra variant için
- * uyarı kaydı atar. İzin verilmezse false döner.
+ * uyarı kaydı atar.
+ *
+ * Sonuç üç durumu AYIRIR: izin reddi ile 401 aynı mesaja düşerse oturumu düşmüş
+ * kullanıcıya "tarayıcı ayarlarından izin verin" denip yanlış yere yönlendirilir.
+ * Çağıranın giriş kontrolünü ÖNCEDEN yapması beklenir (bu fonksiyon push izni
+ * ister; misafire hiç sorulmamalı).
  */
 export async function requestStockAlert(input: {
   variant_id: string
@@ -141,9 +172,11 @@ export async function requestStockAlert(input: {
   product_handle?: string
   product_title?: string
   locale?: string
-}): Promise<boolean> {
+}): Promise<StockAlertResult> {
   const sub = await subscribeToPush(input.locale)
-  if (!sub) return false
+  // Abonelik kurulamadı → izin reddi (ya da tarayıcı/SW engeli). Sunucuya
+  // hiç gidilmediği için burada "failed" değil "denied" doğru sınıflandırma.
+  if (!sub) return { ok: false, denied: true, unauthorized: false, failed: false }
   const res = await saveStockAlert({
     variant_id: input.variant_id,
     endpoint: sub.endpoint,
@@ -151,5 +184,53 @@ export async function requestStockAlert(input: {
     product_handle: input.product_handle,
     product_title: input.product_title,
   })
-  return res.success
+  return {
+    ok: res.success,
+    // İzin ZATEN alındı (sub var); buradan sonraki başarısızlık sunucu/ağ
+    // kaynaklıdır. Eskiden bu da "izin verilmedi" diye gösteriliyordu.
+    denied: false,
+    unauthorized: res.unauthorized,
+    failed: !res.success && !res.unauthorized,
+  }
+}
+
+/**
+ * Çıkışta çağrılır: bu cihazın push aboneliğini hesaptan çözer.
+ *
+ * Ortak/aile cihazında kullanıcı çıktıktan sonra eski hesabın sipariş ve stok
+ * bildirimleri düşmeye devam etmemeli. Abonelik silinmediği için kampanya
+ * bildirimleri çalışır ve yeniden girişte abonelik hesaba geri bağlanır.
+ * Abonelik yoksa veya çağrı başarısız olursa sessizce geçer — çıkışı bloklamaz.
+ */
+export async function unbindPushFromAccount(): Promise<void> {
+  const task = (async () => {
+    try {
+      const sub = await getExistingSubscription()
+      if (!sub) return
+      await unbindPushSubscription(sub.endpoint)
+    } catch {
+      /* çıkış her hâlükârda sürmeli */
+    }
+  })()
+  // Bildirim temizliği çıkışı ASLA geciktirmemeli/engellememeli: üst sınır koy.
+  await withTimeout(task, 2000)
+}
+
+/**
+ * Girişten SONRA çağrılır: izin zaten verilmiş ve tarayıcı aboneliği varsa
+ * kaydı auth başlığıyla yeniden yazar → çıkışta çözülen hesap bağı geri kurulur.
+ *
+ * İzin İSTEMEZ (requestPermission çağrılmaz), yani kullanıcıya hiçbir pencere
+ * göstermez. Bu olmadan çıkış-giriş yapan kullanıcının sipariş bildirimleri
+ * sessizce kesilirdi.
+ */
+export async function syncPushSubscription(locale?: string): Promise<void> {
+  try {
+    if (getPermission() !== "granted") return
+    const sub = await getExistingSubscription()
+    if (!sub) return
+    await savePushSubscription(serialize(sub, locale))
+  } catch {
+    /* senkron hatası sayfayı etkilemesin */
+  }
 }

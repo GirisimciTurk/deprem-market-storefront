@@ -386,5 +386,25 @@
     "unmute": "Sesi aç",
     "mute": "Sesi kapat",
     "tapForSound": "Ses için dokun"
+  },
+  "loginGate": {
+    "favorite": "Favorilere eklemek için giriş yapmanız gerekiyor.",
+    "stockAlert": "Stoğa gelince haber almak için giriş yapmanız gerekiyor.",
+    "cta": "Giriş Yap",
+    "ariaLabel": "Giriş gerekli",
+    "addFavorite": "Favorilere ekle",
+    "removeFavorite": "Favorilerden çıkar",
+    "favoriteError": "Favori kaydedilemedi, tekrar deneyin.",
+    "stockAlertInline": "Haber almak için <link>giriş yapın</link>.",
+    "favoriteInline": "Favorilere eklemek için <link>giriş yapın</link>."
+  },
+  "stockAlert": {
+    "cta": "Stoğa gelince haber ver",
+    "ctaShort": "Gelince haber ver",
+    "done": "Stoğa girince haber vereceğiz!",
+    "doneShort": "Haber vereceğiz!",
+    "denied": "Bildirim izni verilmedi. Tarayıcı ayarlarından izin verip tekrar deneyebilirsiniz.",
+    "failed": "Kayıt yapılamadı. Bağlantınızı kontrol edip tekrar deneyin.",
+    "unsupported": "Tarayıcınız anlık bildirimleri desteklemiyor. (iOS'ta siteyi Ana Ekrana ekleyin.)"
   }
 }

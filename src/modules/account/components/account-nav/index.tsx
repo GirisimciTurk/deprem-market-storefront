@@ -6,6 +6,7 @@ import { useParams, usePathname } from "next/navigation"
 import React from "react"
 
 import { signout } from "@lib/data/customer"
+import { unbindPushFromAccount } from "@lib/util/push"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
@@ -123,6 +124,9 @@ const AccountNav = ({
   const { countryCode } = useParams() as { countryCode: string }
 
   const handleLogout = async () => {
+    // Çıkmadan ÖNCE (hâlâ girişliyken) bu cihazın push aboneliğini hesaptan çöz:
+    // ortak cihazda eski hesabın sipariş/stok bildirimleri düşmeye devam etmesin.
+    await unbindPushFromAccount()
     await signout(countryCode)
   }
 

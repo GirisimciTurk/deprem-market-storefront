@@ -8,6 +8,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import PaginatedProducts from "@modules/store/templates/paginated-products"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
+import { isShowcaseKey } from "@lib/showcase"
 
 export default function CategoryTemplate({
   category,
@@ -16,6 +17,7 @@ export default function CategoryTemplate({
   minPrice,
   maxPrice,
   inStock,
+  showcase,
   countryCode,
 }: {
   category: HttpTypes.StoreProductCategory
@@ -24,11 +26,14 @@ export default function CategoryTemplate({
   minPrice?: string
   maxPrice?: string
   inStock?: string
+  showcase?: string
   countryCode: string
 }) {
   const parsedPage = page ? parseInt(page, 10) : 1
   const pageNumber = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1
   const sort = sortBy || "created_at"
+  // Geçersiz vitrin key'i yok say (StoreTemplate ile aynı davranış).
+  const activeShowcase = isShowcaseKey(showcase) ? showcase : undefined
 
   if (!category || !countryCode) notFound()
 
@@ -53,6 +58,7 @@ export default function CategoryTemplate({
         minPrice={minPrice}
         maxPrice={maxPrice}
         inStock={inStock}
+        showcase={activeShowcase}
         data-testid="sort-by-container"
       />
       <div className="w-full">
@@ -91,6 +97,11 @@ export default function CategoryTemplate({
           </div>
         )}
         <Suspense
+          // Filtre değişince sınır yeniden mount olsun → iskelet gerçekten görünür
+          // (anahtarsız hâlde React eski gridi tutup "tepki yok" hissi veriyordu).
+          key={[sort, pageNumber, minPrice, maxPrice, inStock, activeShowcase]
+            .map((v) => v ?? "")
+            .join("|")}
           fallback={
             <SkeletonProductGrid
               numberOfProducts={category.products?.length ?? 8}
@@ -101,6 +112,10 @@ export default function CategoryTemplate({
             sortBy={sort}
             page={pageNumber}
             categoryId={category.id}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            inStock={inStock}
+            showcase={activeShowcase}
             countryCode={countryCode}
           />
         </Suspense>

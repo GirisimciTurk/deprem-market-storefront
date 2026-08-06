@@ -114,17 +114,33 @@ self.addEventListener("notificationclick", (event: NotificationEvent) => {
         type: "window",
         includeUncontrolled: true,
       })
-      // Açık bir sekme varsa onu hedefe yönlendirip öne getir; yoksa yeni aç.
+
+      // 1) Zaten hedefte olan sekme varsa yalnız öne getir (yönlendirme yok).
+      const already = allClients.find((c) => {
+        try {
+          return new URL(c.url).pathname === new URL(targetUrl, c.url).pathname
+        } catch {
+          return false
+        }
+      })
+      if (already) return already.focus()
+
+      // 2) Yalnız SW'nin KONTROL ETTİĞİ bir sekmeyi yönlendir. Eskiden ilk
+      //    sekme körlemesine ele geçiriliyordu: kullanıcı ödeme adımındaysa
+      //    oradan koparılıyordu; kontrol edilmeyen sekmede ise navigate()
+      //    fırlıyor, sadece focus kalıyor ve bildirim hiçbir yere GÖTÜRMÜYORDU.
       for (const client of allClients) {
-        if ("focus" in client) {
-          try {
-            await client.navigate(targetUrl)
-          } catch {
-            /* navigate engellenirse sadece focus */
-          }
-          return client.focus()
+        // `navigate` yalnız controlled client'ta çalışır.
+        if (!("navigate" in client)) continue
+        try {
+          const navigated = await client.navigate(targetUrl)
+          return (navigated ?? client).focus()
+        } catch {
+          /* bu sekme yönlendirilemedi → sıradakini dene */
         }
       }
+
+      // 3) Uygun sekme yoksa yeni pencere aç (hedefe gitmek garanti).
       return self.clients.openWindow(targetUrl)
     })()
   )

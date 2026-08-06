@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import { getAuthHeaders } from "./cookies"
+import { isUnauthorizedError } from "@lib/util/http-error"
 
 /**
  * Web push abonelik/stok-uyarı server action'ları.
@@ -50,13 +51,19 @@ export async function removePushSubscription(
   }
 }
 
+/**
+ * Stok uyarısı GİRİŞ GEREKTİRİR (backend 401 döner). 401'i diğer hatalardan
+ * ayırıyoruz: buton bunu "bildirim izni verilmedi" değil "giriş yapın" mesajına
+ * çevirmeli. Normalde istemci giriş yoksa buraya hiç gelmez; bu yol oturumu
+ * arada düşen (cookie süresi dolan) kullanıcı içindir.
+ */
 export async function saveStockAlert(input: {
   variant_id: string
   endpoint: string
   product_id?: string
   product_handle?: string
   product_title?: string
-}): Promise<{ success: boolean; error: string | null }> {
+}): Promise<{ success: boolean; error: string | null; unauthorized: boolean }> {
   try {
     const headers = { ...(await getAuthHeaders()) }
     await sdk.client.fetch(`/store/push/stock-alert`, {
@@ -64,8 +71,37 @@ export async function saveStockAlert(input: {
       headers,
       body: input,
     })
-    return { success: true, error: null }
+    return { success: true, error: null, unauthorized: false }
   } catch (e: any) {
-    return { success: false, error: e?.message || String(e) }
+    if (isUnauthorizedError(e)) {
+      return { success: false, error: null, unauthorized: true }
+    }
+    return {
+      success: false,
+      error: e?.message || String(e),
+      unauthorized: false,
+    }
+  }
+}
+
+/**
+ * Cihazın aboneliğini HESAPTAN ÇÖZER (abonelik silinmez, genel bildirimler
+ * çalışmaya devam eder). Çıkış AKIŞINDA, kullanıcı HÂLÂ GİRİŞLİYKEN çağrılmalı:
+ * backend yalnız çağıranın kendi aboneliğini çözer.
+ */
+export async function unbindPushSubscription(
+  endpoint: string
+): Promise<{ success: boolean }> {
+  try {
+    const headers = { ...(await getAuthHeaders()) }
+    await sdk.client.fetch(`/store/push/unbind`, {
+      method: "POST",
+      headers,
+      body: { endpoint },
+    })
+    return { success: true }
+  } catch {
+    // Çıkışı ASLA engelleme: bağ çözülemese bile kullanıcı çıkabilmeli.
+    return { success: false }
   }
 }

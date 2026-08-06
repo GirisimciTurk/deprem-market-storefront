@@ -2,6 +2,7 @@
 
 import { useActionState } from "react"
 import Input from "@modules/common/components/input"
+import { useSearchParams } from "next/navigation"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
@@ -14,6 +15,7 @@ type Props = {
 
 const Register = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(signup as (state: string | null, formData: FormData) => Promise<string | null>, null as string | null)
+  const redirectTo = useSearchParams().get("redirect")
 
   return (
     <div
@@ -27,6 +29,12 @@ const Register = ({ setCurrentView }: Props) => {
         depremTek Market üye profilinizi oluşturun, siparişlerinizi kolayca takip edin.
       </p>
       <form className="w-full flex flex-col" action={formAction}>
+        {/* Kullanıcı "giriş yapın" uyarısından geldiyse hedefi taşı: sunucu
+            eylemi doğrulayıp (safeInternalPath) giriş sonrası oraya döner. */}
+        {redirectTo && (
+          <input type="hidden" name="redirect" value={redirectTo} />
+        )}
+
         <div className="flex flex-col w-full gap-y-2">
           <Input
             label="Ad"
