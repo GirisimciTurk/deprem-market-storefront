@@ -24,8 +24,11 @@ const LocaleSwitcher = () => {
   }
 
   return (
-    <div className="flex items-center justify-between txt-compact-small">
-      <span>{t("language")}</span>
+    // gap-x-4: `justify-between` dar kapsayıcıda etiketi bayraklara dayıyordu
+    // (footerde md altında tam genişlik değil). Etiket ile bayraklar arasında
+    // her zaman boşluk kalsın; etiket de sıkışıp kırılmasın.
+    <div className="flex items-center justify-between gap-x-4 txt-compact-small">
+      <span className="shrink-0">{t("language")}</span>
       <div className="flex items-center gap-x-3">
         {SUPPORTED_LOCALES.map((locale) => (
           <button
