@@ -114,13 +114,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 function FaqSection({
-  eyebrow,
   title,
   description,
   items,
   cta,
 }: {
-  eyebrow: string
   title: string
   description: string
   items: FaqItem[]
@@ -129,10 +127,7 @@ function FaqSection({
   return (
     <section className="mb-12">
       <div className="mb-5">
-        <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase">
-          {eyebrow}
-        </span>
-        <h2 className="text-xl sm:text-2xl font-extrabold text-ui-fg-base tracking-tight mt-1">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-ui-fg-base tracking-tight">
           {title}
         </h2>
         <p className="text-ui-fg-muted text-sm mt-1">{description}</p>
@@ -205,7 +200,6 @@ export default async function SikcaSorulanSorularPage() {
 
       <div id="alisveris" className="scroll-mt-24">
         <FaqSection
-          eyebrow="Halk · Alışveriş"
           title="Alışveriş & Sipariş"
           description="Ürünlerimiz, kargo, iade ve ödeme ile ilgili sorular."
           items={SHOPPING_FAQS}
@@ -214,7 +208,6 @@ export default async function SikcaSorulanSorularPage() {
 
       <div id="uzman" className="scroll-mt-24">
         <FaqSection
-          eyebrow="İnşaat Mühendisleri"
           title="Uzman (Mühendis) Olmak"
           description="Doğrulanmış uzman dizinine katılım, belge doğrulama ve üyelik süreci."
           items={EXPERT_FAQS}
