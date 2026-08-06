@@ -11,6 +11,10 @@ type Props = {
   searchParams: Promise<{
     page?: string
     sortBy?: SortOptions
+    minPrice?: string
+    maxPrice?: string
+    inStock?: string
+    showcase?: string
   }>
 }
 
@@ -35,7 +39,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function SellerPage(props: Props) {
   const searchParams = await props.searchParams
   const params = await props.params
-  const { sortBy, page } = searchParams
+  const { sortBy, page, minPrice, maxPrice, inStock, showcase } = searchParams
 
   const data = await getSellerByHandle(params.handle)
 
@@ -49,6 +53,10 @@ export default async function SellerPage(props: Props) {
       productIds={data.product_ids}
       page={page}
       sortBy={sortBy}
+      minPrice={minPrice}
+      maxPrice={maxPrice}
+      inStock={inStock}
+      showcase={showcase}
       countryCode={params.countryCode}
     />
   )

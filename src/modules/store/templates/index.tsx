@@ -36,6 +36,17 @@ const StoreTemplate = async ({
   const activeShowcase = isShowcaseKey(showcase) ? showcase : undefined
   const categories = await listCategories().catch(() => [])
 
+  // Ana sayfada zaten görsel-gizli bir H1 var; oradaki bağlam başlıkları H2 olur
+  // (tek H1 kuralı). /store'da bu başlıklar sayfanın kendi H1'i olmaya devam eder.
+  const ContextHeading = showSeoContent ? "h1" : "h2"
+
+  // Filtre değişiminde Suspense sınırının YENİDEN mount olması için anahtar.
+  // Anahtarsız hâlde React eski gridi ekranda tutuyordu → tıklamadan sonra
+  // saniyelerce hiçbir şey değişmiyor ("sayfa cevap vermiyor") görüntüsü.
+  const resultsKey = [sort, pageNumber, categoryId, activeShowcase, minPrice, maxPrice, inStock]
+    .map((v) => v ?? "")
+    .join("|")
+
   // /kategoriler sayfasından ?categoryId=<id> ile gelindiğinde başlıkta seçili
   // kategori ad(lar)ını göster (jenerik "Tüm ürünler" yerine bağlam ver).
   const selectedCategoryNames = (categoryId ? categoryId.split(",").filter(Boolean) : [])
@@ -60,9 +71,9 @@ const StoreTemplate = async ({
         <div className="w-full">
           {activeShowcase && (
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-800">
+              <ContextHeading className="text-2xl font-bold text-slate-800">
                 {showcaseLabel(activeShowcase)}
-              </h1>
+              </ContextHeading>
               <p className="mt-2 text-sm text-slate-500">
                 Bu vitrin kategorisindeki tüm ürünler.
               </p>
@@ -70,9 +81,9 @@ const StoreTemplate = async ({
           )}
           {!activeShowcase && selectedCategoryNames.length > 0 && (
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-800">
+              <ContextHeading className="text-2xl font-bold text-slate-800">
                 {selectedCategoryNames.join(", ")}
-              </h1>
+              </ContextHeading>
               <p className="mt-2 text-sm text-slate-500">
                 {selectedCategoryNames.length > 1
                   ? "Seçili kategorilerdeki ürünler."
@@ -95,7 +106,7 @@ const StoreTemplate = async ({
               </p>
             </div>
           )}
-          <Suspense fallback={<SkeletonProductGrid />}>
+          <Suspense key={resultsKey} fallback={<SkeletonProductGrid />}>
             <PaginatedProducts
               sortBy={sort}
               page={pageNumber}
