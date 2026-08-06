@@ -2,6 +2,8 @@
 
 import React, { useState, useActionState, useTransition } from "react"
 import { login, initiateGoogleLogin } from "@lib/data/customer"
+import { useSearchParams } from "next/navigation"
+import { GOOGLE_RETURN_KEY } from "@lib/util/safe-redirect"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
@@ -13,11 +15,20 @@ type Props = {
 
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
+  const redirectTo = useSearchParams().get("redirect")
   const [isPending, startTransition] = useTransition()
   const [googleError, setGoogleError] = useState<string | null>(null)
 
   const handleGoogleLogin = () => {
     setGoogleError(null)
+    // Google akışı siteden ÇIKIP geri döndüğü için form alanı taşınamaz;
+    // dönüş yolu sekme ömrü boyunca saklanıp callback'te okunur.
+    try {
+      if (redirectTo) sessionStorage.setItem(GOOGLE_RETURN_KEY, redirectTo)
+      else sessionStorage.removeItem(GOOGLE_RETURN_KEY)
+    } catch {
+      /* sessionStorage kapalıysa yalnız yönlendirme kaybolur, giriş çalışır */
+    }
     startTransition(async () => {
       try {
         const { location } = await initiateGoogleLogin()
@@ -49,6 +60,12 @@ const Login = ({ setCurrentView }: Props) => {
 
       {/* Main Credentials Login Form */}
       <form className="w-full" action={formAction}>
+        {/* Kullanıcı "giriş yapın" uyarısından geldiyse hedefi taşı: sunucu
+            eylemi doğrulayıp (safeInternalPath) giriş sonrası oraya döner. */}
+        {redirectTo && (
+          <input type="hidden" name="redirect" value={redirectTo} />
+        )}
+
         <div className="flex flex-col w-full gap-y-3">
           <Input
             label="E-posta Adresi"

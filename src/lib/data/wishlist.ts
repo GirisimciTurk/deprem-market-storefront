@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import { getAuthHeaders } from "./cookies"
+import { isUnauthorizedError } from "@lib/util/http-error"
 
 /**
  * Favoriler (wishlist) — MÜŞTERİ HESABINA bağlıdır, backend'de `wishlist` modülünde
@@ -35,16 +36,8 @@ const unauthorized = (): WishlistResult => ({
   error: null,
 })
 
-function isUnauthorized(e: unknown): boolean {
-  // js-sdk 2xx dışında `status` taşıyan FetchError fırlatır.
-  const status = (e as { status?: number })?.status
-  if (typeof status === "number") return status === 401
-  // Status okunamazsa metne düş (proxy/ağ katmanı sarmalamış olabilir).
-  return /\b401\b|unauthorized/i.test(String(e))
-}
-
 function toResult(e: unknown): WishlistResult {
-  if (isUnauthorized(e)) return unauthorized()
+  if (isUnauthorizedError(e)) return unauthorized()
   return { productIds: [], unauthorized: false, error: String(e) }
 }
 

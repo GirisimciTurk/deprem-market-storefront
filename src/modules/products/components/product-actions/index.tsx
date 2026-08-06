@@ -255,6 +255,9 @@ export default function ProductActions({
             "Stoğa gelince haber ver" butonu göster. */}
         {selectedVariant && isValidVariant && !inStock ? (
           <StockAlertButton
+            // Varyant değişince bileşen sıfırdan kurulsun: A varyantı için
+            // alınan "haber vereceğiz" onayı B varyantına yapışmamalı.
+            key={selectedVariant.id}
             variantId={selectedVariant.id}
             productId={product.id}
             productHandle={product.handle ?? undefined}

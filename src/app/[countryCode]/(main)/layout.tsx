@@ -16,7 +16,9 @@ import ContactDock from "@modules/layout/components/contact-dock"
 import PromoVideoPopup from "@modules/layout/components/promo-video-popup"
 import { listWishlist } from "@lib/data/wishlist"
 import { WishlistProvider } from "@lib/context/wishlist-context"
+import { CustomerSessionProvider } from "@lib/context/customer-session-context"
 import WishlistLegacyMigration from "@modules/favorites/components/legacy-migration"
+import PushSync from "@modules/layout/components/push-sync"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -49,32 +51,38 @@ export default async function PageLayout(props: {
   const wishlist = customer ? await listWishlist() : null
 
   return (
-    <WishlistProvider
-      isLoggedIn={!!customer}
-      initialProductIds={wishlist?.productIds ?? []}
-    >
-      <Nav countryCode={countryCode} />
-      {customer && cart && (
-        <CartMismatchBanner customer={customer} cart={cart} />
-      )}
+    <CustomerSessionProvider isLoggedIn={!!customer}>
+      <WishlistProvider
+        isLoggedIn={!!customer}
+        initialProductIds={wishlist?.productIds ?? []}
+      >
+        <Nav countryCode={countryCode} />
+        {customer && cart && (
+          <CartMismatchBanner customer={customer} cart={cart} />
+        )}
 
-      {cart && (
-        <FreeShippingPriceNudge
-          variant="popup"
-          cart={cart}
-          shippingOptions={shippingOptions}
-        />
-      )}
-      {props.children}
-      <Footer />
-      <CookieConsent countryCode={countryCode} />
-      <PushPrompt />
-      <InstallPrompt />
-      <ContactDock countryCode={countryCode} region={region ?? null} />
-      <PromoVideoPopup />
-      {/* Favoriler localStorage'dan hesaba taşındı: giriş yapmış kullanıcının
+        {cart && (
+          <FreeShippingPriceNudge
+            variant="popup"
+            cart={cart}
+            shippingOptions={shippingOptions}
+          />
+        )}
+        {props.children}
+        <Footer />
+        <CookieConsent countryCode={countryCode} />
+        <PushPrompt />
+        <InstallPrompt />
+        <ContactDock countryCode={countryCode} region={region ?? null} />
+        <PromoVideoPopup />
+        {/* Favoriler localStorage'dan hesaba taşındı: giriş yapmış kullanıcının
           cihazında kalan eski kayıtları bir kez hesabına aktarır. */}
-      {customer && <WishlistLegacyMigration />}
-    </WishlistProvider>
+        {customer && <WishlistLegacyMigration />}
+        {/* Çıkışta çözülen cihaz–hesap bağını girişten sonra sessizce geri kurar
+            ve abonelik dilini tazeler (bkz. push-sync). Misafirde de gerekli:
+            dil değişince bildirim metni eski dilde kalmasın. */}
+        <PushSync />
+      </WishlistProvider>
+    </CustomerSessionProvider>
   )
 }

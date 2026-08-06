@@ -386,5 +386,25 @@
     "unmute": "Unmute",
     "mute": "Mute",
     "tapForSound": "Tap for sound"
+  },
+  "loginGate": {
+    "favorite": "You need to sign in to add favorites.",
+    "stockAlert": "You need to sign in to be notified when this is back in stock.",
+    "cta": "Sign in",
+    "ariaLabel": "Sign-in required",
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites",
+    "favoriteError": "Could not save favorite, please try again.",
+    "stockAlertInline": "To get notified, <link>sign in</link>.",
+    "favoriteInline": "To add favorites, <link>sign in</link>."
+  },
+  "stockAlert": {
+    "cta": "Notify me when back in stock",
+    "ctaShort": "Notify me",
+    "done": "We'll let you know when it's back!",
+    "doneShort": "We'll notify you!",
+    "denied": "Notification permission was denied. Allow it in your browser settings and try again.",
+    "failed": "Could not save. Check your connection and try again.",
+    "unsupported": "Your browser doesn't support push notifications. (On iOS, add the site to your Home Screen.)"
   }
 }

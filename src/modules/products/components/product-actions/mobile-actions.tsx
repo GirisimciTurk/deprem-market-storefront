@@ -121,6 +121,11 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               </Button>}
               {variant && !inStock ? (
                 <StockAlertButton
+                  // Varyant değişince durum sıfırlansın (bkz. product-actions).
+                  key={variant.id}
+                  // Yapışkan mobil çubuk: uzun metin ve blok CTA burada çubuğu
+                  // şişirip ekranı kaplıyordu.
+                  compact
                   variantId={variant.id}
                   productId={product.id}
                   productHandle={product.handle ?? undefined}

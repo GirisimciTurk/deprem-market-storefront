@@ -5,6 +5,7 @@ import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
+import { safeInternalPath } from "@lib/util/safe-redirect"
 import {
   getAuthHeaders,
   getCacheOptions,
@@ -61,6 +62,7 @@ export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
 }
 
 export async function signup(_currentState: unknown, formData: FormData) {
+  let created: unknown
   const password = formData.get("password") as string
   let phoneVal = (formData.get("phone") as string || "").trim().replace(/[\s\(\)\-\.]/g, "")
 
@@ -118,10 +120,18 @@ export async function signup(_currentState: unknown, formData: FormData) {
 
     await transferCart()
 
-    return createdCustomer
+    created = createdCustomer
   } catch (error) {
     return String(error)
   }
+
+  // Giriş akışıyla aynı kural: nereden geldiyse oraya dön (bkz. login).
+  const target = safeInternalPath(formData.get("redirect"))
+  if (target) {
+    redirect(target)
+  }
+
+  return created
 }
 
 export async function login(_currentState: unknown, formData: FormData) {
@@ -144,6 +154,15 @@ export async function login(_currentState: unknown, formData: FormData) {
     await transferCart()
   } catch (error) {
     return String(error)
+  }
+
+  // Kullanıcı bir yerden yönlendirilerek geldiyse (ör. "favorilere eklemek için
+  // giriş yapın" / "stoğa gelince haber ver") oraya geri götür; eskiden hesap
+  // panelinde kalıyor ve niyeti kayboluyordu. Yol açık yönlendirmeye karşı
+  // doğrulanır. redirect() NEXT_REDIRECT fırlattığı için try/catch DIŞINDA.
+  const target = safeInternalPath(formData.get("redirect"))
+  if (target) {
+    redirect(target)
   }
 }
 
