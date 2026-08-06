@@ -176,6 +176,29 @@ export const listProductsWithSort = async ({
 }> => {
   const limit = queryParams?.limit || 12
 
+  // HIZLI YOL: bellekte filtre/sıralama GEREKMİYORSA sayfalamayı backend yapsın.
+  // Aksi halde çalışma kümesi MAX_WORKING_SET'te tavan yapıyor ve `count` olarak
+  // bu KIRPILMIŞ sayı dönüyor. Ana kategoriler alt ağaçlarıyla birlikte
+  // sorgulanmaya başlayınca (bkz. category-tree) bu yol ana kategorilerin
+  // VARSAYILAN yolu oldu: 600 ürünlük bir kategoride son 100 ürüne hiç
+  // ulaşılamıyor ve kullanıcı "Tüm ürünler listelendi" yazısını görüyordu.
+  const needsInMemoryPass =
+    Boolean(minPrice || maxPrice || showcase) ||
+    inStock === "true" ||
+    sortBy === "price_asc" ||
+    sortBy === "price_desc"
+
+  if (!needsInMemoryPass) {
+    const { response, nextPage } = await listProducts({
+      pageParam: Math.max(page, 1),
+      // sortProducts "created_at"i AZALAN sıralıyor; sıralama backend'e
+      // devredilirken "-" öneki ŞART, yoksa liste en eski üründen başlar.
+      queryParams: { ...queryParams, limit, order: "-created_at" },
+      countryCode,
+    })
+    return { response, nextPage, queryParams }
+  }
+
   // Fiyat/stok/vitrin filtreleri ve fiyat sıralaması calculated_price / envanter /
   // metadata gerektirdiğinden bellekte uygulanır. Bu yüzden çalışma kümesi katalogun
   // tamamını (sınırlı) kapsamalı; aksi halde 100. üründen sonrası "sessizce" düşer.

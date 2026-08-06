@@ -11,7 +11,12 @@ type InfiniteProductsProps = {
   region: HttpTypes.StoreRegion
   sortBy?: SortOptions
   collectionId?: string
-  categoryId?: string
+  /**
+   * SUNUCUDA alt kategorileriyle genişletilmiş id listesi. Ham `categoryId`
+   * string'i alınsaydı "daha fazla yükle" ilk sayfadan FARKLI bir küme
+   * sorgulardı (ana kategoride ilk 12 ürün gelir, devamı boş dönerdi).
+   */
+  categoryIds?: string[]
   productsIds?: string[]
   countryCode: string
   minPrice?: string
@@ -26,7 +31,7 @@ export default function InfiniteProducts({
   region,
   sortBy,
   collectionId,
-  categoryId,
+  categoryIds,
   productsIds,
   countryCode,
   minPrice,
@@ -39,15 +44,23 @@ export default function InfiniteProducts({
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(initialProducts.length < initialCount)
   const [isLoading, setIsLoading] = useState(false)
+  const categoryKey = categoryIds?.join(",") ?? ""
   const loaderRef = useRef<HTMLDivElement>(null)
 
-  // Reset local state when initialProducts or count changes (e.g. when filters/sorting changes)
+  // Filtre/sıralama değişince yerel durumu sıfırla.
+  //
+  // Bağımlılık dizinin KİMLİĞİ değil İÇERİĞİ: sunucu her yeniden render'da
+  // (ör. sepete ekle → revalidateTag) yeni bir dizi üretiyor, kimliğe bakmak
+  // kullanıcının kaydırarak yüklediği sayfaları siliyor ve liste 12 ürüne
+  // geri dönüyordu.
+  const initialKey = initialProducts.map((p) => p.id).join(",")
   useEffect(() => {
     setProducts(initialProducts)
     setPage(1)
     setHasMore(initialProducts.length < initialCount)
     setIsLoading(false)
-  }, [initialProducts, initialCount])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialKey, initialCount])
 
   const loadMoreProducts = async () => {
     if (isLoading || !hasMore) return
@@ -57,7 +70,7 @@ export default function InfiniteProducts({
       const nextPageNum = page + 1
       const queryParams: any = { limit: 12 }
       if (collectionId) queryParams["collection_id"] = [collectionId]
-      if (categoryId) queryParams["category_id"] = categoryId.split(",").filter(Boolean)
+      if (categoryIds?.length) queryParams["category_id"] = categoryIds
       if (productsIds) queryParams["id"] = productsIds
       if (sortBy === "created_at") queryParams["order"] = "created_at"
 
@@ -114,7 +127,9 @@ export default function InfiniteProducts({
     return () => {
       observer.unobserve(currentLoader)
     }
-  }, [hasMore, isLoading, page, sortBy, collectionId, categoryId, productsIds, minPrice, maxPrice, inStock, showcase, products.length])
+    // Bağımlılıkta dizinin KİMLİĞİ değil İÇERİĞİ var: sunucu her render'da yeni
+    // bir dizi üretiyor, kimliğe bakmak gözlemciyi boşuna yeniden kurardı.
+  }, [hasMore, isLoading, page, sortBy, collectionId, categoryKey, productsIds, minPrice, maxPrice, inStock, showcase, products.length])
 
   if (products.length === 0) {
     return (

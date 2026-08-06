@@ -176,11 +176,49 @@ const RefinementList = ({
     })
   }
 
+  // Bir kategorinin (herhangi bir derinlikte) atası seçili mi? Seçim sunucuda
+  // alt ağacıyla genişletiliyor (bkz. category-tree), yani atası seçiliyse bu
+  // kategori zaten DAHİL. Arayüz bunu göstermezse kullanıcı alt kategoriye
+  // tıklıyor ve hiçbir şeyin değişmediğini görüyor.
+  const parentOf = (id: string): string | undefined => {
+    const c = categories.find((x) => x.id === id)
+    return c?.parent_category_id ?? c?.parent_category?.id ?? undefined
+  }
+  const hasSelectedAncestor = (id: string): boolean => {
+    const seen = new Set<string>()
+    let pid = parentOf(id)
+    while (pid && !seen.has(pid)) {
+      if (selectedCategoryIds.includes(pid)) return true
+      seen.add(pid)
+      pid = parentOf(pid)
+    }
+    return false
+  }
+
   const handleCategoryToggle = (id: string) => {
-    const next = selectedCategoryIds.includes(id)
-      ? selectedCategoryIds.filter((c) => c !== id)
-      : [...selectedCategoryIds, id]
+    let next: string[]
+    if (selectedCategoryIds.includes(id)) {
+      next = selectedCategoryIds.filter((c) => c !== id)
+    } else {
+      // Üst kategori seçilince altındaki seçimler gereksizleşir; listede
+      // bırakmak URL'i şişirir ve "kaldır"ı iki adıma çıkarırdı.
+      next = [
+        ...selectedCategoryIds.filter((c) => !isDescendantOf(c, id)),
+        id,
+      ]
+    }
     updateQueryParams({ categoryId: next.length ? next.join(",") : null })
+  }
+
+  const isDescendantOf = (id: string, ancestorId: string): boolean => {
+    const seen = new Set<string>()
+    let pid = parentOf(id)
+    while (pid && !seen.has(pid)) {
+      if (pid === ancestorId) return true
+      seen.add(pid)
+      pid = parentOf(pid)
+    }
+    return false
   }
 
   const handleStockToggle = () => {
@@ -231,6 +269,8 @@ const RefinementList = ({
       const kids = childrenMap.get(cat.id) ?? []
       const hasKids = kids.length > 0
       const isSelected = selectedCategoryIds.includes(cat.id)
+      // Atası seçiliyse bu kategori sonuçlara zaten dahil.
+      const isIncluded = !isSelected && hasSelectedAncestor(cat.id)
       const isOpen = expandedCats.has(cat.id) || hasSelectedDescendant(cat.id)
       return (
         <div key={cat.id}>
@@ -238,7 +278,9 @@ const RefinementList = ({
             className={`flex items-center rounded-xl transition-all duration-200 ${
               isSelected
                 ? "bg-brand-600 text-white font-semibold shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                : isIncluded
+                  ? "bg-brand-50 text-brand-700"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             }`}
             style={{ paddingLeft: depth * 14 }}
           >
@@ -250,6 +292,11 @@ const RefinementList = ({
               {isSelected && (
                 <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-bold">
                   Aktif
+                </span>
+              )}
+              {isIncluded && (
+                <span className="text-[10px] bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-md font-bold">
+                  Dahil
                 </span>
               )}
             </button>

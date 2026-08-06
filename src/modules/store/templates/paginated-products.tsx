@@ -1,5 +1,7 @@
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { listCategories } from "@lib/data/categories"
+import { expandCategoryIds } from "@lib/util/category-tree"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import InfiniteProducts from "./infinite-products"
 
@@ -44,9 +46,25 @@ export default async function PaginatedProducts({
     queryParams["collection_id"] = [collectionId]
   }
 
-  if (categoryId) {
-    // categoryId virgülle ayrılmış çoklu seçim olabilir (cat_1,cat_2).
-    queryParams["category_id"] = categoryId.split(",").filter(Boolean)
+  // categoryId virgülle ayrılmış çoklu seçim olabilir (cat_1,cat_2).
+  // Seçim ALT KATEGORİLERİYLE genişletilir: Medusa `category_id`'yi doğrudan
+  // atama olarak yorumluyor, ürünler de yaprak kategorilere atandığı için ana
+  // kategori seçildiğinde sonuç boş geliyordu.
+  const selectedCategoryIds = categoryId
+    ? categoryId.split(",").filter(Boolean)
+    : []
+  let expandedCategoryIds: string[] = []
+  if (selectedCategoryIds.length) {
+    const categories = await listCategories().catch((e) => {
+      // Sessiz düşerse genişletme yapılmaz ve "ana kategori boş" hatası geri
+      // gelir; en azından iz bıraksın.
+      console.warn(
+        `[products] Kategori ağacı alınamadı, alt kategoriler filtreye dahil edilemiyor: ${e}`
+      )
+      return []
+    })
+    expandedCategoryIds = expandCategoryIds(selectedCategoryIds, categories ?? [])
+    queryParams["category_id"] = expandedCategoryIds
   }
 
   if (productsIds) {
@@ -82,7 +100,7 @@ export default async function PaginatedProducts({
       region={region}
       sortBy={sortBy}
       collectionId={collectionId}
-      categoryId={categoryId}
+      categoryIds={expandedCategoryIds}
       productsIds={productsIds}
       countryCode={countryCode}
       minPrice={minPrice}
