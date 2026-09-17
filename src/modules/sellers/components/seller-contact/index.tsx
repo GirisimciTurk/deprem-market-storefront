@@ -115,7 +115,7 @@ export default function SellerContact({ sellerHandle }: SellerContactProps) {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Örn: Kargo süresi hakkında"
-              className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all font-medium text-slate-800"
+              className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition-all font-medium text-slate-800"
             />
           </div>
 
@@ -129,7 +129,7 @@ export default function SellerContact({ sellerHandle }: SellerContactProps) {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Satıcıya sormak istediğinizi yazın..."
-              className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none font-medium text-slate-850"
+              className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition-all resize-none font-medium text-slate-850"
             />
           </div>
 

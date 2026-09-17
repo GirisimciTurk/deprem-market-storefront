@@ -145,7 +145,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
             {allReviewPhotos.map((photo, idx) => (
               <div
                 key={`${photo.reviewId}-${idx}`}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-gray-200 cursor-pointer flex-shrink-0 hover:border-orange-500 hover:scale-105 transition-all duration-200 shadow-2xs"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-gray-200 cursor-pointer flex-shrink-0 hover:border-brand-500 hover:scale-105 transition-all duration-200 shadow-2xs"
                 onClick={() => setLightboxImage(photo.url)}
               >
                 <img

@@ -72,7 +72,7 @@ export default function AccountFavorites({
 
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <div className="w-8 h-8 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
         </div>
       ) : products.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

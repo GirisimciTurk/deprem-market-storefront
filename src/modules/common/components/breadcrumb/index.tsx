@@ -16,7 +16,7 @@ export default function Breadcrumb({ items }: { items: Crumb[] }) {
               {item.href && !isLast ? (
                 <LocalizedClientLink
                   href={item.href}
-                  className="hover:text-orange-600 transition-colors whitespace-nowrap"
+                  className="hover:text-brand-600 transition-colors whitespace-nowrap"
                 >
                   {item.label}
                 </LocalizedClientLink>

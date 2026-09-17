@@ -240,12 +240,12 @@ export default function ProductActions({
         {/* Aciliyet: stok azaldıysa "son X adet" uyarısı (deprem nişinde dönüşüm). */}
         {isLowStock && (
           <div
-            className="flex items-center gap-x-2 text-sm font-bold text-orange-700 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2"
+            className="flex items-center gap-x-2 text-sm font-bold text-brand-700 bg-brand-50 border border-brand-200 rounded-lg px-3 py-2"
             role="status"
           >
             <span className="relative flex h-2 w-2 flex-shrink-0">
-              <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-600"></span>
+              <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-600"></span>
             </span>
             Son {remainingStock} adet — stoklar tükenmek üzere!
           </div>
@@ -274,7 +274,7 @@ export default function ProductActions({
               !isValidVariant
             }
             variant="primary"
-            className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg shadow-md transition-colors"
+            className="w-full h-11 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow-md transition-colors"
             isLoading={isAdding}
             data-testid="add-product-button"
           >

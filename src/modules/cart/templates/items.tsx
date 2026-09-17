@@ -85,12 +85,12 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
                         {seller?.handle ? (
                           <LocalizedClientLink
                             href={`/satici/${seller.handle}`}
-                            className="text-orange-600 hover:text-orange-500 transition-colors"
+                            className="text-brand-600 hover:text-brand-500 transition-colors"
                           >
                             {name}
                           </LocalizedClientLink>
                         ) : (
-                          <span className="text-orange-600">{name}</span>
+                          <span className="text-brand-600">{name}</span>
                         )}
                       </Table.Cell>
                     </Table.Row>

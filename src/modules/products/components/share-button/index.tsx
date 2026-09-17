@@ -153,7 +153,7 @@ const ShareButton = ({ title }: { title: string }) => {
         aria-expanded={open}
         title={t("share")}
         data-testid="share-button"
-        className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-orange-600 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
+        className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-brand-600 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
       >
         <Share2 className="w-5 h-5" aria-hidden="true" />
       </button>

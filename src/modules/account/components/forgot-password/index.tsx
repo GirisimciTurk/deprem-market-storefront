@@ -42,7 +42,7 @@ const ForgotPassword = ({ setCurrentView }: Props) => {
           <button
             type="button"
             onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
-            className="text-orange-600 font-bold text-sm hover:underline mt-2"
+            className="text-brand-600 font-bold text-sm hover:underline mt-2"
           >
             Girişe dön
           </button>
@@ -64,7 +64,7 @@ const ForgotPassword = ({ setCurrentView }: Props) => {
             />
             <SubmitButton
               data-testid="send-reset-button"
-              className="w-full mt-5 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition-colors border-0"
+              className="w-full mt-5 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition-colors border-0"
             >
               Sıfırlama Bağlantısı Gönder
             </SubmitButton>
@@ -74,7 +74,7 @@ const ForgotPassword = ({ setCurrentView }: Props) => {
             <button
               type="button"
               onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
-              className="text-orange-600 font-bold hover:underline"
+              className="text-brand-600 font-bold hover:underline"
             >
               Giriş Yap
             </button>

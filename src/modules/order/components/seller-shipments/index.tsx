@@ -84,7 +84,7 @@ const SellerShipments = ({ orderId }: Props) => {
                   {s.seller_handle ? (
                     <LocalizedClientLink
                       href={`/satici/${s.seller_handle}`}
-                      className="font-bold text-gray-900 hover:text-orange-600 transition-colors"
+                      className="font-bold text-gray-900 hover:text-brand-600 transition-colors"
                     >
                       {s.seller_name}
                     </LocalizedClientLink>
@@ -126,7 +126,7 @@ const SellerShipments = ({ orderId }: Props) => {
                       href={s.tracking_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-bold text-orange-600 hover:text-orange-500 transition-colors"
+                      className="font-bold text-brand-600 hover:text-brand-500 transition-colors"
                     >
                       Kargom Nerede? →
                     </a>

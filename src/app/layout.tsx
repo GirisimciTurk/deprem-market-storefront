@@ -14,7 +14,7 @@ const GA_MEASUREMENT_ID = "G-BY6LLHW7GJ"
 // theme-color: tarayıcı/PWA adres çubuğu ve iOS standalone üst bar rengi
 // (manifest theme_color ile aynı marka rengi).
 export const viewport: Viewport = {
-  themeColor: "#F08C1A",
+  themeColor: "#3576BA",
 }
 
 export async function generateMetadata(): Promise<Metadata> {

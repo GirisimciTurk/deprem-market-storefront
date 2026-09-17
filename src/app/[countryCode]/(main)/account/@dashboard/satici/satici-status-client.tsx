@@ -50,7 +50,7 @@ export default function SaticiStatusClient({
                 DURUM
               </span>
               {application.status === "pending" && (
-                <span className="bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1 rounded-full text-xs font-bold tracking-wide animate-pulse">
+                <span className="bg-brand-50 text-brand-700 border border-brand-200 px-3 py-1 rounded-full text-xs font-bold tracking-wide animate-pulse">
                   ⌛ İncelemede
                 </span>
               )}

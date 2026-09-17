@@ -140,7 +140,7 @@ export default function Messages({
               type="button"
               onClick={() => openConversation(c.id)}
               className={`w-full text-left px-4 py-3.5 transition-colors hover:bg-ui-bg-subtle ${
-                isActive ? "bg-orange-50" : ""
+                isActive ? "bg-brand-50" : ""
               }`}
             >
               <div className="flex items-center justify-between gap-2">
@@ -270,7 +270,7 @@ export default function Messages({
                     handleSend(e)
                   }
                 }}
-                className="flex-1 resize-none bg-ui-bg-subtle border border-ui-border-base rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all max-h-32"
+                className="flex-1 resize-none bg-ui-bg-subtle border border-ui-border-base rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition-all max-h-32"
               />
               <button
                 type="submit"

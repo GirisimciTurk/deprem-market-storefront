@@ -93,7 +93,7 @@ export default function FavoritesTemplate({
           </p>
           <LocalizedClientLink
             href="/account"
-            className="bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm py-3 px-8 rounded-lg shadow-md transition-all duration-300 inline-block hover:-translate-y-0.5"
+            className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm py-3 px-8 rounded-lg shadow-md transition-all duration-300 inline-block hover:-translate-y-0.5"
           >
             Giriş Yap
           </LocalizedClientLink>
@@ -105,7 +105,7 @@ export default function FavoritesTemplate({
   if (loading) {
     return (
       <div className="content-container py-12 flex flex-col items-center justify-center min-h-[400px]">
-        <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin mb-4" />
+        <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin mb-4" />
         <span className="text-gray-500 font-semibold text-sm">
           Favorileriniz yükleniyor...
         </span>
@@ -145,7 +145,7 @@ export default function FavoritesTemplate({
           </p>
           <LocalizedClientLink
             href="/store"
-            className="bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm py-3 px-8 rounded-lg shadow-md transition-all duration-300 inline-block hover:-translate-y-0.5"
+            className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm py-3 px-8 rounded-lg shadow-md transition-all duration-300 inline-block hover:-translate-y-0.5"
           >
             Mağazayı İncele
           </LocalizedClientLink>

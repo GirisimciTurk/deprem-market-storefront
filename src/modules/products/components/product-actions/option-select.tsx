@@ -18,8 +18,8 @@ const colorMap: Record<string, string> = {
   "orange": "#ff6b00",
   "siyah": "#000000",
   "black": "#000000",
-  "kırmızı": "#F08C1A",
-  "red": "#F08C1A",
+  "kırmızı": "#DC2626",
+  "red": "#DC2626",
   "yeşil": "#16a34a",
   "green": "#16a34a",
   "mavi": "#2563eb",
@@ -148,7 +148,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
               className={clx(
                 "border bg-white text-small-regular h-auto min-h-[2.75rem] rounded-lg px-4 py-2 flex-1 flex flex-col items-center justify-center gap-0.5 transition-all duration-150 relative",
                 {
-                  "border-orange-500 ring-1 ring-orange-500 shadow-sm": v === current,
+                  "border-brand-500 ring-1 ring-brand-500 shadow-sm": v === current,
                   "border-gray-200 hover:border-gray-300 hover:shadow-sm": v !== current,
                   "opacity-50": !valueInStock,
                 }

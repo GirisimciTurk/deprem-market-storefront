@@ -58,7 +58,7 @@ export default function Mascot({ className }: { className?: string }) {
       {/* Baret — kubbe */}
       <path
         d="M26 41C26 20 37 12 50 12s24 8 24 29c0 0-11-4.5-24-4.5S26 41 26 41z"
-        fill="#F08C1A"
+        fill="#3576BA"
       />
       <path d="M26 41C26 20 37 12 50 12s24 8 24 29" fill="url(#dz-hat)" opacity="0.35" />
       {/* Baret — sırt kaburgası */}

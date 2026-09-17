@@ -257,7 +257,7 @@ export default function InstallmentCargoInfo({
           {/* Card 2: Installments */}
           <div
             onClick={() => setIsInstallmentModalOpen(true)}
-            className="bg-white border border-gray-200 rounded-xl p-3.5 flex items-center justify-between shadow-xs hover:border-orange-500 hover:shadow-sm cursor-pointer transition-all duration-200"
+            className="bg-white border border-gray-200 rounded-xl p-3.5 flex items-center justify-between shadow-xs hover:border-brand-500 hover:shadow-sm cursor-pointer transition-all duration-200"
           >
             <div className="flex items-center gap-x-3">
               <div className="bg-brand-50 p-2 rounded-lg border border-brand-100">
@@ -272,7 +272,7 @@ export default function InstallmentCargoInfo({
                 </span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-orange-600 font-bold" />
+            <ChevronRight className="w-4 h-4 text-brand-600 font-bold" />
           </div>
         </div>
       </div>
@@ -372,7 +372,7 @@ export default function InstallmentCargoInfo({
                       onClick={() => setSelectedBank(bank.CODE)}
                       className={`w-full text-left px-3 py-2.5 rounded-lg border text-xs font-semibold transition-all duration-150 ${
                         isSelected
-                          ? `bg-white border-orange-500 shadow-xs text-orange-600`
+                          ? `bg-white border-brand-500 shadow-xs text-brand-600`
                           : `bg-transparent border-transparent text-gray-600 hover:bg-gray-150`
                       }`}
                     >
@@ -389,9 +389,9 @@ export default function InstallmentCargoInfo({
 
               {/* Right Column: Installment Table */}
               <div className="w-2/3 p-6 overflow-y-auto flex flex-col">
-                <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 mb-4 text-xs text-orange-700 font-medium text-left">
+                <div className="bg-brand-50 border border-brand-100 rounded-xl p-3 mb-4 text-xs text-brand-700 font-medium text-left">
                   Mevcut ürün fiyatı:{" "}
-                  <span className="font-bold text-orange-950 text-sm">
+                  <span className="font-bold text-brand-950 text-sm">
                     ₺
                     {price.toLocaleString("tr-TR", {
                       minimumFractionDigits: 2,

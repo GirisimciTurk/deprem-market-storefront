@@ -138,7 +138,7 @@ export default function ProductPreview({
           {/* Top-Left: Hizmet (serviceable) Badge — rank/indirim rozetlerinin altına yığılır */}
           {isServiceable && (
             <div
-              className={`absolute z-10 left-2 bg-orange-600 text-white font-bold text-[9px] sm:text-[10px] px-2 py-1 rounded-md shadow-md flex items-center gap-x-1 border border-orange-500 ${
+              className={`absolute z-10 left-2 bg-brand-600 text-white font-bold text-[9px] sm:text-[10px] px-2 py-1 rounded-md shadow-md flex items-center gap-x-1 border border-brand-500 ${
                 rankInfo && discountPercentage
                   ? "top-[4.5rem] sm:top-20"
                   : rankInfo || discountPercentage
@@ -189,12 +189,12 @@ export default function ProductPreview({
             return s?.handle ? (
               <LocalizedClientLink
                 href={`/satici/${s.handle}`}
-                className="min-w-0 truncate text-xs font-bold text-orange-600 tracking-wide uppercase transition-colors hover:text-orange-700 hover:underline"
+                className="min-w-0 truncate text-xs font-bold text-brand-600 tracking-wide uppercase transition-colors hover:text-brand-700 hover:underline"
               >
                 {name}
               </LocalizedClientLink>
             ) : (
-              <span className="min-w-0 truncate text-xs font-bold text-orange-600 tracking-wide uppercase">
+              <span className="min-w-0 truncate text-xs font-bold text-brand-600 tracking-wide uppercase">
                 {name}
               </span>
             )

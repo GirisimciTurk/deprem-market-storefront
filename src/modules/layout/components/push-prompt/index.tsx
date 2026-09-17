@@ -75,7 +75,7 @@ const PushPrompt = () => {
       <div className="bg-white/95 backdrop-blur-md border border-ui-border-base shadow-2xl p-6 rounded-xl flex flex-col gap-y-4">
         <div className="flex items-start gap-x-3">
           <svg
-            className="text-orange-600 w-6 h-6 flex-shrink-0 mt-0.5"
+            className="text-brand-600 w-6 h-6 flex-shrink-0 mt-0.5"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -114,7 +114,7 @@ const PushPrompt = () => {
           <button
             onClick={allow}
             disabled={busy}
-            className="px-4 py-2 bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800 rounded-md shadow-sm transition-colors disabled:opacity-60"
+            className="px-4 py-2 bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 rounded-md shadow-sm transition-colors disabled:opacity-60"
           >
             {busy ? "..." : "İzin ver"}
           </button>

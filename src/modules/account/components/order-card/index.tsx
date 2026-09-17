@@ -50,7 +50,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
               <Thumbnail thumbnail={i.thumbnail} images={[]} size="full" />
               <div className="flex items-center text-small-regular text-ui-fg-base">
                 <span
-                  className="text-ui-fg-base font-semibold group-hover:text-orange-600 transition-colors"
+                  className="text-ui-fg-base font-semibold group-hover:text-brand-600 transition-colors"
                   data-testid="item-title"
                 >
                   {i.title}

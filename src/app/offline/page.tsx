@@ -25,20 +25,20 @@ export default async function OfflinePage() {
       >
         <path
           d="M18 3L4 9V17C4 24.5 9.5 31.5 18 33C26.5 31.5 32 24.5 32 17V9L18 3Z"
-          stroke="#F08C1A"
+          stroke="#3576BA"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          fill="#FEF6EA"
+          fill="#E2EEF9"
         />
         <path
           d="M9 19H13L16 12L20 24L23 16L25 19H27"
-          stroke="#F08C1A"
+          stroke="#3576BA"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle cx="18" cy="7" r="2" fill="#F08C1A" />
+        <circle cx="18" cy="7" r="2" fill="#3576BA" />
       </svg>
 
       <div className="flex flex-col gap-2">

@@ -28,7 +28,7 @@ export default async function BlogPage(props: {
       <div className="content-container mx-auto px-4 max-w-6xl">
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-sm font-semibold tracking-wider text-orange-600 uppercase px-3 py-1 bg-orange-100 rounded-full dark:bg-orange-900/30 dark:text-orange-400">
+          <span className="text-sm font-semibold tracking-wider text-brand-600 uppercase px-3 py-1 bg-brand-100 rounded-full dark:bg-brand-900/30 dark:text-brand-400">
             {t("eyebrow")}
           </span>
           <h1 className="text-4xl md:text-5xl font-extrabold text-ui-fg-base mt-4 tracking-tight leading-none">
@@ -81,7 +81,7 @@ export default async function BlogPage(props: {
                     <span className="font-medium text-ui-fg-base">{post.author}</span>
                   </div>
 
-                  <h2 className="text-xl font-bold text-ui-fg-base group-hover:text-orange-600 transition-colors duration-200 line-clamp-2 leading-snug">
+                  <h2 className="text-xl font-bold text-ui-fg-base group-hover:text-brand-600 transition-colors duration-200 line-clamp-2 leading-snug">
                     <Link href={`/${countryCode}/blog/${post.slug}`}>
                       {post.title}
                     </Link>
@@ -94,7 +94,7 @@ export default async function BlogPage(props: {
                   <div className="mt-auto pt-6 border-t border-ui-border-base flex items-center justify-between">
                     <Link
                       href={`/${countryCode}/blog/${post.slug}`}
-                      className="inline-flex items-center text-sm font-semibold text-orange-600 hover:text-orange-700 gap-1 group/btn"
+                      className="inline-flex items-center text-sm font-semibold text-brand-600 hover:text-brand-700 gap-1 group/btn"
                     >
                       {t("readMore")}
                       <span className="transition-transform duration-200 group-hover/btn:translate-x-1">→</span>

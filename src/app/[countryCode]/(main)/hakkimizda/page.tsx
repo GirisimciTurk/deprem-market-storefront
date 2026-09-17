@@ -58,9 +58,9 @@ export default async function HakkimizdaPage(props: {
     <div className="content-container max-w-4xl py-16 px-4 sm:px-6 lg:px-8">
       {/* Hero Header */}
       <div className="relative rounded-2xl overflow-hidden mb-12 bg-gradient-to-r from-brand-800 to-brand-650 p-8 sm:p-12 text-white shadow-lg">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-400 via-brand-900 to-black"></div>
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-300 via-brand-900 to-black"></div>
         <div className="relative z-10">
-          <span className="text-amber-400 text-xs font-semibold tracking-wider uppercase bg-brand-900/50 px-3 py-1 rounded-full border border-brand-700/50">Biz Kimiz?</span>
+          <span className="text-brand-200 text-xs font-semibold tracking-wider uppercase bg-brand-900/50 px-3 py-1 rounded-full border border-brand-700/50">Biz Kimiz?</span>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-4 mb-2">
             depremTek Market
           </h1>

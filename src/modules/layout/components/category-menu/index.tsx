@@ -60,8 +60,8 @@ export default function CategoryMenu({
         className={clx(
           "flex items-center gap-x-1 h-full border-b-2 transition-all duration-200 uppercase text-sm font-semibold tracking-wide",
           open
-            ? "text-orange-600 border-orange-600"
-            : "border-transparent text-slate-600 hover:text-orange-600 hover:border-orange-600/30"
+            ? "text-brand-600 border-brand-600"
+            : "border-transparent text-slate-600 hover:text-brand-600 hover:border-brand-600/30"
         )}
       >
         {t("heading")}
@@ -85,7 +85,7 @@ export default function CategoryMenu({
                   <LocalizedClientLink
                     href={`/categories/${cat.handle}`}
                     onClick={() => setOpen(false)}
-                    className="block font-bold text-slate-800 hover:text-orange-600 transition-colors truncate"
+                    className="block font-bold text-slate-800 hover:text-brand-600 transition-colors truncate"
                     data-testid="category-menu-link"
                   >
                     {cat.name}
@@ -97,7 +97,7 @@ export default function CategoryMenu({
                           <LocalizedClientLink
                             href={`/categories/${ch.handle}`}
                             onClick={() => setOpen(false)}
-                            className="block text-sm text-slate-500 hover:text-orange-600 transition-colors truncate"
+                            className="block text-sm text-slate-500 hover:text-brand-600 transition-colors truncate"
                             data-testid="category-menu-link"
                           >
                             {ch.name}

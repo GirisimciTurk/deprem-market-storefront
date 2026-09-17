@@ -138,7 +138,7 @@ const SideMenu = ({ regions, categories }: SideMenuProps) => {
                                   href={href}
                                   className={clx(
                                     "text-xl leading-8 hover:text-ui-fg-disabled",
-                                    highlight && "text-orange-300 font-semibold hover:text-orange-200"
+                                    highlight && "text-brand-300 font-semibold hover:text-brand-200"
                                   )}
                                   onClick={close}
                                   data-testid={`${key}-link`}
@@ -172,7 +172,7 @@ const SideMenu = ({ regions, categories }: SideMenuProps) => {
                             <li>
                               <LocalizedClientLink
                                 href="/kategoriler"
-                                className="text-base font-semibold text-orange-300 hover:text-orange-200"
+                                className="text-base font-semibold text-brand-300 hover:text-brand-200"
                                 onClick={close}
                                 data-testid="side-all-categories-link"
                               >

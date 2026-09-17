@@ -73,8 +73,8 @@ function NavDropdown({
         className={clx(
           "flex items-center gap-x-1 h-full border-b-2 transition-all duration-200 uppercase text-sm font-semibold tracking-wide",
           open || active
-            ? "text-orange-600 border-orange-600"
-            : "border-transparent text-slate-600 hover:text-orange-600 hover:border-orange-600/30"
+            ? "text-brand-600 border-brand-600"
+            : "border-transparent text-slate-600 hover:text-brand-600 hover:border-brand-600/30"
         )}
       >
         {group.label}
@@ -217,9 +217,9 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
             className={clx(
               "flex items-center h-full border-b-2 transition-all duration-200 uppercase",
               active
-                ? "text-orange-600 border-orange-600"
+                ? "text-brand-600 border-brand-600"
                 : clx(
-                    "border-transparent hover:text-orange-600 hover:border-orange-600/30",
+                    "border-transparent hover:text-brand-600 hover:border-brand-600/30",
                     s.emphasis && "text-brand-600 font-bold"
                   )
             )}

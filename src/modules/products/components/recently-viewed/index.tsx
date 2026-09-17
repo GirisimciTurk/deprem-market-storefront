@@ -70,7 +70,7 @@ export default function RecentlyViewed({
   return (
     <div className="product-page-constraint border-t border-gray-100 pt-12 mt-12">
       <div className="flex flex-col items-center text-center mb-8">
-        <span className="text-[10px] font-bold text-orange-600 tracking-wider uppercase bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-100 mb-3">
+        <span className="text-[10px] font-bold text-brand-600 tracking-wider uppercase bg-brand-50 px-2.5 py-0.5 rounded-full border border-brand-100 mb-3">
           Alışkanlıklarınıza Özel
         </span>
         <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">
@@ -129,7 +129,7 @@ export default function RecentlyViewed({
                           </div>
                         )}
                       </div>
-                      <span className="text-xs text-slate-700 font-medium line-clamp-2 mt-2 leading-tight min-h-[2rem] group-hover:text-orange-600 transition-colors">
+                      <span className="text-xs text-slate-700 font-medium line-clamp-2 mt-2 leading-tight min-h-[2rem] group-hover:text-brand-600 transition-colors">
                         {product.title}
                       </span>
                     </div>
@@ -144,7 +144,7 @@ export default function RecentlyViewed({
                           <span
                             className={clx("text-xs font-bold", {
                               "text-brand-600": cheapestPrice.price_type === "sale",
-                              "text-orange-600": cheapestPrice.price_type !== "sale",
+                              "text-brand-600": cheapestPrice.price_type !== "sale",
                             })}
                           >
                             {cheapestPrice.calculated_price}

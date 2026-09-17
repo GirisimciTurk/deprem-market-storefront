@@ -53,14 +53,14 @@ export default function GoogleCallbackPage() {
           <p className="text-sm font-semibold text-brand-600 max-w-md">{error}</p>
           <button
             onClick={() => router.replace(`/${(params?.countryCode as string) || "tr"}/account`)}
-            className="text-sm text-orange-600 font-bold hover:underline"
+            className="text-sm text-brand-600 font-bold hover:underline"
           >
             Giriş sayfasına dön
           </button>
         </>
       ) : (
         <>
-          <div className="w-10 h-10 border-4 border-gray-200 border-t-orange-600 rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-gray-200 border-t-brand-600 rounded-full animate-spin" />
           <p className="text-sm font-semibold text-gray-600">
             Google ile giriş yapılıyor...
           </p>

@@ -17,7 +17,7 @@ export default async function ConstructionBanner() {
     <div
       role="status"
       aria-live="polite"
-      className="relative w-full overflow-hidden bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600 text-white shadow-md"
+      className="relative w-full overflow-hidden bg-gradient-to-r from-brand-700 via-brand-500 to-brand-700 text-white shadow-md"
     >
       {/* kayan parlama efekti */}
       <div className="pointer-events-none absolute inset-0 -translate-x-full animate-construction-shine bg-gradient-to-r from-transparent via-white/25 to-transparent" />

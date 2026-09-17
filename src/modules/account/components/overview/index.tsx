@@ -158,10 +158,10 @@ const Overview = ({ customer, orders }: OverviewProps) => {
     <div data-testid="overview-page-wrapper" className="space-y-8 relative">
       {/* Premium Hero Welcome Card */}
       <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-brand-900 to-brand-700 p-6 sm:p-8 text-white shadow-md">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-400 via-brand-900 to-black"></div>
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-300 via-brand-900 to-black"></div>
         <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <span className="text-amber-400 text-xs font-semibold tracking-wider uppercase bg-brand-950/50 px-3 py-1 rounded-full border border-brand-800/50">
+            <span className="text-brand-200 text-xs font-semibold tracking-wider uppercase bg-brand-950/50 px-3 py-1 rounded-full border border-brand-800/50">
               Kullanıcı Paneli
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-3 mb-1">

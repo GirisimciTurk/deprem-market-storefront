@@ -41,7 +41,7 @@ export default function PreviewPrice({ price }: { price: VariantPrice }) {
 
   return (
     <div className="flex items-center">
-      <span className="text-sm sm:text-base font-black text-orange-600">
+      <span className="text-sm sm:text-base font-black text-brand-600">
         {price.calculated_price}
       </span>
     </div>

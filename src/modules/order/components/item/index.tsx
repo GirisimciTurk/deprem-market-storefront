@@ -33,7 +33,7 @@ const Item = ({ item, currencyCode }: ItemProps) => {
         {handle ? (
           <LocalizedClientLink
             href={`/products/${handle}`}
-            className="txt-medium-plus text-ui-fg-base hover:text-orange-600 transition-colors"
+            className="txt-medium-plus text-ui-fg-base hover:text-brand-600 transition-colors"
             data-testid="product-name"
           >
             {item.product_title}

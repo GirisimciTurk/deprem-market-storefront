@@ -103,7 +103,7 @@ export default async function IletisimPage(props: {
 
           <div className="border border-ui-border-base p-6 rounded-xl bg-ui-bg-subtle shadow-sm">
             <div className="flex items-center gap-x-4 mb-3">
-              <span className="text-2xl p-2 bg-amber-50 text-amber-600 rounded-lg">🏢</span>
+              <span className="text-2xl p-2 bg-brand-50 text-brand-600 rounded-lg">🏢</span>
               <div>
                 <h3 className="font-bold text-ui-fg-base text-sm">Kurumsal Bilgiler</h3>
                 <p className="text-xs text-ui-fg-muted">Resmi Ünvan</p>

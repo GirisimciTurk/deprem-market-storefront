@@ -89,14 +89,14 @@ const Login = ({ setCurrentView }: Props) => {
           <button
             type="button"
             onClick={() => setCurrentView(LOGIN_VIEW.FORGOT_PASSWORD)}
-            className="text-xs text-gray-500 hover:text-orange-600 font-semibold"
+            className="text-xs text-gray-500 hover:text-brand-600 font-semibold"
             data-testid="forgot-password-button"
           >
             Şifremi unuttum?
           </button>
         </div>
         <ErrorMessage error={message} data-testid="login-error-message" />
-        <SubmitButton data-testid="sign-in-button" className="w-full mt-5 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition-colors border-0">
+        <SubmitButton data-testid="sign-in-button" className="w-full mt-5 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition-colors border-0">
           Giriş Yap
         </SubmitButton>
       </form>
@@ -150,7 +150,7 @@ const Login = ({ setCurrentView }: Props) => {
         Üye değil misiniz?{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="text-orange-600 font-bold hover:underline"
+          className="text-brand-600 font-bold hover:underline"
           data-testid="register-button"
         >
           Kayıt Olun

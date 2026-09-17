@@ -203,7 +203,7 @@ export default function SellerReviews({
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
                       placeholder="Örn: Mehmet Can"
-                      className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all font-medium text-slate-800"
+                      className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition-all font-medium text-slate-800"
                     />
                   </div>
 
@@ -247,7 +247,7 @@ export default function SellerReviews({
                       value={formComment}
                       onChange={(e) => setFormComment(e.target.value)}
                       placeholder="Satıcı hakkındaki görüşlerinizi yazın..."
-                      className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none font-medium text-slate-850"
+                      className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition-all resize-none font-medium text-slate-850"
                     />
                   </div>
 

@@ -56,7 +56,7 @@ export default function ReviewsList({
                 {r.images.map((img, idx) => (
                   <div
                     key={idx}
-                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border border-gray-250 cursor-pointer hover:border-orange-500 transition-all duration-200 flex-shrink-0"
+                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border border-gray-250 cursor-pointer hover:border-brand-500 transition-all duration-200 flex-shrink-0"
                     onClick={() => onImageClick(img)}
                   >
                     <img src={img} alt="Kullanıcı yüklemesi" loading="lazy" decoding="async" className="w-full h-full object-cover" />

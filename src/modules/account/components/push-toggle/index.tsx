@@ -86,7 +86,7 @@ const PushToggle = () => {
         disabled={busy || denied}
         className={clx(
           "relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors mt-1 disabled:opacity-50",
-          enabled ? "bg-orange-600" : "bg-gray-300"
+          enabled ? "bg-brand-600" : "bg-gray-300"
         )}
         data-testid="push-toggle"
       >

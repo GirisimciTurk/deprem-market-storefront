@@ -37,7 +37,7 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
               Satıcı:{" "}
               <LocalizedClientLink
                 href={`/satici/${seller.handle}`}
-                className="font-bold text-orange-600 tracking-wide hover:text-orange-500 transition-colors"
+                className="font-bold text-brand-600 tracking-wide hover:text-brand-500 transition-colors"
               >
                 {seller.name}
               </LocalizedClientLink>
@@ -48,7 +48,7 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
               )}
             </span>
           ) : (
-            <span className="font-bold text-orange-600 tracking-wide">
+            <span className="font-bold text-brand-600 tracking-wide">
               depremTek Market
             </span>
           )}
@@ -57,7 +57,7 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
               <span className="text-gray-300">/</span>
               <LocalizedClientLink
                 href={`/collections/${product.collection.handle}`}
-                className="text-gray-500 hover:text-orange-500 transition-colors"
+                className="text-gray-500 hover:text-brand-500 transition-colors"
               >
                 {product.collection.title}
               </LocalizedClientLink>

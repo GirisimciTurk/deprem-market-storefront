@@ -89,7 +89,7 @@ const ImageGallery = ({ images, productHandle }: ImageGalleryProps) => {
               onMouseEnter={() => setActiveIndex(index)}
               className={`relative aspect-[29/34] w-16 h-20 md:w-20 md:h-24 rounded-lg overflow-hidden flex-shrink-0 bg-ui-bg-subtle transition-all duration-200 outline-none ${
                 isActive
-                  ? "ring-2 ring-orange-500 ring-offset-2 scale-95 opacity-100 shadow-md"
+                  ? "ring-2 ring-brand-500 ring-offset-2 scale-95 opacity-100 shadow-md"
                   : "opacity-60 hover:opacity-100 border border-gray-200"
               }`}
             >

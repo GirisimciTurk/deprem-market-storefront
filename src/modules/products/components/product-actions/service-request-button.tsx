@@ -83,7 +83,7 @@ export default function ServiceRequestButton({
   }
 
   const inputCls =
-    "w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+    "w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
   const labelCls = "block text-xs font-bold text-gray-700 mb-1"
 
   return (
@@ -96,7 +96,7 @@ export default function ServiceRequestButton({
           setErrorMsg(null)
         }}
         variant="secondary"
-        className="w-full h-11 border-2 border-orange-600 text-orange-700 hover:bg-orange-50 font-bold rounded-lg transition-colors"
+        className="w-full h-11 border-2 border-brand-600 text-brand-700 hover:bg-brand-50 font-bold rounded-lg transition-colors"
       >
         <Wrench className="w-4 h-4" /> Ürün + Hizmet Al
       </Button>
@@ -137,7 +137,7 @@ export default function ServiceRequestButton({
                 <Button
                   type="button"
                   variant="primary"
-                  className="w-full h-10 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg"
+                  className="w-full h-10 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg"
                   onClick={() => setOpen(false)}
                 >
                   Kapat
@@ -146,7 +146,7 @@ export default function ServiceRequestButton({
             ) : (
               <form onSubmit={submit} className="px-5 py-4 flex flex-col gap-3">
                 {serviceDesc && (
-                  <p className="text-sm text-gray-700 bg-orange-50 border border-orange-100 rounded-lg px-3 py-2">
+                  <p className="text-sm text-gray-700 bg-brand-50 border border-brand-100 rounded-lg px-3 py-2">
                     {serviceDesc}
                   </p>
                 )}
@@ -235,7 +235,7 @@ export default function ServiceRequestButton({
                   type="submit"
                   variant="primary"
                   disabled={status === "loading"}
-                  className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg mt-1"
+                  className="w-full h-11 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg mt-1"
                 >
                   {status === "loading" ? "Gönderiliyor…" : "Talebi Gönder"}
                 </Button>

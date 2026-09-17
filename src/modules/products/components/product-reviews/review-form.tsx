@@ -126,7 +126,7 @@ export default function ReviewForm({
               value={formName}
               onChange={(e) => setFormName(e.target.value)}
               placeholder="Örn: Mehmet Can"
-              className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all font-medium text-slate-800"
+              className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition-all font-medium text-slate-800"
             />
           </div>
 
@@ -160,7 +160,7 @@ export default function ReviewForm({
               value={formComment}
               onChange={(e) => setFormComment(e.target.value)}
               placeholder="Ürün hakkındaki görüşlerinizi yazın..."
-              className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none font-medium text-slate-850"
+              className="w-full bg-white border border-gray-250 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition-all resize-none font-medium text-slate-850"
             />
           </div>
 
@@ -172,10 +172,10 @@ export default function ReviewForm({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-dashed border-gray-300 hover:border-orange-500 bg-white rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-200 group"
+                className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-dashed border-gray-300 hover:border-brand-500 bg-white rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-200 group"
               >
-                <span className="text-xl text-gray-400 group-hover:text-orange-500 group-hover:scale-110 transition-transform font-bold">+</span>
-                <span className="text-[9px] text-gray-400 group-hover:text-orange-655 font-bold">Fotoğraf</span>
+                <span className="text-xl text-gray-400 group-hover:text-brand-500 group-hover:scale-110 transition-transform font-bold">+</span>
+                <span className="text-[9px] text-gray-400 group-hover:text-brand-655 font-bold">Fotoğraf</span>
               </button>
               <input
                 type="file"

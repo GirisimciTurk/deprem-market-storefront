@@ -28,13 +28,13 @@ export default async function OrderConfirmedPage(props: Props) {
           Siparişiniz Başarıyla Alındı!
         </h1>
         <p className="max-w-md text-base text-gray-650 leading-relaxed">
-          Ödemeniz başarıyla tamamlandı. Sipariş numaranız: <strong className="text-orange-600">{params.id}</strong>.
+          Ödemeniz başarıyla tamamlandı. Sipariş numaranız: <strong className="text-brand-600">{params.id}</strong>.
           Sipariş detayları ve takip bilgileri e-posta adresinize gönderilecektir.
         </p>
         <div className="mt-4">
           <LocalizedClientLink 
             href="/store" 
-            className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all"
+            className="bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all"
           >
             Alışverişe Devam Et
           </LocalizedClientLink>

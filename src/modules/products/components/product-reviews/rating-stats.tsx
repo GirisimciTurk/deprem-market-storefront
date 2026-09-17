@@ -40,8 +40,8 @@ export default function RatingStats({
             <button
               key={stars}
               onClick={() => onFilterChange(isSelected ? null : stars)}
-              className={`w-full flex items-center gap-x-2 text-xs font-semibold text-gray-600 hover:text-orange-600 transition-colors p-1 rounded-md cursor-pointer ${
-                isSelected ? "bg-orange-50 text-brand-650" : ""
+              className={`w-full flex items-center gap-x-2 text-xs font-semibold text-gray-600 hover:text-brand-600 transition-colors p-1 rounded-md cursor-pointer ${
+                isSelected ? "bg-brand-50 text-brand-650" : ""
               }`}
             >
               <span className="w-3 text-right">{stars}</span>
@@ -61,7 +61,7 @@ export default function RatingStats({
       {filterRating !== null && (
         <button
           onClick={() => onFilterChange(null)}
-          className="text-xs text-orange-600 hover:underline font-bold mt-4 cursor-pointer"
+          className="text-xs text-brand-600 hover:underline font-bold mt-4 cursor-pointer"
         >
           Filtreyi Temizle
         </button>

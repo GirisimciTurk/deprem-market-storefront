@@ -60,11 +60,11 @@ export default async function BlogPostPage(props: {
       <article className="content-container mx-auto px-4 max-w-4xl">
         {/* Breadcrumb Navigation */}
         <nav className="text-sm text-ui-fg-subtle mb-8 flex items-center gap-x-2">
-          <Link href={`/${countryCode}`} className="hover:text-orange-600 transition-colors">
+          <Link href={`/${countryCode}`} className="hover:text-brand-600 transition-colors">
             {t("breadcrumbHome")}
           </Link>
           <span>/</span>
-          <Link href={`/${countryCode}/blog`} className="hover:text-orange-600 transition-colors">
+          <Link href={`/${countryCode}/blog`} className="hover:text-brand-600 transition-colors">
             {t("breadcrumbGuides")}
           </Link>
           <span>/</span>
@@ -73,7 +73,7 @@ export default async function BlogPostPage(props: {
 
         {/* Post Title & Meta */}
         <header className="mb-10 text-center md:text-left">
-          <span className="text-sm font-semibold tracking-wider text-orange-600 uppercase px-3 py-1 bg-orange-100 rounded-full dark:bg-orange-900/30 dark:text-orange-400">
+          <span className="text-sm font-semibold tracking-wider text-brand-600 uppercase px-3 py-1 bg-brand-100 rounded-full dark:bg-brand-900/30 dark:text-brand-400">
             {t("badge")}
           </span>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-ui-fg-base mt-4 tracking-tight leading-tight">
@@ -118,7 +118,7 @@ export default async function BlogPostPage(props: {
         {relatedProducts.length > 0 && region && (
           <section className="mt-16 pt-12 border-t border-ui-border-base">
             <div className="flex flex-col gap-2 mb-8 text-center md:text-left">
-              <span className="text-xs font-semibold tracking-wider text-orange-600 uppercase">
+              <span className="text-xs font-semibold tracking-wider text-brand-600 uppercase">
                 {t("relatedEyebrow")}
               </span>
               <h2 className="text-2xl md:text-3xl font-extrabold text-ui-fg-base mt-0 border-b-0 pb-0">

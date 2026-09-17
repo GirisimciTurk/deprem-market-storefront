@@ -167,7 +167,7 @@ export default function InfiniteProducts({
           className="flex justify-center items-center py-12 w-full"
         >
           <div className="flex items-center gap-x-2 text-slate-500 text-sm bg-slate-50 border border-slate-100/50 rounded-full px-4 py-2 shadow-xs">
-            <span className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></span>
+            <span className="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></span>
             Ürünler Yükleniyor...
           </div>
         </div>

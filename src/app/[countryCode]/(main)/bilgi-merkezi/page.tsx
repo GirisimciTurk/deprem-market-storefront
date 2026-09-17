@@ -68,7 +68,7 @@ export default async function BilgiMerkeziPage({
       {/* Hero */}
       <div className="content-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8">
         <div className="text-center max-w-3xl mx-auto">
-          <span className="text-xs font-semibold tracking-wider text-orange-600 uppercase px-3 py-1 bg-orange-100 rounded-full">
+          <span className="text-xs font-semibold tracking-wider text-brand-600 uppercase px-3 py-1 bg-brand-100 rounded-full">
             {isTr ? "Bilgilen · Hazırlan · Koru" : "Learn · Prepare · Protect"}
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base mt-4 tracking-tight">
