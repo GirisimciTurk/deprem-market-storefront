@@ -177,9 +177,19 @@ export default function ProductPreview({
 
       {/* Product info box */}
       <div className="p-3 flex flex-col flex-1 justify-between gap-y-2">
-        {/* Marka / satıcı — mağaza (satıcı) sayfasına gider. Ürün linkinin DIŞINDA
-            (iç içe <a> geçersiz olur); böylece isme tıklayınca sırf o mağazanın
-            ürünlerini gösteren /satici/<handle> sayfası açılır. */}
+        {/* Ürün adı — kartın ana başlığı (mavi, büyük). Mağaza adı altında. */}
+        <LocalizedClientLink href={`/products/${product.handle}`} className="block">
+          <Text
+            className="text-sm font-bold text-brand-600 line-clamp-2 leading-snug transition-colors hover:text-brand-700"
+            data-testid="product-title"
+          >
+            {product.title}
+          </Text>
+        </LocalizedClientLink>
+
+        {/* Mağaza / satıcı — küçük, lacivert; mağaza (satıcı) sayfasına gider. Ürün
+            linkinin DIŞINDA (iç içe <a> geçersiz olur); böylece isme tıklayınca sırf
+            o mağazanın ürünlerini gösteren /satici/<handle> sayfası açılır. */}
         {/* min-w-0 + truncate: kart kökünde artık overflow-hidden yok (kalp
             baloncuğu kırpılmasın diye), uzun satıcı adı kart dışına taşmasın. */}
         <div className="flex min-w-0 items-center gap-x-1 flex-wrap">
@@ -189,18 +199,18 @@ export default function ProductPreview({
             return s?.handle ? (
               <LocalizedClientLink
                 href={`/satici/${s.handle}`}
-                className="min-w-0 truncate text-xs font-bold text-brand-600 tracking-wide uppercase transition-colors hover:text-brand-700 hover:underline"
+                className="min-w-0 truncate text-[11px] font-semibold text-brand-900 tracking-wide uppercase transition-colors hover:text-brand-700 hover:underline"
               >
                 {name}
               </LocalizedClientLink>
             ) : (
-              <span className="min-w-0 truncate text-xs font-bold text-brand-600 tracking-wide uppercase">
+              <span className="min-w-0 truncate text-[11px] font-semibold text-brand-900 tracking-wide uppercase">
                 {name}
               </span>
             )
           })()}
           <svg
-            className="w-3.5 h-3.5 text-blue-500 fill-current"
+            className="w-3 h-3 text-brand-800 fill-current"
             viewBox="0 0 24 24"
           >
             <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
@@ -219,14 +229,6 @@ export default function ProductPreview({
         </div>
 
         <LocalizedClientLink href={`/products/${product.handle}`} className="flex flex-col gap-y-1">
-          {/* Product Title */}
-          <Text
-            className="text-xs text-gray-700 line-clamp-2 leading-tight font-medium"
-            data-testid="product-title"
-          >
-            {product.title}
-          </Text>
-
           {/* Rating Stars & Count — yalnız gerçek ürün puanı varsa */}
           {ratingInfo && ratingInfo.count > 0 && (
             <div className="flex items-center gap-x-1 mt-0.5">
