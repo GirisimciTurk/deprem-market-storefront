@@ -6,6 +6,7 @@ import StoreTemplate from "@modules/store/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import FeaturedSellers from "@modules/sellers/components/featured-sellers"
 import ShowcaseSections from "@modules/home/components/showcase-sections"
+import HeroSlider from "@modules/home/components/hero-slider"
 import { isShowcaseKey } from "@lib/showcase"
 import { listCategories } from "@lib/data/categories"
 
@@ -65,6 +66,8 @@ export default async function Home(props: Params) {
   return (
     <>
       <h1 className="sr-only">{t("homeTitle")}</h1>
+      {/* Karşılama slider'ı — gorseller/sliders görselleri (bkz. hero-slider/slides.ts). */}
+      <HeroSlider />
       {!showcaseActive && (
         <Suspense fallback={null}>
           <ShowcaseSections countryCode={countryCode} />

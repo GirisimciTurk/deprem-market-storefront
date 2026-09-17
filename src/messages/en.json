@@ -6,7 +6,13 @@
     "affiliateBadge": "Earthquake Technologies Affiliate",
     "titleLead": "Earthquake Readiness",
     "titleHighlight": "Market",
-    "ctaSecondary": "Our Mission"
+    "ctaSecondary": "Our Mission",
+    "sliderPrev": "Previous image",
+    "sliderNext": "Next image",
+    "sliderDots": "Images",
+    "sliderGoTo": "Image {n}",
+    "sliderTitleLead": "For 1.5 million homes and 4.5 million people,",
+    "sliderTitleHighlight": "retrofitting is the only remedy."
   },
   "nav": {
     "menu": "Menu",

@@ -6,7 +6,13 @@
     "affiliateBadge": "Deprem Teknolojileri Resmi İştiraki",
     "titleLead": "Deprem Hazırlık",
     "titleHighlight": "Market",
-    "ctaSecondary": "Projeyi İncele"
+    "ctaSecondary": "Projeyi İncele",
+    "sliderPrev": "Önceki görsel",
+    "sliderNext": "Sonraki görsel",
+    "sliderDots": "Görseller",
+    "sliderGoTo": "{n}. görsel",
+    "sliderTitleLead": "1.5 milyon konut, 4.5 milyon insan için",
+    "sliderTitleHighlight": "tek çare güçlendirme."
   },
   "nav": {
     "menu": "Menü",
