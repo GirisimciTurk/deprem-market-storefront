@@ -56,14 +56,21 @@ const backendImagePattern = (() => {
 const IS_PROD = process.env.NODE_ENV === "production"
 const SCRIPT_SRC_EVAL = IS_PROD ? "" : " 'unsafe-eval'"
 
-// Görseller: üretimde yalnız https. Yerelde backend http://localhost:9000
-// üzerinden görsel sunduğu için http: yalnızca dev'de açık kalır.
-const IMG_SRC_HTTP = IS_PROD ? "" : " http:"
+// Sitenin GERÇEKTEN https ile sunulup sunulmadığı. Üretim build'i tek başına
+// yetmez: domain'e geçilmeden önceki IP/HTTP kurulumunda https zorlaması sayfayı
+// komple kırar (upgrade-insecure-requests kendi /_next/static isteklerini bile
+// https'e yükseltir). NEXT_PUBLIC_BASE_URL zaten build anında sabitlendiği için
+// doğru gösterge o.
+const IS_HTTPS = (process.env.NEXT_PUBLIC_BASE_URL || "").startsWith("https:")
 
-// http:// alt kaynakları https'e yükselt (karışık içerik kapanır). Yerelde her
-// şey http olduğu için BİLEREK yalnız üretimde: dev'de açılsa backend çağrıları
-// https'e yükseltilip kırılırdı.
-const UPGRADE_INSECURE = IS_PROD ? " upgrade-insecure-requests;" : ""
+// Görseller: https ile sunulan üretimde yalnız https. Yerelde ve http kurulumda
+// backend http üzerinden görsel sunduğu için http: açık kalır.
+const IMG_SRC_HTTP = IS_PROD && IS_HTTPS ? "" : " http:"
+
+// http:// alt kaynakları https'e yükselt (karışık içerik kapanır). Yalnız site
+// https ile sunuluyorsa: http'te açılsa backend çağrıları ve kendi statik
+// varlıkları https'e yükseltilip kırılırdı.
+const UPGRADE_INSECURE = IS_PROD && IS_HTTPS ? " upgrade-insecure-requests;" : ""
 
 /**
  * @type {import('next').NextConfig}
