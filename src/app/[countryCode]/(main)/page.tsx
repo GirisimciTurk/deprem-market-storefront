@@ -7,6 +7,10 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import FeaturedSellers from "@modules/sellers/components/featured-sellers"
 import ShowcaseSections from "@modules/home/components/showcase-sections"
 import { isShowcaseKey } from "@lib/showcase"
+import { listCategories } from "@lib/data/categories"
+
+/** Ana sayfaya kategori seçmeden gelindiğinde seçili gelecek kategori (handle). */
+const DEFAULT_CATEGORY_HANDLE = "karbon-fiber"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata")
@@ -31,9 +35,21 @@ type Params = {
 
 export default async function Home(props: Params) {
   const { countryCode } = await props.params
-  const { sortBy, page, minPrice, maxPrice, categoryId, inStock, showcase } =
+  const { sortBy, page, minPrice, maxPrice, categoryId: rawCategoryId, inStock, showcase } =
     await props.searchParams
   const t = await getTranslations("metadata")
+
+  // Varsayılan kategori: URL'de hiç `categoryId` yoksa "Karbon Fiber" seçili gelir.
+  // `categoryId=` (boş) ise kullanıcı seçimi bilerek kaldırmıştır → tüm ürünler;
+  // RefinementList ana sayfada boşaltırken paramı silmek yerine boş bırakır ki
+  // varsayılan geri gelmesin. Kategori bulunamazsa (silinmiş/handle değişmiş)
+  // sessizce filtresiz devam edilir.
+  const categoryId =
+    rawCategoryId !== undefined
+      ? rawCategoryId || undefined
+      : await listCategories()
+          .then((cats) => cats.find((c) => c.handle === DEFAULT_CATEGORY_HANDLE)?.id)
+          .catch(() => undefined)
 
   // Ana sayfa: ürünler EN ÜSTTE başlasın (sol filtreler + ürün gridi). İkincil
   // içerik (öne çıkan satıcılar + PDF vizyon şeridi) gridin altına alındı; geri
@@ -64,6 +80,7 @@ export default async function Home(props: Params) {
         showcase={showcase}
         countryCode={countryCode}
         showSeoContent={false}
+        keepEmptyCategoryParam
       />
       <Suspense fallback={null}>
         <FeaturedSellers />

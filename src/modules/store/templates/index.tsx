@@ -18,6 +18,7 @@ const StoreTemplate = async ({
   showcase,
   countryCode,
   showSeoContent = true,
+  keepEmptyCategoryParam = false,
 }: {
   sortBy?: SortOptions
   page?: string
@@ -28,6 +29,8 @@ const StoreTemplate = async ({
   showcase?: string
   countryCode: string
   showSeoContent?: boolean
+  /** Bkz. RefinementList.keepEmptyCategoryParam (ana sayfa varsayılan kategorisi). */
+  keepEmptyCategoryParam?: boolean
 }) => {
   const parsedPage = page ? parseInt(page, 10) : 1
   const pageNumber = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1
@@ -60,6 +63,7 @@ const StoreTemplate = async ({
         data-testid="category-container"
       >
         <RefinementList
+          keepEmptyCategoryParam={keepEmptyCategoryParam}
           sortBy={sort}
           categoryId={categoryId}
           minPrice={minPrice}

@@ -23,6 +23,12 @@ type RefinementListProps = {
   inStock?: string
   showcase?: string
   categories?: any[]
+  /**
+   * Kategori seçimi tamamen kaldırılınca `categoryId`yi URL'den silmek yerine boş
+   * (`categoryId=`) bırak. Ana sayfa paramsız gelişte varsayılan kategoriyi
+   * seçili getirdiğinden, silmek "temizle"yi varsayılana geri döndürürdü.
+   */
+  keepEmptyCategoryParam?: boolean
   'data-testid'?: string
 }
 
@@ -34,6 +40,7 @@ const RefinementList = ({
   inStock,
   showcase,
   categories = [],
+  keepEmptyCategoryParam = false,
   'data-testid': dataTestId,
 }: RefinementListProps) => {
   const router = useRouter()
@@ -86,6 +93,9 @@ const RefinementList = ({
   const [mobileOpen, setMobileOpen] = useState(false)
   // Kategori çoklu seçim: URL'de virgülle ayrılmış id listesi (cat_1,cat_2).
   const selectedCategoryIds = view.categoryIds
+  // Seçim boşalınca URL'e ne yazılacak: normalde param silinir; varsayılan
+  // kategorili sayfada boş değer kalır (bkz. keepEmptyCategoryParam).
+  const emptyCategoryParam = keepEmptyCategoryParam ? "" : null
 
   // Kategori ağacı: parent_category_id ile kökler + çocuk haritası. Parent'ı
   // listede olmayan kategori (ör. limit dışı) de kök sayılır ki kaybolmasın.
@@ -207,7 +217,7 @@ const RefinementList = ({
         id,
       ]
     }
-    updateQueryParams({ categoryId: next.length ? next.join(",") : null })
+    updateQueryParams({ categoryId: next.length ? next.join(",") : emptyCategoryParam })
   }
 
   const isDescendantOf = (id: string, ancestorId: string): boolean => {
@@ -240,7 +250,7 @@ const RefinementList = ({
     setMaxInput("")
     setMobileOpen(false)
     updateQueryParams({
-      categoryId: null,
+      categoryId: emptyCategoryParam,
       showcase: null,
       minPrice: null,
       maxPrice: null,
