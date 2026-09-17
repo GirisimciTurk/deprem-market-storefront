@@ -142,10 +142,7 @@ export default function RecentlyViewed({
                             </span>
                           )}
                           <span
-                            className={clx("text-xs font-bold", {
-                              "text-brand-600": cheapestPrice.price_type === "sale",
-                              "text-brand-600": cheapestPrice.price_type !== "sale",
-                            })}
+                            className="text-xs font-bold text-brand-600"
                           >
                             {cheapestPrice.calculated_price}
                           </span>
