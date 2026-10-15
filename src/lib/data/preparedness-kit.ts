@@ -1,6 +1,8 @@
 "use server"
 
-import { sdk } from "@lib/config"
+// Asistan uçları gobit/dtm'de henüz yok: istek 404 alır ve aşağıdaki yedek
+// yanıt gösterilir.
+import { gobitData } from "@lib/gobit/client"
 import { HttpTypes } from "@medusajs/types"
 import { listProducts } from "./products"
 
@@ -48,7 +50,7 @@ export async function getPreparednessKit(
 ): Promise<KitResult> {
   let rec: RawRec
   try {
-    rec = await sdk.client.fetch<RawRec>("/store/preparedness-kit", {
+    rec = await gobitData<RawRec>("/store/v1/dtm/preparedness-kit", {
       method: "POST",
       body: { need },
     })

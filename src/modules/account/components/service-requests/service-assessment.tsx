@@ -9,9 +9,6 @@ import {
   type StoreServiceRequest,
 } from "@lib/data/service-requests"
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-const PUB_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
 
 const toBase64 = (file: File) =>
   new Promise<string>((resolve, reject) => {
@@ -104,17 +101,9 @@ export default function ServiceAssessment({ req }: { req: StoreServiceRequest })
             data: await toBase64(f),
           }))
       )
-      const res = await fetch(`${BACKEND_URL}/store/service-uploads`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": PUB_KEY,
-        },
-        body: JSON.stringify({ files: payload }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data?.message || "Yükleme başarısız.")
-      setFiles((prev) => [...prev, ...((data.files ?? []) as ServiceMedia[])].slice(0, 8))
+      // Medya yükleme ucu gobit/dtm'de yok: ayrıntı talep açıklamasıyla iletilir.
+      void payload
+      throw new Error("Fotoğraf/video yükleme şu an kullanılamıyor; ayrıntıları açıklamaya yazın.")
     } catch (e) {
       setError(e instanceof Error ? e.message : "Yükleme başarısız.")
     } finally {

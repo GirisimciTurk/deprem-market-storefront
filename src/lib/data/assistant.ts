@@ -1,6 +1,8 @@
 "use server"
 
-import { sdk } from "@lib/config"
+// Asistan uçları gobit/dtm'de henüz yok: istek 404 alır ve aşağıdaki yedek
+// yanıt gösterilir.
+import { gobitData } from "@lib/gobit/client"
 import { HttpTypes } from "@medusajs/types"
 import { listProducts } from "./products"
 
@@ -67,7 +69,7 @@ export async function askAssistant(input: {
 
   let raw: RawAgent
   try {
-    raw = await sdk.client.fetch<RawAgent>("/store/assistant", {
+    raw = await gobitData<RawAgent>("/store/v1/dtm/assistant", {
       method: "POST",
       body: {
         message: input.message,

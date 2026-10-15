@@ -382,22 +382,9 @@ function PaymentSection({ req }: { req: StoreServiceRequest }) {
     setPaying(phase)
     setError(null)
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-      const res = await fetch(`${backendUrl}/store/service-requests/${req.id}/pay`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": publishableKey,
-        },
-        credentials: "include",
-        body: JSON.stringify({ phase }),
-      })
-      const json = await res.json().catch(() => ({}))
-      if (!res.ok || !json.success || !json.iframe_token) {
-        throw new Error(json.error || "Ödeme başlatılamadı. Lütfen tekrar deneyin.")
-      }
-      setIframeToken(json.iframe_token)
+      // Hizmet ödemesi (keşif/kapora/bakiye) gobit/dtm'de yok; ödeme mağazayla yapılır.
+      void phase
+      throw new Error("Çevrimiçi hizmet ödemesi şu an kullanılamıyor; ödeme için mağazayla iletişime geçin.")
     } catch (e: any) {
       setError(e.message || "Bir hata oluştu.")
       setPaying(null)

@@ -1,17 +1,11 @@
 "use server"
 
-import { sdk } from "@lib/config"
+import { gobitData, gobitFetch, GobitError } from "@lib/gobit/client"
 import { getAuthHeaders } from "./cookies"
-import { isUnauthorizedError } from "@lib/util/http-error"
 
-/**
- * Web push abonelik/stok-uyarı server action'ları.
- *
- * Müşteri kimliği (_medusa_jwt) yalnızca sunucu tarafında okunabildiğinden bu
- * çağrılar server action olarak yapılır → giriş yapmış kullanıcıda abonelik
- * customer_id'ye bağlanır (sipariş bildirimleri için). Misafirde auth başlığı
- * boş gider, backend allowUnauthenticated ile yine kaydeder.
- */
+// Tarayıcı bildirimleri gobit'in web-push eklentisiyle (/store/v1/webpush/*):
+// cihaz, oturum varsa oturumdaki müşteriye bağlanır (eklenti müşteriyi
+// kanıttan okur). Stok uyarısı web-push'ta değil, gobit'in istek listesindedir.
 
 type SerializedSubscription = {
   endpoint: string
@@ -19,89 +13,76 @@ type SerializedSubscription = {
   locale?: string
 }
 
+async function sessionCustomer(headers: Record<string, string>): Promise<string | undefined> {
+  if (!headers.cookie) return undefined
+
+  return gobitData<{ customer_id: string }>("/store/v1/auth/session", { headers, cache: "no-store" })
+    .then((s) => s.customer_id)
+    .catch(() => undefined)
+}
+
 export async function savePushSubscription(
   sub: SerializedSubscription
 ): Promise<{ success: boolean; error: string | null }> {
   try {
-    const headers = { ...(await getAuthHeaders()) }
-    await sdk.client.fetch(`/store/push/subscribe`, {
+    const headers = await getAuthHeaders()
+    const customer = await sessionCustomer(headers)
+    await gobitFetch("/store/v1/webpush/subscribe", {
       method: "POST",
       headers,
-      body: sub,
+      body: { endpoint: sub.endpoint, keys: sub.keys, ...(customer ? { customer_id: customer } : {}) },
     })
     return { success: true, error: null }
-  } catch (e: any) {
-    return { success: false, error: e?.message || String(e) }
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : String(e) }
   }
 }
 
-export async function removePushSubscription(
-  endpoint: string
-): Promise<{ success: boolean; error: string | null }> {
+export async function removePushSubscription(endpoint: string): Promise<{ success: boolean; error: string | null }> {
   try {
-    const headers = { ...(await getAuthHeaders()) }
-    await sdk.client.fetch(`/store/push/unsubscribe`, {
+    await gobitFetch("/store/v1/webpush/unsubscribe", {
       method: "POST",
-      headers,
+      headers: await getAuthHeaders(),
       body: { endpoint },
     })
     return { success: true, error: null }
-  } catch (e: any) {
-    return { success: false, error: e?.message || String(e) }
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : String(e) }
   }
 }
 
-/**
- * Stok uyarısı GİRİŞ GEREKTİRİR (backend 401 döner). 401'i diğer hatalardan
- * ayırıyoruz: buton bunu "bildirim izni verilmedi" değil "giriş yapın" mesajına
- * çevirmeli. Normalde istemci giriş yoksa buraya hiç gelmez; bu yol oturumu
- * arada düşen (cookie süresi dolan) kullanıcı içindir.
- */
+/** "Gelince haber ver": ürünü istek listesine koyup stok uyarısını açar (giriş gerekir). */
 export async function saveStockAlert(input: {
   variant_id: string
-  endpoint: string
+  endpoint?: string
   product_id?: string
   product_handle?: string
   product_title?: string
 }): Promise<{ success: boolean; error: string | null; unauthorized: boolean }> {
+  const headers = await getAuthHeaders()
+  const customer = await sessionCustomer(headers)
+  if (!customer) return { success: false, error: null, unauthorized: true }
+  const base = `/store/v1/customers/${encodeURIComponent(customer)}/wishlist/${encodeURIComponent(input.variant_id)}`
   try {
-    const headers = { ...(await getAuthHeaders()) }
-    await sdk.client.fetch(`/store/push/stock-alert`, {
-      method: "POST",
-      headers,
-      body: input,
-    })
+    await gobitFetch(base, { method: "PUT", headers })
+    await gobitFetch(`${base}/stock-alert`, { method: "PUT", headers })
     return { success: true, error: null, unauthorized: false }
-  } catch (e: any) {
-    if (isUnauthorizedError(e)) {
-      return { success: false, error: null, unauthorized: true }
-    }
-    return {
-      success: false,
-      error: e?.message || String(e),
-      unauthorized: false,
-    }
+  } catch (e) {
+    if (e instanceof GobitError && e.status === 401) return { success: false, error: null, unauthorized: true }
+    return { success: false, error: e instanceof Error ? e.message : String(e), unauthorized: false }
   }
 }
 
-/**
- * Cihazın aboneliğini HESAPTAN ÇÖZER (abonelik silinmez, genel bildirimler
- * çalışmaya devam eder). Çıkış AKIŞINDA, kullanıcı HÂLÂ GİRİŞLİYKEN çağrılmalı:
- * backend yalnız çağıranın kendi aboneliğini çözer.
- */
-export async function unbindPushSubscription(
-  endpoint: string
-): Promise<{ success: boolean }> {
+/** Çıkışta cihazı müşteriden ayırır; abonelik kalır. */
+export async function unbindPushSubscription(endpoint: string): Promise<{ success: boolean }> {
   try {
-    const headers = { ...(await getAuthHeaders()) }
-    await sdk.client.fetch(`/store/push/unbind`, {
+    await gobitFetch("/store/v1/webpush/unbind", {
       method: "POST",
-      headers,
+      headers: await getAuthHeaders(),
       body: { endpoint },
     })
     return { success: true }
   } catch {
-    // Çıkışı ASLA engelleme: bağ çözülemese bile kullanıcı çıkabilmeli.
     return { success: false }
   }
 }

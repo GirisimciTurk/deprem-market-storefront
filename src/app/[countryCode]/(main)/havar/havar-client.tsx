@@ -1,5 +1,6 @@
 "use client"
 
+import { sendContact } from "@lib/data/contact"
 import { useState } from "react"
 
 type HavarType = "purchase" | "rental"
@@ -37,15 +38,19 @@ export default function HavarClient() {
     }
     setStatus("loading")
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-      const res = await fetch(`${backendUrl}/store/havar-requests`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-publishable-api-key": pk },
-        body: JSON.stringify({ type: tab, ...form }),
+      // gobit'te ayrı bir Havar talep kaydı yok: talep, ayrıntılarıyla dtm'nin
+      // iletişim kutusuna "Havar talebi" konusuyla düşer.
+      const details = Object.entries(form)
+        .filter(([k, v]) => k !== "ack" && v !== "" && v !== false)
+        .map(([k, v]) => `${k}: ${String(v)}`)
+        .join("\n")
+      const res = await sendContact({
+        name: form.full_name,
+        email: form.email,
+        subject: `Havar talebi (${tab})`,
+        message: details,
       })
-      if (!res.ok) throw new Error("Talep gönderilemedi.")
+      if (!res.success) throw new Error("Talep gönderilemedi.")
       setStatus("success")
       setForm({ ...emptyForm })
     } catch {

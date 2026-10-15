@@ -1,5 +1,6 @@
 "use client"
 
+import { saveMyExpertCard } from "@lib/data/expert-requests"
 import { useState } from "react"
 import {
   EXPERT_BUDGET_TIERS,
@@ -56,9 +57,6 @@ export default function ExpertForm({
   )
   const [errorMsg, setErrorMsg] = useState("")
 
-  const backendUrl =
-    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-  const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
 
   // Belge yükleme: dosyaları base64'e çevirip /store/expert-uploads'a gönderir.
   const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,27 +89,9 @@ export default function ExpertForm({
             )
         )
       )
-      const res = await fetch(`${backendUrl}/store/expert-uploads`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": publishableKey,
-        },
-        body: JSON.stringify({ files: payload }),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data?.message || "Belge yüklenemedi.")
-      }
-      const { urls } = (await res.json()) as { urls: string[] }
-      setDocuments((prev) => [
-        ...prev,
-        ...urls.map((url, i) => ({
-          type: "diger",
-          url,
-          name: files[i]?.name || "Belge",
-        })),
-      ])
+      // Belge yükleme dtm'de yok: doğrulamayı operatör yapar, belgeleri ayrıca ister.
+      void payload
+      throw new Error("Belgelerinizi doğrulama aşamasında ekibimiz sizden ayrıca isteyecek.")
     } catch (err) {
       alert(err instanceof Error ? err.message : "Belge yüklenemedi.")
     } finally {
@@ -143,46 +123,25 @@ export default function ExpertForm({
     setStatus("loading")
     setErrorMsg("")
     try {
-      const res = await fetch(`${backendUrl}/store/expert-leads`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": publishableKey,
-        },
-        body: JSON.stringify({
-          provider_type: providerType,
-          full_name: form.full_name,
-          title: form.title,
-          email: form.email,
-          phone: form.phone,
-          city: form.city,
-          district: form.district,
-          service_areas: form.service_areas,
-          specializations: specs,
-          experience_years: form.experience_years
-            ? Number(form.experience_years)
-            : undefined,
-          imo_member: imoMember,
-          budget_tier: form.budget_tier || undefined,
-          message: form.message,
-          service_regions: regions
-            .filter((r) => r.city.trim())
-            .map((r) => ({ city: r.city.trim(), district: r.district.trim() || undefined })),
-          about: form.about || undefined,
-          whatsapp: form.whatsapp || undefined,
-          show_phone: showPhone,
-          show_email: showEmail,
-          documents: documents.length
-            ? documents.map((d) => ({ type: d.type, url: d.url, name: d.name }))
-            : undefined,
-        }),
+      const res = await saveMyExpertCard({
+        kind: providerType,
+        full_name: form.full_name,
+        title: form.title,
+        about: [form.about, form.message].filter(Boolean).join("\n\n") || undefined,
+        city: form.city,
+        district: form.district,
+        service_provinces: Array.from(
+          new Set([form.city, ...regions.map((r) => r.city.trim())].filter(Boolean))
+        ),
+        specialties: specs,
+        experience_years: form.experience_years ? Number(form.experience_years) : undefined,
+        chamber: imoMember ? "İMO" : "",
+        phone: form.phone,
+        whatsapp: form.whatsapp || undefined,
+        email: form.email,
+        contact_hidden: !showPhone && !showEmail,
       })
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data?.message || "Başvuru gönderilemedi.")
-      }
-
+      if (!res.success) throw new Error(res.error || "Başvuru gönderilemedi.")
       setStatus("success")
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Başvuru gönderilemedi.")

@@ -1,7 +1,7 @@
 "use server"
 
-import { sdk } from "@lib/config"
-import { getAuthHeaders } from "./cookies"
+import { gobitFetch } from "@lib/gobit/client"
+import { getOrderHeaders } from "./cookies"
 
 export type StoreReturnReason = {
   id: string
@@ -16,40 +16,39 @@ export type ReturnRequestItem = {
   reason_id?: string | null
 }
 
-/**
- * İade sebeplerini getirir (public). Müşteri iade formunda sebep seçimi için.
- */
-export const listReturnReasons = async (): Promise<StoreReturnReason[]> => {
-  return sdk.client
-    .fetch<{ return_reasons: StoreReturnReason[] }>(`/store/return-reasons`, {
-      method: "GET",
-      query: { fields: "id,value,label,description" },
-      cache: "no-store",
-    })
-    .then(({ return_reasons }) => return_reasons ?? [])
-    .catch(() => [])
-}
+// gobit'in mağaza tarafında iade nedeni listesi yok; neden metin olarak iadeye
+// yazılır. Liste depremtek'in formundaki seçeneklerdir.
+const REASONS: StoreReturnReason[] = [
+  { id: "hasarli", value: "hasarli", label: "Ürün hasarlı geldi" },
+  { id: "yanlis", value: "yanlis", label: "Yanlış ürün gönderildi" },
+  { id: "eksik", value: "eksik", label: "Eksik parça" },
+  { id: "beklenti", value: "beklenti", label: "Beklentimi karşılamadı" },
+  { id: "vazgectim", value: "vazgectim", label: "Vazgeçtim (cayma hakkı)" },
+  { id: "diger", value: "diger", label: "Diğer" },
+]
 
-/**
- * Giriş yapmış müşteri için iade talebi oluşturur (custom /store/return-requests ucu).
- * Başarıda iade kaydı "requested" olur ve müşteriye onay e-postası gider.
- */
+export const listReturnReasons = async (): Promise<StoreReturnReason[]> => REASONS
+
+/** İade talebi (gobit /store/v1/orders/{id}/returns): oturum ya da siparişin jetonu. */
 export const createReturnRequest = async (
   orderId: string,
   items: ReturnRequestItem[],
   note?: string
 ): Promise<{ success: boolean; error: string | null }> => {
-  const headers = await getAuthHeaders()
-
-  return sdk.client
-    .fetch(`/store/return-requests`, {
+  const reasons = Array.from(
+    new Set(items.map((i) => REASONS.find((r) => r.id === i.reason_id)?.label).filter(Boolean) as string[])
+  )
+  try {
+    await gobitFetch(`/store/v1/orders/${encodeURIComponent(orderId)}/returns`, {
       method: "POST",
-      headers,
-      body: { order_id: orderId, items, note },
+      headers: await getOrderHeaders(orderId),
+      body: {
+        lines: items.map((i) => ({ order_line_item_id: i.id, quantity: i.quantity })),
+        reason: [...reasons, note?.trim()].filter(Boolean).join(" — ").slice(0, 1000),
+      },
     })
-    .then(() => ({ success: true, error: null }))
-    .catch((err: any) => ({
-      success: false,
-      error: err?.message || "İade talebi oluşturulamadı.",
-    }))
+    return { success: true, error: null }
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "İade talebi oluşturulamadı." }
+  }
 }
