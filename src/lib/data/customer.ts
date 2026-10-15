@@ -9,7 +9,6 @@ import { cookies as nextCookies } from "next/headers"
 import {
   GOBIT_SESSION_COOKIE,
   getAuthHeaders,
-  getCacheOptions,
   getCacheTag,
   getCartId,
   removeAuthToken,

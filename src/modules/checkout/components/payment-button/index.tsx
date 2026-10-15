@@ -55,13 +55,13 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 }
 
 /**
- * PayTR iFrame ödeme: "Siparişi Tamamla" → backend'den iframe token alınır →
- * PayTR güvenli ödeme iframe'i modal'da açılır. Ödeme sonucu sunucu-sunucu
- * /paytr-callback'e gelir (sipariş orada oluşur); iframe sonra ok/fail URL'ine
- * (storefront /tr/odeme/sonuc) yönlenir ve üst pencereyi yönlendirir.
+ * PayTR iFrame ödeme: "Siparişi Tamamla" → gobit'te PayTR oturumu açılır, iframe
+ * jetonu alınır → PayTR güvenli ödeme iframe'i modal'da açılır. PayTR ödemeyi
+ * gobit'e bildirir; iframe sonra ok/fail URL'ine (/tr/odeme/sonuc) yönlenir,
+ * o sayfa sepeti tamamlama sırrıyla tamamlayıp siparişe gider (gobit ADR 0438).
  */
 const PayTRPaymentButton = ({
-  cart,
+  cart: _cart,
   notReady,
   "data-testid": dataTestId,
 }: {
