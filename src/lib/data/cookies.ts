@@ -1,18 +1,21 @@
 import "server-only"
 import { cookies as nextCookies } from "next/headers"
 
-export const getAuthHeaders = async (): Promise<
-  { authorization: string } | Record<string, never>
-> => {
+// gobit oturumu: identity-session'ın imzalı çerezi (gobit_session). Vitrin onu
+// kendi alanında _gobit_session olarak tutar ve sunucu tarafı gobit isteklerine
+// Cookie başlığıyla iletir.
+export const GOBIT_SESSION_COOKIE = "gobit_session"
+
+export const getAuthHeaders = async (): Promise<Record<string, string>> => {
   try {
     const cookies = await nextCookies()
-    const token = cookies.get("_medusa_jwt")?.value
+    const token = cookies.get("_gobit_session")?.value
 
     if (!token) {
       return {}
     }
 
-    return { authorization: `Bearer ${token}` }
+    return { cookie: `${GOBIT_SESSION_COOKIE}=${token}` }
   } catch {
     return {}
   }
@@ -56,7 +59,7 @@ export const getCacheOptions = async (
 export const setAuthToken = async (token: string) => {
   try {
     const cookies = await nextCookies()
-    cookies.set("_medusa_jwt", token, {
+    cookies.set("_gobit_session", token, {
       maxAge: 60 * 60 * 24 * 7,
       httpOnly: true,
       // "lax": ödeme sağlayıcısından (PayTR) geri dönen top-level yönlendirmede
@@ -73,7 +76,7 @@ export const setAuthToken = async (token: string) => {
 export const removeAuthToken = async () => {
   try {
     const cookies = await nextCookies()
-    cookies.set("_medusa_jwt", "", { maxAge: -1 })
+    cookies.set("_gobit_session", "", { maxAge: -1 })
   } catch {
     /* render bağlamında cookie yazılamaz — best-effort */
   }

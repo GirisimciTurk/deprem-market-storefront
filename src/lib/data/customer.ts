@@ -6,7 +6,9 @@ import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import { safeInternalPath } from "@lib/util/safe-redirect"
+import { gobitData, gobitResponse } from "@lib/gobit/client"
 import {
+  GOBIT_SESSION_COOKIE,
   getAuthHeaders,
   getCacheOptions,
   getCacheTag,
@@ -16,33 +18,53 @@ import {
   setAuthToken,
 } from "./cookies"
 
+type GobitCustomer = {
+  id: string
+  email: string
+  first_name: string
+  last_name: string
+  phone: string
+  created_at: string
+  updated_at: string
+}
+
+type GobitAddress = Record<string, unknown> & { id: string }
+
+/** Oturumdaki müşteri: gobit'in /store/v1/auth/session'ı ve müşteri rotaları. */
 export const retrieveCustomer =
   async (): Promise<HttpTypes.StoreCustomer | null> => {
-    const authHeaders = await getAuthHeaders()
+    const headers = await getAuthHeaders()
+    if (!headers.cookie) return null
 
-    if (!authHeaders) return null
-
-    const headers = {
-      ...authHeaders,
-    }
-
-    const next = {
-      ...(await getCacheOptions("customers")),
-    }
-
-    return await sdk.client
-      .fetch<{ customer: HttpTypes.StoreCustomer }>(`/store/customers/me`, {
-        method: "GET",
-        query: {
-          // *addresses → adres etiketi (address_name) dahil tüm adres alanları gelsin
-          fields: "*orders,*addresses",
-        },
+    try {
+      const session = await gobitData<{ customer_id: string }>("/store/v1/auth/session", {
         headers,
-        next,
-        cache: "force-cache",
+        cache: "no-store",
       })
-      .then(({ customer }) => customer)
-      .catch(() => null)
+      const id = encodeURIComponent(session.customer_id)
+      const [c, addresses] = await Promise.all([
+        gobitData<GobitCustomer>(`/store/v1/customers/${id}`, { headers, cache: "no-store" }),
+        gobitData<GobitAddress[]>(`/store/v1/customers/${id}/addresses`, { headers, cache: "no-store" }).catch(
+          () => [] as GobitAddress[]
+        ),
+      ])
+
+      return {
+        id: c.id,
+        email: c.email,
+        first_name: c.first_name,
+        last_name: c.last_name,
+        phone: c.phone,
+        has_account: true,
+        addresses,
+        orders: [],
+        created_at: c.created_at,
+        updated_at: c.updated_at,
+        metadata: {},
+      } as unknown as HttpTypes.StoreCustomer
+    } catch {
+      return null
+    }
   }
 
 export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
@@ -138,14 +160,23 @@ export async function login(_currentState: unknown, formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
 
+  // depremtek'in girişi: gobit şifresini, yoksa göçle gelen Medusa şifresini
+  // bir kez kabul edip yükseltir (dtm SignIn). 204 ve oturum çerezi döner.
   try {
-    await sdk.auth
-      .login("customer", "emailpass", { email, password })
-      .then(async (token) => {
-        await setAuthToken(token as string)
-        const customerCacheTag = await getCacheTag("customers")
-        revalidateTag(customerCacheTag)
-      })
+    const res = await gobitResponse("/store/v1/dtm/sign-in", {
+      method: "POST",
+      body: { email, password },
+    })
+    if (res.status === 401) return "E-posta adresi veya şifre hatalı."
+    if (!res.ok) return `Giriş yapılamadı (${res.status}).`
+    const session = res.headers
+      .getSetCookie()
+      .map((c) => c.split(";")[0])
+      .find((c) => c.startsWith(`${GOBIT_SESSION_COOKIE}=`))
+    if (!session) return "Giriş yapılamadı: oturum açılmadı."
+    await setAuthToken(session.slice(GOBIT_SESSION_COOKIE.length + 1))
+    const customerCacheTag = await getCacheTag("customers")
+    revalidateTag(customerCacheTag)
   } catch (error) {
     return String(error)
   }
@@ -253,12 +284,10 @@ export async function updateCustomerPassword(
 }
 
 export async function signout(countryCode: string) {
-  // sdk.auth.logout() backend session'ına bağlı; JWT/Google girişinde session
-  // bulunmayıp hata verebilir → yerel token silme + yönlendirmeyi ENGELLEMESİN.
   try {
-    await sdk.auth.logout()
+    await gobitResponse("/store/v1/auth/sign-out", { method: "POST", headers: await getAuthHeaders() })
   } catch {
-    // yoksay — asıl çıkış aşağıdaki removeAuthToken (cookie silme) ile olur
+    // yoksay — asıl çıkış aşağıdaki çerez silme ile olur
   }
 
   await removeAuthToken()

@@ -45,21 +45,27 @@ function search(query?: Query) {
   return s ? `?${s}` : ""
 }
 
-/** gobit'e bir istek; JSON gövdeyi olduğu gibi döner ({data, count, ...}). */
-export async function gobitFetch<T>(path: string, init: GobitInit = {}): Promise<T> {
+/** gobit'e bir istek; yanıtın kendisi (başlıkları okunacaksa). */
+export async function gobitResponse(path: string, init: GobitInit = {}): Promise<Response> {
   const headers: Record<string, string> = {
     "x-publishable-api-key": PUBLISHABLE_KEY,
     Accept: "application/json",
     ...(init.headers ?? {}),
   }
   if (init.body !== undefined) headers["Content-Type"] = "application/json"
-  const res = await fetch(`${GOBIT_BACKEND_URL}${path}${search(init.query)}`, {
+
+  return fetch(`${GOBIT_BACKEND_URL}${path}${search(init.query)}`, {
     method: init.method ?? "GET",
     headers,
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
     next: init.next,
-    cache: init.cache,
+    cache: init.cache ?? (init.method && init.method !== "GET" ? "no-store" : undefined),
   })
+}
+
+/** gobit'e bir istek; JSON gövdeyi olduğu gibi döner ({data, count, ...}). */
+export async function gobitFetch<T>(path: string, init: GobitInit = {}): Promise<T> {
+  const res = await gobitResponse(path, init)
   if (res.status === 204) return undefined as T
   const text = await res.text()
   const json = text ? JSON.parse(text) : undefined
