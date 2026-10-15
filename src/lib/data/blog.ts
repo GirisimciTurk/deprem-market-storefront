@@ -1,5 +1,5 @@
 import { marked } from "marked"
-import { sdk } from "@lib/config"
+import { gobitData } from "@lib/gobit/client"
 import { getCacheOptions } from "./cookies"
 import { getLocaleSafe, pickTranslation } from "@lib/util/localize"
 
@@ -35,26 +35,39 @@ function localizeBlogPost(post: BlogPost, locale: string): BlogPost {
   }
 }
 
-/**
- * Blog yazıları artık backend `blog` modülünden (admin panelden yönetilen) gelir.
- * Eskiden content/blog/*.md dosyalarından okunuyordu; tek kaynak olması için
- * /store/blog API'sine taşındı. countryCode imza uyumluluğu için korunur.
- */
+// dtm'nin yazısı (/store/v1/dtm/posts): göç aracı Medusa'nın blog_post'unu
+// aynı slug'la taşır; kategori, ilgili ürünler ve çeviriler taşınmadı.
+type DtmPost = {
+  slug: string
+  title: string
+  excerpt: string
+  body: string
+  author: string
+  cover_url: string
+  published_at: string | null
+  created_at: string
+}
+
+const toBlogPost = (p: DtmPost): BlogPost => ({
+  slug: p.slug,
+  title: p.title,
+  description: p.excerpt,
+  date: p.published_at ?? p.created_at,
+  author: p.author,
+  image: p.cover_url,
+  related_products: [],
+  content: p.body,
+  translations: null,
+})
+
 export const listBlogPosts = async (
   _countryCode?: string
 ): Promise<BlogPost[]> => {
-  const next = { ...(await getCacheOptions("blog")) }
-  // Locale'i fetch'ten ÖNCE (doğrudan request scope'ta) oku; cache'li promise
-  // zincirinin .then microtask'ında cookies() scope'u kaybolabiliyor.
+  const next = { ...(await getCacheOptions("blog")), revalidate: 300 }
   const locale = await getLocaleSafe()
-  return sdk.client
-    .fetch<{ posts: BlogPost[] }>(`/store/blog`, {
-      method: "GET",
-      next,
-      cache: "force-cache",
-    })
-    .then(({ posts }) => posts || [])
-    .catch(() => [])
+  return gobitData<DtmPost[]>(`/store/v1/dtm/posts`, { next })
+    .then((posts) => (posts || []).map(toBlogPost))
+    .catch(() => [] as BlogPost[])
     .then((posts) =>
       locale === "tr" ? posts : posts.map((p) => localizeBlogPost(p, locale))
     )
@@ -64,14 +77,9 @@ export const getBlogPost = async (
   slug: string,
   _countryCode?: string
 ): Promise<BlogPost | null> => {
-  const next = { ...(await getCacheOptions("blog")) }
-  const post = await sdk.client
-    .fetch<{ post: BlogPost }>(`/store/blog/${slug}`, {
-      method: "GET",
-      next,
-      cache: "force-cache",
-    })
-    .then(({ post }) => post)
+  const next = { ...(await getCacheOptions("blog")), revalidate: 300 }
+  const post = await gobitData<DtmPost>(`/store/v1/dtm/posts/${encodeURIComponent(slug)}`, { next })
+    .then(toBlogPost)
     .catch(() => null)
 
   if (!post) return null

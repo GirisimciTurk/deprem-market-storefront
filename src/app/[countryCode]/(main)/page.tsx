@@ -9,6 +9,7 @@ import ShowcaseSections from "@modules/home/components/showcase-sections"
 import HeroSlider from "@modules/home/components/hero-slider"
 import { isShowcaseKey } from "@lib/showcase"
 import { listCategories } from "@lib/data/categories"
+import { listProducts } from "@lib/data/products"
 
 /** Ana sayfaya kategori seçmeden gelindiğinde seçili gelecek kategori (handle). */
 const DEFAULT_CATEGORY_HANDLE = "karbon-fiber"
@@ -45,11 +46,21 @@ export default async function Home(props: Params) {
   // RefinementList ana sayfada boşaltırken paramı silmek yerine boş bırakır ki
   // varsayılan geri gelmesin. Kategori bulunamazsa (silinmiş/handle değişmiş)
   // sessizce filtresiz devam edilir.
+  // Varsayılan kategori boşsa (ürünü yoksa) ana sayfa boş bir grid yerine tüm
+  // ürünlerle açılır.
   const categoryId =
     rawCategoryId !== undefined
       ? rawCategoryId || undefined
       : await listCategories()
           .then((cats) => cats.find((c) => c.handle === DEFAULT_CATEGORY_HANDLE)?.id)
+          .then(async (id) => {
+            if (!id) return undefined
+            const { response } = await listProducts({
+              countryCode,
+              queryParams: { category_id: [id], limit: 1 },
+            })
+            return response.count > 0 ? id : undefined
+          })
           .catch(() => undefined)
 
   // Ana sayfa: ürünler EN ÜSTTE başlasın (sol filtreler + ürün gridi). İkincil
