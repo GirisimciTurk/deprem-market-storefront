@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server"
 
 import { getSellerByHandle } from "@lib/data/sellers"
 import SellerTemplate from "@modules/sellers/templates"
+import { followedSellerHandles } from "@lib/data/sellers"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 type Props = {
@@ -47,8 +48,12 @@ export default async function SellerPage(props: Props) {
     notFound()
   }
 
+  const followed = await followedSellerHandles()
+
   return (
     <SellerTemplate
+      following={followed?.includes(data.seller.handle) ?? false}
+      signedIn={followed !== null}
       seller={data.seller}
       productIds={data.product_ids}
       page={page}

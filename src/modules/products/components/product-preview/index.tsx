@@ -1,6 +1,7 @@
 import { Text } from "@modules/common/components/ui"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
+import TrustedBadge from "@modules/sellers/components/trusted-badge"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
@@ -209,12 +210,8 @@ export default function ProductPreview({
               </span>
             )
           })()}
-          <svg
-            className="w-3 h-3 text-brand-800 fill-current"
-            viewBox="0 0 24 24"
-          >
-            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-          </svg>
+          {/* Onay işareti yalnız "Güvenilir Mağaza" rozetli mağazada (dtm). */}
+          {(product as any).seller?.trusted && <TrustedBadge />}
           {(() => {
             const s = (product as any).seller
             const count = s?.rating_count ?? 0

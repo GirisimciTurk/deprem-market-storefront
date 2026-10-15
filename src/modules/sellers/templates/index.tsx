@@ -8,6 +8,8 @@ import { StoreSellerResponse } from "@lib/data/sellers"
 import SellerReviews from "@modules/sellers/components/seller-reviews"
 import SellerContact from "@modules/sellers/components/seller-contact"
 import { isShowcaseKey } from "@lib/showcase"
+import TrustedBadge from "@modules/sellers/components/trusted-badge"
+import FollowButton from "@modules/sellers/components/follow-button"
 
 export default function SellerTemplate({
   sortBy,
@@ -19,7 +21,11 @@ export default function SellerTemplate({
   inStock,
   showcase,
   countryCode,
+  following = false,
+  signedIn = false,
 }: {
+  following?: boolean
+  signedIn?: boolean
   sortBy?: SortOptions
   seller: StoreSellerResponse["seller"]
   productIds: string[]
@@ -59,7 +65,10 @@ export default function SellerTemplate({
             />
           )}
           <div>
-            <h1 className="text-2xl-semi">{seller.name}</h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl-semi">{seller.name}</h1>
+              {seller.trusted && <TrustedBadge size="md" />}
+            </div>
             {hasRating && (
               <div className="mt-1 flex items-center gap-x-1.5">
                 <div className="flex items-center text-yellow-400">
@@ -89,6 +98,14 @@ export default function SellerTemplate({
             {seller.description && (
               <p className="mt-1 text-sm text-gray-500">{seller.description}</p>
             )}
+            <div className="mt-3">
+              <FollowButton
+                handle={seller.handle}
+                initialFollowing={following}
+                initialCount={seller.follower_count ?? 0}
+                signedIn={signedIn}
+              />
+            </div>
           </div>
         </div>
         {hasProducts ? (

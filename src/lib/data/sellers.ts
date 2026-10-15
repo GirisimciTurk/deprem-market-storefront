@@ -1,7 +1,8 @@
 "use server"
 
-import { gobitData } from "@lib/gobit/client"
-import { getCacheOptions } from "./cookies"
+import { revalidateTag } from "next/cache"
+import { gobitData, gobitResponse } from "@lib/gobit/client"
+import { getAuthHeaders, getCacheOptions } from "./cookies"
 
 export type StoreSeller = {
   id: string
@@ -97,3 +98,26 @@ export const getSellerByHandle = async (handle: string): Promise<StoreSellerResp
     return null
   }
 }
+
+/** Oturumdaki müşterinin takip ettiği mağazaların handle'ları; oturum yoksa null. */
+export const followedSellerHandles = async (): Promise<string[] | null> => {
+  const headers = await getAuthHeaders()
+  if (!headers.cookie) return null
+
+  return gobitData<DirectoryEntry[]>("/store/v1/dtm/followed-sellers", { headers, cache: "no-store" })
+    .then((rs) => rs.map((r) => r.handle))
+    .catch(() => null)
+}
+
+async function follow(handle: string, method: "PUT" | "DELETE"): Promise<boolean> {
+  const headers = await getAuthHeaders()
+  if (!headers.cookie) return false
+  const res = await gobitResponse(`/store/v1/dtm/sellers/${encodeURIComponent(handle)}/follow`, { method, headers })
+  // Mağaza sayfasının takipçi sayısı önbellekten okunur: takip onu eskitir.
+  if (res.ok) revalidateTag("sellers")
+
+  return res.ok
+}
+
+export const followSeller = async (handle: string) => follow(handle, "PUT")
+export const unfollowSeller = async (handle: string) => follow(handle, "DELETE")
