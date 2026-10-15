@@ -122,6 +122,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      // gobit'e taşınan ürün görselleri canlı arka ucun /r2 vekili üzerinden.
+      {
+        protocol: "https",
+        hostname: "api.depremtek.market",
+        pathname: "/r2/**",
+      },
       // Cloudflare R2 public bucket (toReachableImageUrl normalize etmezse doğrudan).
       {
         protocol: "https",

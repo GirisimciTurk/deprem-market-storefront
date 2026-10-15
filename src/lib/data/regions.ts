@@ -1,35 +1,23 @@
 "use server"
 
-import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
+import { gobitData } from "@lib/gobit/client"
+import { GobitRegion, toRegion } from "@lib/gobit/adapt"
 import { getCacheOptions } from "./cookies"
 
 export const listRegions = async () => {
   const next = {
     ...(await getCacheOptions("regions")),
+    revalidate: 3600,
   }
 
-  return await sdk.client
-    .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
-      method: "GET",
-      next,
-      cache: "force-cache",
-    })
-    .then(({ regions }) => regions)
+  return gobitData<GobitRegion[]>(`/store/v1/regions`, { next }).then((rs) => rs.map(toRegion))
 }
 
 export const retrieveRegion = async (id: string) => {
-  const next = {
-    ...(await getCacheOptions(["regions", id].join("-"))),
-  }
+  const regions = await listRegions()
 
-  return await sdk.client
-    .fetch<{ region: HttpTypes.StoreRegion }>(`/store/regions/${id}`, {
-      method: "GET",
-      next,
-      cache: "force-cache",
-    })
-    .then(({ region }) => region)
+  return regions.find((r) => r.id === id) as HttpTypes.StoreRegion
 }
 
 const regionMap = new Map<string, HttpTypes.StoreRegion>()
@@ -51,9 +39,7 @@ export const getRegion = async (countryCode: string) => {
     })
   })
 
-  const region = countryCode
-    ? regionMap.get(countryCode)
-    : regionMap.get("us")
+  const region = countryCode ? regionMap.get(countryCode) : regionMap.get("tr")
 
   return region
 }

@@ -1,59 +1,34 @@
 "use server"
 
-import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
+import { gobitData } from "@lib/gobit/client"
 import { getCacheOptions } from "./cookies"
 
-export const retrieveCollection = async (id: string) => {
-  const next = {
-    ...(await getCacheOptions("collections")),
-  }
+type GobitCollection = { id: string; title: string; handle: string; metadata?: Record<string, unknown> | null }
 
-  return await sdk.client
-    .fetch<{ collection: HttpTypes.StoreCollection }>(
-      `/store/collections/${id}`,
-      {
-        next,
-        cache: "force-cache",
-      }
-    )
-    .then(({ collection }) => collection)
+const toCollection = (c: GobitCollection) =>
+  ({ id: c.id, title: c.title, handle: c.handle, metadata: c.metadata ?? {}, products: [] }) as unknown as HttpTypes.StoreCollection
+
+async function all(): Promise<HttpTypes.StoreCollection[]> {
+  const next = { ...(await getCacheOptions("collections")), revalidate: 300 }
+
+  return gobitData<GobitCollection[]>("/store/v1/collections", { query: { limit: 100 }, next }).then((cs) =>
+    cs.map(toCollection)
+  )
+}
+
+export const retrieveCollection = async (id: string) => {
+  return (await all()).find((c) => c.id === id) as HttpTypes.StoreCollection
 }
 
 export const listCollections = async (
-  queryParams: Record<string, string> = {}
+  _queryParams: Record<string, string> = {}
 ): Promise<{ collections: HttpTypes.StoreCollection[]; count: number }> => {
-  const next = {
-    ...(await getCacheOptions("collections")),
-  }
+  const collections = await all()
 
-  queryParams.limit = queryParams.limit || "100"
-  queryParams.offset = queryParams.offset || "0"
-
-  return await sdk.client
-    .fetch<{ collections: HttpTypes.StoreCollection[]; count: number }>(
-      "/store/collections",
-      {
-        query: queryParams,
-        next,
-        cache: "force-cache",
-      }
-    )
-    .then(({ collections }) => ({ collections, count: collections.length }))
+  return { collections, count: collections.length }
 }
 
-export const getCollectionByHandle = async (
-  handle: string
-): Promise<HttpTypes.StoreCollection | null> => {
-  const next = {
-    ...(await getCacheOptions("collections")),
-  }
-
-  return await sdk.client
-    .fetch<HttpTypes.StoreCollectionListResponse>(`/store/collections`, {
-      query: { handle, fields: "*products" },
-      next,
-      cache: "force-cache",
-    })
-    .then(({ collections }) => collections[0] || null)
+export const getCollectionByHandle = async (handle: string): Promise<HttpTypes.StoreCollection | null> => {
+  return (await all()).find((c) => c.handle === handle) ?? null
 }

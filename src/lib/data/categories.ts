@@ -1,57 +1,41 @@
-import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
+import { gobitFetch } from "@lib/gobit/client"
+import { GobitCategory, toCategories } from "@lib/gobit/adapt"
 import { getCacheOptions } from "./cookies"
 
-export const listCategories = async (query?: Record<string, unknown>) => {
-  // Kategoriler `*products` gömüyor → ürün güncellemeleri yansısın: ISR (≤30sn) +
-  // statik "products"/"categories" tag (revalidateTag ile anında tazelenir).
+// gobit kategorileri düz liste verir; ağaç (category_children, parent_category)
+// burada kurulur. Medusa'nın `*products` gömmesi yok: bir kategorinin ürünleri
+// ürün listesinden `category_tree_id` ile okunur.
+async function allCategories(): Promise<HttpTypes.StoreProductCategory[]> {
   const cacheOpts = await getCacheOptions("categories")
   const next = {
     ...cacheOpts,
-    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "categories", "products"],
-    revalidate: 30,
+    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "categories"],
+    revalidate: 60,
   }
-
-  const limit = (query?.limit as number) || 100
-
-  const FIELDS =
-    "*category_children, *products, *parent_category, *parent_category.parent_category"
-
-  const fetchPage = (offset: number) =>
-    sdk.client.fetch<{
-      product_categories: HttpTypes.StoreProductCategory[]
-      count?: number
-    }>("/store/product-categories", {
-      query: { fields: FIELDS, limit, offset, ...query },
+  const flat: GobitCategory[] = []
+  for (let offset = 0; ; offset += 100) {
+    const page = await gobitFetch<{ data: GobitCategory[]; count?: number }>("/store/v1/categories", {
+      query: { limit: 100, offset },
       next,
     })
-
-  // Kategori sayısı `limit`i aşarsa backend listeyi SESSİZCE kırpıyordu. Ürün
-  // filtresi bu düz listeden kurulan ağaca dayandığı için (bkz. category-tree)
-  // eksik kalan alt kategoriler ana kategori sorgusuna hiç girmez → "ana
-  // kategori boş" hatası geri döner. Bu yüzden yanıttaki `count`a bakıp kalanı
-  // da çekiyoruz. Çağıran kendi `offset`ini verdiyse sayfalamayı o yönetiyordur.
-  const first = await fetchPage(0)
-  const all = [...(first.product_categories ?? [])]
-
-  if (query?.offset === undefined) {
-    while (all.length < (first.count ?? all.length)) {
-      const page = await fetchPage(all.length)
-      // `count` tutarsız gelirse sonsuz döngüye girme.
-      if (!page.product_categories?.length) break
-      all.push(...page.product_categories)
-    }
+    flat.push(...page.data)
+    if (!page.data.length || flat.length >= (page.count ?? flat.length)) break
   }
+
+  return toCategories(flat)
+}
+
+export const listCategories = async (query?: Record<string, unknown>) => {
+  const all = await allCategories()
+  if (query?.parent_category_id === "null") return all.filter((c) => !c.parent_category_id)
 
   return all
 }
 
-export const getCategoryByHandle = async (categoryHandle: string[]) => {
-  // Next.js catch-all route segmentleri (`[...category]`) URL'den %-encoded gelir
-  // (örn. Türkçe/`&` içeren handle'larda `i%CC%87lk-...`). Çözmeden backend'e
-  // verilirse SDK `%`'leri tekrar encode eder → çift-encode → handle eşleşmez →
-  // 404. Bu yüzden her segmenti güvenli şekilde decode ediyoruz (zaten decode
-  // edilmiş/ASCII handle'larda no-op, bozuk girdide orijinali korur).
+export const getCategoryByHandle = async (
+  categoryHandle: string[]
+): Promise<HttpTypes.StoreProductCategory> => {
   const safeDecode = (s: string) => {
     try {
       return decodeURIComponent(s)
@@ -59,25 +43,9 @@ export const getCategoryByHandle = async (categoryHandle: string[]) => {
       return s
     }
   }
-  const handle = categoryHandle.map(safeDecode).join("/")
+  const handle = categoryHandle.map(safeDecode)
+  const last = handle[handle.length - 1]
 
-  const cacheOpts = await getCacheOptions("categories")
-  const next = {
-    ...cacheOpts,
-    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "categories", "products"],
-    revalidate: 30,
-  }
-
-  return sdk.client
-    .fetch<HttpTypes.StoreProductCategoryListResponse>(
-      `/store/product-categories`,
-      {
-        query: {
-          fields: "*category_children, *products",
-          handle,
-        },
-        next,
-      }
-    )
-    .then(({ product_categories }) => product_categories[0])
+  // Bulunamayan kategori Medusa'daki gibi boş cevaptır; sayfa notFound() der.
+  return (await allCategories()).find((c) => c.handle === last) as HttpTypes.StoreProductCategory
 }

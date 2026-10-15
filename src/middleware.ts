@@ -1,5 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
+import { foldHandle } from "@lib/gobit/adapt"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
@@ -24,7 +25,7 @@ async function getRegionMap(cacheId: string) {
     regionMapUpdated < Date.now() - 3600 * 1000
   ) {
     // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
-    const response = await fetch(`${BACKEND_URL}/store/regions`, {
+    const response = await fetch(`${BACKEND_URL}/store/v1/regions`, {
       method: "GET",
       headers: {
         "x-publishable-api-key": PUBLISHABLE_API_KEY!,
@@ -42,16 +43,17 @@ async function getRegionMap(cacheId: string) {
 
     const json = await response.json()
 
-    const { regions } = json
+    // gobit: {data: [{id, countries: [{code: "TR"}]}]}
+    const regions = json.data as { id: string; countries?: { code: string }[] }[]
 
     if (!regions?.length) {
       return new Map<string, HttpTypes.StoreRegion>()
     }
 
     // Create a map of country codes to regions.
-    regions.forEach((region: HttpTypes.StoreRegion) => {
+    regions.forEach((region) => {
       region.countries?.forEach((c) => {
-        regionMapCache.regionMap.set(c.iso_2 ?? "", region)
+        regionMapCache.regionMap.set(c.code.toLowerCase(), region as unknown as HttpTypes.StoreRegion)
       })
     })
 
@@ -115,6 +117,25 @@ export async function middleware(request: NextRequest) {
   const country = countryCode || DEFAULT_REGION
   const firstPathSegment = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
   const urlHasCountry = firstPathSegment === country.toLowerCase()
+
+  // Medusa'dan kalma Türkçe kategori adresi (/tr/categories/eğitim-ve-planlama):
+  // göç aracı adresi ASCII'ye katladı; eski bağlantı yeni adrese kalıcı yönlenir.
+  const categoryPath = request.nextUrl.pathname.match(/^\/([^/]+)\/categories\/(.+)$/)
+  if (urlHasCountry && categoryPath) {
+    const segments = categoryPath[2].split("/").map((seg) => {
+      try {
+        return decodeURIComponent(seg)
+      } catch {
+        return seg
+      }
+    })
+    const folded = segments.map(foldHandle)
+    if (folded.join("/") !== segments.join("/")) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/${categoryPath[1]}/categories/${folded.join("/")}`
+      return NextResponse.redirect(url, 301)
+    }
+  }
 
   if (urlHasCountry) {
     const response = NextResponse.next()

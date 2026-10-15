@@ -1,10 +1,11 @@
 "use server"
 
-import { sdk } from "@lib/config"
+import { gobitData, gobitFetch, GobitError, SALES_CHANNEL_ID } from "@lib/gobit/client"
+import { CardSeller, GobitProduct, toProduct } from "@lib/gobit/adapt"
 import { sortProducts } from "@lib/util/sort-products"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 import { getLocaleSafe, pickTranslation } from "@lib/util/localize"
 import { toReachableImageUrl } from "@lib/util/image-url"
@@ -53,6 +54,68 @@ function localizeProduct(
   }
 }
 
+type ProductSeller = { product_id: string; seller: CardSeller }
+
+// gobit'ten bir sayfa ürün: adresle (handle), kimlik listesiyle (id) ya da
+// süzgeçle. Kartın mağazası dtm'nin /product-sellers okumasından tek istekte gelir.
+async function gobitProducts(
+  q: Record<string, any>,
+  limit: number,
+  offset: number,
+  region: HttpTypes.StoreRegion,
+  next: NextFetchRequestConfig
+): Promise<{ products: HttpTypes.StoreProduct[]; count: number }> {
+  const base = `/store/v1/sales-channels/${SALES_CHANNEL_ID}/products`
+  const one = (key: string) =>
+    gobitData<GobitProduct>(`${base}/${encodeURIComponent(key)}`, { query: { region_id: region.id }, next }).catch(
+      (e) => {
+        if (e instanceof GobitError && e.status === 404) return null
+        throw e
+      }
+    )
+  const first = (v: unknown) => (Array.isArray(v) ? v[0] : v) as string | undefined
+
+  let raw: GobitProduct[]
+  let count: number
+  if (q.handle) {
+    const p = await one(String(q.handle))
+    raw = p ? [p] : []
+    count = raw.length
+  } else if (q.id) {
+    // gobit'in listesi ürün kimliğiyle süzmüyor: birkaç kimlik tek tek okunur.
+    const ids = (Array.isArray(q.id) ? q.id : [q.id]).map(String)
+    raw = (await Promise.all(ids.slice(offset, offset + limit).map(one))).filter(Boolean) as GobitProduct[]
+    count = ids.length
+  } else {
+    const page = await gobitFetch<{ data: GobitProduct[]; count?: number }>(base, {
+      query: {
+        limit,
+        offset,
+        region_id: region.id,
+        q: q.q,
+        category_tree_id: first(q.category_id),
+        collection_id: first(q.collection_id),
+        tag_id: first(q.tag_id),
+        sort: q.order === "created_at" ? "oldest" : "newest",
+      },
+      next,
+    })
+    raw = page.data
+    count = page.count ?? raw.length
+  }
+
+  const sellers = new Map<string, CardSeller>()
+  if (raw.length) {
+    const found = await gobitData<ProductSeller[]>("/store/v1/dtm/product-sellers", {
+      query: { product_id: raw.map((p) => p.id) },
+      next,
+    }).catch(() => [] as ProductSeller[])
+    found.forEach((f) => sellers.set(f.product_id, f.seller))
+  }
+
+  return { products: raw.map((p) => toProduct(p, region as any, sellers.get(p.id))), count }
+}
+
 export const listProducts = async ({
   pageParam = 1,
   queryParams,
@@ -91,9 +154,6 @@ export const listProducts = async ({
     }
   }
 
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
 
   // Ürün verisi: force-cache + session-bazlı tag (products-{cache_id}) verisini
   // SÜRESIZ donduruyordu → satıcı ürünü güncellese de mağazada eski resim/bilgi
@@ -112,23 +172,7 @@ export const listProducts = async ({
   // .then microtask'ında cookies() scope'u kaybolabiliyor.
   const locale = await getLocaleSafe()
 
-  return sdk.client
-    .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
-      `/store/products`,
-      {
-        method: "GET",
-        query: {
-          limit,
-          offset,
-          region_id: region?.id,
-          fields:
-            "*variants.calculated_price,*variants.options,+variants.title,+variants.sku,+variants.barcode,+variants.manage_inventory,+variants.allow_backorder,+variants.inventory_quantity,+variants.metadata,*variants.images,*options,*options.values,+metadata,+tags,+seller.id,+seller.name,+seller.handle,+seller.rating_sum,+seller.rating_count",
-          ...queryParams,
-        },
-        headers,
-        next,
-      }
-    )
+  return gobitProducts(queryParams ?? {}, limit, offset, region, next)
     .then(({ products, count }) => {
       const nextPage = count > offset + limit ? pageParam + 1 : null
       const reachable = products.map(normalizeProductImages)
