@@ -121,3 +121,36 @@ async function follow(handle: string, method: "PUT" | "DELETE"): Promise<boolean
 
 export const followSeller = async (handle: string) => follow(handle, "PUT")
 export const unfollowSeller = async (handle: string) => follow(handle, "DELETE")
+
+export type SellerPoint = {
+  id: string
+  name: string
+  kinds: ("sales" | "showroom" | "installation")[]
+  address: string
+  district: string
+  city: string
+  phone: string
+  hours: string
+  latitude?: number
+  longitude?: number
+  is_primary: boolean
+}
+
+/** Mağazanın yayımlanmış fiziksel noktaları (satış, teşhir, uygulama). */
+export const getSellerPoints = async (handle: string): Promise<SellerPoint[]> => {
+  return gobitData<SellerPoint[]>(`/store/v1/dtm/sellers/${encodeURIComponent(handle)}/locations`, {
+    next: await sellersNext(60),
+  }).catch(() => [])
+}
+
+/** Mağazanın anlaşmalı uzmanları (uygulayıcıları). */
+export const getSellerExperts = async (handle: string) => {
+  const { toExpert } = await import("./experts")
+  type Raw = Parameters<typeof toExpert>[0]
+
+  return gobitData<Raw[]>(`/store/v1/dtm/sellers/${encodeURIComponent(handle)}/experts`, {
+    next: await sellersNext(60),
+  })
+    .then((rs) => rs.map(toExpert))
+    .catch(() => [])
+}

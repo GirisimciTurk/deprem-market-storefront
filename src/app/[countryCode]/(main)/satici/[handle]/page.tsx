@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server"
 
 import { getSellerByHandle } from "@lib/data/sellers"
 import SellerTemplate from "@modules/sellers/templates"
-import { followedSellerHandles } from "@lib/data/sellers"
+import { followedSellerHandles, getSellerExperts, getSellerPoints } from "@lib/data/sellers"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 type Props = {
@@ -48,10 +48,16 @@ export default async function SellerPage(props: Props) {
     notFound()
   }
 
-  const followed = await followedSellerHandles()
+  const [followed, points, experts] = await Promise.all([
+    followedSellerHandles(),
+    getSellerPoints(data.seller.handle),
+    getSellerExperts(data.seller.handle),
+  ])
 
   return (
     <SellerTemplate
+      points={points}
+      experts={experts}
       following={followed?.includes(data.seller.handle) ?? false}
       signedIn={followed !== null}
       seller={data.seller}

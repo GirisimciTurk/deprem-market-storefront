@@ -45,7 +45,7 @@ export interface ExpertListResult {
 
 // dtm'nin uzman kartları (/store/v1/dtm/experts): yayımlanmış ve gizlenmemiş
 // kartlar. İletişimini gizleyen uzmanın telefonu ve e-postası gelmez.
-type DtmExpert = {
+export type DtmExpert = {
   slug?: string
   kind: string
   full_name: string
@@ -70,7 +70,7 @@ type DtmExpert = {
   updated_at?: string
 }
 
-const toExpert = (e: DtmExpert): Expert =>
+export const toExpert = (e: DtmExpert): Expert =>
   ({
     slug: e.slug ?? "",
     provider_type: e.kind as ProviderType,

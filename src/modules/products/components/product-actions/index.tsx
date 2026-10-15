@@ -16,6 +16,7 @@ import { getProductPrice } from "@lib/util/get-product-price"
 import { track } from "@lib/util/analytics"
 import InstallmentCargoInfo from "../installment-cargo-info"
 import ServiceRequestButton from "./service-request-button"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -296,6 +297,14 @@ export default function ProductActions({
             onAddToCart={handleAddToCart}
           />
         )}
+        {/* Uygulatma yolu: mağazanın uygulama noktası ve anlaşmalı uzmanları,
+            mağaza yoksa uzman dizini. */}
+        <LocalizedClientLink
+          href={(product as any).seller?.handle ? `/satici/${(product as any).seller.handle}#uygulama` : "/uzmanlar"}
+          className="flex items-center justify-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-4 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-100"
+        >
+          🛠️ Uygulatmak istiyorum
+        </LocalizedClientLink>
         <InstallmentCargoInfo price={priceValue / 100} />
         <MobileActions
           product={product}

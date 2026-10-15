@@ -10,6 +10,10 @@ import SellerContact from "@modules/sellers/components/seller-contact"
 import { isShowcaseKey } from "@lib/showcase"
 import TrustedBadge from "@modules/sellers/components/trusted-badge"
 import FollowButton from "@modules/sellers/components/follow-button"
+import SellerPoints from "@modules/sellers/components/seller-points"
+import SellerExperts from "@modules/sellers/components/seller-experts"
+import type { SellerPoint } from "@lib/data/sellers"
+import type { Expert } from "@lib/data/experts"
 
 export default function SellerTemplate({
   sortBy,
@@ -23,9 +27,13 @@ export default function SellerTemplate({
   countryCode,
   following = false,
   signedIn = false,
+  points = [],
+  experts = [],
 }: {
   following?: boolean
   signedIn?: boolean
+  points?: SellerPoint[]
+  experts?: Expert[]
   sortBy?: SortOptions
   seller: StoreSellerResponse["seller"]
   productIds: string[]
@@ -108,6 +116,8 @@ export default function SellerTemplate({
             </div>
           </div>
         </div>
+        <SellerPoints points={points} />
+        <SellerExperts experts={experts} hasInstallationPoint={points.some((p) => p.kinds.includes("installation"))} />
         {hasProducts ? (
           <Suspense
             // Filtre değişince sınır yeniden mount olsun → iskelet gerçekten görünür.

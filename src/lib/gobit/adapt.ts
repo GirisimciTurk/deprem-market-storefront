@@ -99,7 +99,9 @@ export function toProduct(
   const variants = (p.variants ?? []).map((v) => ({
     id: v.id,
     title: v.title,
-    sku: v.sku ?? null,
+    // Göç aracı kodu olmayan Medusa varyantına MEDUSA-<id> yazar; vitrin onu kod
+    // olarak göstermez.
+    sku: v.sku && !v.sku.startsWith("MEDUSA-") ? v.sku : null,
     product_id: p.id,
     manage_inventory: v.manage_inventory ?? true,
     allow_backorder: v.allow_backorder ?? false,
