@@ -1,3 +1,6 @@
+const PAYTR_ORIGINS = Array.from(
+  new Set(["https://www.paytr.com", process.env.NEXT_PUBLIC_PAYTR_BASE_URL].filter(Boolean))
+).join(" ")
 const checkEnvVariables = require("./check-env-variables")
 
 checkEnvVariables()
@@ -144,6 +147,8 @@ const nextConfig = {
         : []),
     ],
   },
+  // PayTR'nin ödeme çerçevesi ve boy uyarlayıcı betiği. Yerelde sahte PayTR
+  // (NEXT_PUBLIC_PAYTR_BASE_URL) da izinlidir.
   async headers() {
     return [
       {
@@ -153,12 +158,12 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              `script-src 'self' 'unsafe-inline'${SCRIPT_SRC_EVAL} https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
+              `script-src 'self' 'unsafe-inline'${SCRIPT_SRC_EVAL} ${PAYTR_ORIGINS} https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
               "font-src 'self' data: https://fonts.gstatic.com; " +
               `img-src 'self' data: blob: https:${IMG_SRC_HTTP}; ` +
               `connect-src 'self' ${BACKEND_URL} https://images.unsplash.com https://pub-972575e25eda4755b1250ca6be181153.r2.dev https://cdn.jsdelivr.net https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
-              "frame-src 'self' https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; " +
+              `frame-src 'self' ${PAYTR_ORIGINS} https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
               `form-action 'self' ${BACKEND_URL} https://paynkolaytest.nkolayislem.com.tr https://paynkolay.nkolayislem.com.tr; ` +
               "object-src 'none'; " +
               // <base href> enjeksiyonunu engeller: aksi halde bir XSS, sayfadaki

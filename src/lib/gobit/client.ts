@@ -17,7 +17,9 @@ export class GobitError extends Error {
   constructor(
     public status: number,
     public code: string,
-    message: string
+    message: string,
+    /** Retry-After, saniye: gobit "bekle" dediğinde. */
+    public retryAfter?: number
   ) {
     super(message)
   }
@@ -71,7 +73,13 @@ export async function gobitFetch<T>(path: string, init: GobitInit = {}): Promise
   const json = text ? JSON.parse(text) : undefined
   if (!res.ok) {
     const err = json?.error ?? {}
-    throw new GobitError(res.status, err.code ?? "", err.message ?? `gobit ${res.status} ${path}`)
+    const retry = Number(res.headers.get("Retry-After"))
+    throw new GobitError(
+      res.status,
+      err.code ?? "",
+      err.message ?? `gobit ${res.status} ${path}`,
+      Number.isFinite(retry) && retry > 0 ? retry : undefined
+    )
   }
   return json as T
 }

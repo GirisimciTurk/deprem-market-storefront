@@ -1,30 +1,20 @@
 "use server"
 
-import { sdk } from "@lib/config"
-import { getAuthHeaders } from "./cookies"
 import { HttpTypes } from "@medusajs/types"
+import { gobitData } from "@lib/gobit/client"
+import { medusaProviderId } from "@lib/gobit/cart"
+
+// Mağazanın ödeme yöntemleri. depremtek vitrini kartla PayTR'yi gösterir;
+// hediye kartı, puan ve cüzdan sağlayıcıları ödeme adımında seçilmez.
+const SHOWN = new Set(["paytr"])
 
 export const listCartPaymentMethods = async (regionId: string) => {
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
-
-  return sdk.client
-    .fetch<HttpTypes.StorePaymentProviderListResponse>(
-      `/store/payment-providers`,
-      {
-        method: "GET",
-        query: { region_id: regionId },
-        headers,
-        cache: "no-store",
-      }
+  return gobitData<string[]>(`/store/v1/payment-providers`, { query: { region_id: regionId }, cache: "no-store" })
+    .then(
+      (ids) =>
+        ids
+          .filter((id) => SHOWN.has(id))
+          .map((id) => ({ id: medusaProviderId(id), is_enabled: true })) as HttpTypes.StorePaymentProvider[]
     )
-    .then(({ payment_providers }) =>
-      payment_providers.sort((a, b) => {
-        return a.id > b.id ? 1 : -1
-      })
-    )
-    .catch(() => {
-      return null
-    })
+    .catch(() => null)
 }

@@ -111,3 +111,39 @@ export const removeCartId = async () => {
     /* render bağlamında cookie yazılamaz — best-effort (retrieveCart catch'i buradan geçer) */
   }
 }
+
+// gobit'in sipariş jetonu (X-Order-Token, gobit ADR 0439): misafir alışverişte
+// sipariş sayfası onunla açılır. Tamamlamanın verdiği jetonlar, siparişe göre,
+// bu çerezde tutulur (en çok son 10 sipariş).
+const ORDER_TOKENS = "_gobit_order_tokens"
+
+async function orderTokens(): Promise<Record<string, string>> {
+  try {
+    const raw = (await nextCookies()).get(ORDER_TOKENS)?.value
+    return raw ? (JSON.parse(raw) as Record<string, string>) : {}
+  } catch {
+    return {}
+  }
+}
+
+export const rememberOrderToken = async (orderId: string, token: string) => {
+  try {
+    const kept = Object.entries(await orderTokens()).slice(-9)
+    const cookies = await nextCookies()
+    cookies.set(ORDER_TOKENS, JSON.stringify(Object.fromEntries([...kept, [orderId, token]])), {
+      maxAge: 60 * 60 * 24 * 30,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    })
+  } catch {
+    /* render bağlamında cookie yazılamaz — best-effort */
+  }
+}
+
+/** Siparişi okumak için başlıklar: oturum çerezi ve varsa siparişin jetonu. */
+export const getOrderHeaders = async (orderId: string): Promise<Record<string, string>> => {
+  const token = (await orderTokens())[orderId]
+
+  return { ...(await getAuthHeaders()), ...(token ? { "X-Order-Token": token } : {}) }
+}

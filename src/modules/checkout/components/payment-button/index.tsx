@@ -1,7 +1,7 @@
 "use client"
 
 import { isManual, isStripeLike } from "@lib/constants"
-import { placeOrder } from "@lib/data/cart"
+import { openPaytrPayment, placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@modules/common/components/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
@@ -100,21 +100,9 @@ const PayTRPaymentButton = ({
     setSubmitting(true)
     setErrorMessage(null)
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const publishableKey =
-        process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-      const res = await fetch(`${backendUrl}/store/paytr/token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": publishableKey,
-        },
-        credentials: "include",
-        body: JSON.stringify({ cart_id: cart.id }),
-      })
-      const json = await res.json().catch(() => ({}))
-      if (!res.ok || !json.success || !json.iframe_token) {
+      // gobit'te PayTR oturumunu açar (tutar ve adres kesinleşti); iframe jetonu döner.
+      const json = await openPaytrPayment()
+      if (!json.iframe_token) {
         throw new Error(json.error || "PayTR ödeme başlatılamadı. Lütfen tekrar deneyin.")
       }
       setIframeToken(json.iframe_token)
@@ -143,7 +131,7 @@ const PayTRPaymentButton = ({
             </button>
           </div>
           <iframe
-            src={`https://www.paytr.com/odeme/guvenli/${iframeToken}`}
+            src={`${process.env.NEXT_PUBLIC_PAYTR_BASE_URL || "https://www.paytr.com"}/odeme/guvenli/${iframeToken}`}
             id="paytriframe"
             frameBorder={0}
             scrolling="yes"

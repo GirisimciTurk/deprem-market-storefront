@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { clearCartCookie } from "./actions"
+import { finishPayment } from "@lib/data/cart"
 
 /**
  * PayTR ödeme sonucu sayfası (merchant_ok_url / merchant_fail_url hedefi).
@@ -30,12 +30,33 @@ export default function OdemeSonucPage() {
     const ok = params.get("status") === "success"
     // kind=service → hizmet talebi (keşifli kurulum) ödemesi; sipariş değil.
     const service = params.get("kind") === "service"
-    setSuccess(ok)
     setIsService(service)
-    setReady(true)
-    // Hizmet ödemesinde sepet yok → çerez temizleme yalnız normal sipariş için.
-    if (ok && !service) {
-      clearCartCookie().catch(() => {})
+    if (!ok || service) {
+      setSuccess(ok)
+      setReady(true)
+      return
+    }
+    // gobit: sepet, açılan ödemenin tamamlama sırrıyla tamamlanır. PayTR ödemeyi
+    // bildirene kadar gobit beklemeyi ister; sipariş oluşunca sayfasına gidilir.
+    let stopped = false
+    const settle = async (attempt: number) => {
+      const outcome = await finishPayment().catch(() => ({ refused: "other" as const }))
+      if (stopped) return
+      if ("order" in outcome) {
+        const cc = window.location.pathname.split("/")[1] || "tr"
+        window.location.replace(`/${cc}/order/${outcome.order.order_id}/confirmed`)
+        return
+      }
+      if ("wait" in outcome && attempt < 40) {
+        setTimeout(() => settle(attempt + 1), Math.min(outcome.wait * 1000 * 1.5 ** Math.min(attempt, 4), 15000))
+        return
+      }
+      setSuccess("wait" in outcome)
+      setReady(true)
+    }
+    settle(0)
+    return () => {
+      stopped = true
     }
   }, [])
 
