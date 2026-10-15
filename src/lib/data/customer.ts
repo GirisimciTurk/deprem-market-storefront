@@ -1,12 +1,11 @@
 "use server"
 
-import { sdk } from "@lib/config"
-import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import { safeInternalPath } from "@lib/util/safe-redirect"
-import { gobitData, gobitResponse } from "@lib/gobit/client"
+import { gobitData, gobitFetch, gobitResponse } from "@lib/gobit/client"
+import { cookies as nextCookies } from "next/headers"
 import {
   GOBIT_SESSION_COOKIE,
   getAuthHeaders,
@@ -67,29 +66,45 @@ export const retrieveCustomer =
     }
   }
 
-export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
+/** Oturumdaki müşterinin kimliği ve gobit istek başlıkları. */
+async function me(): Promise<{ id: string; headers: Record<string, string> }> {
+  const headers = await getAuthHeaders()
+  if (!headers.cookie) throw new Error("Giriş yapmanız gerekiyor.")
+  const session = await gobitData<{ customer_id: string }>("/store/v1/auth/session", { headers, cache: "no-store" })
 
-  const updateRes = await sdk.store.customer
-    .update(body, {}, headers)
-    .then(({ customer }) => customer)
-    .catch(medusaError)
-
-  const cacheTag = await getCacheTag("customers")
-  revalidateTag(cacheTag)
-
-  return updateRes
+  return { id: encodeURIComponent(session.customer_id), headers }
 }
 
+const errText = (e: unknown) => (e instanceof Error ? e.message : String(e))
+
+export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
+  const { id, headers } = await me()
+  const b = body as Record<string, any>
+  await gobitFetch(`/store/v1/customers/${id}`, {
+    method: "PUT",
+    headers,
+    body: {
+      ...(b.first_name !== undefined ? { first_name: b.first_name } : {}),
+      ...(b.last_name !== undefined ? { last_name: b.last_name } : {}),
+      ...(b.phone !== undefined ? { phone: b.phone } : {}),
+      ...(b.metadata !== undefined ? { metadata: b.metadata } : {}),
+    },
+  })
+  revalidateTag(await getCacheTag("customers"))
+
+  return retrieveCustomer()
+}
+
+// Kayıt (identity-session): e-posta ve şifre alınır, adrese doğrulama bağlantısı
+// gider; hesap bağlantı açılınca kurulur ve kişi oturum açmış olur. Formun ad,
+// soyad ve telefonu doğrulamaya kadar bir çerezde bekler (verifyRegistration).
+const PENDING_PROFILE = "_gobit_pending_profile"
+
 export async function signup(_currentState: unknown, formData: FormData) {
-  let created: unknown
   const password = formData.get("password") as string
-  let phoneVal = (formData.get("phone") as string || "").trim().replace(/[\s\(\)\-\.]/g, "")
+  let phoneVal = ((formData.get("phone") as string) || "").trim().replace(/[\s\(\)\-\.]/g, "")
 
   if (phoneVal) {
-    // Normalize to Turkish international format (+905XXXXXXXXX)
     if (phoneVal.startsWith("0")) {
       phoneVal = "+90" + phoneVal.substring(1)
     } else if (phoneVal.startsWith("90")) {
@@ -97,63 +112,69 @@ export async function signup(_currentState: unknown, formData: FormData) {
     } else if (!phoneVal.startsWith("+")) {
       phoneVal = "+90" + phoneVal
     }
-
-    // Format validation: must match +90 followed by 10 digits starting with 5
-    const phoneRegex = /^\+905\d{9}$/
-    if (!phoneRegex.test(phoneVal)) {
+    if (!/^\+905\d{9}$/.test(phoneVal)) {
       return "Lütfen geçerli bir cep telefonu numarası girin (Örn: 0555 123 45 67)"
     }
   }
 
-  const customerForm = {
-    email: formData.get("email") as string,
-    first_name: formData.get("first_name") as string,
-    last_name: formData.get("last_name") as string,
-    phone: phoneVal,
-  }
-
+  const email = ((formData.get("email") as string) || "").trim()
   try {
-    const token = await sdk.auth.register("customer", "emailpass", {
-      email: customerForm.email,
-      password: password,
-    })
-
-    await setAuthToken(token as string)
-
-    const headers = {
-      ...(await getAuthHeaders()),
+    const res = await gobitResponse("/store/v1/auth/register", { method: "POST", body: { email, password } })
+    if (res.status === 404) return "Yeni üyelik şu an açık değil."
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+      return body?.error?.message || `Kayıt yapılamadı (${res.status}).`
     }
-
-    const { customer: createdCustomer } = await sdk.store.customer.create(
-      customerForm,
-      {},
-      headers
+    ;(await nextCookies()).set(
+      PENDING_PROFILE,
+      JSON.stringify({
+        email: email.toLowerCase(),
+        first_name: formData.get("first_name") || "",
+        last_name: formData.get("last_name") || "",
+        phone: phoneVal,
+      }),
+      { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 60 * 60 * 2 }
     )
-
-    const loginToken = await sdk.auth.login("customer", "emailpass", {
-      email: customerForm.email,
-      password,
-    })
-
-    await setAuthToken(loginToken as string)
-
-    const customerCacheTag = await getCacheTag("customers")
-    revalidateTag(customerCacheTag)
-
-    await transferCart()
-
-    created = createdCustomer
   } catch (error) {
-    return String(error)
+    return errText(error)
   }
 
-  // Giriş akışıyla aynı kural: nereden geldiyse oraya dön (bkz. login).
-  const target = safeInternalPath(formData.get("redirect"))
-  if (target) {
-    redirect(target)
-  }
+  redirect(`/${(formData.get("country_code") as string) || "tr"}/kayit-onay?gonderildi=1`)
+}
 
-  return created
+/** Doğrulama bağlantısı: hesabı açar, oturumu kurar, formun ad/soyad/telefonunu yazar. */
+export async function verifyRegistration(token: string): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const res = await gobitResponse("/store/v1/auth/register/verify", { method: "POST", body: { token } })
+    if (!res.ok) return { success: false, error: "Doğrulama bağlantısı geçersiz ya da süresi dolmuş." }
+    const session = res.headers
+      .getSetCookie()
+      .map((c) => c.split(";")[0])
+      .find((c) => c.startsWith(`${GOBIT_SESSION_COOKIE}=`))
+    if (!session) return { success: false, error: "Oturum açılamadı." }
+    await setAuthToken(session.slice(GOBIT_SESSION_COOKIE.length + 1))
+
+    const jar = await nextCookies()
+    const raw = jar.get(PENDING_PROFILE)?.value
+    jar.set(PENDING_PROFILE, "", { maxAge: -1 })
+    if (raw) {
+      const profile = JSON.parse(raw) as { email: string; first_name: string; last_name: string; phone: string }
+      const { id, headers } = await me()
+      const c = await gobitData<{ email: string }>(`/store/v1/customers/${id}`, { headers, cache: "no-store" })
+      if (c.email.toLowerCase() === profile.email) {
+        await gobitFetch(`/store/v1/customers/${id}`, {
+          method: "PUT",
+          headers,
+          body: { first_name: profile.first_name, last_name: profile.last_name, phone: profile.phone },
+        }).catch(() => {})
+      }
+    }
+    revalidateTag(await getCacheTag("customers"))
+
+    return { success: true, error: null }
+  } catch (e) {
+    return { success: false, error: errText(e) }
+  }
 }
 
 export async function login(_currentState: unknown, formData: FormData) {
@@ -202,51 +223,37 @@ export async function login(_currentState: unknown, formData: FormData) {
  * backend subscriber müşteriye sıfırlama linkli e-posta gönderir. E-posta sızıntısını
  * önlemek için (kayıtlı olsun olmasın) her zaman başarılı döner.
  */
-export async function requestPasswordReset(
-  email: string
-): Promise<{ success: boolean; error: string | null }> {
-  try {
-    await sdk.auth.resetPassword("customer", "emailpass", { identifier: email })
-  } catch {
-    // Sessizce yut — e-posta kayıtlı mı bilgisini sızdırma.
-  }
+/**
+ * Şifre sıfırlama bağlantısı ister (identity-session). Adresin kayıtlı olup
+ * olmadığını sızdırmamak için her zaman başarılı döner.
+ */
+export async function requestPasswordReset(email: string): Promise<{ success: boolean; error: string | null }> {
+  await gobitResponse("/store/v1/auth/password-reset", { method: "POST", body: { email } }).catch(() => null)
+
   return { success: true, error: null }
 }
 
-/**
- * E-postadaki linkten gelen token ile yeni şifreyi belirler.
- */
+/** Bağlantıdaki jetonla yeni şifreyi belirler. */
 export async function resetPassword(
-  email: string,
+  _email: string,
   password: string,
   token: string
 ): Promise<{ success: boolean; error: string | null }> {
-  try {
-    await sdk.auth.updateProvider(
-      "customer",
-      "emailpass",
-      { email, password },
-      token
-    )
-    return { success: true, error: null }
-  } catch (error: any) {
-    const msg = String(error?.message || "")
-    return {
-      success: false,
-      error:
-        msg.includes("401") || msg.toLowerCase().includes("unauthorized")
-          ? "Sıfırlama bağlantısı geçersiz veya süresi dolmuş. Lütfen yeni bir bağlantı isteyin."
-          : error?.message || "Şifre sıfırlanamadı.",
-    }
+  const res = await gobitResponse("/store/v1/auth/password-reset/confirm", {
+    method: "POST",
+    body: { token, password },
+  }).catch(() => null)
+  if (res?.ok) return { success: true, error: null }
+
+  return {
+    success: false,
+    error:
+      res && (res.status === 401 || res.status === 404 || res.status === 422)
+        ? "Sıfırlama bağlantısı geçersiz veya süresi dolmuş. Lütfen yeni bir bağlantı isteyin."
+        : "Şifre sıfırlanamadı.",
   }
 }
 
-/**
- * Giriş yapmış müşterinin şifresini değiştirir. Backend custom endpoint
- * (/store/customers/me/change-password) eski şifreyi DOĞRULAR ve emailpass
- * provider'ını yeni şifreyle günceller (Medusa'nın /auth/.../update'i yalnız
- * reset-token kabul ettiği için login token'ıyla çalışmaz → custom endpoint).
- */
 export async function updateCustomerPassword(
   _currentState: Record<string, unknown>,
   formData: FormData
@@ -265,21 +272,19 @@ export async function updateCustomerPassword(
     return { success: false, error: "Yeni şifreler eşleşmiyor." }
   }
 
-  const headers = { ...(await getAuthHeaders()) }
   try {
-    await sdk.client.fetch("/store/customers/me/change-password", {
+    const res = await gobitResponse("/store/v1/auth/password", {
       method: "POST",
-      headers,
-      body: { old_password: oldPassword, new_password: newPassword },
+      headers: await getAuthHeaders(),
+      body: { current_password: oldPassword, new_password: newPassword },
     })
-    return { success: true, error: null }
-  } catch (error: any) {
-    const msg = String(error?.message || "")
-    // Backend mesajını ilet; 401 → eski şifre hatalı
-    if (msg.includes("401") || msg.toLowerCase().includes("hatalı") || msg.toLowerCase().includes("unauthorized")) {
-      return { success: false, error: "Mevcut şifreniz hatalı." }
-    }
-    return { success: false, error: error?.message || "Şifre güncellenemedi." }
+    if (res.ok) return { success: true, error: null }
+    if (res.status === 401 || res.status === 403) return { success: false, error: "Mevcut şifreniz hatalı." }
+    const body = await res.json().catch(() => null)
+
+    return { success: false, error: body?.error?.message || "Şifre güncellenemedi." }
+  } catch (error) {
+    return { success: false, error: errText(error) }
   }
 }
 
@@ -303,224 +308,96 @@ export async function signout(countryCode: string) {
   redirect(`/${countryCode}/account`)
 }
 
+/** Girişte sepeti müşteriye bağlar (gobit sepetinin müşterisi). */
 export async function transferCart() {
   const cartId = await getCartId()
+  if (!cartId) return
 
-  if (!cartId) {
-    return
-  }
-
-  const headers = await getAuthHeaders()
-
-  await sdk.store.cart.transferCart(cartId, {}, headers)
-
-  const cartCacheTag = await getCacheTag("carts")
-  revalidateTag(cartCacheTag)
+  const { id, headers } = await me()
+  await gobitFetch(`/store/v1/carts/${cartId}`, {
+    method: "POST",
+    headers,
+    body: { customer_id: decodeURIComponent(id) },
+  }).catch(() => {})
+  revalidateTag(await getCacheTag("carts"))
 }
 
+const addressFrom = (formData: FormData) => ({
+  first_name: (formData.get("first_name") as string) || "",
+  last_name: (formData.get("last_name") as string) || "",
+  company: (formData.get("company") as string) || "",
+  address_1: (formData.get("address_1") as string) || "",
+  address_2: (formData.get("address_2") as string) || "",
+  city: (formData.get("city") as string) || "",
+  postal_code: (formData.get("postal_code") as string) || "",
+  province: (formData.get("province") as string) || "",
+  country_code: ((formData.get("country_code") as string) || "tr").toLowerCase(),
+  phone: (formData.get("phone") as string) || "",
+})
+
+// Adres etiketi (address_name) gobit'te yok.
 export const addCustomerAddress = async (
   currentState: Record<string, unknown>,
   formData: FormData
 ): Promise<{ success: boolean; error: string | null }> => {
-  // Varsayılan: currentState'ten ya da formdaki "is_default" onay kutusundan.
   const formDefault = formData.get("is_default_shipping") != null
-  const isDefaultBilling =
-    (currentState.isDefaultBilling as boolean) || formDefault || false
-  const isDefaultShipping =
-    (currentState.isDefaultShipping as boolean) || formDefault || false
-
-  const address = {
-    address_name: (formData.get("address_name") as string) || "Adresim",
-    first_name: formData.get("first_name") as string,
-    last_name: formData.get("last_name") as string,
-    company: formData.get("company") as string,
-    address_1: formData.get("address_1") as string,
-    address_2: formData.get("address_2") as string,
-    city: formData.get("city") as string,
-    postal_code: formData.get("postal_code") as string,
-    province: formData.get("province") as string,
-    country_code: formData.get("country_code") as string,
-    phone: formData.get("phone") as string,
-    is_default_billing: isDefaultBilling,
-    is_default_shipping: isDefaultShipping,
-  }
-
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
-
-  return sdk.store.customer
-    .createAddress(address, {}, headers)
-    .then(async () => {
-      const customerCacheTag = await getCacheTag("customers")
-      revalidateTag(customerCacheTag)
-      return { success: true, error: null }
+  try {
+    const { id, headers } = await me()
+    await gobitFetch(`/store/v1/customers/${id}/addresses`, {
+      method: "POST",
+      headers,
+      body: {
+        ...addressFrom(formData),
+        is_default_billing: (currentState.isDefaultBilling as boolean) || formDefault || false,
+        is_default_shipping: (currentState.isDefaultShipping as boolean) || formDefault || false,
+      },
     })
-    .catch((err) => {
-      return { success: false, error: err.toString() }
-    })
+    revalidateTag(await getCacheTag("customers"))
+    return { success: true, error: null }
+  } catch (e) {
+    return { success: false, error: errText(e) }
+  }
 }
 
-export const deleteCustomerAddress = async (
-  addressId: string
-): Promise<void> => {
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
-
-  await sdk.store.customer
-    .deleteAddress(addressId, headers)
-    .then(async () => {
-      const customerCacheTag = await getCacheTag("customers")
-      revalidateTag(customerCacheTag)
-      return { success: true, error: null }
-    })
-    .catch((err) => {
-      return { success: false, error: err.toString() }
-    })
+export const deleteCustomerAddress = async (addressId: string): Promise<void> => {
+  const { id, headers } = await me()
+  await gobitFetch(`/store/v1/customers/${id}/addresses/${encodeURIComponent(addressId)}`, {
+    method: "DELETE",
+    headers,
+  }).catch(() => {})
+  revalidateTag(await getCacheTag("customers"))
 }
 
 export const updateCustomerAddress = async (
   currentState: Record<string, unknown>,
   formData: FormData
 ): Promise<{ success: boolean; error: string | null }> => {
-  const addressId =
-    (currentState.addressId as string) || (formData.get("addressId") as string)
+  const addressId = (currentState.addressId as string) || (formData.get("addressId") as string)
+  if (!addressId) return { success: false, error: "Address ID is required" }
 
-  if (!addressId) {
-    return { success: false, error: "Address ID is required" }
-  }
-
-  const address = {
-    address_name: (formData.get("address_name") as string) || undefined,
-    first_name: formData.get("first_name") as string,
-    last_name: formData.get("last_name") as string,
-    company: formData.get("company") as string,
-    address_1: formData.get("address_1") as string,
-    address_2: formData.get("address_2") as string,
-    city: formData.get("city") as string,
-    postal_code: formData.get("postal_code") as string,
-    province: formData.get("province") as string,
-    country_code: formData.get("country_code") as string,
-  } as HttpTypes.StoreUpdateCustomerAddress
-
-  const phone = formData.get("phone") as string
-
-  if (phone) {
-    address.phone = phone
-  }
-
-  // "Varsayılan adresim yap" işaretliyse hem teslimat hem fatura varsayılanı yap.
-  if (formData.get("is_default_shipping") != null) {
-    address.is_default_shipping = true
-    address.is_default_billing = true
-  }
-
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
-
-  return sdk.store.customer
-    .updateAddress(addressId, address, {}, headers)
-    .then(async () => {
-      const customerCacheTag = await getCacheTag("customers")
-      revalidateTag(customerCacheTag)
-      return { success: true, error: null }
-    })
-    .catch((err) => {
-      return { success: false, error: err.toString() }
-    })
-}
-
-// Decode the payload of a Medusa auth JWT (no verification — used only to read
-// non-sensitive claims like actor_id/email after the backend already issued it).
-function decodeAuthToken(token: string): { actor_id?: string; email?: string } {
   try {
-    const payload = token.split(".")[1]
-    if (!payload) return {}
-    const json = Buffer.from(
-      payload.replace(/-/g, "+").replace(/_/g, "/"),
-      "base64"
-    ).toString("utf-8")
-    const data = JSON.parse(json)
-    return {
-      actor_id: data?.actor_id,
-      // Medusa's registration JWT carries the provider profile in `user_metadata`
-      // (the Google provider stores the verified email there).
-      email:
-        data?.email ??
-        data?.user_metadata?.email ??
-        data?.app_metadata?.email,
+    const { id, headers } = await me()
+    const path = `/store/v1/customers/${id}/addresses/${encodeURIComponent(addressId)}`
+    await gobitFetch(path, { method: "PUT", headers, body: addressFrom(formData) })
+    if (formData.get("is_default_shipping") != null) {
+      await gobitFetch(`${path}/default-shipping`, { method: "POST", headers })
+      await gobitFetch(`${path}/default-billing`, { method: "POST", headers })
     }
-  } catch {
-    return {}
-  }
-}
-
-/**
- * Step 1 of the real Google OAuth flow: ask Medusa where to redirect the user.
- * Returns the Google consent-screen URL. Requires GOOGLE_CLIENT_ID/SECRET to be
- * configured on the backend, otherwise the redirect will fail closed.
- */
-export async function initiateGoogleLogin(): Promise<{ location: string }> {
-  const result = await sdk.auth.login("customer", "google", {})
-
-  if (typeof result === "object" && result !== null && "location" in result) {
-    return { location: (result as { location: string }).location }
-  }
-
-  // If a token string is returned the session already exists; treat as ready.
-  if (typeof result === "string") {
-    await setAuthToken(result)
-    return { location: "" }
-  }
-
-  throw new Error("Google ile giriş başlatılamadı. Lütfen tekrar deneyin.")
-}
-
-/**
- * Step 2: validate the callback Google sent back, creating the customer record on
- * first login, and persist the resulting session token.
- */
-export async function validateGoogleCallback(
-  query: Record<string, unknown>
-): Promise<{ success: boolean; error: string | null }> {
-  try {
-    let token = await sdk.auth.callback("customer", "google", query)
-
-    if (typeof token !== "string") {
-      return { success: false, error: "Google doğrulaması tamamlanamadı." }
-    }
-
-    const decoded = decodeAuthToken(token)
-
-    // actor_id is empty on the very first login with this Google identity.
-    // Hand off to the backend, which either LINKS this identity to an existing
-    // customer that already uses this email (e.g. an email/password account) or
-    // creates a new customer — avoiding duplicate accounts and the
-    // (email, has_account) unique-constraint error.
-    if (!decoded.actor_id) {
-      await sdk.client.fetch("/store/customers/google-link", {
-        method: "POST",
-        headers: { authorization: `Bearer ${token}` },
-      })
-      // Refresh to obtain a token whose actor_id is now populated. The SDK does
-      // not persist the token server-side, so pass it explicitly — otherwise the
-      // refresh call is unauthenticated and Medusa returns 401.
-      token = await sdk.auth.refresh({
-        authorization: `Bearer ${token}`,
-      } as Record<string, string>)
-    }
-
-    await setAuthToken(token as string)
-
-    const customerCacheTag = await getCacheTag("customers")
-    revalidateTag(customerCacheTag)
-
-    await transferCart()
-
+    revalidateTag(await getCacheTag("customers"))
     return { success: true, error: null }
-  } catch (error) {
-    return { success: false, error: String(error) }
+  } catch (e) {
+    return { success: false, error: errText(e) }
   }
+}
+
+// Google ile giriş gobit'te yok (identity-session şifre ve passkey sunar); göç
+// aracı da Medusa'nın Google girişlerini taşımadı. Düğme bu mesajı gösterir.
+export async function initiateGoogleLogin(): Promise<{ location: string }> {
+  throw new Error("Google ile giriş şu an kullanılamıyor. Lütfen e-posta ve şifrenizle giriş yapın.")
+}
+
+export async function validateGoogleCallback(
+  _query: Record<string, unknown>
+): Promise<{ success: boolean; error: string | null }> {
+  return { success: false, error: "Google ile giriş şu an kullanılamıyor." }
 }
