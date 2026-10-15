@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { sdk } from "@lib/config"
+import { listProductsByIds } from "@lib/data/products"
 import { useWishlist } from "@lib/context/wishlist-context"
 
 type FavoritesTemplateProps = {
@@ -36,19 +36,7 @@ export default function FavoritesTemplate({
     }
 
     try {
-      const queryParams = new URLSearchParams()
-      productIds.forEach((id) => queryParams.append("id", id))
-      queryParams.append("region_id", region.id)
-      queryParams.append(
-        "fields",
-        "*variants.calculated_price,+variants.inventory_quantity,+variants.metadata,*variants.images,+metadata,+tags,"
-      )
-
-      const response = await sdk.client.fetch<{
-        products: HttpTypes.StoreProduct[]
-      }>(`/store/products?${queryParams.toString()}`, { method: "GET" })
-
-      const apiProducts = response?.products || []
+      const apiProducts = await listProductsByIds(productIds, region.id)
       // Favori sırasını koru (backend en yeni önce döndürüyor); artık satılmayan
       // ürünler listeden düşer.
       const ordered = productIds

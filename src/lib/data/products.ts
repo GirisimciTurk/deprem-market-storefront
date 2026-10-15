@@ -317,3 +317,11 @@ export const listProductsWithSort = async ({
     queryParams,
   }
 }
+
+/** Kimliği verilen ürünler (favoriler gibi istemci bileşenleri için). */
+export const listProductsByIds = async (ids: string[], regionId: string): Promise<HttpTypes.StoreProduct[]> => {
+  if (!ids.length) return []
+  const { response } = await listProducts({ regionId, queryParams: { id: ids, limit: ids.length } as any })
+
+  return response.products
+}

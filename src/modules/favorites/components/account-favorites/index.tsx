@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { sdk } from "@lib/config"
+import { listProductsByIds } from "@lib/data/products"
 import { useWishlist } from "@lib/context/wishlist-context"
 import { getProductPrice } from "@lib/util/get-product-price"
 
@@ -30,16 +30,7 @@ export default function AccountFavorites({
       return
     }
     try {
-      const qp = new URLSearchParams()
-      productIds.forEach((id) => qp.append("id", id))
-      qp.append("region_id", region.id)
-      qp.append("fields", "*variants.calculated_price,+metadata,+tags")
-
-      const res = await sdk.client.fetch<{ products: HttpTypes.StoreProduct[] }>(
-        `/store/products?${qp.toString()}`,
-        { method: "GET" }
-      )
-      const api = res?.products || []
+      const api = await listProductsByIds(productIds, region.id)
       setProducts(
         productIds
           .map((id) => api.find((p) => p.id === id))
