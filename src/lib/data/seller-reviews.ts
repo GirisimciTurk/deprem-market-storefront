@@ -1,6 +1,6 @@
 "use server"
 
-import { sdk } from "@lib/config"
+import { gobitData, gobitFetch } from "@lib/gobit/client"
 import { getAuthHeaders } from "./cookies"
 
 export type StoreSellerReview = {
@@ -17,40 +17,63 @@ export type StoreSellerReviewsResponse = {
   rating_count: number
 }
 
+// dtm'nin mağaza yorumları (/store/v1/dtm/sellers/{handle}/reviews). Bir yorum
+// siparişe bağlıdır: siparişin numarası ve e-postasıyla yazılır.
+
 /** Public — approved reviews for a seller (for the seller store page). */
-export async function getSellerReviews(
-  sellerHandle: string
-): Promise<StoreSellerReviewsResponse> {
-  return sdk.client
-    .fetch<StoreSellerReviewsResponse>(`/store/seller-reviews`, {
-      method: "GET",
-      query: { seller_handle: sellerHandle },
-      cache: "no-store",
-    })
-    .then((r) => ({
-      reviews: r.reviews ?? [],
-      rating_avg: r.rating_avg ?? 0,
-      rating_count: r.rating_count ?? 0,
-    }))
-    .catch(() => ({ reviews: [], rating_avg: 0, rating_count: 0 }))
+export async function getSellerReviews(sellerHandle: string): Promise<StoreSellerReviewsResponse> {
+  const h = encodeURIComponent(sellerHandle)
+  try {
+    const [reviews, entry] = await Promise.all([
+      gobitData<{ id: string; author_name: string; rating: number; body: string; created_at: string }[]>(
+        `/store/v1/dtm/sellers/${h}/reviews`,
+        { cache: "no-store" }
+      ),
+      gobitData<{ rating_avg: number | null; review_count: number }>(`/store/v1/dtm/sellers/${h}`, { cache: "no-store" }),
+    ])
+
+    return {
+      reviews: reviews.map((r) => ({
+        id: r.id,
+        rating: r.rating,
+        comment: r.body,
+        customer_name: r.author_name,
+        created_at: r.created_at,
+      })),
+      rating_avg: entry.rating_avg ?? 0,
+      rating_count: entry.review_count,
+    }
+  } catch {
+    return { reviews: [], rating_avg: 0, rating_count: 0 }
+  }
 }
 
-/** Submit a seller review. Attaches the logged-in customer when present. Status: pending. */
+/** Mağaza yorumu: siparişin numarası ve e-postasıyla (dtm yorumu siparişe bağlar). */
 export async function submitSellerReview(input: {
   seller_handle: string
   rating: number
   comment: string
   name: string
+  order_id?: string
+  email?: string
 }): Promise<{ success: boolean; error: string | null }> {
-  const headers = { ...(await getAuthHeaders()) }
+  if (!input.order_id || !input.email) {
+    return { success: false, error: "Mağaza değerlendirmesi, o mağazadan verdiğiniz siparişin sayfasından yapılır." }
+  }
   try {
-    await sdk.client.fetch(`/store/seller-reviews`, {
+    await gobitFetch(`/store/v1/dtm/sellers/${encodeURIComponent(input.seller_handle)}/reviews`, {
       method: "POST",
-      headers,
-      body: input,
+      headers: await getAuthHeaders(),
+      body: {
+        order_id: input.order_id,
+        author_email: input.email,
+        author_name: input.name,
+        rating: input.rating,
+        body: input.comment,
+      },
     })
     return { success: true, error: null }
   } catch (e) {
-    return { success: false, error: String(e) }
+    return { success: false, error: e instanceof Error ? e.message : String(e) }
   }
 }

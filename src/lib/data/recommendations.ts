@@ -1,26 +1,19 @@
 "use server"
 
-import { sdk } from "@lib/config"
+import { SALES_CHANNEL_ID, gobitData } from "@lib/gobit/client"
 
 /**
- * Backend "birlikte alınanlar" önerisi — verilen ürünle aynı siparişlerde sık
- * geçen ürünlerin id'lerini sıralı döndürür. Hata/boş → []; çağıran bölüm gizlenir.
+ * "Birlikte alınanlar": gobit'in ilgili ürünleri
+ * (/store/v1/sales-channels/{id}/products/{id}/related). Hata/boş → []; çağıran
+ * bölüm gizlenir.
  */
 export async function getBoughtTogetherIds(productId: string): Promise<string[]> {
   if (!productId) return []
-  try {
-    const res = await sdk.client.fetch<{ product_ids: string[] }>(
-      `/store/recommendations`,
-      {
-        method: "GET",
-        query: { product_id: productId, limit: 8 },
-        // Ürün-bazlı (kullanıcıya özel değil); sipariş geçmişinden türer, yavaş
-        // değişir → 30 dk önbellek. Her PDP görüntülemede backend'e gitmez.
-        next: { revalidate: 1800 },
-      }
-    )
-    return res?.product_ids ?? []
-  } catch {
-    return []
-  }
+
+  return gobitData<{ id: string }[]>(
+    `/store/v1/sales-channels/${SALES_CHANNEL_ID}/products/${encodeURIComponent(productId)}/related`,
+    { next: { revalidate: 1800 } }
+  )
+    .then((ps) => ps.slice(0, 8).map((p) => p.id))
+    .catch(() => [])
 }

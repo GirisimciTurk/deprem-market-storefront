@@ -1,42 +1,20 @@
 "use server"
 
-import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
+import { SALES_CHANNEL_ID, gobitFetch } from "@lib/gobit/client"
+import { GobitProduct, toProduct } from "@lib/gobit/adapt"
 
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+/** Varyant, ürünüyle birlikte: gobit listesi varyant kimliğiyle süzer. */
+export const retrieveVariant = async (variant_id: string): Promise<HttpTypes.StoreProductVariant | null> => {
+  return gobitFetch<{ data: GobitProduct[] }>(`/store/v1/sales-channels/${SALES_CHANNEL_ID}/products`, {
+    query: { variant_id: [variant_id], limit: 1 },
+    next: { revalidate: 30, tags: ["products"] },
+  })
+    .then(({ data }) => {
+      const product = data[0] ? toProduct(data[0]) : null
+      const variant = (product?.variants ?? []).find((v) => v.id === variant_id)
 
-export const retrieveVariant = async (
-  variant_id: string
-): Promise<HttpTypes.StoreProductVariant | null> => {
-  const authHeaders = await getAuthHeaders()
-
-  if (!authHeaders) return null
-
-  const headers = {
-    ...authHeaders,
-  }
-
-  // Varyant resim/bilgi güncellemeleri yansısın: ISR (≤30sn) + statik "products"
-  // tag (backend güncellemesinde revalidateTag ile anında tazelenir).
-  const cacheOpts = await getCacheOptions("variants")
-  const next = {
-    ...cacheOpts,
-    tags: [...("tags" in cacheOpts ? cacheOpts.tags : []), "products"],
-    revalidate: 30,
-  }
-
-  return await sdk.client
-    .fetch<{ variant: HttpTypes.StoreProductVariant }>(
-      `/store/product-variants/${variant_id}`,
-      {
-        method: "GET",
-        query: {
-          fields: "*images",
-        },
-        headers,
-        next,
-      }
-    )
-    .then(({ variant }) => variant)
+      return variant ? ({ ...variant, product, images: product?.images ?? [] } as any) : null
+    })
     .catch(() => null)
 }

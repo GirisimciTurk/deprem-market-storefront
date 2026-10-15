@@ -1,7 +1,7 @@
 "use client"
 
 import { convertToLocale } from "@lib/util/money"
-import { sdk } from "@lib/config"
+import { estimateShipping } from "@lib/data/cart"
 import React from "react"
 
 type CartTotalsProps = {
@@ -42,13 +42,9 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
   React.useEffect(() => {
     if (methodSelected || !cartId) return
     let active = true
-    sdk.client
-      .fetch<{ amount: number; free: boolean }>("/store/shipping-quote", {
-        method: "GET",
-        query: { cart_id: cartId },
-      })
+    estimateShipping(cartId)
       .then((r) => {
-        if (active) setEstimate({ amount: r.amount ?? 0, free: !!r.free })
+        if (active) setEstimate(r)
       })
       .catch(() => {
         if (active) setEstimate(null)

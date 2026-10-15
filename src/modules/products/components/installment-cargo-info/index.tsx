@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { Truck, CreditCard, MapPin, X, ChevronRight } from "lucide-react"
 import { TR_CITIES_DISTRICTS } from "@lib/util/tr-cities-districts"
-import { sdk } from "@lib/config"
+import { getInstallments } from "@lib/data/installments"
 import CarrierLogo from "@modules/common/components/carrier-logo"
 
 type InstallmentCargoInfoProps = {
@@ -101,7 +101,7 @@ export default function InstallmentCargoInfo({
     async function fetchInstallments() {
       try {
         setLoading(true)
-        const response = await sdk.client.fetch<any>("/store/installments")
+        const response = await getInstallments()
         if (response && response.success && response.data?.COMMISSION_LIST) {
           setInstallmentList(response.data.COMMISSION_LIST)
           // Find first bank in commission list to set as default select

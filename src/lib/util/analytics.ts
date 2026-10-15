@@ -1,4 +1,3 @@
-import { sdk } from "@lib/config"
 
 /**
  * İstemci-tarafı davranış izleme (fire-and-forget). Olaylar backend'e
@@ -45,19 +44,12 @@ export type TrackPayload = {
   currency_code?: string | null
 }
 
+// gobit'te davranış izleme ucu (/store/track) yok; olaylar şimdilik
+// gönderilmiyor. İmza korunur ki çağıranlar değişmesin.
 export function track(type: TrackEventType, payload: TrackPayload = {}): void {
   if (typeof window === "undefined") return
   const session_id = getSessionId()
   if (!session_id) return
-  try {
-    // Yanıt beklemiyoruz; ağ/hata sessizce yutulur.
-    void sdk.client
-      .fetch("/store/track", {
-        method: "POST",
-        body: { type, session_id, ...payload },
-      })
-      .catch(() => {})
-  } catch {
-    /* sessiz */
-  }
+  void type
+  void payload
 }

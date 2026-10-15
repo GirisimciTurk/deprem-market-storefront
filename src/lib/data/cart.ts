@@ -372,3 +372,15 @@ export async function listCartOptions() {
 
   return { shipping_options: options.map(toShippingOption) }
 }
+
+/** Kargo yöntemi seçilmeden önceki tahmin: sepetin en ucuz kargo seçeneği. */
+export async function estimateShipping(cartId: string): Promise<{ amount: number; free: boolean } | null> {
+  const options = await gobitData<{ amount: number }[]>(`/store/v1/carts/${cartId}/shipping-options`, {
+    headers: await getAuthHeaders(),
+    cache: "no-store",
+  }).catch(() => [])
+  if (!options.length) return null
+  const amount = Math.min(...options.map((o) => o.amount))
+
+  return { amount, free: amount === 0 }
+}

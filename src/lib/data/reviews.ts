@@ -1,6 +1,7 @@
 "use server"
 
-import { sdk } from "@lib/config"
+import { gobitData, gobitFetch } from "@lib/gobit/client"
+import { productIdOf } from "@lib/gobit/product-id"
 import { getAuthHeaders } from "./cookies"
 
 export type StoreReview = {
@@ -20,17 +21,45 @@ export type StoreReview = {
   created_at: string
 }
 
+type GobitReview = {
+  id: string
+  product_id: string
+  rating: number
+  title: string
+  body: string
+  author_name: string
+  verified_purchase: boolean
+  created_at: string
+}
+
+// gobit'in ürün yorumları (/store/v1/products/{product_id}/reviews): yalnız
+// onaylı yorumlar okunur; yazılan yorum onay bekler. Fotoğraf ve "yorumlarım"
+// listesi gobit'te yok.
+
 /** Public — approved reviews for a product (for the product page). */
-export async function listProductReviews(
-  productHandle: string
-): Promise<StoreReview[]> {
-  return sdk.client
-    .fetch<{ reviews: StoreReview[] }>(`/store/reviews`, {
-      method: "GET",
-      query: { product_handle: productHandle },
-      cache: "no-store",
-    })
-    .then((r) => r.reviews ?? [])
+export async function listProductReviews(productHandle: string): Promise<StoreReview[]> {
+  const id = await productIdOf(productHandle)
+  if (!id) return []
+
+  return gobitData<GobitReview[]>(`/store/v1/products/${encodeURIComponent(id)}/reviews`, {
+    query: { limit: 50 },
+    cache: "no-store",
+  })
+    .then((rs) =>
+      rs.map((r) => ({
+        id: r.id,
+        product_id: r.product_id,
+        product_handle: productHandle,
+        product_title: "",
+        customer_name: r.author_name,
+        rating: r.rating,
+        comment: r.title ? `${r.title}\n\n${r.body}` : r.body,
+        status: "approved" as const,
+        images: null,
+        verified_purchase: r.verified_purchase,
+        created_at: r.created_at,
+      }))
+    )
     .catch(() => [])
 }
 
@@ -42,47 +71,29 @@ export async function submitReview(input: {
   name: string
   images?: string[]
 }): Promise<{ success: boolean; error: string | null }> {
-  const headers = { ...(await getAuthHeaders()) }
+  const id = await productIdOf(input.product_handle)
+  if (!id) return { success: false, error: "Ürün bulunamadı." }
   try {
-    await sdk.client.fetch(`/store/reviews`, {
+    await gobitFetch(`/store/v1/products/${encodeURIComponent(id)}/reviews`, {
       method: "POST",
-      headers,
-      body: input,
+      headers: await getAuthHeaders(),
+      body: { rating: input.rating, body: input.comment, author_name: input.name },
     })
     return { success: true, error: null }
   } catch (e) {
-    return { success: false, error: String(e) }
+    return { success: false, error: e instanceof Error ? e.message : String(e) }
   }
 }
 
-/**
- * Yorum fotoğraflarını backend'e yükler (base64) → R2'ye kaydedilir, public URL'ler döner.
- * İstemci (client component) dosyaları okuyup yeniden boyutlandırarak base64 verir.
- */
+/** Yorum fotoğrafı yüklemesi gobit'te yok. */
 export async function uploadReviewImages(
   files: { filename: string; mime_type: string; data: string }[]
 ): Promise<{ urls: string[]; error: string | null }> {
   if (!files || files.length === 0) return { urls: [], error: null }
-  try {
-    const res = await sdk.client.fetch<{ urls: string[] }>(`/store/review-uploads`, {
-      method: "POST",
-      body: { files },
-    })
-    return { urls: res.urls ?? [], error: null }
-  } catch (e) {
-    return { urls: [], error: String(e) }
-  }
+  return { urls: [], error: "Yorumlara fotoğraf eklenemiyor." }
 }
 
-/** The logged-in customer's own reviews (any status) for the account page. */
+/** Müşterinin kendi yorumları gobit'te listelenmiyor. */
 export async function listMyReviews(): Promise<StoreReview[]> {
-  const headers = { ...(await getAuthHeaders()) }
-  return sdk.client
-    .fetch<{ reviews: StoreReview[] }>(`/store/reviews/me`, {
-      method: "GET",
-      headers,
-      cache: "no-store",
-    })
-    .then((r) => r.reviews ?? [])
-    .catch(() => [])
+  return []
 }
