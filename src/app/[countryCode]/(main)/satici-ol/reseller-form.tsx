@@ -1,14 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-
-type SellerContract = {
-  id: string
-  title: string
-  version: number
-  body: string
-  required?: boolean
-}
+import { listSellerContracts, submitApplication } from "@lib/data/reseller"
+import SellerContracts, { SellerContract } from "@modules/common/components/seller-contracts"
 
 /**
  * Bayilik (hizmet ortaklığı) başvuru formu (/satici-ol). Firma formuyla aynı
@@ -38,26 +32,21 @@ export default function ResellerForm() {
     address: "",
     offering: "",
     website: "",
+    taxId: "",
+    taxOffice: "",
   })
   const [dialCode, setDialCode] = useState("+90")
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle")
   // Pazaryeri sözleşmeleri — başvuru öncesi okunup kabul edilmesi gerekir.
   const [contracts, setContracts] = useState<SellerContract[]>([])
   const [accepted, setAccepted] = useState(false)
-  const [viewing, setViewing] = useState<SellerContract | null>(null)
 
   useEffect(() => {
-    const backendUrl =
-      process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-    const publishableKey =
-      process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-    fetch(`${backendUrl}/store/seller-contracts`, {
-      headers: { "x-publishable-api-key": publishableKey },
-    })
-      .then((r) => (r.ok ? r.json() : { contracts: [] }))
-      .then((d) => setContracts(d.contracts || []))
+    listSellerContracts()
+      .then(setContracts)
       .catch(() => setContracts([]))
   }, [])
 
@@ -69,7 +58,8 @@ export default function ResellerForm() {
       !formData.email ||
       !formData.phone ||
       !formData.address ||
-      !formData.offering
+      !formData.offering ||
+      !formData.taxId
     ) {
       alert("Lütfen zorunlu alanları doldurun.")
       return
@@ -83,45 +73,27 @@ export default function ResellerForm() {
 
     setStatus("loading")
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const publishableKey =
-        process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-
-      const composedMessage = [
-        `Adres: ${formData.address.trim()}`,
-        `Satış / Hizmet: ${formData.offering.trim()}`,
-        formData.website.trim()
-          ? `Web sitesi: ${formData.website.trim()}`
-          : null,
-      ]
-        .filter(Boolean)
-        .join("\n")
-
-      const res = await fetch(`${backendUrl}/store/reseller-applications`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": publishableKey,
-        },
-        body: JSON.stringify({
-          company_name: formData.companyName,
-          applicant_name: formData.contactName,
-          email: formData.email,
-          phone: `${dialCode} ${formData.phone.trim()}`,
-          message: composedMessage,
-          // Başvuru anında sözleşmelerin okunup kabul edildiği beyanı + sürümleri.
-          contracts_accepted: contracts.length > 0 ? accepted : undefined,
-          contracts_versions: contracts.map((c) => ({
-            id: c.id,
-            title: c.title,
-            version: c.version,
-          })),
-        }),
+      const res = await submitApplication({
+        kind: "reseller",
+        companyName: formData.companyName,
+        contactName: formData.contactName,
+        email: formData.email,
+        phone: `${dialCode} ${formData.phone.trim()}`,
+        taxId: formData.taxId,
+        taxOffice: formData.taxOffice,
+        city: formData.address,
+        note: [
+          `Adres: ${formData.address.trim()}`,
+          `Satış / Hizmet: ${formData.offering.trim()}`,
+          formData.website.trim() ? `Web sitesi: ${formData.website.trim()}` : null,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        contracts: contracts.length > 0 && accepted ? contracts : [],
       })
-
-      if (!res.ok) {
-        throw new Error("Başvuru gönderilemedi.")
+      if (!res.success) {
+        setErrorMessage(res.error)
+        throw new Error(res.error || "Başvuru gönderilemedi.")
       }
 
       setStatus("success")
@@ -133,6 +105,8 @@ export default function ResellerForm() {
         address: "",
         offering: "",
         website: "",
+        taxId: "",
+        taxOffice: "",
       })
       setDialCode("+90")
     } catch (err) {
@@ -303,86 +277,42 @@ export default function ResellerForm() {
         />
       </div>
 
-      {contracts.length > 0 && (
-        <div className="border border-ui-border-base rounded-lg p-4 bg-ui-bg-subtle">
-          <p className="text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-2">
-            Bayilik Sözleşmeleri <span className="text-brand-500">*</span>
-          </p>
-          <p className="text-xs text-ui-fg-subtle mb-3">
-            Bayi olmak için aşağıdaki sözleşmeleri okuyup onaylamanız
-            gerekmektedir. Başvurunuz onaylandıktan sonra bayilik panelinde, kimlik
-            ve IP bilgilerinizle birlikte bağlayıcı dijital onayınız ayrıca alınır.
-          </p>
-          <ul className="space-y-1.5 mb-3">
-            {contracts.map((c) => (
-              <li key={c.id} className="flex items-center justify-between gap-2">
-                <span className="text-sm text-ui-fg-base">{c.title}</span>
-                <button
-                  type="button"
-                  onClick={() => setViewing(c)}
-                  className="text-xs font-semibold text-brand-600 hover:text-brand-700 underline shrink-0"
-                >
-                  Görüntüle
-                </button>
-              </li>
-            ))}
-          </ul>
-          <label className="flex items-start gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={accepted}
-              disabled={status === "loading"}
-              onChange={(e) => setAccepted(e.target.checked)}
-              className="mt-0.5 h-4 w-4 accent-brand-600"
-            />
-            <span className="text-sm text-ui-fg-base">
-              Yukarıdaki sözleşmeleri okudum, anladım ve kabul ediyorum.
-            </span>
+      <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1.5">
+            Vergi No / TC Kimlik No <span className="text-brand-500">*</span>
           </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            required
+            value={formData.taxId}
+            disabled={status === "loading"}
+            onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
+            placeholder="10 haneli VKN ya da 11 haneli TCKN"
+            className={inputCls}
+          />
         </div>
-      )}
+        <div>
+          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1.5">
+            Vergi Dairesi
+          </label>
+          <input
+            type="text"
+            value={formData.taxOffice}
+            disabled={status === "loading"}
+            onChange={(e) => setFormData({ ...formData, taxOffice: e.target.value })}
+            className={inputCls}
+          />
+        </div>
+      </div>
 
-      {viewing && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClick={() => setViewing(null)}
-        >
-          <div
-            className="bg-ui-bg-base rounded-xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-ui-border-base px-5 py-3">
-              <h4 className="text-sm font-bold text-ui-fg-base pr-4">
-                {viewing.title}{" "}
-                <span className="text-ui-fg-subtle font-normal">
-                  (v{viewing.version})
-                </span>
-              </h4>
-              <button
-                type="button"
-                onClick={() => setViewing(null)}
-                aria-label="Kapat"
-                className="text-ui-fg-subtle hover:text-ui-fg-base text-xl leading-none shrink-0"
-              >
-                ×
-              </button>
-            </div>
-            <div
-              className="overflow-y-auto px-5 py-4 prose prose-sm max-w-none text-sm leading-relaxed [&_h2]:font-bold [&_h2]:mt-4 [&_h2]:mb-1 [&_h3]:font-semibold [&_h3]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_p]:mb-2"
-              dangerouslySetInnerHTML={{ __html: viewing.body }}
-            />
-            <div className="border-t border-ui-border-base px-5 py-3 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setViewing(null)}
-                className="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-5 rounded-lg text-sm"
-              >
-                Kapat
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SellerContracts
+        contracts={contracts}
+        accepted={accepted}
+        setAccepted={setAccepted}
+        disabled={status === "loading"}
+      />
 
       <button
         type="submit"
@@ -419,7 +349,7 @@ export default function ResellerForm() {
 
       {status === "error" && (
         <p className="text-sm text-brand-600 text-center">
-          Başvuru gönderilemedi. Lütfen tekrar deneyin veya bizimle iletişime geçin.
+          {errorMessage || "Başvuru gönderilemedi. Lütfen tekrar deneyin veya bizimle iletişime geçin."}
         </p>
       )}
     </form>

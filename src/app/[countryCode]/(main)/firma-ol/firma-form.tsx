@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { listSellerContracts, submitApplication } from "@lib/data/reseller"
+import SellerContracts, { SellerContract } from "@modules/common/components/seller-contracts"
 
 /**
  * Firma (satıcı) başvuru formu (/firma-ol) — "Firmamız Ol": kendi mağazasında
@@ -31,11 +33,23 @@ export default function FirmaForm() {
     address: "",
     offering: "",
     website: "",
+    taxId: "",
+    taxOffice: "",
   })
   const [dialCode, setDialCode] = useState("+90")
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle")
+
+  const [contracts, setContracts] = useState<SellerContract[]>([])
+  const [accepted, setAccepted] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    listSellerContracts()
+      .then(setContracts)
+      .catch(() => setContracts([]))
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,49 +59,40 @@ export default function FirmaForm() {
       !formData.email ||
       !formData.phone ||
       !formData.address ||
-      !formData.offering
+      !formData.offering ||
+      !formData.taxId
     ) {
       alert("Lütfen zorunlu alanları doldurun.")
+      return
+    }
+    if (!accepted) {
+      alert("Devam etmek için firma sözleşmelerini okuyup onaylamanız gerekmektedir.")
       return
     }
 
     setStatus("loading")
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const publishableKey =
-        process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-
-      // Backend şemasında adres/satış-hizmet/web sitesi alanı yok; message
-      // içinde etiketli satırlar olarak iletilir.
-      const composedMessage = [
-        `Adres: ${formData.address.trim()}`,
-        `Satış / Hizmet: ${formData.offering.trim()}`,
-        formData.website.trim()
-          ? `Web sitesi: ${formData.website.trim()}`
-          : null,
-      ]
-        .filter(Boolean)
-        .join("\n")
-
-      const res = await fetch(`${backendUrl}/store/reseller-applications`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-publishable-api-key": publishableKey,
-        },
-        body: JSON.stringify({
-          company_name: formData.companyName,
-          applicant_name: formData.contactName,
-          email: formData.email,
-          phone: `${dialCode} ${formData.phone.trim()}`,
-          message: composedMessage,
-          application_type: "firma",
-        }),
+      const res = await submitApplication({
+        kind: "company",
+        companyName: formData.companyName,
+        contactName: formData.contactName,
+        email: formData.email,
+        phone: `${dialCode} ${formData.phone.trim()}`,
+        taxId: formData.taxId,
+        taxOffice: formData.taxOffice,
+        city: formData.address,
+        note: [
+          `Adres: ${formData.address.trim()}`,
+          `Satış / Hizmet: ${formData.offering.trim()}`,
+          formData.website.trim() ? `Web sitesi: ${formData.website.trim()}` : null,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        contracts,
       })
-
-      if (!res.ok) {
-        throw new Error("Başvuru gönderilemedi.")
+      if (!res.success) {
+        setErrorMessage(res.error)
+        throw new Error(res.error || "Başvuru gönderilemedi.")
       }
 
       setStatus("success")
@@ -99,6 +104,8 @@ export default function FirmaForm() {
         address: "",
         offering: "",
         website: "",
+        taxId: "",
+        taxOffice: "",
       })
       setDialCode("+90")
     } catch (err) {
@@ -269,6 +276,44 @@ export default function FirmaForm() {
         />
       </div>
 
+      <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1.5">
+            Vergi No / TC Kimlik No <span className="text-brand-500">*</span>
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            required
+            value={formData.taxId}
+            disabled={status === "loading"}
+            onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
+            placeholder="10 haneli VKN ya da 11 haneli TCKN"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1.5">
+            Vergi Dairesi
+          </label>
+          <input
+            type="text"
+            value={formData.taxOffice}
+            disabled={status === "loading"}
+            onChange={(e) => setFormData({ ...formData, taxOffice: e.target.value })}
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      <SellerContracts
+        contracts={contracts}
+        accepted={accepted}
+        setAccepted={setAccepted}
+        disabled={status === "loading"}
+        title="Firma Sözleşmeleri"
+      />
+
       <button
         type="submit"
         disabled={status === "loading"}
@@ -304,8 +349,7 @@ export default function FirmaForm() {
 
       {status === "error" && (
         <p className="text-sm text-brand-600 text-center">
-          Başvuru gönderilemedi. Lütfen tekrar deneyin veya bizimle iletişime
-          geçin.
+          {errorMessage || "Başvuru gönderilemedi. Lütfen tekrar deneyin veya bizimle iletişime geçin."}
         </p>
       )}
     </form>

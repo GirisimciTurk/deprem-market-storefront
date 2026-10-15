@@ -1,7 +1,11 @@
 "use server"
 
-import { sdk } from "@lib/config"
+import { gobitData, gobitFetch } from "@lib/gobit/client"
 import { getAuthHeaders } from "./cookies"
+
+// Bayilik ve firma başvuruları dtm'ye (/store/v1/dtm/storefront-applications)
+// gider; pazaryeri sözleşmeleri /store/v1/dtm/contracts'tan okunur. Başvuru
+// geçerli bir VKN ya da TCKN ister (sağlama ile denetlenir).
 
 export interface MyResellerApplication {
   companyName: string
@@ -13,53 +17,58 @@ export interface MyResellerApplication {
   message?: string
   date: string
   status: "pending" | "approved" | "rejected" | "suspended"
-  // "bayi" (hizmet ortağı) | "firma" (ürün satan mağaza)
   applicationType: "bayi" | "firma"
 }
 
-interface BackendApplication {
-  company_name: string
-  applicant_name: string
-  tax_number?: string
-  email: string
-  phone?: string
-  city?: string
-  message?: string
-  created_at: string
-  status: "pending" | "approved" | "rejected" | "suspended"
-  application_type?: "bayi" | "firma"
+/** Müşterinin kendi başvurusunu okuyan uç dtm'de yok. */
+export const getMyResellerApplication = async (): Promise<MyResellerApplication | null> => null
+
+export type SellerContract = { id: string; title: string; version: number; body: string; required?: boolean }
+
+/** Etkin pazaryeri sözleşmeleri. */
+export async function listSellerContracts(): Promise<SellerContract[]> {
+  return gobitData<SellerContract[]>("/store/v1/dtm/contracts", { next: { revalidate: 300 } }).catch(() => [])
 }
 
-/**
- * Giriş yapmış müşterinin en güncel satıcı başvurusu (gerçek backend verisi,
- * /store/reseller-applications/me). Eskiden localStorage demo'su kullanılıyordu.
- */
-export const getMyResellerApplication = async (): Promise<MyResellerApplication | null> => {
-  const headers = { ...(await getAuthHeaders()) }
-  if (!("authorization" in headers)) return null
-
-  const apps = await sdk.client
-    .fetch<{ applications: BackendApplication[] }>(`/store/reseller-applications/me`, {
-      method: "GET",
-      headers,
-      cache: "no-store",
+/** Bayilik (reseller) ya da firma (company) başvurusu. */
+export async function submitApplication(input: {
+  kind: "reseller" | "company"
+  companyName: string
+  contactName: string
+  email: string
+  phone: string
+  taxId: string
+  taxOffice?: string
+  iban?: string
+  city?: string
+  note?: string
+  contracts: SellerContract[]
+}): Promise<{ success: boolean; error: string | null }> {
+  try {
+    await gobitFetch("/store/v1/dtm/storefront-applications", {
+      method: "POST",
+      headers: await getAuthHeaders(),
+      body: {
+        kind: input.kind,
+        company_name: input.companyName,
+        contact_name: input.contactName,
+        contact_email: input.email,
+        contact_phone: input.phone,
+        tax_id: input.taxId,
+        tax_office: input.taxOffice ?? "",
+        iban: input.iban ?? "",
+        city: input.city ?? "",
+        note: input.note ?? "",
+        contract_accepted: input.contracts.length > 0,
+        contract_version: input.contracts.map((c) => `${c.id}:v${c.version}`).join(","),
+      },
     })
-    .then(({ applications }) => applications || [])
-    .catch(() => [])
-
-  const a = apps[0]
-  if (!a) return null
-
-  return {
-    companyName: a.company_name,
-    contactName: a.applicant_name,
-    taxOfficeNumber: a.tax_number,
-    email: a.email,
-    phone: a.phone || "",
-    city: a.city || "",
-    message: a.message,
-    date: new Date(a.created_at).toLocaleDateString("tr-TR"),
-    status: a.status,
-    applicationType: a.application_type === "firma" ? "firma" : "bayi",
+    return { success: true, error: null }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    return {
+      success: false,
+      error: /tax id/i.test(msg) ? "Vergi numarası ya da TC kimlik numarası geçerli değil." : msg,
+    }
   }
 }

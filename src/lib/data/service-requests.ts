@@ -1,6 +1,8 @@
 "use server"
 
-import { sdk } from "@lib/config"
+import { randomBytes } from "node:crypto"
+import { cookies as nextCookies } from "next/headers"
+import { gobitData, gobitFetch } from "@lib/gobit/client"
 import { getAuthHeaders } from "./cookies"
 
 export type ServiceOfferItem = {
@@ -61,39 +63,113 @@ export type ServicePayment = {
   created_at?: string
 }
 
-/** Giriş yapmış müşterinin kendi hizmet talepleri (takip ekranı için). */
-export async function listMyServiceRequests(): Promise<StoreServiceRequest[]> {
-  const headers = { ...(await getAuthHeaders()) }
-  return sdk.client
-    .fetch<{ service_requests: StoreServiceRequest[] }>(`/store/service-requests`, {
-      method: "GET",
-      headers,
-      cache: "no-store",
-    })
-    .then((r) => r.service_requests ?? [])
-    .catch(() => [])
+// dtm'nin hizmet talepleri (/store/v1/dtm/service-requests). Bir talep onu açan
+// hesaba ya da açılışta verilen anahtara (X-Service-Request-Key) cevap verir;
+// başkasına "yok" der. Anahtarı bu sunucu üretir ve misafir talepler için
+// HttpOnly bir çerezde tutar; hiçbir yanıtta dönmez. dtm teklifi tek fiyatla
+// verir; keşif ücreti, kapora ve bakiyenin çevrimiçi ödemesi dtm'de yok.
+
+const KEYS = "_gobit_service_keys"
+const KEY_HEADER = "X-Service-Request-Key"
+
+type DtmServiceRequest = {
+  id: string
+  kind: string
+  product_title?: string
+  status: string
+  city?: string
+  district?: string
+  detail?: string
+  quote_price?: number | null
+  quote_note?: string
+  created_at: string
+  decided_at?: string | null
 }
 
-/**
- * Müşteri gönderilen teklifi onaylar/reddeder.
- * Yalnız "teklif_gonderildi" durumundaki talepte geçerli (backend doğrular).
- */
+async function keys(): Promise<Record<string, string>> {
+  try {
+    const raw = (await nextCookies()).get(KEYS)?.value
+    return raw ? (JSON.parse(raw) as Record<string, string>) : {}
+  } catch {
+    return {}
+  }
+}
+
+async function rememberKey(id: string, key: string) {
+  try {
+    const kept = Object.entries(await keys()).slice(-19)
+    ;(await nextCookies()).set(KEYS, JSON.stringify(Object.fromEntries([...kept, [id, key]])), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 180,
+    })
+  } catch {
+    /* render bağlamında çerez yazılamaz */
+  }
+}
+
+async function headersFor(id: string): Promise<Record<string, string>> {
+  const key = (await keys())[id]
+
+  return { ...(await getAuthHeaders()), ...(key ? { [KEY_HEADER]: key } : {}) }
+}
+
+const toRequest = (r: DtmServiceRequest): StoreServiceRequest => ({
+  id: r.id,
+  service_title: r.product_title || (r.kind === "discovery" ? "Keşif talebi" : "Hizmet talebi"),
+  service_kind: r.kind,
+  status: r.status,
+  city: r.city,
+  district: r.district,
+  note: r.detail,
+  offer_total: r.quote_price ?? null,
+  offer_items: r.quote_note ? [{ label: r.quote_note }] : null,
+  offer_decision: r.status === "accepted" || r.status === "done" ? "accepted" : r.status === "declined" ? "rejected" : "pending",
+  payment_status: "none",
+  payments: [],
+  created_at: r.created_at,
+})
+
+/** Müşterinin hizmet talepleri: hesabındakiler ve bu tarayıcıda anahtarı olanlar. */
+export async function listMyServiceRequests(): Promise<StoreServiceRequest[]> {
+  const headers = await getAuthHeaders()
+  const own = headers.cookie
+    ? await gobitData<DtmServiceRequest[]>("/store/v1/dtm/service-requests", { headers, cache: "no-store" }).catch(
+        () => [] as DtmServiceRequest[]
+      )
+    : []
+  const seen = new Set(own.map((r) => r.id))
+  const kept = await keys()
+  const guest = await Promise.all(
+    Object.entries(kept)
+      .filter(([id]) => !seen.has(id))
+      .map(([id, key]) =>
+        gobitData<DtmServiceRequest>(`/store/v1/dtm/service-requests/${encodeURIComponent(id)}`, {
+          headers: { [KEY_HEADER]: key },
+          cache: "no-store",
+        }).catch(() => null)
+      )
+  )
+
+  return [...own, ...(guest.filter(Boolean) as DtmServiceRequest[])]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .map(toRequest)
+}
+
+/** Teklifi kabul ya da reddet. */
 export async function decideServiceOffer(
   id: string,
   decision: "accept" | "reject"
 ): Promise<{ success: boolean; error: string | null }> {
-  const headers = { ...(await getAuthHeaders()) }
   try {
-    await sdk.client.fetch(`/store/service-requests/${id}`, {
-      method: "POST",
-      headers,
-      body: { decision },
-    })
+    await gobitFetch(
+      `/store/v1/dtm/service-requests/${encodeURIComponent(id)}/${decision === "accept" ? "accept" : "decline"}`,
+      { method: "POST", headers: await headersFor(id), body: {} }
+    )
     return { success: true, error: null }
   } catch (e) {
-    const msg =
-      typeof e === "object" && e && "message" in e ? String((e as { message: unknown }).message) : String(e)
-    return { success: false, error: msg }
+    return { success: false, error: e instanceof Error ? e.message : String(e) }
   }
 }
 
@@ -112,46 +188,49 @@ export type CreateServiceRequestPayload = {
   preferred_dates?: string[]
 }
 
-/**
- * Müşteri "hizmet verilebilir" bir ürün için montaj/uygulama talebi açar.
- * Giriş yapmışsa auth header ile talep hesabına bağlanır (Hizmet Taleplerim'de görünür);
- * misafir de açabilir. Backend, ürünün gerçekten hizmet verilebilir olduğunu metadata'dan
- * doğrular ve talebi havuza düşürür (otomatik atama yok).
- */
+/** Hizmet ya da keşif talebi açar; anahtarı üretip saklar. */
 export async function createServiceRequest(
   payload: CreateServiceRequestPayload
 ): Promise<{ success: boolean; error: string | null; id?: string }> {
-  const headers = { ...(await getAuthHeaders()) }
+  const accessKey = randomBytes(32).toString("base64url")
+  const extra = [
+    payload.service_title ? `Hizmet: ${payload.service_title}` : "",
+    payload.address ? `Adres: ${payload.address}` : "",
+    payload.preferred_dates?.length ? `Tercih edilen tarihler: ${payload.preferred_dates.join(", ")}` : "",
+    payload.details ? Object.entries(payload.details).map(([k, v]) => `${k}: ${String(v)}`).join("\n") : "",
+    payload.note ?? "",
+  ]
+    .filter(Boolean)
+    .join("\n")
   try {
-    const res = await sdk.client.fetch<{ service_request?: { id?: string } }>(
-      `/store/service-requests`,
-      {
-        method: "POST",
-        headers,
-        body: payload,
-      }
-    )
-    return { success: true, error: null, id: res?.service_request?.id }
+    const out = await gobitData<{ id: string }>("/store/v1/dtm/service-requests", {
+      method: "POST",
+      headers: await getAuthHeaders(),
+      body: {
+        kind: payload.product_id ? "service" : "discovery",
+        product_id: payload.product_id ?? "",
+        customer_name: payload.full_name,
+        customer_email: payload.email,
+        customer_phone: payload.phone ?? "",
+        city: payload.city ?? "",
+        district: payload.district ?? "",
+        detail: extra.slice(0, 2000),
+        access_key: accessKey,
+      },
+    })
+    await rememberKey(out.id, accessKey)
+    return { success: true, error: null, id: out.id }
   } catch (e) {
-    const msg =
-      typeof e === "object" && e && "message" in e ? String((e as { message: unknown }).message) : String(e)
-    return { success: false, error: msg }
+    return { success: false, error: e instanceof Error ? e.message : String(e) }
   }
 }
 
 export type ServiceMedia = { url: string; type?: string }
 
-/**
- * Müşteri "Ürün + Hizmet" talebinin DEĞERLENDİRME YÖNTEMİNİ seçer:
- *  - "media": yüklediği foto/video URL'leriyle → bayiler uzaktan teklif verir
- *  - "survey": yerinde keşif (tercih tarihleri + adres)
- * Talep havuzda kalır; yalnız teklif öncesi (erken) aşamada çağrılabilir.
- * (Medya yüklemesi büyük olabildiği için doğrudan backend'e yapılır; burada yalnız
- *  hazır URL'ler talebe bağlanır — küçük yük.)
- */
+/** Keşif/medya değerlendirme adımı dtm'de yok; talep açıklamasıyla birlikte gelir. */
 export async function setServiceAssessment(
-  id: string,
-  payload: {
+  _id: string,
+  _payload: {
     assessment_mode: "media" | "survey"
     media?: ServiceMedia[]
     preferred_dates?: string[]
@@ -161,17 +240,5 @@ export async function setServiceAssessment(
     note?: string
   }
 ): Promise<{ success: boolean; error: string | null }> {
-  const headers = { ...(await getAuthHeaders()) }
-  try {
-    await sdk.client.fetch(`/store/service-requests/${id}`, {
-      method: "POST",
-      headers,
-      body: payload,
-    })
-    return { success: true, error: null }
-  } catch (e) {
-    const msg =
-      typeof e === "object" && e && "message" in e ? String((e as { message: unknown }).message) : String(e)
-    return { success: false, error: msg }
-  }
+  return { success: false, error: "Değerlendirme bilgisi talebinizle birlikte iletilir; mağaza size teklif gönderecek." }
 }

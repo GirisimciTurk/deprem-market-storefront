@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Send, MessageSquarePlus } from "lucide-react"
+import { sendExpertRequest } from "@lib/data/expert-requests"
 
 const inputCls =
   "w-full border border-ui-border-base rounded-lg px-3.5 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
@@ -40,31 +41,15 @@ export default function ExpertRequestForm({
     setStatus("loading")
     setErrorMsg("")
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-      const res = await fetch(
-        `${backendUrl}/store/experts/${encodeURIComponent(slug)}/requests`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-publishable-api-key": publishableKey,
-          },
-          body: JSON.stringify({
-            customer_name: form.customer_name,
-            customer_phone: form.customer_phone,
-            customer_email: form.customer_email || undefined,
-            city: form.city || undefined,
-            topic: form.topic || undefined,
-            message: form.message || undefined,
-          }),
-        }
-      )
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data?.message || "Talep gönderilemedi.")
-      }
+      const res = await sendExpertRequest(slug, {
+        name: form.customer_name,
+        phone: form.customer_phone,
+        email: form.customer_email || undefined,
+        city: form.city || undefined,
+        topic: form.topic || undefined,
+        message: form.message || undefined,
+      })
+      if (!res.success) throw new Error(res.error || "Talep gönderilemedi.")
       setStatus("success")
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Talep gönderilemedi.")

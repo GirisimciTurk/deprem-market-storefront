@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { createServiceRequest } from "@lib/data/service-requests"
 
 /**
  * Karbon Fiber Kolon Güçlendirme — hizmet vitrini + KEŞİF TALEP formu.
@@ -64,34 +65,26 @@ export default function KarbonFiberClient() {
     }
     setStatus("loading")
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
       const preferred_dates = [date1, date2].filter(Boolean)
-      const res = await fetch(`${backendUrl}/store/service-requests`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-publishable-api-key": pk },
-        body: JSON.stringify({
-          service_kind: "carbon_fiber",
-          service_title: "Karbon Fiber Kolon Güçlendirme",
-          requires_survey: true,
-          full_name: form.full_name,
-          email: form.email,
-          phone: form.phone,
-          city: form.city,
-          district: form.district,
-          address: form.address,
-          note: form.note,
-          details: {
-            kat_sayisi: kat,
-            m2,
-            kolon_sayisi: kolon,
-            tahmini_fiyat_araligi: `${fmt(estimate.low)}–${fmt(estimate.high)} TL`,
-          },
-          preferred_dates,
-        }),
+      const res = await createServiceRequest({
+        service_kind: "carbon_fiber",
+        service_title: "Karbon Fiber Kolon Güçlendirme",
+        full_name: form.full_name,
+        email: form.email,
+        phone: form.phone,
+        city: form.city,
+        district: form.district,
+        address: form.address,
+        note: form.note,
+        details: {
+          kat_sayisi: kat,
+          m2,
+          kolon_sayisi: kolon,
+          tahmini_fiyat_araligi: `${fmt(estimate.low)}–${fmt(estimate.high)} TL`,
+        },
+        preferred_dates,
       })
-      if (!res.ok) throw new Error("Talep gönderilemedi.")
+      if (!res.success) throw new Error(res.error || "Talep gönderilemedi.")
       setStatus("success")
       setForm({ ...emptyForm })
     } catch {
