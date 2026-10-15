@@ -3,6 +3,13 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
 import ResellerForm from "./reseller-form"
 
+// Form, başvuruyu ve sözleşmeleri sunucu eylemleriyle (dtm) yapar.
+const submitApplication = vi.fn()
+vi.mock("@lib/data/reseller", () => ({
+  listSellerContracts: () => Promise.resolve([]),
+  submitApplication: (...args: unknown[]) => submitApplication(...args),
+}))
+
 // Zorunlu alanları doldurur (sade form: alt alta alanlar, ülke kodlu telefon).
 function fillRequiredFields() {
   fireEvent.change(
@@ -30,12 +37,15 @@ function fillRequiredFields() {
     ),
     { target: { value: "Outdoor ve afet ekipmanları kurulum hizmeti." } }
   )
+  fireEvent.change(screen.getByPlaceholderText("10 haneli VKN ya da 11 haneli TCKN"), {
+    target: { value: "10000000146" },
+  })
 }
 
 describe("ResellerForm Component (Bayimiz Olun)", () => {
   beforeEach(() => {
-    // Component backend'e fetch ile POST ediyor (/store/reseller-applications).
     vi.restoreAllMocks()
+    submitApplication.mockReset()
   })
 
   afterEach(() => {
@@ -87,11 +97,8 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
     expect(emailInput.value).toBe("test@sirket.com")
   })
 
-  it("should POST to the backend and show the success screen on success", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => ({}) })
-    vi.stubGlobal("fetch", fetchMock)
+  it("should send the application and show the success screen on success", async () => {
+    submitApplication.mockResolvedValue({ success: true, error: null })
 
     render(<ResellerForm />)
     fillRequiredFields()
@@ -102,32 +109,23 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Gönder/i }))
 
-    // Loading durumuna geçer
     expect(screen.getByText(/Başvuru Alınıyor.../i)).toBeInTheDocument()
-
-    // fetch çözülünce başarı ekranı render olur (async)
     expect(await screen.findByText("Başvurunuz Alındı!")).toBeInTheDocument()
     expect(
       screen.getByText(/Bayilik başvurunuz başarıyla tarafımıza ulaştı./i)
     ).toBeInTheDocument()
 
-    // Backend'e doğru uçtan ve alanlarla POST edildiğini doğrula. (Bileşen mount'ta
-    // ayrıca /store/seller-contracts'i GET eder → çağrılar arasından POST'u bul.)
-    const postCall = fetchMock.mock.calls.find((c: any[]) =>
-      String(c[0]).includes("/store/reseller-applications")
-    )
-    expect(postCall).toBeTruthy()
-    const [url, options] = postCall as any[]
-    expect(String(url)).toContain("/store/reseller-applications")
-    expect(options.method).toBe("POST")
-    const body = JSON.parse(options.body)
-    expect(body.company_name).toBe("Afet Tedarik A.Ş.")
-    expect(body.applicant_name).toBe("Mehmet Yılmaz")
-    expect(body.email).toBe("mehmet@afettedarik.com")
+    expect(submitApplication).toHaveBeenCalledTimes(1)
+    const input = submitApplication.mock.calls[0][0]
+    expect(input.kind).toBe("reseller")
+    expect(input.companyName).toBe("Afet Tedarik A.Ş.")
+    expect(input.contactName).toBe("Mehmet Yılmaz")
+    expect(input.email).toBe("mehmet@afettedarik.com")
     // Telefon, seçili ülke koduyla birlikte gönderilir (varsayılan +90).
-    expect(body.phone).toBe("+90 555 555 5555")
-    // Adres / hizmet / web sitesi message içinde etiketli satırlar olarak gider.
-    expect(body.message).toBe(
+    expect(input.phone).toBe("+90 555 555 5555")
+    expect(input.taxId).toBe("10000000146")
+    // Adres / hizmet / web sitesi not içinde etiketli satırlar olarak gider.
+    expect(input.note).toBe(
       "Adres: Antakya Merkez, Hatay\n" +
         "Satış / Hizmet: Outdoor ve afet ekipmanları kurulum hizmeti.\n" +
         "Web sitesi: www.afettedarik.com"
@@ -135,9 +133,7 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
   })
 
   it("should show the error screen when the request fails", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false })
-    vi.stubGlobal("fetch", fetchMock)
-    // Hata yolundaki console.error testi kirletmesin
+    submitApplication.mockResolvedValue({ success: false, error: "Vergi numarası ya da TC kimlik numarası geçerli değil." })
     vi.spyOn(console, "error").mockImplementation(() => {})
 
     render(<ResellerForm />)
@@ -145,9 +141,8 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Gönder/i }))
 
-    // Başarısız istek sonrası form tekrar görünür olmalı (success ekranına geçmez)
     expect(
-      await screen.findByRole("button", { name: /Gönder/i })
+      await screen.findByText("Vergi numarası ya da TC kimlik numarası geçerli değil.")
     ).toBeInTheDocument()
     expect(screen.queryByText("Başvurunuz Alındı!")).not.toBeInTheDocument()
   })
