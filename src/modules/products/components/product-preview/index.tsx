@@ -61,8 +61,6 @@ export default function ProductPreview({
       : null
 
   const hasFreeShipping = (product.metadata as Record<string, unknown>)?.free_shipping === true
-  // Hizmet verilebilir ürün: kartta "Hizmet" rozeti + ürün sayfasında "Talep Oluştur".
-  const isServiceable = (product.metadata as Record<string, unknown>)?.is_serviceable === true
 
   // Yalnız GERÇEK metadata varsa rank/rating göster (uydurma fallback YOK).
   const rankInfo = (product.metadata as any)?.rank
@@ -132,22 +130,6 @@ export default function ProductPreview({
               }`}
             >
               %{discountPercentage} İndirim
-            </div>
-          )}
-
-          {/* Top-Left: Hizmet (serviceable) Badge — rank/indirim rozetlerinin altına yığılır */}
-          {isServiceable && (
-            <div
-              className={`absolute z-10 left-2 bg-brand-600 text-white font-bold text-[9px] sm:text-[10px] px-2 py-1 rounded-md shadow-md flex items-center gap-x-1 border border-brand-500 ${
-                rankInfo && discountPercentage
-                  ? "top-[4.5rem] sm:top-20"
-                  : rankInfo || discountPercentage
-                  ? "top-10 sm:top-11"
-                  : "top-2"
-              }`}
-            >
-              <span>🛠️</span>
-              <span>Hizmet</span>
             </div>
           )}
 

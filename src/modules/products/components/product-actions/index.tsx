@@ -15,16 +15,11 @@ import { useRouter } from "next/navigation"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { track } from "@lib/util/analytics"
 import InstallmentCargoInfo from "../installment-cargo-info"
-import ServiceRequestButton from "./service-request-button"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   disabled?: boolean
-  // "Hizmet verilebilir" ürünlerde talep formunu ön-doldurmak için (giriş yapmış müşteri).
-  defaultName?: string
-  defaultEmail?: string
-  defaultPhone?: string
 }
 
 const optionsAsKeymap = (
@@ -39,12 +34,8 @@ const optionsAsKeymap = (
 export default function ProductActions({
   product,
   disabled,
-  defaultName,
-  defaultEmail,
-  defaultPhone,
 }: ProductActionsProps) {
   const router = useRouter()
-  const isServiceable = (product.metadata as Record<string, unknown> | null)?.is_serviceable === true
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -284,17 +275,6 @@ export default function ProductActions({
               ? "Tükendi"
               : "Sepete Ekle"}
           </Button>
-        )}
-        {/* Hizmet verilebilir ürün: "Ürün + Hizmet Al" — ürünü sepete ekler ve hizmet
-            talebi açar (havuz). Müşteri hesaptan foto/video yükler ya da keşif ister. */}
-        {isServiceable && (
-          <ServiceRequestButton
-            product={product}
-            defaultName={defaultName}
-            defaultEmail={defaultEmail}
-            defaultPhone={defaultPhone}
-            onAddToCart={handleAddToCart}
-          />
         )}
         <InstallmentCargoInfo price={priceValue / 100} />
         <MobileActions
