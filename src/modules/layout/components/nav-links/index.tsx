@@ -176,6 +176,11 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
           highlight: true,
         },
         {
+          href: "/account/uzman-kartim?rol=uzman",
+          label: t("expertLogin"),
+          desc: t("expertLoginDesc"),
+        },
+        {
           href: "/uygulayici-ol",
           label: t("becomeImplementer"),
           desc: t("becomeImplementerDesc"),

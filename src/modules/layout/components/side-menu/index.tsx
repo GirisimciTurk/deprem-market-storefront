@@ -43,6 +43,7 @@ const MENU_GROUPS: { titleKey: string; items: MobileItem[] }[] = [
     titleKey: "join",
     items: [
       { key: "becomeExpert", href: "/uzman-ol", highlight: true },
+      { key: "expertLogin", href: "/account/uzman-kartim?rol=uzman" },
       { key: "becomeImplementer", href: "/uygulayici-ol", highlight: true },
       { key: "becomeDealer", href: "/satici-ol", highlight: true },
     ],

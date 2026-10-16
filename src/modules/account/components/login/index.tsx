@@ -2,20 +2,32 @@
 
 import React, { useState, useActionState, useTransition } from "react"
 import { login, initiateGoogleLogin } from "@lib/data/customer"
-import { useSearchParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { GOOGLE_RETURN_KEY } from "@lib/util/safe-redirect"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
 }
 
+type Role = "customer" | "expert"
+
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
-  const redirectTo = useSearchParams().get("redirect")
+  const searchParams = useSearchParams()
+  const { countryCode } = useParams<{ countryCode: string }>()
+  // "?rol=uzman" (menüdeki "Uzman Girişi") uzman sekmesini açar. Uzmanlar da
+  // müşteri hesabıyla girer; fark yalnız girişten sonra gidilen sayfa.
+  const [role, setRole] = useState<Role>(
+    searchParams.get("rol") === "uzman" ? "expert" : "customer"
+  )
+  const redirectTo =
+    searchParams.get("redirect") ||
+    (role === "expert" ? `/${countryCode}/account/uzman-kartim` : null)
   const [isPending, startTransition] = useTransition()
   const [googleError, setGoogleError] = useState<string | null>(null)
 
@@ -51,11 +63,42 @@ const Login = ({ setCurrentView }: Props) => {
       className="max-w-sm w-full flex flex-col items-center"
       data-testid="login-page"
     >
+      <div
+        className="w-full grid grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 mb-6"
+        role="tablist"
+        aria-label="Giriş türü"
+      >
+        {(
+          [
+            ["customer", "Müşteri Girişi"],
+            ["expert", "Uzman Girişi"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={role === key}
+            onClick={() => setRole(key)}
+            className={`rounded-md py-2 text-sm font-bold transition-colors ${
+              role === key
+                ? "bg-white text-brand-700 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+            data-testid={`login-role-${key}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <h1 className="text-xl font-extrabold text-gray-900 uppercase tracking-tight mb-2">
-        Tekrar Hoş Geldiniz
+        {role === "expert" ? "Uzman Girişi" : "Tekrar Hoş Geldiniz"}
       </h1>
       <p className="text-center text-sm text-gray-500 mb-6">
-        Gelişmiş bir deprem hazırlık alışveriş deneyimi için oturum açın.
+        {role === "expert"
+          ? "Uzman kartınızı düzenlemek için hesabınızla giriş yapın."
+          : "Gelişmiş bir deprem hazırlık alışveriş deneyimi için oturum açın."}
       </p>
 
       {/* Main Credentials Login Form */}
@@ -146,16 +189,29 @@ const Login = ({ setCurrentView }: Props) => {
         <span>Google ile Giriş Yap</span>
       </button>
 
-      <span className="text-center text-gray-500 text-xs mt-6 select-none">
-        Üye değil misiniz?{" "}
-        <button
-          onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="text-brand-600 font-bold hover:underline"
-          data-testid="register-button"
-        >
-          Kayıt Olun
-        </button>
-      </span>
+      {role === "expert" ? (
+        <span className="text-center text-gray-500 text-xs mt-6 select-none">
+          Uzman kartınız yok mu?{" "}
+          <LocalizedClientLink
+            href="/uzman-ol"
+            className="text-brand-600 font-bold hover:underline"
+            data-testid="expert-apply-link"
+          >
+            Uzman Kartı Açın
+          </LocalizedClientLink>
+        </span>
+      ) : (
+        <span className="text-center text-gray-500 text-xs mt-6 select-none">
+          Üye değil misiniz?{" "}
+          <button
+            onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
+            className="text-brand-600 font-bold hover:underline"
+            data-testid="register-button"
+          >
+            Kayıt Olun
+          </button>
+        </span>
+      )}
 
     </div>
   )

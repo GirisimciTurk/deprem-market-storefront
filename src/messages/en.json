@@ -119,6 +119,8 @@
     "join": "Join the Platform",
     "becomeExpert": "Become an Expert",
     "becomeExpertDesc": "I am a civil engineer",
+    "expertLogin": "Expert Login",
+    "expertLoginDesc": "Edit my expert card",
     "becomeImplementer": "Become a Contractor",
     "becomeImplementerDesc": "I do construction & retrofit work",
     "becomeDealer": "Become a Dealer",

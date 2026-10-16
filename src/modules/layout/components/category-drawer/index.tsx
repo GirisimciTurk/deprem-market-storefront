@@ -41,6 +41,7 @@ const MENU_GROUPS: { titleKey: string; items: NavItem[] }[] = [
     titleKey: "join",
     items: [
       { key: "becomeExpert", href: "/uzman-ol", highlight: true },
+      { key: "expertLogin", href: "/account/uzman-kartim?rol=uzman" },
       { key: "becomeDealer", href: "/satici-ol", highlight: true },
     ],
   },
