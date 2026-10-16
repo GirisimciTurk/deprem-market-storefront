@@ -108,13 +108,8 @@ function RequestCard({ req }: { req: StoreServiceRequest }) {
           <Info key={k} label={prettyKey(k)} value={String(v)} />
         ))}
       </div>
-
-      {req.note && (
-        <div className="text-xs">
-          <span className="text-ui-fg-muted font-semibold">Not: </span>
-          <span className="text-ui-fg-base whitespace-pre-wrap">{req.note}</span>
-        </div>
-      )}
+      {/* `note` gösterilmez: admin panelindeki not alanı aynı sütuna yazar,
+          iç not müşteriye sızmasın. */}
     </div>
   )
 }
