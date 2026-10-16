@@ -1,6 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { normalizeTrPhone, trPhoneProblem } from "@lib/util/tr-phone"
+import PhoneInput from "@modules/common/components/phone-input"
+import CityDistrictSelect from "@modules/common/components/city-district-select"
 
 /**
  * Karbon Fiber Kolon Güçlendirme — hizmet vitrini + GÖRÜŞME TALEP formu.
@@ -45,6 +48,11 @@ export default function KarbonFiberClient() {
       alert("Lütfen ad soyad, e-posta ve telefon alanlarını doldurun.")
       return
     }
+    const phoneProblem = trPhoneProblem(form.phone)
+    if (phoneProblem) {
+      alert(phoneProblem)
+      return
+    }
     setStatus("loading")
     try {
       const backendUrl =
@@ -59,7 +67,7 @@ export default function KarbonFiberClient() {
           requires_survey: false,
           full_name: form.full_name,
           email: form.email,
-          phone: form.phone,
+          phone: normalizeTrPhone(form.phone),
           city: form.city,
           district: form.district,
           address: form.address,
@@ -146,8 +154,8 @@ export default function KarbonFiberClient() {
                 </div>
                 <div>
                   <label className={labelCls}>Telefon <span className="text-brand-500">*</span></label>
-                  <input type="tel" className={inputCls} value={form.phone}
-                    onChange={(e) => set("phone", e.target.value)} placeholder="05xx xxx xx xx" />
+                  <PhoneInput className={inputCls} value={form.phone}
+                    onChange={(v) => set("phone", v)} aria-label="Telefon" />
                 </div>
               </div>
 
@@ -160,10 +168,17 @@ export default function KarbonFiberClient() {
                 <div>
                   <label className={labelCls}>Şehir / İlçe</label>
                   <div className="flex gap-2">
-                    <input className={inputCls} value={form.city}
-                      onChange={(e) => set("city", e.target.value)} placeholder="İl" />
-                    <input className={inputCls} value={form.district}
-                      onChange={(e) => set("district", e.target.value)} placeholder="İlçe" />
+                    <CityDistrictSelect
+                      city={form.city}
+                      district={form.district}
+                      onChange={({ city, district }) =>
+                        setForm((f) => ({ ...f, city, district }))
+                      }
+                      districtOptional
+                      className={inputCls}
+                      cityProps={{ "aria-label": "İl" }}
+                      districtProps={{ "aria-label": "İlçe" }}
+                    />
                   </div>
                 </div>
               </div>

@@ -27,6 +27,14 @@ import {
   uploadExpertFiles,
 } from "@lib/util/expert-upload"
 import { toReachableImageUrl } from "@lib/util/image-url"
+import {
+  formatTrPhone,
+  normalizeTrPhone,
+  trPhoneProblem,
+} from "@lib/util/tr-phone"
+import PhoneInput from "@modules/common/components/phone-input"
+import CityDistrictSelect from "@modules/common/components/city-district-select"
+import ExpertTitleSelect from "@modules/experts/components/title-select"
 
 const inputCls =
   "w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
@@ -46,13 +54,13 @@ export default function ExpertCardEditor({ expert }: { expert: MyExpert }) {
   const [form, setForm] = useState({
     full_name: expert.full_name,
     title: expert.title,
-    phone: expert.phone,
+    phone: formatTrPhone(expert.phone),
     city: expert.city,
     district: expert.district,
     experience_years:
       expert.experience_years != null ? String(expert.experience_years) : "",
     about: expert.about,
-    whatsapp: expert.whatsapp,
+    whatsapp: formatTrPhone(expert.whatsapp),
   })
   const [specs, setSpecs] = useState<string[]>(expert.specializations ?? [])
   const [imoMember, setImoMember] = useState(expert.imo_member)
@@ -82,8 +90,8 @@ export default function ExpertCardEditor({ expert }: { expert: MyExpert }) {
     setSpecs((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     )
-  const updateRegion = (i: number, field: keyof RegionDraft, v: string) =>
-    setRegions((r) => r.map((x, idx) => (idx === i ? { ...x, [field]: v } : x)))
+  const updateRegion = (i: number, next: RegionDraft) =>
+    setRegions((r) => r.map((x, idx) => (idx === i ? next : x)))
 
   const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -144,12 +152,17 @@ export default function ExpertCardEditor({ expert }: { expert: MyExpert }) {
       setNotice({ ok: false, text: invalid })
       return
     }
+    const whatsappProblem = trPhoneProblem(form.whatsapp)
+    if (whatsappProblem) {
+      setNotice({ ok: false, text: `WhatsApp: ${whatsappProblem}` })
+      return
+    }
     setSaving(true)
     setNotice(null)
     const res = await updateMyExpert({
       full_name: form.full_name.trim(),
       title: form.title.trim(),
-      phone: form.phone.trim(),
+      phone: normalizeTrPhone(form.phone),
       city: form.city.trim(),
       district: form.district.trim(),
       specializations: specs,
@@ -159,7 +172,7 @@ export default function ExpertCardEditor({ expert }: { expert: MyExpert }) {
       imo_member: imoMember,
       about: form.about,
       photo_url: photoUrl,
-      whatsapp: form.whatsapp.trim(),
+      whatsapp: normalizeTrPhone(form.whatsapp),
       show_phone: showPhone,
       show_email: showEmail,
       service_regions: cleanRegions(regions),
@@ -244,13 +257,11 @@ export default function ExpertCardEditor({ expert }: { expert: MyExpert }) {
               <label htmlFor="card-title" className={labelCls}>
                 Unvan
               </label>
-              <input
+              <ExpertTitleSelect
                 id="card-title"
-                type="text"
                 disabled={busy}
                 value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="Örn: İnşaat Yüksek Mühendisi"
+                onChange={(title) => setForm({ ...form, title })}
                 className={inputCls}
               />
             </div>
@@ -258,13 +269,11 @@ export default function ExpertCardEditor({ expert }: { expert: MyExpert }) {
               <label htmlFor="card-phone" className={labelCls}>
                 Telefon <span className="text-brand-500">*</span>
               </label>
-              <input
+              <PhoneInput
                 id="card-phone"
-                type="tel"
                 disabled={busy}
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="Örn: 0532 000 0000"
+                onChange={(phone) => setForm({ ...form, phone })}
                 className={inputCls}
               />
             </div>
@@ -283,34 +292,28 @@ export default function ExpertCardEditor({ expert }: { expert: MyExpert }) {
                 Hesabınızın e-postası kullanılır.
               </p>
             </div>
-            <div>
-              <label htmlFor="card-city" className={labelCls}>
-                Ana İl <span className="text-brand-500">*</span>
-              </label>
-              <input
-                id="card-city"
-                type="text"
-                disabled={busy}
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
-                placeholder="Örn: İstanbul"
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label htmlFor="card-district" className={labelCls}>
-                İlçe <span className="text-brand-500">*</span>
-              </label>
-              <input
-                id="card-district"
-                type="text"
-                disabled={busy}
-                value={form.district}
-                onChange={(e) => setForm({ ...form, district: e.target.value })}
-                placeholder="Örn: Kadıköy"
-                className={inputCls}
-              />
-            </div>
+            <CityDistrictSelect
+              city={form.city}
+              district={form.district}
+              onChange={({ city, district }) =>
+                setForm({ ...form, city, district })
+              }
+              disabled={busy}
+              className={inputCls}
+              labelClassName={labelCls}
+              cityLabel={
+                <>
+                  Ana İl <span className="text-brand-500">*</span>
+                </>
+              }
+              districtLabel={
+                <>
+                  İlçe <span className="text-brand-500">*</span>
+                </>
+              }
+              cityProps={{ id: "card-city" }}
+              districtProps={{ id: "card-district" }}
+            />
             <div>
               <label htmlFor="card-experience" className={labelCls}>
                 Deneyim (yıl)
@@ -463,13 +466,11 @@ export default function ExpertCardEditor({ expert }: { expert: MyExpert }) {
               <label htmlFor="card-whatsapp" className={labelCls}>
                 WhatsApp (opsiyonel)
               </label>
-              <input
+              <PhoneInput
                 id="card-whatsapp"
-                type="text"
                 disabled={busy}
                 value={form.whatsapp}
-                onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-                placeholder="Örn: 0532 000 0000"
+                onChange={(whatsapp) => setForm({ ...form, whatsapp })}
                 className={inputCls}
               />
             </div>
@@ -515,23 +516,15 @@ export default function ExpertCardEditor({ expert }: { expert: MyExpert }) {
                 key={i}
                 className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center"
               >
-                <input
-                  type="text"
+                <CityDistrictSelect
+                  city={r.city}
+                  district={r.district}
+                  onChange={(next) => updateRegion(i, next)}
+                  districtOptional
                   disabled={busy}
-                  value={r.city}
-                  onChange={(e) => updateRegion(i, "city", e.target.value)}
-                  placeholder="İl (örn. Kocaeli)"
-                  aria-label={`${i + 1}. bölge ili`}
                   className={inputCls}
-                />
-                <input
-                  type="text"
-                  disabled={busy}
-                  value={r.district}
-                  onChange={(e) => updateRegion(i, "district", e.target.value)}
-                  placeholder="İlçe (opsiyonel)"
-                  aria-label={`${i + 1}. bölge ilçesi`}
-                  className={inputCls}
+                  cityProps={{ "aria-label": `${i + 1}. bölge ili` }}
+                  districtProps={{ "aria-label": `${i + 1}. bölge ilçesi` }}
                 />
                 <button
                   type="button"

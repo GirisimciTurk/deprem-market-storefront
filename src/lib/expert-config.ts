@@ -48,6 +48,23 @@ export function specializationLabel(key: string): string {
   return ALL_SPECIALIZATIONS.find((s) => s.key === key)?.label ?? key
 }
 
+/**
+ * Uzman kartının "Unvan" seçenekleri. Backend unvanı serbest metin olarak
+ * saklar; liste yalnız formdaki seçimdir. "Diğer" seçilince serbest metin
+ * girilir ve o metin gönderilir.
+ */
+export const EXPERT_TITLES: readonly string[] = [
+  "İnşaat Mühendisi",
+  "İnşaat Yüksek Mühendisi",
+  "Dr. İnşaat Mühendisi",
+  "Doç. Dr.",
+  "Prof. Dr.",
+  "Jeoloji Mühendisi",
+  "Jeofizik Mühendisi",
+  "Mimar",
+]
+export const EXPERT_TITLE_OTHER = "Diğer"
+
 export const PROVIDER_LABELS: Record<ProviderType, string> = {
   engineer: "İnşaat Mühendisi",
   implementer: "Uygulayıcı / Yüklenici",

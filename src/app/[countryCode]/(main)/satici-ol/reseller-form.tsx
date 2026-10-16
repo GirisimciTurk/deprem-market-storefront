@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { normalizeTrPhone, trPhoneProblem } from "@lib/util/tr-phone"
+import PhoneInput from "@modules/common/components/phone-input"
 
 type SellerContract = {
   id: string
@@ -12,9 +14,9 @@ type SellerContract = {
 
 /**
  * Bayilik (hizmet ortaklığı) başvuru formu (/satici-ol). Firma formuyla aynı
- * sade yapı: alanlar alt alta, telefon ülke koduyla gönderilir; adres/hizmet/
- * web sitesi backend şemasında ayrı alan olmadığından message içinde etiketli
- * satırlar olarak iletilir. Bayiliğe özgü sözleşme onayı bölümü korunur.
+ * sade yapı: alanlar alt alta, telefon +90'da "05xxxxxxxxx", başka ülkede
+ * ülke koduyla gönderilir; adres/hizmet/web sitesi backend şemasında ayrı alan
+ * olmadığından message içinde etiketli satırlar olarak iletilir. Bayiliğe özgü sözleşme onayı bölümü korunur.
  */
 
 const DIAL_CODES = [
@@ -74,6 +76,12 @@ export default function ResellerForm() {
       alert("Lütfen zorunlu alanları doldurun.")
       return
     }
+    // +90: Türkiye numarası eksiksiz olmalı; kanonik "05xxxxxxxxx" gönderilir.
+    const phoneProblem = dialCode === "+90" ? trPhoneProblem(formData.phone) : ""
+    if (phoneProblem) {
+      alert(phoneProblem)
+      return
+    }
     if (contracts.length > 0 && !accepted) {
       alert(
         "Devam etmek için bayilik sözleşmelerini okuyup onaylamanız gerekmektedir."
@@ -108,7 +116,10 @@ export default function ResellerForm() {
           company_name: formData.companyName,
           applicant_name: formData.contactName,
           email: formData.email,
-          phone: `${dialCode} ${formData.phone.trim()}`,
+          phone:
+            dialCode === "+90"
+              ? normalizeTrPhone(formData.phone)
+              : `${dialCode} ${formData.phone.trim()}`,
           message: composedMessage,
           // Başvuru anında sözleşmelerin okunup kabul edildiği beyanı + sürümleri.
           contracts_accepted: contracts.length > 0 ? accepted : undefined,
@@ -225,17 +236,33 @@ export default function ResellerForm() {
               </option>
             ))}
           </select>
-          <input
-            type="tel"
-            required
-            disabled={status === "loading"}
-            value={formData.phone}
-            onChange={(e) =>
-              setFormData({ ...formData, phone: e.target.value })
-            }
-            placeholder="Örn: 532 000 00 00"
-            className={inputCls}
-          />
+          {dialCode === "+90" ? (
+            <PhoneInput
+              required
+              disabled={status === "loading"}
+              value={formData.phone}
+              onChange={(phone) => setFormData({ ...formData, phone })}
+              aria-label="Telefon numarası"
+              className={inputCls}
+            />
+          ) : (
+            <input
+              type="tel"
+              inputMode="tel"
+              required
+              disabled={status === "loading"}
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  phone: e.target.value.replace(/[^\d ]/g, ""),
+                })
+              }
+              aria-label="Telefon numarası"
+              placeholder="Örn: 151 2345 6789"
+              className={inputCls}
+            />
+          )}
         </div>
       </div>
 

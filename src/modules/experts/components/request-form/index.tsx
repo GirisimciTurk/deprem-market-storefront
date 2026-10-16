@@ -2,6 +2,9 @@
 
 import { useState } from "react"
 import { Send, MessageSquarePlus } from "lucide-react"
+import { normalizeTrPhone, trPhoneProblem } from "@lib/util/tr-phone"
+import PhoneInput from "@modules/common/components/phone-input"
+import CityDistrictSelect from "@modules/common/components/city-district-select"
 
 const inputCls =
   "w-full border border-ui-border-base rounded-lg px-3.5 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
@@ -25,6 +28,7 @@ export default function ExpertRequestForm({
     customer_phone: "",
     customer_email: "",
     city: "",
+    district: "",
     topic: "",
     message: "",
   })
@@ -37,6 +41,13 @@ export default function ExpertRequestForm({
       alert("Lütfen ad soyad ve telefon alanlarını doldurun.")
       return
     }
+    const phoneProblem = trPhoneProblem(form.customer_phone)
+    if (phoneProblem) {
+      alert(phoneProblem)
+      return
+    }
+    // Backend tek "city" alanı alır: "İl / İlçe" ya da yalnız il.
+    const place = form.district ? `${form.city} / ${form.district}` : form.city
     setStatus("loading")
     setErrorMsg("")
     try {
@@ -53,9 +64,9 @@ export default function ExpertRequestForm({
           },
           body: JSON.stringify({
             customer_name: form.customer_name,
-            customer_phone: form.customer_phone,
+            customer_phone: normalizeTrPhone(form.customer_phone),
             customer_email: form.customer_email || undefined,
-            city: form.city || undefined,
+            city: place || undefined,
             topic: form.topic || undefined,
             message: form.message || undefined,
           }),
@@ -119,13 +130,13 @@ export default function ExpertRequestForm({
           placeholder="Ad Soyad *"
           className={inputCls}
         />
-        <input
-          type="tel"
+        <PhoneInput
           required
           disabled={loading}
           value={form.customer_phone}
-          onChange={(e) => setForm({ ...form, customer_phone: e.target.value })}
-          placeholder="Telefon *"
+          onChange={(customer_phone) => setForm({ ...form, customer_phone })}
+          placeholder="Telefon * (0 5xx xxx xx xx)"
+          aria-label="Telefon"
           className={inputCls}
         />
         <input
@@ -136,14 +147,19 @@ export default function ExpertRequestForm({
           placeholder="E-posta (opsiyonel)"
           className={inputCls}
         />
-        <input
-          type="text"
-          disabled={loading}
-          value={form.city}
-          onChange={(e) => setForm({ ...form, city: e.target.value })}
-          placeholder="Şehir / İlçe (opsiyonel)"
-          className={inputCls}
-        />
+        <div className="flex gap-2">
+          <CityDistrictSelect
+            city={form.city}
+            district={form.district}
+            onChange={({ city, district }) => setForm({ ...form, city, district })}
+            districtOptional
+            disabled={loading}
+            className={inputCls}
+            cityPlaceholder="İl (opsiyonel)"
+            cityProps={{ "aria-label": "İl" }}
+            districtProps={{ "aria-label": "İlçe" }}
+          />
+        </div>
       </div>
       <input
         type="text"

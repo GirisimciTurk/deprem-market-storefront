@@ -88,7 +88,7 @@ describe("ExpertCardEditor — Uzman Kartım", () => {
   it("en fazla 3 ek hizmet bölgesi eklenebilir", () => {
     render(<ExpertCardEditor expert={base} />)
     for (let i = 0; i < 3; i++) fireEvent.click(addBtn()!)
-    expect(screen.getAllByPlaceholderText("İl (örn. Kocaeli)")).toHaveLength(3)
+    expect(screen.getAllByLabelText(/bölge ili$/)).toHaveLength(3)
     expect(addBtn()).toBeNull()
     expect(screen.getByText(/En fazla 3 ek bölge/)).toBeInTheDocument()
 
@@ -117,8 +117,8 @@ describe("ExpertCardEditor — Uzman Kartım", () => {
     mockUpdate.mockResolvedValue({ expert: base, error: null })
     render(<ExpertCardEditor expert={base} />)
     fireEvent.click(addBtn()!)
-    fireEvent.change(screen.getByPlaceholderText("İl (örn. Kocaeli)"), {
-      target: { value: " Kocaeli " },
+    fireEvent.change(screen.getByLabelText("1. bölge ili"), {
+      target: { value: "Kocaeli" },
     })
     fireEvent.click(addBtn()!) // boş satır gönderilmez
     fireEvent.click(screen.getByRole("button", { name: /Değişiklikleri Kaydet/ }))
@@ -126,6 +126,7 @@ describe("ExpertCardEditor — Uzman Kartım", () => {
     await waitFor(() => expect(mockUpdate).toHaveBeenCalledTimes(1))
     const body = mockUpdate.mock.calls[0][0]
     expect(body.service_regions).toEqual([{ city: "Kocaeli", district: undefined }])
+    expect(body.phone).toBe("05320000000")
     expect(body.experience_years).toBeNull()
     for (const k of [
       "is_published",
@@ -155,5 +156,62 @@ describe("ExpertCardEditor — Uzman Kartım", () => {
     fireEvent.click(screen.getByRole("button", { name: /Değişiklikleri Kaydet/ }))
     expect(await screen.findByRole("alert")).toHaveTextContent("Geçersiz veri.")
     expect(refresh).not.toHaveBeenCalled()
+  })
+
+  it("eski serbest metin il/ilçe/unvan kaybolmaz, telefonlar normalleşir", async () => {
+    mockUpdate.mockResolvedValue({ expert: base, error: null })
+    render(
+      <ExpertCardEditor
+        expert={{
+          ...base,
+          title: "Harita Mühendisi",
+          phone: "+90 532 000 00 00",
+          whatsapp: "0532-111-22-33",
+          city: "istanbul",
+          district: "kadikoy",
+          service_regions: [{ city: "Kocaeli", district: "Eski Mahalle" }],
+        }}
+      />
+    )
+    expect((screen.getByLabelText(/Ana İl/) as HTMLSelectElement).value).toBe(
+      "istanbul"
+    )
+    expect((screen.getByLabelText(/^İlçe/) as HTMLSelectElement).value).toBe(
+      "kadikoy"
+    )
+    expect((screen.getByLabelText(/^Unvan$/) as HTMLSelectElement).value).toBe(
+      "Diğer"
+    )
+    expect(
+      (screen.getByLabelText("Unvan (diğer)") as HTMLInputElement).value
+    ).toBe("Harita Mühendisi")
+    expect((screen.getByLabelText(/^Telefon\s*\*$/) as HTMLInputElement).value).toBe(
+      "0 532 000 00 00"
+    )
+    expect(
+      (screen.getByLabelText("1. bölge ilçesi") as HTMLSelectElement).value
+    ).toBe("Eski Mahalle")
+
+    fireEvent.click(screen.getByRole("button", { name: /Değişiklikleri Kaydet/ }))
+    await waitFor(() => expect(mockUpdate).toHaveBeenCalledTimes(1))
+    const body = mockUpdate.mock.calls[0][0]
+    expect(body).toMatchObject({
+      title: "Harita Mühendisi",
+      phone: "05320000000",
+      whatsapp: "05321112233",
+      city: "istanbul",
+      district: "kadikoy",
+      service_regions: [{ city: "Kocaeli", district: "Eski Mahalle" }],
+    })
+  })
+
+  it("eksik WhatsApp numarasıyla kaydetmez", async () => {
+    render(<ExpertCardEditor expert={base} />)
+    fireEvent.change(screen.getByLabelText(/WhatsApp/), {
+      target: { value: "0532 11" },
+    })
+    fireEvent.click(screen.getByRole("button", { name: /Değişiklikleri Kaydet/ }))
+    expect(await screen.findByRole("alert")).toHaveTextContent(/WhatsApp/)
+    expect(mockUpdate).not.toHaveBeenCalled()
   })
 })

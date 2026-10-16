@@ -5,6 +5,10 @@ import { useParams, useRouter } from "next/navigation"
 import { ENGINEER_SPECIALIZATIONS } from "@lib/expert-config"
 import { createExpertCard } from "@lib/data/experts"
 import { validateExpertBasics } from "@lib/util/expert-card"
+import { formatTrPhone, normalizeTrPhone } from "@lib/util/tr-phone"
+import PhoneInput from "@modules/common/components/phone-input"
+import CityDistrictSelect from "@modules/common/components/city-district-select"
+import ExpertTitleSelect from "@modules/experts/components/title-select"
 
 const inputCls =
   "w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
@@ -27,7 +31,7 @@ export default function ExpertForm({
   const [form, setForm] = useState({
     full_name: initial.full_name,
     title: "",
-    phone: initial.phone,
+    phone: formatTrPhone(initial.phone),
     city: "",
     district: "",
   })
@@ -55,7 +59,7 @@ export default function ExpertForm({
     const res = await createExpertCard({
       full_name: form.full_name.trim(),
       title: form.title.trim() || undefined,
-      phone: form.phone.trim(),
+      phone: normalizeTrPhone(form.phone),
       city: form.city.trim(),
       district: form.district.trim(),
       specializations: specs,
@@ -91,13 +95,11 @@ export default function ExpertForm({
           <label htmlFor="expert-title" className={labelCls}>
             Unvan
           </label>
-          <input
+          <ExpertTitleSelect
             id="expert-title"
-            type="text"
             disabled={loading}
             value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            placeholder="Örn: İnşaat Yüksek Mühendisi"
+            onChange={(title) => setForm({ ...form, title })}
             className={inputCls}
           />
         </div>
@@ -107,49 +109,38 @@ export default function ExpertForm({
         <label htmlFor="expert-phone" className={labelCls}>
           Telefon <span className="text-brand-500">*</span>
         </label>
-        <input
+        <PhoneInput
           id="expert-phone"
-          type="tel"
           required
           disabled={loading}
           value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          placeholder="Örn: 0532 000 0000"
+          onChange={(phone) => setForm({ ...form, phone })}
           className={inputCls}
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="expert-city" className={labelCls}>
-            İl <span className="text-brand-500">*</span>
-          </label>
-          <input
-            id="expert-city"
-            type="text"
-            required
-            disabled={loading}
-            value={form.city}
-            onChange={(e) => setForm({ ...form, city: e.target.value })}
-            placeholder="Örn: İstanbul"
-            className={inputCls}
-          />
-        </div>
-        <div>
-          <label htmlFor="expert-district" className={labelCls}>
-            İlçe <span className="text-brand-500">*</span>
-          </label>
-          <input
-            id="expert-district"
-            type="text"
-            required
-            disabled={loading}
-            value={form.district}
-            onChange={(e) => setForm({ ...form, district: e.target.value })}
-            placeholder="Örn: Kadıköy"
-            className={inputCls}
-          />
-        </div>
+        <CityDistrictSelect
+          city={form.city}
+          district={form.district}
+          onChange={({ city, district }) => setForm({ ...form, city, district })}
+          required
+          disabled={loading}
+          className={inputCls}
+          labelClassName={labelCls}
+          cityLabel={
+            <>
+              İl <span className="text-brand-500">*</span>
+            </>
+          }
+          districtLabel={
+            <>
+              İlçe <span className="text-brand-500">*</span>
+            </>
+          }
+          cityProps={{ id: "expert-city" }}
+          districtProps={{ id: "expert-district" }}
+        />
       </div>
 
       <div>

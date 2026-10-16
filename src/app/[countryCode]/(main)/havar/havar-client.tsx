@@ -1,6 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { normalizeTrPhone, trPhoneProblem } from "@lib/util/tr-phone"
+import PhoneInput from "@modules/common/components/phone-input"
+import CityDistrictSelect from "@modules/common/components/city-district-select"
 
 type HavarType = "purchase" | "rental"
 
@@ -31,6 +34,11 @@ export default function HavarClient() {
       alert("Lütfen ad soyad, e-posta ve telefon alanlarını doldurun.")
       return
     }
+    const phoneProblem = trPhoneProblem(form.phone)
+    if (phoneProblem) {
+      alert(phoneProblem)
+      return
+    }
     if (!form.ack) {
       alert("Devam etmek için ön ilgi onayını işaretleyin.")
       return
@@ -43,7 +51,11 @@ export default function HavarClient() {
       const res = await fetch(`${backendUrl}/store/havar-requests`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-publishable-api-key": pk },
-        body: JSON.stringify({ type: tab, ...form }),
+        body: JSON.stringify({
+          type: tab,
+          ...form,
+          phone: normalizeTrPhone(form.phone),
+        }),
       })
       if (!res.ok) throw new Error("Talep gönderilemedi.")
       setStatus("success")
@@ -191,16 +203,21 @@ export default function HavarClient() {
                 </div>
                 <div>
                   <label className={labelCls}>Telefon <span className="text-brand-500">*</span></label>
-                  <input type="tel" className={inputCls} value={form.phone}
-                    onChange={(e) => set("phone", e.target.value)} placeholder="05xx xxx xx xx" />
+                  <PhoneInput className={inputCls} value={form.phone}
+                    onChange={(v) => set("phone", v)} aria-label="Telefon" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className={labelCls}>Şehir</label>
-                  <input className={inputCls} value={form.city}
-                    onChange={(e) => set("city", e.target.value)} placeholder="İstanbul" />
+                  <CityDistrictSelect
+                    city={form.city}
+                    onChange={({ city }) => set("city", city)}
+                    withDistrict={false}
+                    className={inputCls}
+                    cityProps={{ "aria-label": "Şehir" }}
+                  />
                 </div>
                 <div>
                   <label className={labelCls}>Kullanım Amacı</label>

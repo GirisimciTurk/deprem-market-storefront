@@ -8,6 +8,7 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { signup } from "@lib/data/customer"
+import { useTrPhoneField } from "@modules/common/components/phone-input"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -16,6 +17,8 @@ type Props = {
 const Register = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(signup as (state: string | null, formData: FormData) => Promise<string | null>, null as string | null)
   const redirectTo = useSearchParams().get("redirect")
+  // Opsiyonel; doluysa eksiksiz cep numarası olmalı (sunucu +905… olarak saklar).
+  const phone = useTrPhoneField("", { mobileOnly: true })
 
   return (
     <div
@@ -61,8 +64,7 @@ const Register = ({ setCurrentView }: Props) => {
           <Input
             label="Telefon"
             name="phone"
-            type="tel"
-            autoComplete="tel"
+            {...phone.inputProps}
             data-testid="phone-input"
           />
           <Input

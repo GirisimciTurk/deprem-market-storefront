@@ -17,11 +17,17 @@ const valid = {
 describe("validateExpertBasics", () => {
   it("geçerli temel bilgiler için null döner", () => {
     expect(validateExpertBasics(valid)).toBeNull()
+    expect(
+      validateExpertBasics({ ...valid, phone: "+90 532 000 00 00" })
+    ).toBeNull()
   })
 
   it("her zorunlu alanın kendi hatası var", () => {
     expect(validateExpertBasics({ ...valid, full_name: " A " })).toMatch(/ad/i)
     expect(validateExpertBasics({ ...valid, phone: "0532 000" })).toMatch(
+      /telefon/i
+    )
+    expect(validateExpertBasics({ ...valid, phone: "0832 000 0000" })).toMatch(
       /telefon/i
     )
     expect(validateExpertBasics({ ...valid, city: "  " })).toMatch(/il ve ilçe/)

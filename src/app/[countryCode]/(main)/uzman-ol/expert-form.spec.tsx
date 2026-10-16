@@ -35,29 +35,61 @@ describe("ExpertForm — kısa 'Uzman ol' formu", () => {
 
   it("yalnız kısa alanları gösterir, ad ve telefon müşteriden dolar", () => {
     const { container } = render(
-      <ExpertForm initial={{ full_name: "Ayşe Yılmaz", phone: "05320000000" }} />
+      <ExpertForm initial={{ full_name: "Ayşe Yılmaz", phone: "+905320000000" }} />
     )
     expect((screen.getByLabelText(/Ad Soyad/) as HTMLInputElement).value).toBe(
       "Ayşe Yılmaz"
     )
+    // Hesaptaki "+90…" numara açılışta biçimlenir.
     expect((screen.getByLabelText(/Telefon/) as HTMLInputElement).value).toBe(
-      "05320000000"
+      "0 532 000 00 00"
     )
-    expect(screen.getByLabelText(/Unvan/)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Unvan/).tagName).toBe("SELECT")
     // Uzun formdan kalanlar (e-posta, bölge, belge, bütçe anketi) artık burada değil:
-    // beş metin alanı + uzmanlık düğmeleri.
+    // iki metin alanı (ad, telefon) + üç seçim (unvan, il, ilçe) + uzmanlık düğmeleri.
     expect(screen.queryByLabelText(/E-Posta/i)).toBeNull()
-    expect(container.querySelectorAll("input")).toHaveLength(5)
+    expect(container.querySelectorAll("input")).toHaveLength(2)
+    expect(container.querySelectorAll("select")).toHaveLength(3)
     expect(container.querySelector("input[type=file]")).toBeNull()
-    expect(container.querySelector("select")).toBeNull()
     expect(container.querySelector("textarea")).toBeNull()
+  })
+
+  it("ilçe listesi seçilen ile göre dolar", () => {
+    render(<ExpertForm initial={{ full_name: "Ayşe Yılmaz", phone: "" }} />)
+    const district = screen.getByLabelText(/^İlçe/) as HTMLSelectElement
+    expect(district).toBeDisabled()
+    fireEvent.change(screen.getByLabelText(/^İl\s*\*$/), {
+      target: { value: "İstanbul" },
+    })
+    expect(district).not.toBeDisabled()
+    expect(Array.from(district.options).map((o) => o.value)).toContain("Kadıköy")
+  })
+
+  it("unvan listeden seçilir, 'Diğer' serbest metin açar", async () => {
+    mockCreate.mockResolvedValue({ expert: { id: "x" } as never, error: null })
+    render(
+      <ExpertForm initial={{ full_name: "Ayşe Yılmaz", phone: "05320000000" }} />
+    )
+    expect(screen.queryByLabelText("Unvan (diğer)")).toBeNull()
+    fireEvent.change(screen.getByLabelText(/Unvan/), {
+      target: { value: "Diğer" },
+    })
+    fireEvent.change(screen.getByLabelText("Unvan (diğer)"), {
+      target: { value: "Harita Mühendisi" },
+    })
+    fill()
+    fireEvent.click(screen.getByRole("button", { name: /Uzman Kartımı Aç/ }))
+    await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1))
+    expect(mockCreate.mock.calls[0][0].title).toBe("Harita Mühendisi")
   })
 
   it("eksik alanla göndermez ve hatayı gösterir", async () => {
     render(<ExpertForm initial={{ full_name: "Ayşe Yılmaz", phone: "0532" }} />)
     fill()
     fireEvent.click(screen.getByRole("button", { name: /Uzman Kartımı Aç/ }))
-    expect(await screen.findByRole("alert")).toHaveTextContent(/telefon/i)
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /telefon numarasını eksiksiz/i
+    )
     expect(mockCreate).not.toHaveBeenCalled()
   })
 
@@ -79,7 +111,7 @@ describe("ExpertForm — kısa 'Uzman ol' formu", () => {
   it("kartı açar ve Uzman Kartım'a götürür (e-posta gövdede yok)", async () => {
     mockCreate.mockResolvedValue({ expert: { id: "x" } as never, error: null })
     render(
-      <ExpertForm initial={{ full_name: " Ayşe Yılmaz ", phone: "05320000000" }} />
+      <ExpertForm initial={{ full_name: " Ayşe Yılmaz ", phone: "0532 000 00 00" }} />
     )
     fill()
     fireEvent.click(screen.getByRole("button", { name: /Uzman Kartımı Aç/ }))

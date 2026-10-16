@@ -15,8 +15,8 @@ function fillRequiredFields() {
   fireEvent.change(screen.getByPlaceholderText("bayi@example.com"), {
     target: { value: "mehmet@afettedarik.com" },
   })
-  fireEvent.change(screen.getByPlaceholderText("Örn: 532 000 00 00"), {
-    target: { value: "555 555 5555" },
+  fireEvent.change(screen.getByLabelText("Telefon numarası"), {
+    target: { value: "532 123 4567" },
   })
   fireEvent.change(
     screen.getByPlaceholderText(
@@ -49,9 +49,10 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
       screen.getByPlaceholderText("Örn: Demir Outdoor Ekipmanları")
     ).toBeInTheDocument()
     expect(screen.getByPlaceholderText("Örn: Hakan Demir")).toBeInTheDocument()
-    expect(
-      screen.getByPlaceholderText("Örn: 532 000 00 00")
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Telefon numarası")).toHaveAttribute(
+      "inputmode",
+      "tel"
+    )
     expect(screen.getByLabelText("Ülke kodu")).toBeInTheDocument()
     expect(screen.getByPlaceholderText("bayi@example.com")).toBeInTheDocument()
     expect(
@@ -124,8 +125,8 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
     expect(body.company_name).toBe("Afet Tedarik A.Ş.")
     expect(body.applicant_name).toBe("Mehmet Yılmaz")
     expect(body.email).toBe("mehmet@afettedarik.com")
-    // Telefon, seçili ülke koduyla birlikte gönderilir (varsayılan +90).
-    expect(body.phone).toBe("+90 555 555 5555")
+    // +90 (varsayılan) seçiliyken telefon kanonik "05xxxxxxxxx" gider.
+    expect(body.phone).toBe("05321234567")
     // Adres / hizmet / web sitesi message içinde etiketli satırlar olarak gider.
     expect(body.message).toBe(
       "Adres: Antakya Merkez, Hatay\n" +
@@ -150,5 +151,57 @@ describe("ResellerForm Component (Bayimiz Olun)", () => {
       await screen.findByRole("button", { name: /Gönder/i })
     ).toBeInTheDocument()
     expect(screen.queryByText("Başvurunuz Alındı!")).not.toBeInTheDocument()
+  })
+
+  it("biçimler: yazılan numara '0 5xx xxx xx xx' olur", () => {
+    render(<ResellerForm />)
+    const phone = screen.getByLabelText("Telefon numarası") as HTMLInputElement
+    fireEvent.change(phone, { target: { value: "5321234567" } })
+    expect(phone.value).toBe("0 532 123 45 67")
+  })
+
+  it("eksik telefonla göndermez, Türkçe ileti verir", () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => ({ contracts: [] }) })
+    vi.stubGlobal("fetch", fetchMock)
+    const alertMock = vi.spyOn(window, "alert").mockImplementation(() => {})
+
+    render(<ResellerForm />)
+    fillRequiredFields()
+    const phone = screen.getByLabelText("Telefon numarası") as HTMLInputElement
+    fireEvent.change(phone, { target: { value: "0532 123" } })
+    expect(phone.validationMessage).toMatch(/eksiksiz/)
+
+    // Yerel doğrulama aşılsa bile gönderim JS kontrolünde durur.
+    fireEvent.submit(phone.form!)
+    expect(alertMock).toHaveBeenCalledWith(expect.stringMatching(/eksiksiz/))
+    expect(
+      fetchMock.mock.calls.some((c: unknown[]) =>
+        String(c[0]).includes("/store/reseller-applications")
+      )
+    ).toBe(false)
+  })
+
+  it("başka ülke kodunda numara kodla birlikte gider", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => ({}) })
+    vi.stubGlobal("fetch", fetchMock)
+
+    render(<ResellerForm />)
+    fillRequiredFields()
+    fireEvent.change(screen.getByLabelText("Ülke kodu"), {
+      target: { value: "+49" },
+    })
+    fireEvent.change(screen.getByLabelText("Telefon numarası"), {
+      target: { value: "151 2345-6789" },
+    })
+    fireEvent.click(screen.getByRole("button", { name: /Gönder/i }))
+    expect(await screen.findByText("Başvurunuz Alındı!")).toBeInTheDocument()
+    const postCall = fetchMock.mock.calls.find((c: unknown[]) =>
+      String(c[0]).includes("/store/reseller-applications")
+    ) as [string, RequestInit]
+    expect(JSON.parse(String(postCall[1].body)).phone).toBe("+49 151 23456789")
   })
 })

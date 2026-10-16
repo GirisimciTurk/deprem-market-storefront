@@ -3,6 +3,7 @@
 import React, { useEffect, useActionState } from "react";
 
 import Input from "@modules/common/components/input"
+import { useTrPhoneField } from "@modules/common/components/phone-input"
 
 import AccountInfo from "../account-info"
 import { HttpTypes } from "@medusajs/types"
@@ -14,6 +15,8 @@ type MyInformationProps = {
 
 const ProfilePhone: React.FC<MyInformationProps> = ({ customer }) => {
   const [successState, setSuccessState] = React.useState(false)
+  // Kayıtlı "+905…" numara "0 5xx xxx xx xx" olarak açılır.
+  const phone = useTrPhoneField(customer.phone, { mobileOnly: true })
 
   const updateCustomerPhone = async (
     _currentState: Record<string, unknown>,
@@ -79,10 +82,8 @@ const ProfilePhone: React.FC<MyInformationProps> = ({ customer }) => {
           <Input
             label="Telefon Numarası"
             name="phone"
-            type="tel"
-            autoComplete="tel"
+            {...phone.inputProps}
             required
-            defaultValue={customer.phone ?? ""}
             data-testid="phone-input"
           />
         </div>

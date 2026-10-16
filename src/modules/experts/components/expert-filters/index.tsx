@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Search, X } from "lucide-react"
 import { ENGINEER_SPECIALIZATIONS } from "@lib/expert-config"
+import CityDistrictSelect from "@modules/common/components/city-district-select"
 
 const inputCls =
   "w-full border border-ui-border-base rounded-lg px-3 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
@@ -47,19 +48,20 @@ export default function ExpertFilters() {
         }}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
       >
-        <input
-          type="text"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          placeholder="İl (örn. İstanbul)"
+        <CityDistrictSelect
+          city={city}
+          district={district}
+          onChange={(next) => {
+            setCity(next.city)
+            setDistrict(next.district)
+            apply(next)
+          }}
+          districtOptional
           className={inputCls}
-        />
-        <input
-          type="text"
-          value={district}
-          onChange={(e) => setDistrict(e.target.value)}
-          placeholder="İlçe (örn. Kadıköy)"
-          className={inputCls}
+          cityPlaceholder="Tüm iller"
+          districtPlaceholder="Tüm ilçeler"
+          cityProps={{ "aria-label": "İl" }}
+          districtProps={{ "aria-label": "İlçe" }}
         />
         <select
           value={specialization}

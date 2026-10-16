@@ -1,13 +1,16 @@
 "use client"
 
 import { useState } from "react"
+import { normalizeTrPhone, trPhoneProblem } from "@lib/util/tr-phone"
+import PhoneInput from "@modules/common/components/phone-input"
 
 /**
  * Firma (satıcı) başvuru formu (/firma-ol) — "Firmamız Ol": kendi mağazasında
  * ÜRÜN satan, hizmeti kendi yürüten firma. Başvuru /store/reseller-applications
  * ucuna application_type:"firma" ile gönderilir; onaylanınca satıcıya dönüşür.
  * Sade hızlı-kayıt formu: alanlar alt alta; e-posta backend'de zorunlu olduğu
- * için formda tutulur. Telefon, seçilen ülke koduyla birlikte gönderilir.
+ * için formda tutulur. Telefon +90 seçiliyken kanonik "05xxxxxxxxx", başka
+ * ülke kodunda kodla birlikte gönderilir.
  */
 
 const DIAL_CODES = [
@@ -50,6 +53,12 @@ export default function FirmaForm() {
       alert("Lütfen zorunlu alanları doldurun.")
       return
     }
+    // +90: Türkiye numarası eksiksiz olmalı; kanonik "05xxxxxxxxx" gönderilir.
+    const phoneProblem = dialCode === "+90" ? trPhoneProblem(formData.phone) : ""
+    if (phoneProblem) {
+      alert(phoneProblem)
+      return
+    }
 
     setStatus("loading")
     try {
@@ -80,7 +89,10 @@ export default function FirmaForm() {
           company_name: formData.companyName,
           applicant_name: formData.contactName,
           email: formData.email,
-          phone: `${dialCode} ${formData.phone.trim()}`,
+          phone:
+            dialCode === "+90"
+              ? normalizeTrPhone(formData.phone)
+              : `${dialCode} ${formData.phone.trim()}`,
           message: composedMessage,
           application_type: "firma",
         }),
@@ -191,17 +203,33 @@ export default function FirmaForm() {
               </option>
             ))}
           </select>
-          <input
-            type="tel"
-            required
-            disabled={status === "loading"}
-            value={formData.phone}
-            onChange={(e) =>
-              setFormData({ ...formData, phone: e.target.value })
-            }
-            placeholder="Örn: 532 000 00 00"
-            className={inputCls}
-          />
+          {dialCode === "+90" ? (
+            <PhoneInput
+              required
+              disabled={status === "loading"}
+              value={formData.phone}
+              onChange={(phone) => setFormData({ ...formData, phone })}
+              aria-label="Telefon numarası"
+              className={inputCls}
+            />
+          ) : (
+            <input
+              type="tel"
+              inputMode="tel"
+              required
+              disabled={status === "loading"}
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  phone: e.target.value.replace(/[^\d ]/g, ""),
+                })
+              }
+              aria-label="Telefon numarası"
+              placeholder="Örn: 151 2345 6789"
+              className={inputCls}
+            />
+          )}
         </div>
       </div>
 

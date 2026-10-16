@@ -1,4 +1,5 @@
 import { EXPERT_REGION_LIMIT } from "@lib/expert-config"
+import { isValidTrPhone, TR_PHONE_INCOMPLETE_MESSAGE } from "@lib/util/tr-phone"
 
 /**
  * Uzman kartı formlarının (kısa "Uzman ol" formu ve Hesabım → Uzman Kartım)
@@ -22,11 +23,11 @@ export function validateExpertBasics(v: ExpertBasics): string | null {
   if (v.full_name.trim().length < 2) {
     return "Lütfen adınızı ve soyadınızı girin."
   }
-  if (v.phone.trim().length < 10) {
-    return "Lütfen geçerli bir telefon numarası girin (en az 10 hane)."
+  if (!isValidTrPhone(v.phone)) {
+    return TR_PHONE_INCOMPLETE_MESSAGE
   }
   if (!v.city.trim() || !v.district.trim()) {
-    return "Lütfen ana konumunuzu (il ve ilçe) girin."
+    return "Lütfen ana konumunuzu (il ve ilçe) seçin."
   }
   if (v.specializations.length === 0) {
     return "Lütfen en az bir uzmanlık alanı seçin."
