@@ -3,20 +3,20 @@
 import { useMemo, useState } from "react"
 
 /**
- * Karbon Fiber Kolon Güçlendirme — hizmet vitrini + KEŞİF TALEP formu.
- * Normal e-ticaretten farklı: "sepete at" yok; müşteri keşif talebi bırakır.
- * Akış: talep → keşif → teklif → onay → tedarik → montaj → kabul.
+ * Karbon Fiber Kolon Güçlendirme — hizmet vitrini + GÖRÜŞME TALEP formu.
+ * Normal e-ticaretten farklı: "sepete at" yok; müşteri talep bırakır, ayrı bir
+ * keşif adımı yoktur: bina incelemesi işin içindedir, fiyat ve iş yüz yüze
+ * görüşmede kararlaştırılır.
+ * Akış: talep → yüz yüze görüşme → anlaşma → tedarik ve uygulama → kabul.
  * Form /store/service-requests'e POST eder (service_kind=carbon_fiber).
  */
 
 const STEPS = [
-  ["1", "Keşif Talebi", "Aşağıdaki formu doldurun; bina ve ihtiyaç bilgilerinizi alalım."],
-  ["2", "Keşif & Ölçüm", "Anlaşmalı bayimiz yerinde inceleme yapar, kolon/statik ölçümü alır."],
-  ["3", "Teklif", "Keşfe göre kalemli, net fiyatlı ve geçerlilik süreli teklif sunulur."],
-  ["4", "Onay & Kapora", "Teklifi onaylarsınız; malzeme tedariki için kapora alınır."],
-  ["5", "Tedarik & Teslim", "Karbon fiber malzeme tedarik edilip sahaya ulaştırılır."],
-  ["6", "Usta Montajı", "Bayi ustası randevulu gelir, güçlendirmeyi uygular."],
-  ["7", "Kabul & Garanti", "İşi onaylarsınız; garanti belgesi ve bakım planı verilir."],
+  ["1", "Talep", "Aşağıdaki formu doldurun; bina ve ihtiyaç bilgilerinizi alalım."],
+  ["2", "Yüz Yüze Görüşme", "Sizi arayıp buluşuyoruz; binanızı birlikte inceliyoruz."],
+  ["3", "Anlaşma", "Malzeme ve uygulama için fiyatı ve takvimi birlikte netleştiriyoruz."],
+  ["4", "Tedarik & Uygulama", "Karbon fiber sahaya gelir, ustamız güçlendirmeyi uygular."],
+  ["5", "Kabul & Garanti", "İşi onaylarsınız; garanti belgesi ve bakım planı verilir."],
 ] as const
 
 const emptyForm = {
@@ -31,19 +31,16 @@ const emptyForm = {
 
 export default function KarbonFiberClient() {
   const [form, setForm] = useState({ ...emptyForm })
-  // Kaba fiyat hesaplayıcı girdileri (keşifte netleşir).
+  // Kaba fiyat hesaplayıcı girdileri (görüşmede netleşir).
   const [kat, setKat] = useState<number>(5)
   const [m2, setM2] = useState<number>(120)
   const [kolon, setKolon] = useState<number>(8)
-  // Tercih edilen keşif tarihleri.
-  const [date1, setDate1] = useState("")
-  const [date2, setDate2] = useState("")
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
 
   const set = (k: keyof typeof form, v: any) => setForm((f) => ({ ...f, [k]: v }))
 
   // Kaba tahmin: kolon başına işçilik+malzeme + m² ek faktör + kat (erişim) çarpanı.
-  // SADECE fikir vermek için; kesin fiyat keşiften sonra teklifte belirlenir.
+  // SADECE fikir vermek için; kesin fiyat yüz yüze görüşmede belirlenir.
   const estimate = useMemo(() => {
     const perKolon = 9000
     const perM2 = 120
@@ -67,14 +64,13 @@ export default function KarbonFiberClient() {
       const backendUrl =
         process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
       const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-      const preferred_dates = [date1, date2].filter(Boolean)
       const res = await fetch(`${backendUrl}/store/service-requests`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-publishable-api-key": pk },
         body: JSON.stringify({
           service_kind: "carbon_fiber",
           service_title: "Karbon Fiber Kolon Güçlendirme",
-          requires_survey: true,
+          requires_survey: false,
           full_name: form.full_name,
           email: form.email,
           phone: form.phone,
@@ -88,7 +84,6 @@ export default function KarbonFiberClient() {
             kolon_sayisi: kolon,
             tahmini_fiyat_araligi: `${fmt(estimate.low)}–${fmt(estimate.high)} TL`,
           },
-          preferred_dates,
         }),
       })
       if (!res.ok) throw new Error("Talep gönderilemedi.")
@@ -109,22 +104,22 @@ export default function KarbonFiberClient() {
       {/* HERO */}
       <div className="rounded-2xl bg-gradient-to-br from-brandblue-700 to-brandblue-900 text-white px-6 sm:px-10 py-10 mb-10">
         <span className="inline-block bg-white/15 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
-          Özel Hizmet · Keşifli Kurulum
+          Özel Hizmet · Malzeme + Uygulama
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold mb-3 max-w-2xl">
           Karbon Fiber Kolon Güçlendirme Sistemleri
         </h1>
         <p className="text-white/85 max-w-2xl text-sm sm:text-base leading-relaxed">
           Binanızın taşıyıcı kolonlarını yüksek mukavemetli karbon fiber ile güçlendiriyoruz.
-          Bu bir <strong>keşifli kurulum hizmetidir</strong>: önce ücretsiz/keşifli inceleme,
-          sonra net teklif, onayınızla malzeme tedariki ve usta montajı. Aşağıdan keşif
-          talebinizi bırakın.
+          Malzemeyi ve uygulamayı birlikte sunuyoruz; ayrı bir keşif ücreti yok, bina
+          incelemesi işin içinde. Formu doldurun; sizi arayalım, binanızı yerinde görüp
+          işi <strong>yüz yüze görüşerek</strong> netleştirelim.
         </p>
       </div>
 
       {/* KURULUM AŞAMALARI */}
       <h2 className="text-xl font-bold mb-4">Nasıl İşliyor? — Kurulum Aşamaları</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-12">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-12">
         {STEPS.map(([no, title, desc]) => (
           <div key={no} className="border border-ui-border-base rounded-xl p-4">
             <div className="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-sm mb-2">
@@ -144,10 +139,10 @@ export default function KarbonFiberClient() {
               <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4 text-3xl">
                 ✓
               </div>
-              <h3 className="text-lg font-bold mb-2">Keşif Talebiniz Alındı!</h3>
+              <h3 className="text-lg font-bold mb-2">Talebiniz Alındı!</h3>
               <p className="text-sm text-ui-fg-subtle max-w-sm">
-                Talebiniz tarafımıza ulaştı. Anlaşmalı bayimiz keşif için en kısa sürede
-                sizinle iletişime geçecek.
+                Talebiniz tarafımıza ulaştı. Yüz yüze görüşme için en kısa sürede sizi
+                arayacağız.
               </p>
               <button
                 onClick={() => setStatus("idle")}
@@ -158,7 +153,7 @@ export default function KarbonFiberClient() {
             </div>
           ) : (
             <form onSubmit={submit} className="space-y-4 border border-ui-border-base rounded-xl p-5 sm:p-6">
-              <h2 className="text-lg font-bold">Keşif Talep Formu</h2>
+              <h2 className="text-lg font-bold">Görüşme Talep Formu</h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -193,7 +188,7 @@ export default function KarbonFiberClient() {
               <div>
                 <label className={labelCls}>Adres</label>
                 <input className={inputCls} value={form.address}
-                  onChange={(e) => set("address", e.target.value)} placeholder="Bina adresi (keşif için)" />
+                  onChange={(e) => set("address", e.target.value)} placeholder="Bina adresi" />
               </div>
 
               {/* Bina bilgileri = hesaplayıcı girdileri */}
@@ -215,20 +210,6 @@ export default function KarbonFiberClient() {
                 </div>
               </div>
 
-              {/* Tarih seçici */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Tercih Edilen Keşif Tarihi 1</label>
-                  <input type="date" className={inputCls} value={date1}
-                    onChange={(e) => setDate1(e.target.value)} />
-                </div>
-                <div>
-                  <label className={labelCls}>Tercih Edilen Keşif Tarihi 2</label>
-                  <input type="date" className={inputCls} value={date2}
-                    onChange={(e) => setDate2(e.target.value)} />
-                </div>
-              </div>
-
               <div>
                 <label className={labelCls}>Ek Bilgi / Not</label>
                 <textarea rows={3} className={`${inputCls} resize-none`} value={form.note}
@@ -238,7 +219,7 @@ export default function KarbonFiberClient() {
 
               <button type="submit" disabled={status === "loading"}
                 className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg text-sm transition-colors">
-                {status === "loading" ? "Gönderiliyor..." : "Keşif Talebini Gönder"}
+                {status === "loading" ? "Gönderiliyor..." : "Talebi Gönder"}
               </button>
               {status === "error" && (
                 <p className="text-sm text-red-600 text-center">Talep gönderilemedi. Lütfen tekrar deneyin.</p>
@@ -253,7 +234,7 @@ export default function KarbonFiberClient() {
             <h3 className="font-bold text-sm mb-1 text-brand-700">Kaba Fiyat Tahmini</h3>
             <p className="text-xs text-ui-fg-subtle mb-3">
               Soldaki kat / m² / kolon bilgilerine göre <strong>yaklaşık</strong> aralık.
-              Kesin fiyat keşiften sonra teklifte belirlenir.
+              Kesin fiyat yüz yüze görüşmede belirlenir.
             </p>
             <div className="text-2xl font-extrabold text-brand-700">
               {fmt(estimate.low)} – {fmt(estimate.high)} ₺
@@ -268,7 +249,7 @@ export default function KarbonFiberClient() {
               <li>Çeliğe göre çok daha hafif, yüksek mukavemet</li>
               <li>Kolon kesitini büyütmeden güçlendirme</li>
               <li>Hızlı uygulama, az toz/molozsuz işçilik</li>
-              <li>Anlaşmalı bayi + usta montaj garantisi</li>
+              <li>Malzeme ve uygulama tek elden, garantili</li>
             </ul>
           </div>
         </aside>
