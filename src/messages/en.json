@@ -146,7 +146,7 @@
     "searching": "Thinking...",
     "resultsTitle": "Recommended Products ({count})",
     "surveyTitle": "An expert inspection is recommended for your building",
-    "surveyCta": "Strengthening & Inspection Service",
+    "surveyCta": "Carbon Fiber Strengthening",
     "disclaimer": "These answers are general information only. Structural safety can only be determined by a licensed civil engineer's on-site assessment.",
     "suggestedQty": "Suggested qty: {qty}",
     "addAll": "Add All to Cart",
@@ -183,7 +183,7 @@
     "addError": "Some items couldn't be added to the cart, please try again.",
     "suggestedQty": "Suggested qty: {qty}",
     "surveyTitle": "An expert survey is recommended for your building",
-    "surveyCta": "Strengthening & Survey Service",
+    "surveyCta": "Carbon Fiber Strengthening",
     "disclaimer": "AI assistant; building safety can only be determined by a licensed engineer's on-site survey.",
     "suggestions": {
       "kit": "Recommend a preparedness kit",

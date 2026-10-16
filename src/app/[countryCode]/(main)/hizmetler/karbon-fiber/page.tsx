@@ -2,9 +2,9 @@ import { Metadata } from "next"
 import KarbonFiberClient from "./karbon-fiber-client"
 
 export const metadata: Metadata = {
-  title: "Karbon Fiber Kolon Güçlendirme — Keşifli Kurulum | depremTek",
+  title: "Karbon Fiber Kolon Güçlendirme — Malzeme ve Uygulama | depremTek",
   description:
-    "Binanızın taşıyıcı kolonlarını karbon fiber ile güçlendirin. Keşif → teklif → onay → usta montajı. Kaba fiyat tahmini alın, keşif talebinizi bırakın.",
+    "Binanızın taşıyıcı kolonlarını karbon fiber ile güçlendirin. Malzeme ve uygulama birlikte; fiyat yüz yüze görüşmede netleşir. Kaba fiyat tahmini alın, talebinizi bırakın.",
 }
 
 export default function KarbonFiberPage() {

@@ -102,7 +102,7 @@ export default function HizmetAlClient({
               <ServiceLink
                 href="/hizmetler/karbon-fiber"
                 title="Karbon Fiber Kolon Güçlendirme"
-                desc="Keşif talebi bırakın: keşif → teklif → onay → montaj akışı."
+                desc="Talebinizi bırakın; sizi arayıp yüz yüze görüşelim, malzeme ve uygulamada anlaşalım."
               />
               <ServiceLink
                 href="/uzman-paketleri"

@@ -146,7 +146,7 @@
     "searching": "Yanıtlıyor...",
     "resultsTitle": "Önerilen Ürünler ({count})",
     "surveyTitle": "Yapınız için uzman keşfi önerilir",
-    "surveyCta": "Güçlendirme & Keşif Hizmeti",
+    "surveyCta": "Karbon Fiber Güçlendirme",
     "disclaimer": "Bu yanıtlar genel bilgilendirme amaçlıdır. Bina/yapı güvenliği ancak ruhsatlı bir inşaat mühendisinin yerinde değerlendirmesiyle belirlenebilir.",
     "suggestedQty": "Önerilen adet: {qty}",
     "addAll": "Tümünü Sepete Ekle",
@@ -183,7 +183,7 @@
     "addError": "Bazı ürünler sepete eklenemedi, lütfen tekrar deneyin.",
     "suggestedQty": "Önerilen adet: {qty}",
     "surveyTitle": "Yapınız için uzman keşfi önerilir",
-    "surveyCta": "Güçlendirme & Keşif Hizmeti",
+    "surveyCta": "Karbon Fiber Güçlendirme",
     "disclaimer": "Yapay zekâ yardımcısı; bina güvenliği ancak ruhsatlı mühendis keşfiyle belirlenir.",
     "suggestions": {
       "kit": "Bana hazırlık seti öner",
