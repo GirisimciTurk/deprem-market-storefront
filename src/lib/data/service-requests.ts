@@ -18,11 +18,6 @@ export type StoreServiceRequest = {
   service_title?: string
   service_kind: string
   requires_survey?: boolean
-  // Havuz/teklif akışı (Ürün + Hizmet'ten açılan talepler). Değerlendirme seçimi
-  // yalnız bu taleplerde gösterilir.
-  is_bidding?: boolean
-  // Değerlendirme yöntemi: pending (henüz seçilmedi) | media (foto/video) | survey (keşif)
-  assessment_mode?: "pending" | "media" | "survey"
   media?: { url: string; type?: string }[] | null
   status: string
   city?: string
@@ -223,22 +218,4 @@ export async function createServiceRequest(
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : String(e) }
   }
-}
-
-export type ServiceMedia = { url: string; type?: string }
-
-/** Keşif/medya değerlendirme adımı dtm'de yok; talep açıklamasıyla birlikte gelir. */
-export async function setServiceAssessment(
-  _id: string,
-  _payload: {
-    assessment_mode: "media" | "survey"
-    media?: ServiceMedia[]
-    preferred_dates?: string[]
-    city?: string
-    district?: string
-    address?: string
-    note?: string
-  }
-): Promise<{ success: boolean; error: string | null }> {
-  return { success: false, error: "Değerlendirme bilgisi talebinizle birlikte iletilir; mağaza size teklif gönderecek." }
 }
