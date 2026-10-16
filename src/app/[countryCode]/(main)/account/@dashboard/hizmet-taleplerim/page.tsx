@@ -5,7 +5,7 @@ import ServiceRequestsList from "@modules/account/components/service-requests"
 
 export const metadata: Metadata = {
   title: "Hizmet Taleplerim",
-  description: "Keşifli kurulum hizmet taleplerinizin durumunu takip edin ve teklifleri onaylayın.",
+  description: "Hizmet taleplerinizi ve durumlarını görün.",
 }
 
 export default async function ServiceRequestsPage() {
@@ -18,8 +18,8 @@ export default async function ServiceRequestsPage() {
           🏗️ Hizmet Taleplerim
         </h1>
         <p className="text-xs text-ui-fg-muted mt-1">
-          Karbon fiber güçlendirme, panik odası ve diğer keşifli kurulum talepleriniz: süreci takip edin,
-          size sunulan teklifi onaylayın.
+          Karbon fiber güçlendirme, panik odası ve diğer hizmet talepleriniz. Talepleriniz telefonla ve yüz
+          yüze görüşülerek yürütülür; ekibimiz sizi arar.
         </p>
       </div>
 
