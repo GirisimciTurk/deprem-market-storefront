@@ -38,6 +38,7 @@ export type CreateServiceRequestPayload = {
   product_id?: string
   service_title?: string
   service_kind?: string
+  requires_survey?: boolean
   full_name: string
   email: string
   phone?: string

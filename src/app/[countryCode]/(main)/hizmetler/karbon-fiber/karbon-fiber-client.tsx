@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { createServiceRequest } from "@lib/data/service-requests"
 import { normalizeTrPhone, trPhoneProblem } from "@lib/util/tr-phone"
 import PhoneInput from "@modules/common/components/phone-input"
 import CityDistrictSelect from "@modules/common/components/city-district-select"
@@ -55,29 +56,24 @@ export default function KarbonFiberClient() {
     }
     setStatus("loading")
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-      const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-      const res = await fetch(`${backendUrl}/store/service-requests`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-publishable-api-key": pk },
-        body: JSON.stringify({
-          service_kind: "carbon_fiber",
-          service_title: "Karbon Fiber Kolon Güçlendirme",
-          requires_survey: false,
-          full_name: form.full_name,
-          email: form.email,
-          phone: normalizeTrPhone(form.phone),
-          city: form.city,
-          district: form.district,
-          address: form.address,
-          note: form.note,
-          details: Object.fromEntries(
-            Object.entries({ kat_sayisi: kat, m2, kolon_sayisi: kolon }).filter(([, v]) => v !== "")
-          ),
-        }),
+      // Sunucu eylemi oturum çerezini taşır: giriş yapmış müşterinin talebi
+      // hesabına bağlanır ve Hizmet Taleplerim'de görünür.
+      const res = await createServiceRequest({
+        service_kind: "carbon_fiber",
+        service_title: "Karbon Fiber Kolon Güçlendirme",
+        requires_survey: false,
+        full_name: form.full_name,
+        email: form.email,
+        phone: normalizeTrPhone(form.phone),
+        city: form.city,
+        district: form.district,
+        address: form.address,
+        note: form.note,
+        details: Object.fromEntries(
+          Object.entries({ kat_sayisi: kat, m2, kolon_sayisi: kolon }).filter(([, v]) => v !== "")
+        ),
       })
-      if (!res.ok) throw new Error("Talep gönderilemedi.")
+      if (!res.success) throw new Error(res.error || "Talep gönderilemedi.")
       setStatus("success")
       setForm({ ...emptyForm })
     } catch {
