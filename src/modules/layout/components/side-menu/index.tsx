@@ -45,7 +45,6 @@ const MENU_GROUPS: { titleKey: string; items: MobileItem[] }[] = [
       { key: "becomeExpert", href: "/uzman-ol", highlight: true },
       { key: "becomeImplementer", href: "/uygulayici-ol", highlight: true },
       { key: "becomeDealer", href: "/satici-ol", highlight: true },
-      { key: "packages", href: "/uzman-paketleri" },
     ],
   },
 ]

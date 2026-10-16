@@ -187,11 +187,6 @@ export default function NavLinks({ countryCode }: { countryCode: string }) {
           desc: t("becomeDealerDesc"),
           highlight: true,
         },
-        {
-          href: "/uzman-paketleri",
-          label: t("packages"),
-          desc: t("packagesDesc"),
-        },
       ],
     },
   ]

@@ -62,12 +62,12 @@ const EXPERT_FAQS: FaqItem[] = [
   {
     question: "Hizmet bölgemi nasıl belirlerim?",
     answer:
-      "Hizmet bölgenizi siz seçersiniz, biz dayatmayız. Ana konum (büro/oturduğunuz il + ilçe) zorunludur; dilerseniz ek bölgeler ekleyebilirsiniz. Kapsayabileceğiniz bölge sayısı üyelik paketinize bağlı olacaktır.",
+      "Hizmet bölgenizi siz seçersiniz, biz dayatmayız. Ana konum (büro/oturduğunuz il + ilçe) zorunludur; dilerseniz en fazla 3 ek il/ilçe ekleyebilirsiniz. Bu sınır her uzman için aynıdır.",
   },
   {
-    question: "Üyelik ücreti veya komisyon var mı?",
+    question: "Uzman olmak ücretli mi, komisyon var mı?",
     answer:
-      "Şu an ön kayıt tamamen ücretsizdir. İleride dizinde yer almak için katmanlı bir üyelik planlanıyor (Temel: listede yer al · Üst: öne çık, daha geniş kapsam). Platform işlemin/sözleşmenin içine girmez; komisyon, escrow veya ödeme aracılığı YOKTUR. Tek gelir kalemi uzman üyeliğidir.",
+      "Hayır. Uzman dizininde yer almak ücretsizdir; üyelik paketi yoktur. Platform işlemin/sözleşmenin içine girmez; komisyon, escrow veya ödeme aracılığı YOKTUR.",
   },
   {
     question: "Müşteriyle iletişim nasıl olacak, telefonum herkese mi açık?",

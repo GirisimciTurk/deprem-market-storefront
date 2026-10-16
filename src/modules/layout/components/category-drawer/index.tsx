@@ -42,7 +42,6 @@ const MENU_GROUPS: { titleKey: string; items: NavItem[] }[] = [
     items: [
       { key: "becomeExpert", href: "/uzman-ol", highlight: true },
       { key: "becomeDealer", href: "/satici-ol", highlight: true },
-      { key: "packages", href: "/uzman-paketleri" },
     ],
   },
 ]

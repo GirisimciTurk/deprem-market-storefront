@@ -31,11 +31,6 @@ export default function HizmetAlClient() {
             title="Uzman / Mühendis Bul"
             desc="Doğrulanmış inşaat mühendislerini inceleyin, iletişime geçin."
           />
-          <ServiceLink
-            href="/uzman-paketleri"
-            title="Uzman Paketleri"
-            desc="Hazır mühendislik hizmet paketlerini görüntüleyin."
-          />
         </ul>
       </div>
     </div>

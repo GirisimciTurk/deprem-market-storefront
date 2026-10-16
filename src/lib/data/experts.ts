@@ -18,8 +18,6 @@ export interface Expert {
   photo_url: string
   verified: boolean
   document_count: number
-  membership_tier: "none" | "basic" | "premium"
-  featured: boolean
   phone: string
   email: string
   whatsapp: string
@@ -88,8 +86,6 @@ export const toExpert = (e: DtmExpert): Expert =>
     photo_url: e.photo_url,
     verified: e.verified,
     document_count: 0,
-    membership_tier: "none",
-    featured: false,
     phone: e.contact_hidden ? "" : e.phone,
     email: e.contact_hidden ? "" : e.email,
     whatsapp: e.contact_hidden ? "" : e.whatsapp,

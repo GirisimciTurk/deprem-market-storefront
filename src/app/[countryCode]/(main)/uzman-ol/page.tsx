@@ -85,9 +85,9 @@ const FAQS: FaqItem[] = [
       "Onay sürecinde diploma, oda (İMO) kaydı ve ilgili lisans/sertifikalarınızı isteriz. Profiliniz, belgeleriniz elle incelenip onaylanmadan halka görünmez — dizinin güveni buna bağlı.",
   },
   {
-    question: "Üyelik ücreti var mı?",
+    question: "Uzman olmak ücretli mi?",
     answer:
-      "Şu an ön kayıt tamamen ücretsizdir. İleride dizinde yer almak ve öne çıkmak için katmanlı bir üyelik planlanıyor; detaylar netleştiğinde sizinle paylaşılacak. İşlem/komisyon altyapısı yoktur, platform sözleşmenin içine girmez.",
+      "Hayır. Dizinde yer almak ücretsizdir; üyelik paketi ya da komisyon yoktur. Platform sizinle müşteri arasındaki sözleşmenin içine girmez.",
   },
   {
     question: "Müşteriyle iletişim nasıl olacak?",
