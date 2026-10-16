@@ -1,6 +1,7 @@
 "use server"
 
 import { gobitData, gobitFetch } from "@lib/gobit/client"
+import { headers as nextHeaders } from "next/headers"
 import { getAuthHeaders } from "./cookies"
 
 // Bayilik ve firma başvuruları dtm'ye (/store/v1/dtm/storefront-applications)
@@ -44,10 +45,19 @@ export async function submitApplication(input: {
   note?: string
   contracts: SellerContract[]
 }): Promise<{ success: boolean; error: string | null }> {
+  // Sözleşme kabulünün kanıtı ziyaretçinin adresi ve tarayıcısıdır: bu sunucu
+  // isteği vekil olarak ilettiği için onları gobit'e geçirir (gobit güvendiği
+  // vekil sayısına göre X-Forwarded-For'dan okur).
+  const h = await nextHeaders()
+  const forwarded = [h.get("x-forwarded-for"), h.get("x-real-ip")].filter(Boolean).join(", ")
   try {
     await gobitFetch("/store/v1/dtm/storefront-applications", {
       method: "POST",
-      headers: await getAuthHeaders(),
+      headers: {
+        ...(await getAuthHeaders()),
+        ...(forwarded ? { "X-Forwarded-For": forwarded } : {}),
+        "User-Agent": h.get("user-agent") ?? "",
+      },
       body: {
         kind: input.kind,
         company_name: input.companyName,
