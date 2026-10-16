@@ -42,17 +42,17 @@ const SHOPPING_FAQS: FaqItem[] = [
   },
 ]
 
-// 2) Uzman (İnşaat Mühendisi) Olmak — PDF: Hizmet/Uzman Dizini, doğrulama, üyelik
+// 2) Uzman (İnşaat Mühendisi) Olmak — Uzman Dizini, uzman kartı, doğrulama
 const EXPERT_FAQS: FaqItem[] = [
   {
     question: "İnşaat mühendisi olarak platforma nasıl katılırım?",
     answer:
-      "“Uzman Ol” sayfasındaki ön kayıt formunu doldurmanız yeterli. Uzmanlık alanlarınızı, hizmet bölgenizi ve iletişim bilgilerinizi belirtirsiniz. Bu, doğrulanmış uzman dizinimize ilk adımdır; ücretsiz ve taahhütsüzdür.",
+      "depremTek Market hesabınızla giriş yapıp “Uzman Ol” sayfasındaki kısa formu doldurmanız yeterli. Uzman kartınız hemen açılır; fotoğraf, hakkında yazısı, hizmet bölgeleri, iletişim tercihleri ve doğrulama belgelerinizi Hesabım → Uzman Kartım sayfasından eklersiniz. Kart açmak ücretsizdir.",
   },
   {
     question: "Profilim doğrulama olmadan yayınlanır mı?",
     answer:
-      "Hayır. Süreç şöyle işler: Ön Kayıt → Belge (diploma, oda/İMO kaydı, ilgili lisanslar) → İnceleme (ekibimizce elle) → Onay → Yayın. Bir profil onaylanana kadar halka GÖRÜNMEZ. Tek bir eksik/sahte profil tüm dizinin güvenini bozacağı için doğrulama platformun kalbidir.",
+      "Hayır. Süreç şöyle işler: Uzman Kartı → Belge (diploma, oda/İMO kaydı, ilgili lisanslar) → İnceleme (ekibimizce elle) → Doğrulama ve Yayın. Bir kart doğrulanana kadar halka GÖRÜNMEZ. Tek bir eksik/sahte profil tüm dizinin güvenini bozacağı için doğrulama platformun kalbidir.",
   },
   {
     question: "Hangi uzmanlık alanları var, birden fazla seçebilir miyim?",
@@ -62,12 +62,12 @@ const EXPERT_FAQS: FaqItem[] = [
   {
     question: "Hizmet bölgemi nasıl belirlerim?",
     answer:
-      "Hizmet bölgenizi siz seçersiniz, biz dayatmayız. Ana konum (büro/oturduğunuz il + ilçe) zorunludur; dilerseniz ek bölgeler ekleyebilirsiniz. Kapsayabileceğiniz bölge sayısı üyelik paketinize bağlı olacaktır.",
+      "Hizmet bölgenizi siz seçersiniz, biz dayatmayız. Ana konum (büro/oturduğunuz il + ilçe) zorunludur; dilerseniz en fazla 3 ek il/ilçe ekleyebilirsiniz. Bu sınır her uzman için aynıdır.",
   },
   {
     question: "Üyelik ücreti veya komisyon var mı?",
     answer:
-      "Şu an ön kayıt tamamen ücretsizdir. İleride dizinde yer almak için katmanlı bir üyelik planlanıyor (Temel: listede yer al · Üst: öne çık, daha geniş kapsam). Platform işlemin/sözleşmenin içine girmez; komisyon, escrow veya ödeme aracılığı YOKTUR. Tek gelir kalemi uzman üyeliğidir.",
+      "Hayır. Uzman kartı açmak ve dizinde yer almak ücretsizdir; üyelik paketi yoktur. Platform işlemin/sözleşmenin içine girmez; komisyon, escrow veya ödeme aracılığı YOKTUR.",
   },
   {
     question: "Müşteriyle iletişim nasıl olacak, telefonum herkese mi açık?",
@@ -209,9 +209,9 @@ export default async function SikcaSorulanSorularPage() {
       <div id="uzman" className="scroll-mt-24">
         <FaqSection
           title="Uzman (Mühendis) Olmak"
-          description="Doğrulanmış uzman dizinine katılım, belge doğrulama ve üyelik süreci."
+          description="Doğrulanmış uzman dizinine katılım, uzman kartı ve belge doğrulama süreci."
           items={EXPERT_FAQS}
-          cta={{ href: "/uzman-ol", label: "Uzman Ön Kaydı Yap" }}
+          cta={{ href: "/uzman-ol", label: "Uzman Kartı Aç" }}
         />
       </div>
 

@@ -1,5 +1,8 @@
 import { Metadata } from "next"
+import { redirect } from "next/navigation"
 import { getLocale } from "next-intl/server"
+import { retrieveCustomer } from "@lib/data/customer"
+import { getMyExpert } from "@lib/data/experts"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import FaqAccordion, {
   type FaqItem,
@@ -9,29 +12,29 @@ import ExpertForm from "./expert-form"
 export const metadata: Metadata = {
   title: "Uzman Ağına Katıl — Doğrulanmış Mühendis Dizini | depremTek Market",
   description:
-    "İnşaat mühendisleri için doğrulanmış uzman dizinine ön kayıt. Bina risk tespiti, güçlendirme, statik proje ve daha fazlasında halkla buluşun.",
+    "İnşaat mühendisleri için doğrulanmış uzman dizini: uzman kartınızı açın, doğrulandıktan sonra bina risk tespiti, güçlendirme, statik proje ve daha fazlasında halkla buluşun.",
 }
 
 const STEPS = [
   {
     no: "1",
-    title: "Ön Kayıt",
-    desc: "Aşağıdaki formu doldurun; uzmanlık alanlarınızı ve hizmet bölgenizi belirtin.",
+    title: "Giriş Yapın",
+    desc: "depremTek Market hesabınızla giriş yapın; hesabınız yoksa birkaç saniyede üye olun.",
   },
   {
     no: "2",
-    title: "Belge & Doğrulama",
-    desc: "Diploma, oda kaydı ve lisanslarınızı isteriz; her uzmanlık ayrı doğrulanır.",
+    title: "Kartınızı Açın",
+    desc: "Ad, telefon, konum ve uzmanlık alanlarınızı girin; kartınız hemen açılır.",
   },
   {
     no: "3",
-    title: "Onay & Yayın",
-    desc: "Profiliniz onaylanınca 'doğrulanmış uzman' rozetiyle dizinde yayınlanır.",
+    title: "Kartınızı Tamamlayın",
+    desc: "Hesabım → Uzman Kartım'dan fotoğraf, hakkında yazısı, hizmet bölgeleri ve belgelerinizi ekleyin.",
   },
   {
     no: "4",
-    title: "Halkla Buluşun",
-    desc: "İl/ilçe ve uzmanlık filtreleriyle sizi arayan vatandaşlar size ulaşır.",
+    title: "Doğrulama & Yayın",
+    desc: "Ekibimiz belgelerinizi doğrulayınca kartınız 'doğrulanmış uzman' rozetiyle dizinde yayınlanır.",
   },
 ]
 
@@ -70,33 +73,43 @@ const BENEFITS = [
 
 const FAQS: FaqItem[] = [
   {
-    question: "Bu ön kayıt beni neye bağlar?",
+    question: "Uzman kartı açmak ücretli mi?",
     answer:
-      "Hiçbir ücret veya taahhüt yok. Bu, doğrulanmış uzman dizinimize ilgi/ön kayıt aşamasıdır. Amacımız mühendislerin beklentilerini öğrenip dizini birlikte şekillendirmek. Onay ve belge doğrulaması ayrı bir adımdır.",
+      "Hayır. Kart açmak ve dizinde yer almak ücretsizdir; üyelik paketi ya da komisyon yoktur. Platform sizinle müşteri arasındaki sözleşmenin içine girmez.",
+  },
+  {
+    question: "Kartım ne zaman yayınlanır?",
+    answer:
+      "Kartınız formu gönderdiğiniz anda açılır ve hemen düzenleyebilirsiniz; ancak dizinde görünmesi için ekibimizin doğrulaması gerekir. Doğrulama tamamlanınca kartınız yayına alınır, sonraki düzenlemeleriniz doğrudan yayına yansır.",
   },
   {
     question: "Hangi uzmanlık alanları var?",
     answer:
-      "Bina Risk & Hasar Tespiti, Güçlendirme (Retrofit), Statik/Betonarme Proje, Zemin Etüdü & Geoteknik, Yapı Denetimi, Kentsel Dönüşüm Danışmanlığı ve Deprem Performans Analizi. Birden fazla alan seçebilirsiniz; her biri ayrı doğrulanır.",
+      "Bina Risk & Hasar Tespiti, Güçlendirme (Retrofit), Statik/Betonarme Proje, Zemin Etüdü & Geoteknik, Yapı Denetimi, Kentsel Dönüşüm Danışmanlığı ve Deprem Performans Analizi. Birden fazla alan seçebilirsiniz; her biri ayrı doğrulanır, sonradan eklediğiniz alanlar doğrulanana kadar 'inceleniyor' olarak görünür.",
   },
   {
     question: "Doğrulama nasıl yapılıyor?",
     answer:
-      "Onay sürecinde diploma, oda (İMO) kaydı ve ilgili lisans/sertifikalarınızı isteriz. Profiliniz, belgeleriniz elle incelenip onaylanmadan halka görünmez — dizinin güveni buna bağlı.",
+      "Kartınıza diploma, oda (İMO) kaydı ve ilgili lisans/sertifikalarınızı yüklersiniz. Belgeler yalnız ekibimizce incelenir, profilinizde paylaşılmaz. Kartınız elle incelenip doğrulanmadan halka görünmez — dizinin güveni buna bağlı.",
   },
   {
-    question: "Üyelik ücreti var mı?",
+    question: "Kaç bölgede hizmet verebilirim?",
     answer:
-      "Şu an ön kayıt tamamen ücretsizdir. İleride dizinde yer almak ve öne çıkmak için katmanlı bir üyelik planlanıyor; detaylar netleştiğinde sizinle paylaşılacak. İşlem/komisyon altyapısı yoktur, platform sözleşmenin içine girmez.",
+      "Ana konumunuza ek olarak en fazla 3 il/ilçe ekleyebilirsiniz. Bu sınır her uzman için aynıdır.",
   },
   {
     question: "Müşteriyle iletişim nasıl olacak?",
     answer:
-      "Başlangıçta dizin 'pasif' çalışır: vatandaş sizi filtreleyip bulur ve belirttiğiniz kanaldan ulaşır. İlerleyen aşamada telefonunuzu gizli tutabileceğiniz 'talep bırak' formu da eklenecek.",
+      "Vatandaş sizi il/ilçe ve uzmanlık filtreleriyle bulur ve kartınızda göstermeyi seçtiğiniz kanaldan (telefon, WhatsApp, e-posta) ulaşır. Hangi bilginin görüneceğini kartınızdan siz belirlersiniz.",
   },
 ]
 
-export default async function UzmanOlPage() {
+export default async function UzmanOlPage({
+  params,
+}: {
+  params: Promise<{ countryCode: string }>
+}) {
+  const { countryCode } = await params
   const isTr = (await getLocale()) === "tr"
 
   if (!isTr) {
@@ -109,7 +122,8 @@ export default async function UzmanOlPage() {
           <p>
             We are building a directory of verified civil engineers for
             earthquake risk assessment, retrofitting, structural design and
-            more. To pre-register, please email us at destek@depremtek.market.
+            more. To create your expert card, please use the Turkish version
+            of the site or email us at destek@depremtek.market.
           </p>
           <div className="pt-8">
             <LocalizedClientLink
@@ -124,12 +138,24 @@ export default async function UzmanOlPage() {
     )
   }
 
+  const customer = await retrieveCustomer().catch(() => null)
+  if (customer) {
+    // Müşteri başına tek kart: kartı olan doğrudan kartına gider.
+    const { expert } = await getMyExpert()
+    if (expert) redirect(`/${countryCode}/account/uzman-kartim`)
+  }
+
+  // Giriş sonrası bu sayfaya dönülür (yol sunucuda safeInternalPath ile doğrulanır).
+  const loginHref = `/account?redirect=${encodeURIComponent(
+    `/${countryCode}/uzman-ol#kart-ac`
+  )}`
+
   return (
     <div className="content-container max-w-6xl py-16 px-4 sm:px-6 lg:px-8">
       {/* Hero */}
       <div className="text-center max-w-3xl mx-auto mb-14">
         <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
-          Doğrulanmış Uzman Dizini · Ön Kayıt
+          Doğrulanmış Uzman Dizini
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
           İnşaat Mühendisi misiniz? Uzman Ağına Katılın
@@ -137,15 +163,15 @@ export default async function UzmanOlPage() {
         <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed">
           Deprem Güvenliği Platformu, halkı doğrulanmış inşaat mühendisleriyle
           buluşturuyor. Doğrulanmış uzman rozetiyle dizinde yer alın, sizi arayan
-          vatandaşlara görünün. Ön kayıt ücretsiz ve taahhütsüz — fikirleriniz
-          dizini şekillendirecek.
+          vatandaşlara görünün. Kart açmak ücretsiz; kartınız ekibimiz
+          doğruladıktan sonra yayınlanır.
         </p>
         <div className="mt-6">
           <a
-            href="#onkayit"
+            href="#kart-ac"
             className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5 duration-200"
           >
-            Hemen Ön Kayıt Ol
+            Uzman Kartı Aç
           </a>
         </div>
       </div>
@@ -198,19 +224,51 @@ export default async function UzmanOlPage() {
         </div>
       </div>
 
-      {/* Ön kayıt formu */}
-      <div id="onkayit" className="scroll-mt-24 mb-16">
+      {/* Kart açma */}
+      <div id="kart-ac" className="scroll-mt-24 mb-16">
         <div className="max-w-2xl mx-auto border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6 sm:p-8">
           <div className="text-center mb-6">
             <h2 className="text-xl font-extrabold text-ui-fg-base">
-              Uzman Ön Kayıt Formu
+              Uzman Kartı Aç
             </h2>
             <p className="text-xs text-ui-fg-muted mt-1">
-              Bilgilerinizi bırakın, ekibimiz doğrulama ve sonraki adımlar için
-              dönüş yapsın.
+              Kartınız hemen açılır; ekibimiz doğruladıktan sonra dizinde
+              yayınlanır.
             </p>
           </div>
-          <ExpertForm />
+          {customer ? (
+            <ExpertForm
+              initial={{
+                full_name: [customer.first_name, customer.last_name]
+                  .filter(Boolean)
+                  .join(" "),
+                phone: customer.phone ?? "",
+              }}
+            />
+          ) : (
+            <div className="text-center space-y-4">
+              <p className="text-sm text-ui-fg-subtle leading-relaxed">
+                Uzman kartı, depremTek Market hesabınıza bağlanır: kartınızı
+                daha sonra Hesabım → Uzman Kartım sayfasından düzenlersiniz.
+                Devam etmek için giriş yapın ya da ücretsiz üye olun; ardından
+                bu sayfaya geri dönersiniz.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <LocalizedClientLink
+                  href={loginHref}
+                  className="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-8 rounded-xl text-sm transition-colors shadow-sm"
+                >
+                  Giriş Yap
+                </LocalizedClientLink>
+                <LocalizedClientLink
+                  href={`${loginHref}&view=register`}
+                  className="w-full sm:w-auto border border-brand-600 text-brand-700 hover:bg-brand-50 font-bold py-2.5 px-8 rounded-xl text-sm transition-colors"
+                >
+                  Üye Ol
+                </LocalizedClientLink>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -220,7 +278,7 @@ export default async function UzmanOlPage() {
           Sıkça Sorulan Sorular
         </h2>
         <p className="text-center text-sm text-ui-fg-muted mb-8">
-          Uzman dizini ve ön kayıt hakkında en çok merak edilenler.
+          Uzman dizini ve uzman kartı hakkında en çok merak edilenler.
         </p>
         <FaqAccordion items={FAQS} defaultOpen={0} />
       </div>

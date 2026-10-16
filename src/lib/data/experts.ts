@@ -1,5 +1,9 @@
+"use server"
+
+import { revalidateTag } from "next/cache"
 import { sdk } from "@lib/config"
-import type { ProviderType } from "@lib/expert-config"
+import type { DocType, ProviderType } from "@lib/expert-config"
+import { getAuthHeaders } from "./cookies"
 
 export interface Expert {
   slug: string
@@ -18,8 +22,6 @@ export interface Expert {
   photo_url: string
   verified: boolean
   document_count: number
-  membership_tier: "none" | "basic" | "premium"
-  featured: boolean
   phone: string
   email: string
   whatsapp: string
@@ -75,4 +77,142 @@ export const getExpert = async (slug: string): Promise<Expert | null> => {
     })
     .then((r) => r.expert)
     .catch(() => null)
+}
+
+// ── Giriş yapmış müşterinin kendi uzman kartı (Hesabım → Uzman Kartım) ──────
+
+export type ExpertRegion = { city: string; district?: string }
+export type ExpertDocument = { type: DocType; url: string; name?: string }
+
+/** /store/expert-leads/me görünümü: kartın sahibine dönen alanlar. */
+export interface MyExpert {
+  id: string
+  full_name: string
+  title: string
+  email: string
+  phone: string
+  city: string
+  district: string
+  specializations: string[]
+  verified_specializations: string[] | null
+  experience_years: number | null
+  imo_member: boolean
+  about: string
+  photo_url: string
+  whatsapp: string
+  show_phone: boolean
+  show_email: boolean
+  service_regions: ExpertRegion[] | null
+  documents: ExpertDocument[] | null
+  status: "new" | "contacted" | "approved" | "archived" | string
+  is_published: boolean
+  published_at: string | null
+  slug: string | null
+}
+
+/** "Uzman ol" kısa formu: kart bu alanlarla açılır, gerisi karttan düzenlenir. */
+export type ExpertCardCreateInput = {
+  full_name: string
+  title?: string
+  phone: string
+  city: string
+  district: string
+  specializations: string[]
+}
+
+/** Kart sahibinin düzenleyebildiği alanlar (yayın/durum/slug yalnız admin'de). */
+export type ExpertCardUpdateInput = Partial<{
+  full_name: string
+  title: string
+  phone: string
+  city: string
+  district: string
+  specializations: string[]
+  experience_years: number | null
+  imo_member: boolean
+  about: string
+  photo_url: string
+  whatsapp: string
+  show_phone: boolean
+  show_email: boolean
+  service_regions: ExpertRegion[]
+  documents: ExpertDocument[]
+}>
+
+export type ExpertCardResult = {
+  expert: MyExpert | null
+  error: string | null
+  status?: number
+}
+
+const errorOf = (e: unknown, fallback: string) => ({
+  message: e instanceof Error && e.message ? e.message : fallback,
+  status: (e as { status?: number })?.status,
+})
+
+/**
+ * Giriş yapmış müşterinin uzman kartı. Kart yoksa (404) `expert: null, error: null`;
+ * giriş yoksa ya da backend'e ulaşılamazsa `error` dolu döner — sayfa "kart yok"
+ * ile "okunamadı"yı karıştırmasın.
+ */
+export async function getMyExpert(): Promise<ExpertCardResult> {
+  const headers = { ...(await getAuthHeaders()) }
+  if (!("authorization" in headers)) {
+    return { expert: null, error: "Giriş yapmalısınız.", status: 401 }
+  }
+  try {
+    const r = await sdk.client.fetch<{ expert: MyExpert }>(
+      `/store/expert-leads/me`,
+      { method: "GET", headers, cache: "no-store" }
+    )
+    return { expert: r.expert, error: null }
+  } catch (e) {
+    const { message, status } = errorOf(e, "Uzman kartı okunamadı.")
+    if (status === 404) return { expert: null, error: null, status }
+    return { expert: null, error: message, status }
+  }
+}
+
+/** "Uzman ol": giriş yapmış müşteriye kart açar (yayın admin doğrulamasıyla). */
+export async function createExpertCard(
+  input: ExpertCardCreateInput
+): Promise<ExpertCardResult> {
+  const headers = { ...(await getAuthHeaders()) }
+  if (!("authorization" in headers)) {
+    return { expert: null, error: "Giriş yapmalısınız.", status: 401 }
+  }
+  try {
+    const r = await sdk.client.fetch<{ expert: MyExpert }>(
+      `/store/expert-leads`,
+      { method: "POST", headers, body: input }
+    )
+    return { expert: r.expert, error: null }
+  } catch (e) {
+    const { message, status } = errorOf(e, "Uzman kartı açılamadı.")
+    return { expert: null, error: message, status }
+  }
+}
+
+/**
+ * Kart sahibinin düzenlemesi. Yayındaki kartın değişikliği doğrudan yayına
+ * geçer; dizinin ISR önbelleği ("experts" etiketi) bu yüzden hemen tazelenir.
+ */
+export async function updateMyExpert(
+  input: ExpertCardUpdateInput
+): Promise<ExpertCardResult> {
+  const headers = { ...(await getAuthHeaders()) }
+  if (!("authorization" in headers)) {
+    return { expert: null, error: "Giriş yapmalısınız.", status: 401 }
+  }
+  try {
+    const r = await sdk.client.fetch<{ expert: MyExpert }>(
+      `/store/expert-leads/me`,
+      { method: "POST", headers, body: input }
+    )
+    if (r.expert?.is_published) revalidateTag("experts")
+    return { expert: r.expert, error: null }
+  } catch (e) {
+    const { message, status } = errorOf(e, "Değişiklikler kaydedilemedi.")
+    return { expert: null, error: message, status }
+  }
 }

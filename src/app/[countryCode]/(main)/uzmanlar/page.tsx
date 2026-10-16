@@ -105,14 +105,14 @@ export default async function UzmanlarPage({
           </h2>
           <p className="text-sm text-ui-fg-muted mb-4">
             {isTr
-              ? "Dizine ön kayıt olun; doğrulanmış rozetiyle görünür olun."
-              : "Pre-register; get listed with a verified badge."}
+              ? "Uzman kartınızı açın; ekibimiz doğruladıktan sonra dizinde yayınlanır."
+              : "Create your expert card; it is listed once our team verifies it."}
           </p>
           <LocalizedClientLink
             href="/uzman-ol"
             className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-colors shadow-sm"
           >
-            {isTr ? "Uzman Ön Kaydı →" : "Engineer Sign-up →"}
+            {isTr ? "Uzman Kartı Aç →" : "Create Expert Card →"}
           </LocalizedClientLink>
         </div>
       </div>

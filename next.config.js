@@ -224,6 +224,12 @@ const nextConfig = {
         destination: "/:countryCode/account/satici",
         permanent: true,
       },
+      // Uzman üyelik paketleri kaldırıldı: herkes aynı kartı açar.
+      {
+        source: "/:countryCode/uzman-paketleri",
+        destination: "/:countryCode/uzman-ol",
+        permanent: true,
+      },
     ]
   },
 }

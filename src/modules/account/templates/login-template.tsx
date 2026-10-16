@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useSearchParams } from "next/navigation"
 
 import Register from "@modules/account/components/register"
 import Login from "@modules/account/components/login"
@@ -13,7 +14,12 @@ export enum LOGIN_VIEW {
 }
 
 const LoginTemplate = () => {
-  const [currentView, setCurrentView] = useState("sign-in")
+  // "?view=register": "Üye ol" bağlantıları (ör. /uzman-ol) doğrudan kayıt formunu açar.
+  const initialView =
+    useSearchParams().get("view") === LOGIN_VIEW.REGISTER
+      ? LOGIN_VIEW.REGISTER
+      : LOGIN_VIEW.SIGN_IN
+  const [currentView, setCurrentView] = useState<string>(initialView)
 
   return (
     <div className="w-full flex justify-start px-8 py-8">

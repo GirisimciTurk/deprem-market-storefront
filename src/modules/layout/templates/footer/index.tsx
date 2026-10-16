@@ -101,7 +101,7 @@ export default async function Footer() {
             )}
             {/* Legal Policies — en fazla 5 bağlantı. Çerez politikası/tercihleri
                 alt yasal banda taşındı; kalanlar (SSS, Blog, Bilgi Merkezi,
-                Uzman/Bayi Olun, Üyelik Paketleri) yalnız header/sayfa içinden erişilir. */}
+                Uzman/Bayi Olun) yalnız header/sayfa içinden erişilir. */}
             <div className="flex flex-col gap-y-2">
               <span className="txt-small-plus txt-ui-fg-base">Destek & Bilgi</span>
               <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">

@@ -115,6 +115,25 @@ const HardHatIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 )
 
+const IdCardIcon = ({ size = 20 }: { size?: number }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2" y="5" width="20" height="14" rx="2" />
+    <circle cx="8" cy="12" r="2" />
+    <path d="M14 10h4" />
+    <path d="M14 14h4" />
+  </svg>
+)
+
 const AccountNav = ({
   customer,
 }: {
@@ -267,6 +286,18 @@ const AccountNav = ({
                   </LocalizedClientLink>
                 </li>
                 <li>
+                  <LocalizedClientLink
+                    href="/account/uzman-kartim"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <IdCardIcon size={20} />
+                      <span>Uzman Kartım</span>
+                    </div>
+                    <ChevronDown className="transform -rotate-90" />
+                  </LocalizedClientLink>
+                </li>
+                <li>
                   <button
                     type="button"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full text-brand-600"
@@ -382,6 +413,15 @@ const AccountNav = ({
                   icon={<WrenchIcon size={18} />}
                 >
                   Hizmet Al
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/uzman-kartim"
+                  active={isActive("/account/uzman-kartim")}
+                  icon={<IdCardIcon size={18} />}
+                >
+                  Uzman Kartım
                 </AccountNavLink>
               </li>
 
