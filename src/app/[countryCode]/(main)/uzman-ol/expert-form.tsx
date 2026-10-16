@@ -2,17 +2,17 @@
 
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { ENGINEER_SPECIALIZATIONS } from "@lib/expert-config"
 import { createExpertCard } from "@lib/data/experts"
 import { validateExpertBasics } from "@lib/util/expert-card"
 import { formatTrPhone, normalizeTrPhone } from "@lib/util/tr-phone"
 import PhoneInput from "@modules/common/components/phone-input"
 import CityDistrictSelect from "@modules/common/components/city-district-select"
 import ExpertTitleSelect from "@modules/experts/components/title-select"
+import SpecializationChips from "./specialization-chips"
 
-const inputCls =
+export const inputCls =
   "w-full border border-ui-border-base rounded-lg px-4 py-2 bg-ui-bg-base text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
-const labelCls =
+export const labelCls =
   "block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1"
 
 /**
@@ -38,11 +38,6 @@ export default function ExpertForm({
   const [specs, setSpecs] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState("")
-
-  const toggleSpec = (key: string) =>
-    setSpecs((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    )
 
   const cardHref = `/${countryCode}/account/uzman-kartim`
 
@@ -143,36 +138,12 @@ export default function ExpertForm({
         />
       </div>
 
-      <div>
-        <span className={labelCls}>
-          Uzmanlık Alanları <span className="text-brand-500">*</span>
-        </span>
-        <p className="text-xs text-ui-fg-muted mb-2">
-          Birden fazla seçebilirsiniz. Her uzmanlık ayrıca belge ile doğrulanır.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {ENGINEER_SPECIALIZATIONS.map((s) => {
-            const active = specs.includes(s.key)
-            return (
-              <button
-                type="button"
-                key={s.key}
-                disabled={loading}
-                onClick={() => toggleSpec(s.key)}
-                aria-pressed={active}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-                  active
-                    ? "bg-brand-600 text-white border-brand-600"
-                    : "bg-ui-bg-base text-ui-fg-subtle border-ui-border-base hover:border-brand-400"
-                }`}
-              >
-                {active ? "✓ " : ""}
-                {s.label}
-              </button>
-            )
-          })}
-        </div>
-      </div>
+      <SpecializationChips
+        value={specs}
+        onChange={setSpecs}
+        disabled={loading}
+        labelClassName={labelCls}
+      />
 
       <p className="text-xs text-ui-fg-muted">
         Fotoğraf, hakkında yazısı, hizmet bölgeleri ve doğrulama belgelerini kartınız

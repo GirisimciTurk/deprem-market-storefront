@@ -3,7 +3,9 @@ import { EXPERT_REGION_LIMIT } from "@lib/expert-config"
 import {
   addRegionDraft,
   cleanRegions,
+  splitFullName,
   validateExpertBasics,
+  validateExpertSignup,
 } from "./expert-card"
 
 const valid = {
@@ -68,5 +70,46 @@ describe("hizmet bölgesi sınırı", () => {
       { city: "Sakarya", district: undefined },
       { city: "Bursa", district: undefined },
     ])
+  })
+})
+
+describe("validateExpertSignup", () => {
+  const signup = { ...valid, email: "ayse@example.com", password: "12345678" }
+
+  it("geçerli kayıt için null döner", () => {
+    expect(validateExpertSignup(signup)).toBeNull()
+  })
+
+  it("hataları formdaki sırayla verir: ad, e-posta, şifre, sonra kısa form", () => {
+    expect(
+      validateExpertSignup({ ...signup, full_name: "", email: "", password: "" })
+    ).toMatch(/ad/i)
+    expect(validateExpertSignup({ ...signup, email: "ayse@", password: "" })).toMatch(
+      /e-posta/
+    )
+    expect(validateExpertSignup({ ...signup, password: "1234567" })).toMatch(
+      /en az 8 karakter/
+    )
+    expect(validateExpertSignup({ ...signup, phone: "0532" })).toMatch(/telefon/i)
+    expect(validateExpertSignup({ ...signup, specializations: [] })).toMatch(
+      /uzmanlık/
+    )
+  })
+})
+
+describe("splitFullName", () => {
+  it("son kelime soyad, gerisi ad", () => {
+    expect(splitFullName("  Ayşe  Nur Yılmaz ")).toEqual({
+      first_name: "Ayşe Nur",
+      last_name: "Yılmaz",
+    })
+    expect(splitFullName("Ayşe Yılmaz")).toEqual({
+      first_name: "Ayşe",
+      last_name: "Yılmaz",
+    })
+  })
+
+  it("tek kelimede soyad boş", () => {
+    expect(splitFullName(" Ayşe ")).toEqual({ first_name: "Ayşe", last_name: "" })
   })
 })

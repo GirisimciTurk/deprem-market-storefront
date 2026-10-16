@@ -4,6 +4,7 @@ import {
   isTrMobilePhone,
   isValidTrPhone,
   normalizeTrPhone,
+  toAccountPhone,
   toE164TrPhone,
   trPhoneProblem,
 } from "./tr-phone"
@@ -87,5 +88,27 @@ describe("geçerlilik", () => {
     expect(trPhoneProblem("0212 123 45 67", { mobileOnly: true })).toMatch(
       /cep telefonu/
     )
+  })
+})
+
+describe("toAccountPhone (hesap telefonu, signup kuralı)", () => {
+  it("boş girdi boş dize", () => {
+    expect(toAccountPhone("")).toBe("")
+    expect(toAccountPhone("  ")).toBe("")
+    expect(toAccountPhone(null)).toBe("")
+  })
+
+  it("cep numarasını her biçimden +905… yapar", () => {
+    expect(toAccountPhone("0 532 123 45 67")).toBe("+905321234567")
+    expect(toAccountPhone("(0532) 123-45.67")).toBe("+905321234567")
+    expect(toAccountPhone("905321234567")).toBe("+905321234567")
+    expect(toAccountPhone("5321234567")).toBe("+905321234567")
+    expect(toAccountPhone("+90 532 123 45 67")).toBe("+905321234567")
+  })
+
+  it("sabit hat, eksik ya da fazla numara null", () => {
+    expect(toAccountPhone("0212 123 45 67")).toBeNull()
+    expect(toAccountPhone("0532 123")).toBeNull()
+    expect(toAccountPhone("0532 123 45 678")).toBeNull()
   })
 })

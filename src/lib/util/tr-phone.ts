@@ -68,3 +68,24 @@ export function trPhoneProblem(
   }
   return isValidTrPhone(input) ? "" : TR_PHONE_INCOMPLETE_MESSAGE
 }
+
+export const ACCOUNT_PHONE_INVALID_MESSAGE =
+  "Lütfen geçerli bir cep telefonu numarası girin (Örn: 0555 123 45 67)"
+
+/**
+ * Müşteri hesabının telefonu: hesapta "+905xxxxxxxxx" olarak saklanır. Boş
+ * girdi boş dize, cep numarası olmayan girdi null döner. Kayıt eylemleri
+ * (signup, signupExpert) bu tek kuralı kullanır.
+ */
+export function toAccountPhone(input: string | null | undefined): string | null {
+  let v = (input ?? "").trim().replace(/[\s()\-.]/g, "")
+  if (!v) return ""
+  if (v.startsWith("0")) {
+    v = "+90" + v.substring(1)
+  } else if (v.startsWith("90")) {
+    v = "+" + v
+  } else if (!v.startsWith("+")) {
+    v = "+90" + v
+  }
+  return /^\+905\d{9}$/.test(v) ? v : null
+}

@@ -7,6 +7,10 @@ import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import { safeInternalPath } from "@lib/util/safe-redirect"
 import {
+  ACCOUNT_PHONE_INVALID_MESSAGE,
+  toAccountPhone,
+} from "@lib/util/tr-phone"
+import {
   getAuthHeaders,
   getCacheOptions,
   getCacheTag,
@@ -64,23 +68,10 @@ export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
 export async function signup(_currentState: unknown, formData: FormData) {
   let created: unknown
   const password = formData.get("password") as string
-  let phoneVal = (formData.get("phone") as string || "").trim().replace(/[\s\(\)\-\.]/g, "")
-
-  if (phoneVal) {
-    // Normalize to Turkish international format (+905XXXXXXXXX)
-    if (phoneVal.startsWith("0")) {
-      phoneVal = "+90" + phoneVal.substring(1)
-    } else if (phoneVal.startsWith("90")) {
-      phoneVal = "+" + phoneVal
-    } else if (!phoneVal.startsWith("+")) {
-      phoneVal = "+90" + phoneVal
-    }
-
-    // Format validation: must match +90 followed by 10 digits starting with 5
-    const phoneRegex = /^\+905\d{9}$/
-    if (!phoneRegex.test(phoneVal)) {
-      return "Lütfen geçerli bir cep telefonu numarası girin (Örn: 0555 123 45 67)"
-    }
+  // Hesap telefonu "+905XXXXXXXXX" olarak saklanır; boş bırakılabilir.
+  const phoneVal = toAccountPhone(formData.get("phone") as string | null)
+  if (phoneVal === null) {
+    return ACCOUNT_PHONE_INVALID_MESSAGE
   }
 
   const customerForm = {

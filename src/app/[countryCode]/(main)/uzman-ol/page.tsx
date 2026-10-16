@@ -8,6 +8,7 @@ import FaqAccordion, {
   type FaqItem,
 } from "@modules/common/components/faq-accordion"
 import ExpertForm from "./expert-form"
+import SignupExpertForm from "./signup-expert-form"
 
 export const metadata: Metadata = {
   title: "Uzman Ağına Katıl — Doğrulanmış Mühendis Dizini | depremTek Market",
@@ -18,21 +19,16 @@ export const metadata: Metadata = {
 const STEPS = [
   {
     no: "1",
-    title: "Giriş Yapın",
-    desc: "depremTek Market hesabınızla giriş yapın; hesabınız yoksa birkaç saniyede üye olun.",
+    title: "Formu Doldurun",
+    desc: "Ad, e-posta, şifre, telefon, konum ve uzmanlık alanlarınızı girin; hesabınız ve uzman kartınız tek adımda açılır. Hesabınız varsa Uzman Girişi ile girip kartı tek tıkla açın.",
   },
   {
     no: "2",
-    title: "Kartınızı Açın",
-    desc: "Ad, telefon, konum ve uzmanlık alanlarınızı girin; kartınız hemen açılır.",
-  },
-  {
-    no: "3",
     title: "Kartınızı Tamamlayın",
     desc: "Hesabım → Uzman Kartım'dan fotoğraf, hakkında yazısı, hizmet bölgeleri ve belgelerinizi ekleyin.",
   },
   {
-    no: "4",
+    no: "3",
     title: "Doğrulama & Yayın",
     desc: "Ekibimiz belgelerinizi doğrulayınca kartınız 'doğrulanmış uzman' rozetiyle dizinde yayınlanır.",
   },
@@ -72,6 +68,11 @@ const BENEFITS = [
 ]
 
 const FAQS: FaqItem[] = [
+  {
+    question: "Uzman kartı için önce üye olmam gerekir mi?",
+    answer:
+      "Hayır. Formu doldurduğunuzda depremTek Market hesabınız ve uzman kartınız birlikte açılır; kartınızı daha sonra aynı e-posta ve şifreyle giriş yapıp Hesabım → Uzman Kartım'dan düzenlersiniz. Zaten bir hesabınız varsa Uzman Girişi ile girin; kartınız aynı kısa formla hesabınıza bağlanır.",
+  },
   {
     question: "Uzman kartı açmak ücretli mi?",
     answer:
@@ -145,11 +146,6 @@ export default async function UzmanOlPage({
     if (expert) redirect(`/${countryCode}/account/uzman-kartim`)
   }
 
-  // Giriş sonrası bu sayfaya dönülür (yol sunucuda safeInternalPath ile doğrulanır).
-  const loginHref = `/account?redirect=${encodeURIComponent(
-    `/${countryCode}/uzman-ol#kart-ac`
-  )}`
-
   return (
     <div className="content-container max-w-6xl py-16 px-4 sm:px-6 lg:px-8">
       {/* Hero */}
@@ -181,7 +177,7 @@ export default async function UzmanOlPage({
         <h2 className="text-center text-xl font-extrabold text-ui-fg-base mb-8">
           Nasıl Çalışır?
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {STEPS.map((s) => (
             <div
               key={s.no}
@@ -232,8 +228,9 @@ export default async function UzmanOlPage({
               Uzman Kartı Aç
             </h2>
             <p className="text-xs text-ui-fg-muted mt-1">
-              Kartınız hemen açılır; ekibimiz doğruladıktan sonra dizinde
-              yayınlanır.
+              {customer
+                ? "Kartınız hemen açılır; ekibimiz doğruladıktan sonra dizinde yayınlanır."
+                : "Tek adım: hesabınız ve uzman kartınız birlikte açılır; ekibimiz doğruladıktan sonra dizinde yayınlanır."}
             </p>
           </div>
           {customer ? (
@@ -246,28 +243,7 @@ export default async function UzmanOlPage({
               }}
             />
           ) : (
-            <div className="text-center space-y-4">
-              <p className="text-sm text-ui-fg-subtle leading-relaxed">
-                Uzman kartı, depremTek Market hesabınıza bağlanır: kartınızı
-                daha sonra Hesabım → Uzman Kartım sayfasından düzenlersiniz.
-                Devam etmek için giriş yapın ya da ücretsiz üye olun; ardından
-                bu sayfaya geri dönersiniz.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <LocalizedClientLink
-                  href={loginHref}
-                  className="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-8 rounded-xl text-sm transition-colors shadow-sm"
-                >
-                  Giriş Yap
-                </LocalizedClientLink>
-                <LocalizedClientLink
-                  href={`${loginHref}&view=register`}
-                  className="w-full sm:w-auto border border-brand-600 text-brand-700 hover:bg-brand-50 font-bold py-2.5 px-8 rounded-xl text-sm transition-colors"
-                >
-                  Üye Ol
-                </LocalizedClientLink>
-              </div>
-            </div>
+            <SignupExpertForm />
           )}
         </div>
       </div>

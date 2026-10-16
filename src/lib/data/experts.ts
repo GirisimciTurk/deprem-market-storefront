@@ -3,7 +3,20 @@
 import { revalidateTag } from "next/cache"
 import { sdk } from "@lib/config"
 import type { DocType, ProviderType } from "@lib/expert-config"
-import { getAuthHeaders } from "./cookies"
+import {
+  EXPERT_EMAIL_TAKEN_MESSAGE,
+  splitFullName,
+  validateExpertSignup,
+  type ExpertSignup,
+} from "@lib/util/expert-card"
+import { normalizeTrPhone, toAccountPhone } from "@lib/util/tr-phone"
+import {
+  getAuthHeaders,
+  getCacheTag,
+  removeAuthToken,
+  setAuthToken,
+} from "./cookies"
+import { transferCart } from "./customer"
 
 export interface Expert {
   slug: string
@@ -214,5 +227,118 @@ export async function updateMyExpert(
   } catch (e) {
     const { message, status } = errorOf(e, "Değişiklikler kaydedilemedi.")
     return { expert: null, error: message, status }
+  }
+}
+
+// ── Tek adımlı "Uzman ol": giriş yapmamış ziyaretçiye hesap + kart ──────────
+
+export type ExpertSignupInput = ExpertSignup
+
+export type ExpertSignupResult =
+  | { ok: true }
+  | {
+      ok: false
+      /**
+       * invalid: alanlar geçersiz; email_taken: bu e-postanın hesabı var (Uzman
+       * Girişi); account_failed: hesap açılamadı, oturum yok; card_failed: hesap
+       * açıldı ve oturum açık, yalnız kart açılamadı (yeniden denenebilir).
+       */
+      code: "invalid" | "email_taken" | "account_failed" | "card_failed"
+      error: string
+    }
+
+/**
+ * Medusa'nın emailpass sağlayıcısı, sahibi olan bir kimlikle kayıt denemesini
+ * 401 "Identity with email already exists" ile reddeder (sahipsiz kimlik
+ * yeniden kaydı kabul eder, o yüzden bu ileti gerçekten "hesap var" demektir).
+ */
+const isEmailTaken = (e: unknown) =>
+  e instanceof Error && /identity with email already exists/i.test(e.message)
+
+/**
+ * "Uzman ol" formunun giriş yapmamış hâli: müşteri hesabını açar, oturumu
+ * kurar (signup ile aynı adımlar: register → müşteri → login → önbellek →
+ * sepet aktarımı) ve ardından uzman kartını açar. Kartı zaten varsa (409)
+ * başarı sayılır; istemci Uzman Kartım'a gider.
+ */
+export async function signupExpert(
+  input: ExpertSignupInput
+): Promise<ExpertSignupResult> {
+  const invalid = validateExpertSignup(input)
+  if (invalid) return { ok: false, code: "invalid", error: invalid }
+
+  const email = input.email.trim()
+  const password = input.password
+  const fullName = input.full_name.trim()
+
+  let token: unknown
+  try {
+    token = await sdk.auth.register("customer", "emailpass", {
+      email,
+      password,
+    })
+  } catch (e) {
+    if (isEmailTaken(e)) {
+      return { ok: false, code: "email_taken", error: EXPERT_EMAIL_TAKEN_MESSAGE }
+    }
+    return {
+      ok: false,
+      code: "account_failed",
+      error: "Hesabınız oluşturulamadı. Lütfen tekrar deneyin.",
+    }
+  }
+
+  try {
+    await setAuthToken(token as string)
+    const headers = { ...(await getAuthHeaders()) }
+    // Hesap telefonu yalnız cep numarasıysa saklanır ("+905…"); sabit hat
+    // yalnız kartta kalır.
+    const accountPhone = toAccountPhone(input.phone)
+    await sdk.store.customer.create(
+      {
+        email,
+        ...splitFullName(fullName),
+        ...(accountPhone ? { phone: accountPhone } : {}),
+      },
+      {},
+      headers
+    )
+    const loginToken = await sdk.auth.login("customer", "emailpass", {
+      email,
+      password,
+    })
+    await setAuthToken(loginToken as string)
+  } catch {
+    // Kayıt jetonu bir müşteriye bağlı değil; yarım oturum bırakma.
+    await removeAuthToken()
+    return {
+      ok: false,
+      code: "account_failed",
+      error: "Hesabınız oluşturulamadı. Lütfen tekrar deneyin.",
+    }
+  }
+
+  const customerCacheTag = await getCacheTag("customers")
+  revalidateTag(customerCacheTag)
+  try {
+    await transferCart()
+  } catch {
+    // Sepet aktarılamadı diye açılmış hesabın kartı engellenmez.
+  }
+
+  const card = await createExpertCard({
+    full_name: fullName,
+    phone: normalizeTrPhone(input.phone),
+    city: input.city.trim(),
+    district: input.district.trim(),
+    specializations: input.specializations,
+  })
+  if (card.expert || card.status === 409) return { ok: true }
+  return {
+    ok: false,
+    code: "card_failed",
+    error: `Hesabınız açıldı ve giriş yaptınız, ancak uzman kartınız açılamadı${
+      card.error ? ` (${card.error})` : ""
+    }. Bilgileriniz duruyor; "Uzman Kartımı Aç" düğmesine tekrar basın.`,
   }
 }

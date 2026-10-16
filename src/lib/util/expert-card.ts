@@ -35,6 +35,53 @@ export function validateExpertBasics(v: ExpertBasics): string | null {
   return null
 }
 
+/** Tek adımlı "Uzman ol" (giriş yapmamış ziyaretçi): hesap + kart birlikte açılır. */
+export type ExpertSignup = ExpertBasics & {
+  email: string
+  password: string
+}
+
+export const EXPERT_SIGNUP_PASSWORD_MIN = 8
+
+/** Kayıtta e-postanın hesabı çıktığında gösterilir (form Uzman Girişi linkini ekler). */
+export const EXPERT_EMAIL_TAKEN_MESSAGE =
+  "Bu e-posta ile bir hesabınız var. Uzman Girişi ile giriş yapıp kartınızı açabilirsiniz."
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/**
+ * Tek adımlı formun kuralları, formdaki sırayla: ad, e-posta, şifre, sonra
+ * kısa formun kuralları (telefon, konum, uzmanlık). İlk hatayı döndürür.
+ * Sunucu eylemi (signupExpert) aynı kuralı yeniden uygular.
+ */
+export function validateExpertSignup(v: ExpertSignup): string | null {
+  const basics = validateExpertBasics(v)
+  if (basics && v.full_name.trim().length < 2) return basics
+  if (!EMAIL_RE.test(v.email.trim())) {
+    return "Lütfen geçerli bir e-posta adresi girin."
+  }
+  if (v.password.length < EXPERT_SIGNUP_PASSWORD_MIN) {
+    return `Şifreniz en az ${EXPERT_SIGNUP_PASSWORD_MIN} karakter olmalı.`
+  }
+  return basics
+}
+
+/**
+ * "Ad Soyad"ı müşteri hesabının ad/soyad alanlarına böler: son kelime soyad,
+ * gerisi ad. Tek kelimede soyad boş kalır (Medusa ikisini de boş kabul eder).
+ */
+export function splitFullName(fullName: string): {
+  first_name: string
+  last_name: string
+} {
+  const words = fullName.trim().split(/\s+/).filter(Boolean)
+  if (words.length < 2) return { first_name: words[0] ?? "", last_name: "" }
+  return {
+    first_name: words.slice(0, -1).join(" "),
+    last_name: words[words.length - 1],
+  }
+}
+
 export type RegionDraft = { city: string; district: string }
 
 /** Boş bir bölge satırı ekler; sınır (EXPERT_REGION_LIMIT) doluysa listeyi değiştirmez. */

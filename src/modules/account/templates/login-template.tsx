@@ -14,7 +14,7 @@ export enum LOGIN_VIEW {
 }
 
 const LoginTemplate = () => {
-  // "?view=register": "Üye ol" bağlantıları (ör. /uzman-ol) doğrudan kayıt formunu açar.
+  // "?view=register": "Üye ol" bağlantıları doğrudan kayıt formunu açar.
   const initialView =
     useSearchParams().get("view") === LOGIN_VIEW.REGISTER
       ? LOGIN_VIEW.REGISTER
