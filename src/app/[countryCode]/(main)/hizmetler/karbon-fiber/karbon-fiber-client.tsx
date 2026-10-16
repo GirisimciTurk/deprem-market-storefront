@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
 /**
  * Karbon Fiber Kolon Güçlendirme — hizmet vitrini + GÖRÜŞME TALEP formu.
@@ -31,27 +31,13 @@ const emptyForm = {
 
 export default function KarbonFiberClient() {
   const [form, setForm] = useState({ ...emptyForm })
-  // Kaba fiyat hesaplayıcı girdileri (görüşmede netleşir).
-  const [kat, setKat] = useState<number>(5)
-  const [m2, setM2] = useState<number>(120)
-  const [kolon, setKolon] = useState<number>(8)
+  // Bina bilgileri; isteğe bağlı, doldurulanlar talebe eklenir.
+  const [kat, setKat] = useState("")
+  const [m2, setM2] = useState("")
+  const [kolon, setKolon] = useState("")
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
 
   const set = (k: keyof typeof form, v: any) => setForm((f) => ({ ...f, [k]: v }))
-
-  // Kaba tahmin: kolon başına işçilik+malzeme + m² ek faktör + kat (erişim) çarpanı.
-  // SADECE fikir vermek için; kesin fiyat yüz yüze görüşmede belirlenir.
-  const estimate = useMemo(() => {
-    const perKolon = 9000
-    const perM2 = 120
-    const access = 1 + Math.max(0, kat - 2) * 0.03 // üst katlarda erişim zorluğu
-    const base = (kolon * perKolon + m2 * perM2) * access
-    const low = Math.round((base * 0.85) / 100) * 100
-    const high = Math.round((base * 1.2) / 100) * 100
-    return { low, high }
-  }, [kat, m2, kolon])
-
-  const fmt = (n: number) => n.toLocaleString("tr-TR")
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,12 +64,9 @@ export default function KarbonFiberClient() {
           district: form.district,
           address: form.address,
           note: form.note,
-          details: {
-            kat_sayisi: kat,
-            m2,
-            kolon_sayisi: kolon,
-            tahmini_fiyat_araligi: `${fmt(estimate.low)}–${fmt(estimate.high)} TL`,
-          },
+          details: Object.fromEntries(
+            Object.entries({ kat_sayisi: kat, m2, kolon_sayisi: kolon }).filter(([, v]) => v !== "")
+          ),
         }),
       })
       if (!res.ok) throw new Error("Talep gönderilemedi.")
@@ -191,22 +174,22 @@ export default function KarbonFiberClient() {
                   onChange={(e) => set("address", e.target.value)} placeholder="Bina adresi" />
               </div>
 
-              {/* Bina bilgileri = hesaplayıcı girdileri */}
+              {/* Bina bilgileri */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className={labelCls}>Kat Sayısı</label>
-                  <input type="number" min={1} className={inputCls} value={kat}
-                    onChange={(e) => setKat(Number(e.target.value) || 0)} />
+                  <input type="number" min={1} className={inputCls} value={kat} placeholder="Örn: 5"
+                    onChange={(e) => setKat(e.target.value)} />
                 </div>
                 <div>
                   <label className={labelCls}>Toplam m²</label>
-                  <input type="number" min={1} className={inputCls} value={m2}
-                    onChange={(e) => setM2(Number(e.target.value) || 0)} />
+                  <input type="number" min={1} className={inputCls} value={m2} placeholder="Örn: 120"
+                    onChange={(e) => setM2(e.target.value)} />
                 </div>
                 <div>
                   <label className={labelCls}>Güçlendirilecek Kolon</label>
-                  <input type="number" min={1} className={inputCls} value={kolon}
-                    onChange={(e) => setKolon(Number(e.target.value) || 0)} />
+                  <input type="number" min={1} className={inputCls} value={kolon} placeholder="Örn: 8"
+                    onChange={(e) => setKolon(e.target.value)} />
                 </div>
               </div>
 
@@ -228,21 +211,8 @@ export default function KarbonFiberClient() {
           )}
         </div>
 
-        {/* SAĞ: kaba fiyat hesaplayıcı + bilgi */}
+        {/* SAĞ: bilgi */}
         <aside className="space-y-4">
-          <div className="border-2 border-brand-200 bg-brand-50 rounded-xl p-5">
-            <h3 className="font-bold text-sm mb-1 text-brand-700">Kaba Fiyat Tahmini</h3>
-            <p className="text-xs text-ui-fg-subtle mb-3">
-              Soldaki kat / m² / kolon bilgilerine göre <strong>yaklaşık</strong> aralık.
-              Kesin fiyat yüz yüze görüşmede belirlenir.
-            </p>
-            <div className="text-2xl font-extrabold text-brand-700">
-              {fmt(estimate.low)} – {fmt(estimate.high)} ₺
-            </div>
-            <p className="text-[11px] text-ui-fg-muted mt-2">
-              {kolon} kolon · {m2} m² · {kat} kat üzerinden tahmin.
-            </p>
-          </div>
           <div className="border border-ui-border-base rounded-xl p-5">
             <h3 className="font-bold text-sm mb-2 text-brandblue-700">Neden Karbon Fiber?</h3>
             <ul className="text-sm text-ui-fg-subtle space-y-1.5 list-disc pl-4">
