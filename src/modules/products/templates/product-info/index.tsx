@@ -1,4 +1,4 @@
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 import { Heading, Text } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import React from "react"
@@ -7,7 +7,7 @@ import ShareButton from "@modules/products/components/share-button"
 import ProductRating from "@modules/products/components/product-rating"
 
 type ProductInfoProps = {
-  product: HttpTypes.StoreProduct
+  product: StoreProduct
 }
 
 const ProductInfo = async ({ product }: ProductInfoProps) => {

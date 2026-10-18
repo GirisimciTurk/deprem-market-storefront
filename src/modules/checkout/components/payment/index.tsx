@@ -1,13 +1,10 @@
 "use client"
+import { CircleCheck, CreditCard } from "lucide-react"
 import { RadioGroup } from "@headlessui/react"
-import { isStripeLike, paymentInfoMap } from "@lib/constants"
+import { paymentInfoMap } from "@lib/constants"
 import { initiatePaymentSession } from "@lib/data/cart"
-import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import ErrorMessage from "@modules/checkout/components/error-message"
-import PaymentContainer, {
-  StripeCardContainer,
-  IyzicoCardContainer,
-} from "@modules/checkout/components/payment-container"
+import PaymentContainer from "@modules/checkout/components/payment-container"
 import Divider from "@modules/common/components/divider"
 import {
   Button,
@@ -16,7 +13,7 @@ import {
   Text,
   clx,
 } from "@modules/common/components/ui"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCart } from "types/store"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 
@@ -24,13 +21,10 @@ const Payment = ({
   cart,
   availablePaymentMethods,
 }: {
-  cart: HttpTypes.StoreCart
+  cart: StoreCart
   availablePaymentMethods: { id: string }[]
 }) => {
-  const filteredPaymentMethods = availablePaymentMethods?.filter(
-    // iyzico-mock test sağlayıcısı gizlenir (aktif kart ödemesi PayTR).
-    (pm) => pm.id !== "pp_iyzico-mock_iyzico-mock"
-  )
+  const filteredPaymentMethods = availablePaymentMethods
 
   const activeSession = cart.payment_collection?.payment_sessions?.find(
     (paymentSession) => paymentSession.status === "pending"
@@ -38,9 +32,6 @@ const Payment = ({
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [cardBrand, setCardBrand] = useState<string | null>(null)
-  const [cardComplete, setCardComplete] = useState(false)
-  const [iyzicoComplete, setIyzicoComplete] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
     activeSession?.provider_id ?? ""
   )
@@ -54,11 +45,6 @@ const Payment = ({
   const setPaymentMethod = async (method: string) => {
     setError(null)
     setSelectedPaymentMethod(method)
-    if (isStripeLike(method)) {
-      await initiatePaymentSession(cart, {
-        provider_id: method,
-      })
-    }
   }
 
   const paidByGiftcard = !!(
@@ -87,9 +73,6 @@ const Payment = ({
   const handleSubmit = async () => {
     setIsLoading(true)
     try {
-      const shouldInputCard =
-        isStripeLike(selectedPaymentMethod) && !activeSession
-
       const checkActiveSession =
         activeSession?.provider_id === selectedPaymentMethod
 
@@ -99,14 +82,9 @@ const Payment = ({
         })
       }
 
-      if (!shouldInputCard) {
-        return router.push(
-          pathname + "?" + createQueryString("step", "review"),
-          {
-            scroll: false,
-          }
-        )
-      }
+      return router.push(pathname + "?" + createQueryString("step", "review"), {
+        scroll: false,
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
@@ -135,7 +113,7 @@ const Payment = ({
           )}
         >
           Ödeme
-          {!isOpen && paymentReady && <CheckCircleSolid />}
+          {!isOpen && paymentReady && <CircleCheck size={16} />}
         </Heading>
         {!isOpen && paymentReady && (
           <Text>
@@ -159,29 +137,11 @@ const Payment = ({
               >
                 {filteredPaymentMethods.map((paymentMethod) => (
                   <div key={paymentMethod.id}>
-                    {isStripeLike(paymentMethod.id) ? (
-                      <StripeCardContainer
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                        paymentInfoMap={paymentInfoMap}
-                        setCardBrand={setCardBrand}
-                        setError={setError}
-                        setCardComplete={setCardComplete}
-                      />
-                    ) : paymentMethod.id === "pp_iyzico-mock_iyzico-mock" ? (
-                      <IyzicoCardContainer
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                        paymentInfoMap={paymentInfoMap}
-                        setIyzicoComplete={setIyzicoComplete}
-                      />
-                    ) : (
-                      <PaymentContainer
-                        paymentInfoMap={paymentInfoMap}
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                      />
-                    )}
+                    <PaymentContainer
+                      paymentInfoMap={paymentInfoMap}
+                      paymentProviderId={paymentMethod.id}
+                      selectedPaymentOptionId={selectedPaymentMethod}
+                    />
                   </div>
                 ))}
               </RadioGroup>
@@ -212,17 +172,10 @@ const Payment = ({
             className="mt-6"
             onClick={handleSubmit}
             isLoading={isLoading}
-            disabled={
-              (isStripeLike(selectedPaymentMethod) && !cardComplete) ||
-              (selectedPaymentMethod === "pp_iyzico-mock_iyzico-mock" && !iyzicoComplete) ||
-              (!selectedPaymentMethod && !paidByGiftcard)
-            }
+            disabled={!selectedPaymentMethod && !paidByGiftcard}
             data-testid="submit-payment-button"
           >
-            {(!activeSession && isStripeLike(selectedPaymentMethod)) ||
-            (selectedPaymentMethod === "pp_iyzico-mock_iyzico-mock" && !iyzicoComplete)
-              ? "Kart bilgilerini girin"
-              : "İncelemeye devam et"}
+            İncelemeye devam et
           </Button>
         </div>
 
@@ -251,14 +204,10 @@ const Payment = ({
                 >
                   <Container className="flex items-center h-7 w-fit p-2 bg-ui-button-neutral-hover">
                     {paymentInfoMap[selectedPaymentMethod]?.icon || (
-                      <CreditCard />
+                      <CreditCard size={16} />
                     )}
                   </Container>
-                  <Text>
-                    {isStripeLike(selectedPaymentMethod) && cardBrand
-                      ? cardBrand
-                      : "Sonraki adım görüntülenecek"}
-                  </Text>
+                  <Text>Sonraki adım görüntülenecek</Text>
                 </div>
               </div>
             </div>

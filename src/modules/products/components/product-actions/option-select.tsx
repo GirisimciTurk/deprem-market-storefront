@@ -1,14 +1,14 @@
-import { HttpTypes } from "@medusajs/types"
+import { StoreProductOption, StoreVariant } from "types/store"
 import { clx } from "@modules/common/components/ui"
 import React, { useMemo } from "react"
 
 type OptionSelectProps = {
-  option: HttpTypes.StoreProductOption
+  option: StoreProductOption
   current: string | undefined
   updateOption: (title: string, value: string) => void
   title: string
   disabled: boolean
-  variants?: HttpTypes.StoreProductVariant[] | null
+  variants?: StoreVariant[] | null
   "data-testid"?: string
 }
 
@@ -37,7 +37,7 @@ const colorMap: Record<string, string> = {
  */
 function getStockByOptionValue(
   optionId: string,
-  variants?: HttpTypes.StoreProductVariant[] | null
+  variants?: StoreVariant[] | null
 ): Record<string, { inStock: boolean; quantity: number }> {
   const stockMap: Record<string, { inStock: boolean; quantity: number }> = {}
 

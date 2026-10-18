@@ -1,7 +1,9 @@
+import { sendTrack } from "@lib/data/track"
+
 
 /**
- * İstemci-tarafı davranış izleme (fire-and-forget). Olaylar backend'e
- * `POST /store/track` ile gider (publishable key sdk tarafından eklenir).
+ * İstemci-tarafı davranış izleme (fire-and-forget). Olaylar bir sunucu eylemi
+ * üzerinden gobit'e (`POST /store/v1/dtm/track`) gider.
  *
  * - `session_id`: ilk ziyarette üretilip localStorage'da saklanan anonim kimlik;
  *   giriş öncesi/sonrası davranışı birleştirir. customer_id'yi backend, giriş
@@ -44,12 +46,9 @@ export type TrackPayload = {
   currency_code?: string | null
 }
 
-// gobit'te davranış izleme ucu (/store/track) yok; olaylar şimdilik
-// gönderilmiyor. İmza korunur ki çağıranlar değişmesin.
 export function track(type: TrackEventType, payload: TrackPayload = {}): void {
   if (typeof window === "undefined") return
   const session_id = getSessionId()
   if (!session_id) return
-  void type
-  void payload
+  void sendTrack({ type, session_id, ...payload }).catch(() => {})
 }

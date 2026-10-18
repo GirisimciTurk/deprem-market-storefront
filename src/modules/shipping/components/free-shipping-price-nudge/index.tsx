@@ -1,175 +1,111 @@
 "use client"
 
+import { CircleCheck, X } from "lucide-react"
 import { convertToLocale } from "@lib/util/money"
-import { CheckCircleSolid, XMark } from "@medusajs/icons"
-import {
-  HttpTypes,
-  StoreCart,
-  StoreCartShippingOption,
-  StorePrice,
-} from "@medusajs/types"
+import { StoreCart } from "types/store"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Button, clx } from "@modules/common/components/ui"
 import { useState } from "react"
-import { StoreFreeShippingPrice } from "types/global"
+import {
+  pickFreeShippingTarget,
+  type FreeShippingTarget,
+  type ShippingQuote,
+} from "@lib/util/free-shipping"
 
-const computeTarget = (
-  cart: HttpTypes.StoreCart,
-  price: HttpTypes.StorePrice
-) => {
-  const priceRule = (price.price_rules || []).find(
-    (pr) => pr.attribute === "item_total"
-  )!
-
-  const currentAmount = cart.item_total
-  const targetAmount = parseFloat(priceRule.value)
-
-  if (priceRule.operator === "gt") {
-    return {
-      current_amount: currentAmount,
-      target_amount: targetAmount,
-      target_reached: currentAmount > targetAmount,
-      target_remaining:
-        currentAmount > targetAmount ? 0 : targetAmount + 1 - currentAmount,
-      remaining_percentage: (currentAmount / targetAmount) * 100,
-    }
-  } else if (priceRule.operator === "gte") {
-    return {
-      current_amount: currentAmount,
-      target_amount: targetAmount,
-      target_reached: currentAmount > targetAmount,
-      target_remaining:
-        currentAmount > targetAmount ? 0 : targetAmount - currentAmount,
-      remaining_percentage: (currentAmount / targetAmount) * 100,
-    }
-  } else if (priceRule.operator === "lt") {
-    return {
-      current_amount: currentAmount,
-      target_amount: targetAmount,
-      target_reached: targetAmount > currentAmount,
-      target_remaining:
-        targetAmount > currentAmount ? 0 : currentAmount + 1 - targetAmount,
-      remaining_percentage: (currentAmount / targetAmount) * 100,
-    }
-  } else if (priceRule.operator === "lte") {
-    return {
-      current_amount: currentAmount,
-      target_amount: targetAmount,
-      target_reached: targetAmount > currentAmount,
-      target_remaining:
-        targetAmount > currentAmount ? 0 : currentAmount - targetAmount,
-      remaining_percentage: (currentAmount / targetAmount) * 100,
-    }
-  } else {
-    return {
-      current_amount: currentAmount,
-      target_amount: targetAmount,
-      target_reached: currentAmount === targetAmount,
-      target_remaining:
-        targetAmount > currentAmount ? 0 : targetAmount - currentAmount,
-      remaining_percentage: (currentAmount / targetAmount) * 100,
-    }
-  }
-}
-
+// Ücretsiz kargo hedefi dtm'nin kargo teklifinden gelir: her satıcının kendi
+// eşiği (free_shipping_threshold) o satıcının sepetteki ara toplamına uygulanır.
 export default function ShippingPriceNudge({
   variant = "inline",
   cart,
-  shippingOptions,
+  quote,
 }: {
   variant?: "popup" | "inline"
   cart: StoreCart
-  shippingOptions: StoreCartShippingOption[]
+  quote: ShippingQuote | null
 }) {
-  if (!cart || !shippingOptions?.length) {
-    return
+  const target = pickFreeShippingTarget(quote)
+  if (!cart || !quote || !target) {
+    return null
   }
-
-  // Check if any shipping options have a conditional price based on item_total
-  const freeShippingPrice = shippingOptions
-    .map((shippingOption) => {
-      const calculatedPrice = shippingOption.calculated_price
-
-      if (!calculatedPrice) {
-        return
-      }
-
-      // Get all prices that are:
-      // 1. Currency code is same as the cart's
-      // 2. Have a rule that is set on item_total
-      const validCurrencyPrices = shippingOption.prices.filter(
-        (price) =>
-          price.currency_code === cart.currency_code &&
-          (price.price_rules || []).some(
-            (priceRule) => priceRule.attribute === "item_total"
-          )
-      )
-
-      return validCurrencyPrices.map((price) => {
-        return {
-          ...price,
-          shipping_option_id: shippingOption.id,
-          ...computeTarget(cart, price),
-        }
-      })
-    })
-    .flat(1)
-    .filter(Boolean)
-    // We focus here entirely on free shipping, but this can be edited to handle multiple layers
-    // of reduced shipping prices.
-    .find((price) => price?.amount === 0)
-
-  if (!freeShippingPrice) {
-    return
-  }
+  const perSeller = quote.sellers.length > 1
 
   if (variant === "popup") {
-    return <FreeShippingPopup cart={cart} price={freeShippingPrice} />
-  } else {
-    return <FreeShippingInline cart={cart} price={freeShippingPrice} />
+    return <FreeShippingPopup cart={cart} target={target} perSeller={perSeller} />
   }
+
+  return <FreeShippingInline cart={cart} target={target} perSeller={perSeller} />
+}
+
+function Remaining({ cart, target }: { cart: StoreCart; target: FreeShippingTarget }) {
+  return (
+    <>
+      {convertToLocale({
+        amount: target.target_remaining,
+        currency_code: cart.currency_code,
+      })}
+    </>
+  )
+}
+
+/** "«Mağaza» için" — hedef bir mağazaya aitse adı (sayfasına bağlantılı). */
+function StoreName({ target, className }: { target: FreeShippingTarget; className?: string }) {
+  if (!target.seller_name) return null
+  return (
+    <>
+      «
+      {target.seller_handle ? (
+        <LocalizedClientLink
+          href={`/satici/${encodeURIComponent(target.seller_handle)}`}
+          className={clx("underline underline-offset-2", className)}
+        >
+          {target.seller_name}
+        </LocalizedClientLink>
+      ) : (
+        <span className={className}>{target.seller_name}</span>
+      )}
+      » için{" "}
+    </>
+  )
 }
 
 function FreeShippingInline({
   cart,
-  price,
+  target,
+  perSeller,
 }: {
   cart: StoreCart
-  price: StorePrice & {
-    target_reached: boolean
-    target_remaining: number
-    remaining_percentage: number
-  }
+  target: FreeShippingTarget
+  perSeller: boolean
 }) {
   return (
     <div className="bg-neutral-100 p-2 rounded-lg border">
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs text-neutral-600">
           <div>
-            {price.target_reached ? (
+            {target.target_reached ? (
               <div className="flex items-center gap-1.5">
-                {" "}
-                <CheckCircleSolid className="text-green-500 inline-block" />{" "}
-                Free Shipping unlocked!
+                <CircleCheck size={16} className="text-green-500 inline-block" />
+                Ücretsiz kargo açıldı!
               </div>
+            ) : target.seller_name ? (
+              <>
+                <StoreName target={target} className="text-neutral-950" />
+                ücretsiz kargoya
+              </>
             ) : (
-              `Unlock Free Shipping`
+              "Ücretsiz kargo kazan"
             )}
           </div>
 
           <div
             className={clx("visible", {
-              "opacity-0 invisible": price.target_reached,
+              "opacity-0 invisible": target.target_reached,
             })}
           >
-            Only{" "}
             <span className="text-neutral-950">
-              {convertToLocale({
-                amount: price.target_remaining,
-                currency_code: cart.currency_code,
-              })}
+              <Remaining cart={cart} target={target} />
             </span>{" "}
-            away
+            kaldı
           </div>
         </div>
         <div className="flex justify-between gap-1">
@@ -177,13 +113,18 @@ function FreeShippingInline({
             className={clx(
               "bg-gradient-to-r from-zinc-400 to-zinc-500 h-1 rounded-full max-w-full duration-500 ease-in-out",
               {
-                "from-green-400 to-green-500": price.target_reached,
+                "from-green-400 to-green-500": target.target_reached,
               }
             )}
-            style={{ width: `${price.remaining_percentage}%` }}
+            style={{ width: `${target.remaining_percentage}%` }}
           ></div>
           <div className="bg-neutral-300 h-1 rounded-full w-fit flex-grow"></div>
         </div>
+        {perSeller && (
+          <p className="text-[11px] text-neutral-500">
+            Ücretsiz kargo eşiği her satıcının kendi ürünlerine ayrı uygulanır.
+          </p>
+        )}
       </div>
     </div>
   )
@@ -191,10 +132,12 @@ function FreeShippingInline({
 
 function FreeShippingPopup({
   cart,
-  price,
+  target,
+  perSeller,
 }: {
   cart: StoreCart
-  price: StoreFreeShippingPrice
+  target: FreeShippingTarget
+  perSeller: boolean
 }) {
   const [isClosed, setIsClosed] = useState(false)
 
@@ -203,9 +146,9 @@ function FreeShippingPopup({
       className={clx(
         "fixed bottom-5 right-5 flex flex-col items-end gap-2 transition-all duration-500 ease-in-out z-10",
         {
-          "opacity-0 invisible delay-1000": price.target_reached,
+          "opacity-0 invisible delay-1000": target.target_reached,
           "opacity-0 invisible": isClosed,
-          "opacity-100 visible": !price.target_reached && !isClosed,
+          "opacity-100 visible": !target.target_reached && !isClosed,
         }
       )}
     >
@@ -213,8 +156,9 @@ function FreeShippingPopup({
         <Button
           className="rounded-full bg-neutral-900 shadow-none outline-none border-none text-[15px] p-2"
           onClick={() => setIsClosed(true)}
+          aria-label="Kapat"
         >
-          <XMark />
+          <X size={16} />
         </Button>
       </div>
 
@@ -223,27 +167,25 @@ function FreeShippingPopup({
           <div className="space-y-3">
             <div className="flex justify-between text-[15px] text-neutral-400">
               <div>
-                {price.target_reached ? (
+                {target.target_reached ? (
                   <div className="flex items-center gap-1.5">
-                    <CheckCircleSolid className="text-green-500 inline-block" />{" "}
+                    <CircleCheck size={16} className="text-green-500 inline-block" />{" "}
                     Ücretsiz kargo açıldı!
                   </div>
                 ) : (
-                  `Ücretsiz kargo kazan`
+                  "Ücretsiz kargo kazan"
                 )}
               </div>
 
               <div
                 className={clx("visible", {
-                  "opacity-0 invisible": price.target_reached,
+                  "opacity-0 invisible": target.target_reached,
                 })}
               >
-                Ücretsiz kargoya{" "}
+                <StoreName target={target} className="text-white" />
+                {target.seller_name ? "ücretsiz kargoya" : "Ücretsiz kargoya"}{" "}
                 <span className="text-white">
-                  {convertToLocale({
-                    amount: price.target_remaining,
-                    currency_code: cart.currency_code,
-                  })}
+                  <Remaining cart={cart} target={target} />
                 </span>{" "}
                 kaldı
               </div>
@@ -253,13 +195,19 @@ function FreeShippingPopup({
                 className={clx(
                   "bg-gradient-to-r from-zinc-400 to-zinc-500 h-1.5 rounded-full max-w-full duration-500 ease-in-out",
                   {
-                    "from-green-400 to-green-500": price.target_reached,
+                    "from-green-400 to-green-500": target.target_reached,
                   }
                 )}
-                style={{ width: `${price.remaining_percentage}%` }}
+                style={{ width: `${target.remaining_percentage}%` }}
               ></div>
               <div className="bg-zinc-600 h-1.5 rounded-full w-fit flex-grow"></div>
             </div>
+            {perSeller && (
+              <p className="text-xs text-neutral-400">
+                Sepetinizde birden çok satıcı var; ücretsiz kargo eşiği her
+                satıcının kendi ürünlerine ayrı uygulanır.
+              </p>
+            )}
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { HttpTypes } from "@medusajs/types"
+import { StoreCartLineItem, StoreOrderLineItem } from "types/store"
 import { Table, Text } from "@modules/common/components/ui"
 
 import LineItemOptions from "@modules/common/components/line-item-options"
@@ -8,7 +8,7 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type ItemProps = {
-  item: HttpTypes.StoreCartLineItem | HttpTypes.StoreOrderLineItem
+  item: StoreCartLineItem | StoreOrderLineItem
   currencyCode: string
 }
 

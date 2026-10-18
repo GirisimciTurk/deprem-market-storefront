@@ -1,6 +1,6 @@
 import { Text } from "@modules/common/components/ui"
 import { getProductPrice } from "@lib/util/get-product-price"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreRegion } from "types/store"
 import TrustedBadge from "@modules/sellers/components/trusted-badge"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
@@ -40,9 +40,9 @@ export default function ProductPreview({
   isFeatured,
   region: _region,
 }: {
-  product: HttpTypes.StoreProduct
+  product: StoreProduct
   isFeatured?: boolean
-  region: HttpTypes.StoreRegion
+  region: StoreRegion
 }) {
   const { cheapestPrice } = getProductPrice({
     product,

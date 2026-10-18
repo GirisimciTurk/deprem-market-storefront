@@ -1,5 +1,5 @@
 import repeat from "@lib/util/repeat"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCart } from "types/store"
 import { Heading, Table } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
@@ -7,10 +7,10 @@ import Item from "@modules/cart/components/item"
 import SkeletonLineItem from "@modules/skeletons/components/skeleton-line-item"
 
 type ItemsTemplateProps = {
-  cart?: HttpTypes.StoreCart
+  cart?: StoreCart
 }
 
-type CartLineItem = NonNullable<HttpTypes.StoreCart["items"]>[number]
+type CartLineItem = NonNullable<StoreCart["items"]>[number]
 
 type SellerInfo = { id: string; name: string; handle?: string }
 

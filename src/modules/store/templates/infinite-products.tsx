@@ -1,14 +1,14 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreRegion } from "types/store"
 import ProductPreview from "@modules/products/components/product-preview"
 import { listProductsWithSort } from "@lib/data/products"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 type InfiniteProductsProps = {
-  initialProducts: HttpTypes.StoreProduct[]
-  region: HttpTypes.StoreRegion
+  initialProducts: StoreProduct[]
+  region: StoreRegion
   sortBy?: SortOptions
   collectionId?: string
   /**
@@ -40,7 +40,7 @@ export default function InfiniteProducts({
   showcase,
   initialCount,
 }: InfiniteProductsProps) {
-  const [products, setProducts] = useState<HttpTypes.StoreProduct[]>(initialProducts)
+  const [products, setProducts] = useState<StoreProduct[]>(initialProducts)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(initialProducts.length < initialCount)
   const [isLoading, setIsLoading] = useState(false)

@@ -1,4 +1,4 @@
-import { ChevronUpDown } from "@medusajs/icons"
+import { ChevronsUpDown } from "lucide-react"
 import { Label } from "@modules/common/components/ui"
 import React, { useImperativeHandle } from "react"
 
@@ -49,7 +49,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             {required && <span className="text-brand-500">*</span>}
           </label>
           <span className="absolute right-4 inset-y-0 flex items-center pointer-events-none text-ui-fg-subtle">
-            <ChevronUpDown />
+            <ChevronsUpDown size={16} />
           </span>
         </div>
       </div>

@@ -5,9 +5,8 @@ import {
   updateCustomerAddress,
 } from "@lib/data/customer"
 import useToggleState from "@lib/hooks/use-toggle-state"
-import { PencilSquare as Edit, Trash } from "@medusajs/icons"
-import { Home, Briefcase, MapPin } from "lucide-react"
-import { HttpTypes } from "@medusajs/types"
+import { Home, Briefcase, MapPin, SquarePen as Edit, Trash2 } from "lucide-react"
+import { StoreCustomerAddress, StoreRegion } from "types/store"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
 import Modal from "@modules/common/components/modal"
@@ -18,8 +17,8 @@ import Spinner from "@modules/common/icons/spinner"
 import React, { useActionState, useEffect, useState } from "react"
 
 type EditAddressProps = {
-  region: HttpTypes.StoreRegion
-  address: HttpTypes.StoreCustomerAddress
+  region: StoreRegion
+  address: StoreCustomerAddress
   isActive?: boolean
 }
 
@@ -136,7 +135,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
             onClick={removeAddress}
             data-testid="address-delete-button"
           >
-            {removing ? <Spinner /> : <Trash />}
+            {removing ? <Spinner /> : <Trash2 size={16} />}
             Kaldır
           </button>
         </div>

@@ -1,4 +1,4 @@
-import { HttpTypes } from "@medusajs/types"
+import { StoreCart } from "types/store"
 import Input from "@modules/common/components/input"
 import Select from "@modules/common/components/select"
 import { TR_CITIES_DISTRICTS } from "@lib/util/tr-cities-districts"
@@ -40,7 +40,7 @@ const isValidVKN = (val: string): boolean => {
   return checksum === digits[9]
 }
 
-const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
+const BillingAddress = ({ cart }: { cart: StoreCart | null }) => {
   const t = useTranslations("billingAddress")
   // TR: geçersiz İl/İlçe değerlerini (eski/bozuk kayıt) yanlış "Adana" fallback'ine
   // düşmesin diye boşa çevir; kullanıcı doğru seçer.

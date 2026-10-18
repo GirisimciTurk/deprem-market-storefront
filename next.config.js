@@ -25,16 +25,10 @@ const withSerwist = require("@serwist/next").default({
   additionalPrecacheEntries: [{ url: "/offline", revision: "offline-v1" }],
 })
 
-/**
- * Medusa Cloud-related environment variables
- */
-const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
-const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
-
 // Backend origin used in the CSP. Driven by env so production does not stay
 // locked to localhost. Falls back to the local dev backend.
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+  process.env.NEXT_PUBLIC_GOBIT_BACKEND_URL || "http://localhost:9100"
 
 // Backend/nginx host'u (r2.dev görselleri buradaki `/r2/` reverse-proxy'sinden
 // sunulur — bkz. toReachableImageUrl). next/image optimizasyonu için remotePatterns'e
@@ -90,6 +84,11 @@ const nextConfig = {
       fullUrl: true,
     },
   },
+  experimental: {
+    // Server action gövdesi varsayılan 1 MB; uzman profil fotoğrafı 3 MB'a kadar
+    // (gobit'in sınırı) server action üzerinden yükleniyor.
+    serverActions: { bodySizeLimit: "4mb" },
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -136,15 +135,6 @@ const nextConfig = {
         protocol: "https",
         hostname: "pub-972575e25eda4755b1250ca6be181153.r2.dev",
       },
-      ...(S3_HOSTNAME && S3_PATHNAME
-        ? [
-            {
-              protocol: "https",
-              hostname: S3_HOSTNAME,
-              pathname: S3_PATHNAME,
-            },
-          ]
-        : []),
     ],
   },
   // PayTR'nin ödeme çerçevesi ve boy uyarlayıcı betiği. Yerelde sahte PayTR
@@ -233,6 +223,14 @@ const nextConfig = {
       {
         source: "/:countryCode/account/bayilik",
         destination: "/:countryCode/account/satici",
+        permanent: true,
+      },
+      // gobit'in "satıcıdan yeni mesajınız var" e-postası (posta
+      // depremtek.message_to_customer) /account/mesajlar'a bağlanır; sayfa
+      // /account/mesajlarim'dir.
+      {
+        source: "/:countryCode/account/mesajlar",
+        destination: "/:countryCode/account/mesajlarim",
         permanent: true,
       },
       // Uzman üyelik paketleri kaldırıldı: herkes aynı kartı açar.

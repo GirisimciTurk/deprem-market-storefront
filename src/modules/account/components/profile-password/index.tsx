@@ -3,11 +3,11 @@
 import React, { useEffect, useActionState } from "react"
 import Input from "@modules/common/components/input"
 import AccountInfo from "../account-info"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCustomer } from "types/store"
 import { updateCustomerPassword } from "@lib/data/customer"
 
 type MyInformationProps = {
-  customer: HttpTypes.StoreCustomer
+  customer: StoreCustomer
 }
 
 const ProfilePassword: React.FC<MyInformationProps> = ({ customer: _customer }) => {

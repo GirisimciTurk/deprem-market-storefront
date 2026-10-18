@@ -93,9 +93,9 @@ describe("promo-video gösterildi işareti", () => {
   })
 
   it("başka çerezlerin arasında dursa da bulur", () => {
-    document.cookie = "_medusa_cache_id=abc; path=/"
+    document.cookie = "_dt_cache_id=abc; path=/"
     document.cookie = `${PROMO_VIDEO_COOKIE}=1; path=/`
-    document.cookie = "_medusa_cart_id=xyz; path=/"
+    document.cookie = "_dt_cart_id=xyz; path=/"
     expect(hasSeenPromoVideo()).toBe(true)
   })
 

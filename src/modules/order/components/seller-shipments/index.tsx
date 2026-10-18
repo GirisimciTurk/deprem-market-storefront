@@ -20,6 +20,7 @@ const STAGE_LABELS: Record<string, string> = {
   received: "Sipariş Alındı",
   preparing: "Hazırlanıyor",
   shipped: "Kargoya Verildi",
+  delivered: "Teslim Edildi",
   canceled: "İptal",
 }
 
@@ -27,6 +28,7 @@ const STAGE_STYLES: Record<string, string> = {
   received: "bg-gray-100 text-gray-600",
   preparing: "bg-amber-50 text-amber-700",
   shipped: "bg-green-50 text-green-600",
+  delivered: "bg-green-100 text-green-700",
   canceled: "bg-brand-50 text-brand-600",
 }
 

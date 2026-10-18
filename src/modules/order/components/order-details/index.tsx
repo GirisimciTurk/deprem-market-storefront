@@ -1,17 +1,20 @@
-import { HttpTypes } from "@medusajs/types"
+import { StoreOrder } from "types/store"
 import { Text } from "@modules/common/components/ui"
+import {
+  getFulfillmentLabel,
+  getPaymentLabel,
+} from "@modules/order-tracking/components/tracking-utils"
 
 type OrderDetailsProps = {
-  order: HttpTypes.StoreOrder
+  order: StoreOrder
   showStatus?: boolean
 }
 
 const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
-  const formatStatus = (str: string) => {
-    const formatted = str.split("_").join(" ")
-
-    return formatted.slice(0, 1).toUpperCase() + formatted.slice(1)
-  }
+  // dtm'nin aşama adı ("Kargoya Verildi") varsa o; yoksa durumun Türkçesi.
+  const orderStatus =
+    order.stage_label || getFulfillmentLabel(order.fulfillment_status).text
+  const paymentStatus = getPaymentLabel(order.payment_status).text
 
   return (
     <div>
@@ -45,7 +48,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
             <Text>
               Sipariş durumu:{" "}
               <span className="text-ui-fg-subtle " data-testid="order-status">
-                {formatStatus(order.fulfillment_status)}
+                {orderStatus}
               </span>
             </Text>
             <Text>
@@ -54,7 +57,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
                 className="text-ui-fg-subtle "
                 data-testid="order-payment-status"
               >
-                {formatStatus(order.payment_status)}
+                {paymentStatus}
               </span>
             </Text>
           </>

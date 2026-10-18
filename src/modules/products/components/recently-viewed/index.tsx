@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreRegion } from "types/store"
 import Thumbnail from "../thumbnail"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { clx } from "@modules/common/components/ui"
@@ -9,9 +9,9 @@ import { getProductPrice } from "@lib/util/get-product-price"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 type RecentlyViewedProps = {
-  allProducts: HttpTypes.StoreProduct[]
+  allProducts: StoreProduct[]
   currentHandle: string
-  region: HttpTypes.StoreRegion
+  region: StoreRegion
 }
 
 export default function RecentlyViewed({
@@ -19,7 +19,7 @@ export default function RecentlyViewed({
   currentHandle,
   region: _region,
 }: RecentlyViewedProps) {
-  const [viewedProducts, setViewedProducts] = useState<HttpTypes.StoreProduct[]>([])
+  const [viewedProducts, setViewedProducts] = useState<StoreProduct[]>([])
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function RecentlyViewed({
       const otherHandles = limitedHandles.filter((h) => h !== currentHandle)
       const matched = otherHandles
         .map((h) => allProducts.find((p) => p.handle === h))
-        .filter((p): p is HttpTypes.StoreProduct => !!p)
+        .filter((p): p is StoreProduct => !!p)
 
       setViewedProducts(matched)
     } catch (e) {

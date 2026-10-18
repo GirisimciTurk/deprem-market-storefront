@@ -6,6 +6,8 @@ import { getAuthHeaders } from "./cookies"
 export type StoreConversationSummary = {
   id: string
   seller: { id: string; name: string; handle: string }
+  /** Konuşmanın açıldığı sipariş (yoksa null). */
+  order_id: string | null
   order_display_id: number | null
   subject: string | null
   status: string
@@ -25,6 +27,7 @@ export type StoreConversationMessage = {
 export type StoreConversationDetail = {
   id: string
   subject: string | null
+  order_id: string | null
   order_display_id: number | null
   status: string
 }
@@ -41,6 +44,9 @@ type DtmThread = {
   unread: number
   last_message_preview: string | null
   last_sender_type: "customer" | "seller" | null
+  /** Konuşmanın bağlı olduğu sipariş ve numarası; gobit okunamazsa null. */
+  order_id?: string | null
+  order_display_id?: number | null
 }
 
 /** Giriş yapmış müşterinin tüm konuşmaları (son mesaja göre sıralı). */
@@ -56,7 +62,8 @@ export async function listConversations(): Promise<{
       conversations: ts.map((t) => ({
         id: t.id,
         seller: t.seller,
-        order_display_id: null,
+        order_id: t.order_id ?? null,
+        order_display_id: t.order_display_id ?? null,
         subject: t.subject || null,
         status: t.status,
         last_message_at: t.last_message_at,
@@ -89,7 +96,15 @@ export async function getConversationMessages(id: string): Promise<{
     const head = list.find((t) => t.id === id)
 
     return {
-      conversation: head ? { id, subject: head.subject || null, order_display_id: null, status: head.status } : null,
+      conversation: head
+        ? {
+            id,
+            subject: head.subject || null,
+            order_id: head.order_id ?? null,
+            order_display_id: head.order_display_id ?? null,
+            status: head.status,
+          }
+        : null,
       messages: messages.map((m) => ({ id: m.id, sender_type: m.side, body: m.body, created_at: m.created_at })),
     }
   } catch {
@@ -129,6 +144,8 @@ export async function startConversation(input: {
       headers,
       body: {
         ...(input.seller_id ? { seller_id: input.seller_id } : { seller_handle: input.seller_handle }),
+        // Siparişten açılan konuşma o siparişe bağlanır (sipariş müşterinin olmalı ve bu mağazanın ürününü içermeli).
+        ...(input.order_id ? { order_id: input.order_id } : {}),
         subject: input.subject ?? "",
         message: input.message,
       },

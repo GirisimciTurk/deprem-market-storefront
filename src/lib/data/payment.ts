@@ -1,8 +1,7 @@
 "use server"
 
-import { HttpTypes } from "@medusajs/types"
+import { StorePaymentProvider } from "types/store"
 import { gobitData } from "@lib/gobit/client"
-import { medusaProviderId } from "@lib/gobit/cart"
 
 // Mağazanın ödeme yöntemleri. depremtek vitrini kartla PayTR'yi gösterir;
 // hediye kartı, puan ve cüzdan sağlayıcıları ödeme adımında seçilmez.
@@ -14,7 +13,7 @@ export const listCartPaymentMethods = async (regionId: string) => {
       (ids) =>
         ids
           .filter((id) => SHOWN.has(id))
-          .map((id) => ({ id: medusaProviderId(id), is_enabled: true })) as HttpTypes.StorePaymentProvider[]
+          .map((id): StorePaymentProvider => ({ id, is_enabled: true }))
     )
     .catch(() => null)
 }

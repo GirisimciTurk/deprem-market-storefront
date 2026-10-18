@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { sortProducts } from "./sort-products"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 
 describe("sortProducts utility", () => {
   const mockProducts = [
@@ -30,7 +30,7 @@ describe("sortProducts utility", () => {
         { calculated_price: { calculated_amount: 75 } },
       ],
     },
-  ] as unknown as HttpTypes.StoreProduct[]
+  ] as unknown as StoreProduct[]
 
   it("should sort products by price ascending (price_asc)", () => {
     // Min prices: prod_1 = 100, prod_2 = 300, prod_3 = 50
@@ -70,7 +70,7 @@ describe("sortProducts utility", () => {
         title: "Normal Product",
         variants: [{ calculated_price: { calculated_amount: 100 } }],
       },
-    ] as unknown as HttpTypes.StoreProduct[]
+    ] as unknown as StoreProduct[]
 
     const result = sortProducts(productsWithEmpty, "price_asc")
     // Empty product minPrice is Infinity, so it should be at the end

@@ -12,13 +12,13 @@ export type ServiceOfferItem = {
   total?: number
 }
 
-// Müşteriye yansıyan hizmet talebi alanları. Tutarlar TAM LİRA (major), kuruş değil.
+// Müşteriye yansıyan hizmet talebi alanları. Tutarlar TAM LİRA (major): gobit'in
+// kuruşları toRequest'te çevrilir.
 export type StoreServiceRequest = {
   id: string
   service_title?: string
   service_kind: string
   requires_survey?: boolean
-  media?: { url: string; type?: string }[] | null
   status: string
   city?: string
   district?: string
@@ -62,7 +62,8 @@ export type ServicePayment = {
 // hesaba ya da açılışta verilen anahtara (X-Service-Request-Key) cevap verir;
 // başkasına "yok" der. Anahtarı bu sunucu üretir ve misafir talepler için
 // HttpOnly bir çerezde tutar; hiçbir yanıtta dönmez. dtm teklifi tek fiyatla
-// verir; keşif ücreti, kapora ve bakiyenin çevrimiçi ödemesi dtm'de yok.
+// verir; keşif ücreti, kapora ve bakiye operatörce kaydedilir (çevrimiçi
+// tahsilat yok).
 
 const KEYS = "_gobit_service_keys"
 const KEY_HEADER = "X-Service-Request-Key"
@@ -72,13 +73,39 @@ type DtmServiceRequest = {
   kind: string
   product_title?: string
   status: string
+  /** Ayrıntılı aşama (talep, kesif_planlandi, teklif_gonderildi, onaylandi, …). */
+  stage?: string
   city?: string
   district?: string
+  /** Müşterinin notu. */
   detail?: string
+  service_title?: string
+  service_kind?: string
+  requires_survey?: boolean
+  address?: string
+  details?: Record<string, unknown> | null
+  preferred_dates?: string[] | null
   quote_price?: number | null
   quote_note?: string
+  offer_items?: ServiceOfferItem[] | null
+  offer_valid_until?: string | null
+  offer_sent_at?: string | null
+  offer_decision?: "pending" | "accepted" | "rejected"
+  survey_scheduled_at?: string | null
+  survey_done_at?: string | null
+  survey_report?: string
+  install_scheduled_at?: string | null
+  install_done_at?: string | null
+  survey_fee?: number | null
+  deposit_amount?: number | null
+  balance_amount?: number | null
+  payment_status?: string
+  paid_total?: number
+  payments?: { phase: ServicePhase; amount: number; method?: string; status?: string; paid_at?: string }[] | null
   created_at: string
   decided_at?: string | null
+  // İşi yapan: mağazanın uygulama noktası ya da anlaşmalı uzmanı.
+  installer?: { kind: "location" | "expert"; id: string; name: string; slug?: string }
 }
 
 async function keys(): Promise<Record<string, string>> {
@@ -110,19 +137,55 @@ async function headersFor(id: string): Promise<Record<string, string>> {
   return { ...(await getAuthHeaders()), ...(key ? { [KEY_HEADER]: key } : {}) }
 }
 
+// gobit tutarları kuruş tutar; hesap sayfası tam lira gösterir.
+const lira = (n?: number | null) => (typeof n === "number" ? n / 100 : null)
+
 const toRequest = (r: DtmServiceRequest): StoreServiceRequest => ({
   id: r.id,
-  service_title: r.product_title || (r.kind === "discovery" ? "Keşif talebi" : "Hizmet talebi"),
-  service_kind: r.kind,
-  status: r.status,
+  service_title:
+    r.service_title || r.product_title || (r.kind === "discovery" ? "Keşif talebi" : "Hizmet talebi"),
+  service_kind: r.service_kind || r.kind,
+  requires_survey: r.requires_survey,
+  status: r.stage || r.status,
   city: r.city,
   district: r.district,
+  address: r.address,
+  details: r.details ?? null,
+  preferred_dates: r.preferred_dates ?? null,
   note: r.detail,
-  offer_total: r.quote_price ?? null,
-  offer_items: r.quote_note ? [{ label: r.quote_note }] : null,
-  offer_decision: r.status === "accepted" || r.status === "done" ? "accepted" : r.status === "declined" ? "rejected" : "pending",
-  payment_status: "none",
-  payments: [],
+  survey_scheduled_at: r.survey_scheduled_at ?? null,
+  survey_done_at: r.survey_done_at ?? null,
+  survey_report: r.survey_report,
+  offer_items: r.offer_items?.length
+    ? r.offer_items.map((it) => ({
+        label: it.label,
+        qty: it.qty,
+        unit_price: lira(it.unit_price) ?? undefined,
+        total: lira(it.total) ?? undefined,
+      }))
+    : r.quote_note
+      ? [{ label: r.quote_note }]
+      : null,
+  offer_total: lira(r.quote_price),
+  offer_valid_until: r.offer_valid_until ?? null,
+  offer_sent_at: r.offer_sent_at ?? null,
+  offer_decision:
+    r.offer_decision ??
+    (r.status === "accepted" || r.status === "done" ? "accepted" : r.status === "declined" ? "rejected" : "pending"),
+  survey_fee: lira(r.survey_fee),
+  deposit_amount: lira(r.deposit_amount),
+  balance_amount: lira(r.balance_amount),
+  paid_total: lira(r.paid_total),
+  payment_status: r.payment_status ?? "none",
+  payments: (r.payments ?? []).map((p) => ({
+    phase: p.phase,
+    amount: lira(p.amount) ?? 0,
+    status: p.status === "paid" ? "paid" : "pending",
+    method: p.method === "paytr" ? "paytr" : "manual",
+    paid_at: p.paid_at,
+  })),
+  install_scheduled_at: r.install_scheduled_at ?? null,
+  install_done_at: r.install_done_at ?? null,
   created_at: r.created_at,
 })
 
@@ -150,6 +213,26 @@ export async function listMyServiceRequests(): Promise<StoreServiceRequest[]> {
   return [...own, ...(guest.filter(Boolean) as DtmServiceRequest[])]
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
     .map(toRequest)
+}
+
+/**
+ * Hesabın açtığı ve verilen uzmanın tamamladığı işler: uzman değerlendirmesine
+ * "Doğrulanmış iş" olarak bağlanabilenler. Misafir talepler sayılmaz; gobit işi
+ * yalnız onu açan hesabın değerlendirmesine bağlar.
+ */
+export async function listMyJobsWithExpert(
+  slug: string
+): Promise<{ id: string; title: string; created_at: string }[]> {
+  const headers = await getAuthHeaders()
+  if (!headers.cookie) return []
+  const own = await gobitData<DtmServiceRequest[]>("/store/v1/dtm/service-requests", {
+    headers,
+    cache: "no-store",
+  }).catch(() => [] as DtmServiceRequest[])
+
+  return own
+    .filter((r) => r.status === "done" && r.installer?.kind === "expert" && r.installer.slug === slug)
+    .map((r) => ({ id: r.id, title: toRequest(r).service_title ?? "Hizmet talebi", created_at: r.created_at }))
 }
 
 /** Teklifi kabul ya da reddet. */
@@ -181,6 +264,7 @@ export type CreateServiceRequestPayload = {
   note?: string
   details?: Record<string, unknown>
   preferred_dates?: string[]
+  requires_survey?: boolean
 }
 
 /** Hizmet ya da keşif talebi açar; anahtarı üretip saklar. */
@@ -188,15 +272,6 @@ export async function createServiceRequest(
   payload: CreateServiceRequestPayload
 ): Promise<{ success: boolean; error: string | null; id?: string }> {
   const accessKey = randomBytes(32).toString("base64url")
-  const extra = [
-    payload.service_title ? `Hizmet: ${payload.service_title}` : "",
-    payload.address ? `Adres: ${payload.address}` : "",
-    payload.preferred_dates?.length ? `Tercih edilen tarihler: ${payload.preferred_dates.join(", ")}` : "",
-    payload.details ? Object.entries(payload.details).map(([k, v]) => `${k}: ${String(v)}`).join("\n") : "",
-    payload.note ?? "",
-  ]
-    .filter(Boolean)
-    .join("\n")
   try {
     const out = await gobitData<{ id: string }>("/store/v1/dtm/service-requests", {
       method: "POST",
@@ -209,7 +284,13 @@ export async function createServiceRequest(
         customer_phone: payload.phone ?? "",
         city: payload.city ?? "",
         district: payload.district ?? "",
-        detail: extra.slice(0, 2000),
+        address: payload.address ?? "",
+        detail: (payload.note ?? "").slice(0, 2000),
+        service_title: payload.service_title ?? "",
+        ...(payload.service_kind ? { service_kind: payload.service_kind } : {}),
+        ...(payload.requires_survey !== undefined ? { requires_survey: payload.requires_survey } : {}),
+        details: payload.details ?? {},
+        preferred_dates: payload.preferred_dates ?? [],
         access_key: accessKey,
       },
     })

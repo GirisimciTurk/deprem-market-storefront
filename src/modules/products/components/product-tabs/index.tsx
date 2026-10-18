@@ -5,10 +5,10 @@ import FastDelivery from "@modules/common/icons/fast-delivery"
 import Refresh from "@modules/common/icons/refresh"
 
 import Accordion from "./accordion"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 
 type ProductTabsProps = {
-  product: HttpTypes.StoreProduct
+  product: StoreProduct
 }
 
 type Spec = { key: string; name: string; value: string }

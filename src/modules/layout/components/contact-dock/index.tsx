@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { HttpTypes } from "@medusajs/types"
+import { StoreRegion } from "types/store"
 import { Headset, X, Phone, PhoneCall, MessageCircle, Copy, Check } from "lucide-react"
 import { clx } from "@modules/common/components/ui"
 import AiMascot from "@modules/layout/components/ai-mascot"
@@ -29,7 +29,7 @@ export default function ContactDock({
   region,
 }: {
   countryCode: string
-  region: HttpTypes.StoreRegion | null
+  region: StoreRegion | null
 }) {
   const t = useTranslations("dock")
   const tm = useTranslations("mascot")

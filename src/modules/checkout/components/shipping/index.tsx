@@ -1,13 +1,13 @@
 "use client"
+import { CircleCheck, Loader2 } from "lucide-react"
 import { Radio, RadioGroup } from "@headlessui/react"
 import { setShippingMethod } from "@lib/data/cart"
 import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
 import { convertToLocale } from "@lib/util/money"
-import { CheckCircleSolid, Loader } from "@medusajs/icons"
-import { HttpTypes } from "@medusajs/types"
+import { StoreAddress, StoreCart, StoreCartShippingOption } from "types/store"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import Divider from "@modules/common/components/divider"
-import MedusaRadio from "@modules/common/components/radio"
+import RadioMark from "@modules/common/components/radio"
 import { Button, clx, Heading, Text } from "@modules/common/components/ui"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -16,11 +16,11 @@ const PICKUP_OPTION_ON = "__PICKUP_ON"
 const PICKUP_OPTION_OFF = "__PICKUP_OFF"
 
 type ShippingProps = {
-  cart: HttpTypes.StoreCart
-  availableShippingMethods: HttpTypes.StoreCartShippingOption[] | null
+  cart: StoreCart
+  availableShippingMethods: StoreCartShippingOption[] | null
 }
 
-function formatAddress(address: HttpTypes.StoreCartAddress) {
+function formatAddress(address: StoreAddress) {
   if (!address) {
     return ""
   }
@@ -71,7 +71,7 @@ const Shipping: React.FC<ShippingProps> = ({
 
   const _shippingMethods = availableShippingMethods?.filter((sm) => {
     const isPickup =
-      (sm as unknown as { service_zone?: { fulfillment_set?: { type?: string; location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.type === "pickup"
+      sm.service_zone?.fulfillment_set?.type === "pickup"
 
     if (isPickup) {
       return false
@@ -88,7 +88,7 @@ const Shipping: React.FC<ShippingProps> = ({
   })
 
   const _pickupMethods = availableShippingMethods?.filter(
-    (sm) => (sm as unknown as { service_zone?: { fulfillment_set?: { type?: string; location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.type === "pickup"
+    (sm) => sm.service_zone?.fulfillment_set?.type === "pickup"
   )
 
   const hasPickupOptions = !!_pickupMethods?.length
@@ -180,7 +180,7 @@ const Shipping: React.FC<ShippingProps> = ({
         >
           Teslimat
           {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && (
-            <CheckCircleSolid />
+            <CircleCheck size={16} />
           )}
         </Heading>
         {!isOpen &&
@@ -236,7 +236,7 @@ const Shipping: React.FC<ShippingProps> = ({
                       )}
                     >
                       <div className="flex items-center gap-x-4">
-                        <MedusaRadio
+                        <RadioMark
                           checked={showPickupOptions === PICKUP_OPTION_ON}
                         />
                         <span className="text-base-regular">
@@ -286,7 +286,7 @@ const Shipping: React.FC<ShippingProps> = ({
                         )}
                       >
                         <div className="flex items-center gap-x-4">
-                          <MedusaRadio
+                          <RadioMark
                             checked={option.id === shippingMethodId}
                           />
                           <div className="flex flex-col">
@@ -318,7 +318,7 @@ const Shipping: React.FC<ShippingProps> = ({
                               currency_code: cart?.currency_code,
                             })
                           ) : isLoadingPrices ? (
-                            <Loader />
+                            <Loader2 size={16} className="animate-spin" />
                           ) : (
                             "-"
                           )}
@@ -369,7 +369,7 @@ const Shipping: React.FC<ShippingProps> = ({
                           )}
                         >
                           <div className="flex items-start gap-x-4">
-                            <MedusaRadio
+                            <RadioMark
                               checked={option.id === shippingMethodId}
                             />
                             <div className="flex flex-col">
@@ -378,8 +378,8 @@ const Shipping: React.FC<ShippingProps> = ({
                               </span>
                               <span className="text-base-regular text-ui-fg-muted">
                                 {formatAddress(
-                                  (option as unknown as { service_zone?: { fulfillment_set?: { location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.location
-                                    ?.address as HttpTypes.StoreCartAddress
+                                  option.service_zone?.fulfillment_set?.location
+                                    ?.address as StoreAddress
                                 )}
                               </span>
                             </div>

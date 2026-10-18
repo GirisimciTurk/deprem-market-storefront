@@ -10,7 +10,7 @@ import ProductCertifications from "@modules/products/components/product-certific
 import Breadcrumb from "@modules/common/components/breadcrumb"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { notFound } from "next/navigation"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreProductImage, StoreRegion } from "types/store"
 
 import ProductActionsWrapper from "./product-actions-wrapper"
 import ProductShowcase from "../components/product-showcase"
@@ -23,10 +23,10 @@ import TrackView from "@modules/products/components/track-view"
 import BoughtTogether from "@modules/products/components/bought-together"
 
 type ProductTemplateProps = {
-  product: HttpTypes.StoreProduct
-  region: HttpTypes.StoreRegion
+  product: StoreProduct
+  region: StoreRegion
   countryCode: string
-  images: HttpTypes.StoreProductImage[]
+  images: StoreProductImage[]
 }
 
 const ProductTemplate = async ({
@@ -54,9 +54,7 @@ const ProductTemplate = async ({
   // Hedef `/categories/<handle>` DEĞİL `/store?categoryId=<id>` — footer'la aynı
   // gerekçe: kategori seçimi mağazanın sol kategori menüsünden yapılmış gibi
   // davranmalı, ayrı bir kategori şablonu açmamalı.
-  const primaryCategory = (product as any).categories?.[0] as
-    | { id?: string; name?: string }
-    | undefined
+  const primaryCategory = product.categories?.[0]
   const breadcrumbItems = [
     { label: "Ana Sayfa", href: "/" },
     { label: "Mağaza", href: "/store" },

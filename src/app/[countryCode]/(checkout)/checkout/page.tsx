@@ -1,6 +1,5 @@
 import { refreshCartPrices, retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
-import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import TrackCheckoutStart from "@modules/checkout/components/track-checkout"
@@ -35,9 +34,9 @@ export default async function Checkout() {
         value={cart.total != null ? Math.round(Number(cart.total) * 100) : null}
         currency={cart.currency_code}
       />
-      <PaymentWrapper cart={cart}>
+      <div>
         <CheckoutForm cart={cart} customer={customer} />
-      </PaymentWrapper>
+      </div>
       <CheckoutSummary cart={cart} />
     </div>
   )

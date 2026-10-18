@@ -1,5 +1,5 @@
 import repeat from "@lib/util/repeat"
-import { HttpTypes } from "@medusajs/types"
+import { StoreOrder } from "types/store"
 import { Table } from "@modules/common/components/ui"
 
 import Divider from "@modules/common/components/divider"
@@ -7,7 +7,7 @@ import Item from "@modules/order/components/item"
 import SkeletonLineItem from "@modules/skeletons/components/skeleton-line-item"
 
 type ItemsProps = {
-  order: HttpTypes.StoreOrder
+  order: StoreOrder
 }
 
 const Items = ({ order }: ItemsProps) => {

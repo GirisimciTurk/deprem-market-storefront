@@ -1,10 +1,10 @@
 "use client"
 
 import React, { useState } from "react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCustomer } from "types/store"
 import { updateCustomer } from "@lib/data/customer"
 
-type Props = { customer: HttpTypes.StoreCustomer }
+type Props = { customer: StoreCustomer }
 
 type Pref = { key: "comm_sms" | "comm_email" | "comm_phone"; title: string; desc: string }
 

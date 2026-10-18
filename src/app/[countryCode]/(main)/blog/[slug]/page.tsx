@@ -8,7 +8,7 @@ import { getRegion } from "@lib/data/regions"
 import ProductPreview from "@modules/products/components/product-preview"
 import { getTranslations } from "next-intl/server"
 
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string; countryCode: string }>
@@ -39,8 +39,8 @@ export default async function BlogPostPage(props: {
 
   const region = await getRegion(countryCode)
   
-  // Fetch related products linked in markdown frontmatter
-  let relatedProducts: HttpTypes.StoreProduct[] = []
+  // Yazının ilgili ürünleri (dtm related_products: ürün adresleri, en çok 24).
+  let relatedProducts: StoreProduct[] = []
   if (post.related_products && post.related_products.length > 0 && region) {
     try {
       const { response } = await listProducts({
@@ -73,9 +73,18 @@ export default async function BlogPostPage(props: {
 
         {/* Post Title & Meta */}
         <header className="mb-10 text-center md:text-left">
-          <span className="text-sm font-semibold tracking-wider text-brand-600 uppercase px-3 py-1 bg-brand-100 rounded-full dark:bg-brand-900/30 dark:text-brand-400">
-            {t("badge")}
-          </span>
+          {post.category ? (
+            <Link
+              href={`/${countryCode}/blog?kategori=${encodeURIComponent(post.category)}`}
+              className="text-sm font-semibold tracking-wider text-brand-600 uppercase px-3 py-1 bg-brand-100 rounded-full dark:bg-brand-900/30 dark:text-brand-400 hover:bg-brand-200"
+            >
+              {post.category}
+            </Link>
+          ) : (
+            <span className="text-sm font-semibold tracking-wider text-brand-600 uppercase px-3 py-1 bg-brand-100 rounded-full dark:bg-brand-900/30 dark:text-brand-400">
+              {t("badge")}
+            </span>
+          )}
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-ui-fg-base mt-4 tracking-tight leading-tight">
             {post.title}
           </h1>

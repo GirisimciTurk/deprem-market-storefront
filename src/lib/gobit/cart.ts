@@ -2,13 +2,13 @@ import "server-only"
 
 import { randomUUID } from "node:crypto"
 import { cookies } from "next/headers"
-import type { HttpTypes } from "@medusajs/types"
+import type { StoreCart, StoreCartShippingOption, StoreProduct, StoreRegion } from "types/store"
 
 import { GobitError, SALES_CHANNEL_ID, gobitData, gobitFetch } from "./client"
 import { GobitProduct, toProduct } from "./adapt"
 
-// gobit sepeti (/store/v1/carts) ve PayTR ödemesi (gobit ADR 0438). Vitrinin
-// bileşenleri Medusa'nın StoreCart şeklini okur; burada çevrilir.
+// gobit sepeti (/store/v1/carts) ve PayTR ödemesi (gobit ADR 0438). Sepet
+// burada vitrinin StoreCart tipine çevrilir.
 
 export type GobitAddress = {
   id?: string
@@ -60,12 +60,6 @@ export type GobitCart = {
   metadata?: Record<string, unknown> | null
 }
 
-// Vitrin bileşenleri Medusa'nın sağlayıcı kimliklerini tanır.
-const toMedusaProvider: Record<string, string> = { paytr: "pp_paytr_paytr", manual: "pp_system_default" }
-const fromMedusaProvider: Record<string, string> = { pp_paytr_paytr: "paytr", pp_system_default: "manual" }
-export const medusaProviderId = (id: string) => toMedusaProvider[id] ?? id
-export const gobitProviderId = (id: string) => fromMedusaProvider[id] ?? id
-
 // Seçilen ödeme yöntemi: PayTR oturumu ancak son adımda (tutar ve adres
 // kesinleşince) açılır; seçim o zamana kadar bu çerezde durur.
 const choiceCookie = "_gobit_payment_choice"
@@ -91,7 +85,7 @@ async function paymentChoice(cartId: string): Promise<string | undefined> {
 
 /** Sepet satırlarının ürünü ve varyantı: gobit listesi varyant kimliğiyle süzer. */
 export async function productsByVariant(variantIds: string[], regionId: string) {
-  const out = new Map<string, { product: HttpTypes.StoreProduct; variant: any }>()
+  const out = new Map<string, { product: StoreProduct; variant: any }>()
   if (!variantIds.length) return out
   const page = await gobitFetch<{ data: GobitProduct[] }>(`/store/v1/sales-channels/${SALES_CHANNEL_ID}/products`, {
     query: { variant_id: variantIds, region_id: regionId, limit: 100 },
@@ -105,7 +99,7 @@ export async function productsByVariant(variantIds: string[], regionId: string) 
   return out
 }
 
-export async function toCart(c: GobitCart, region: HttpTypes.StoreRegion | undefined): Promise<HttpTypes.StoreCart> {
+export async function toCart(c: GobitCart, region: StoreRegion | undefined): Promise<StoreCart> {
   const lines = c.items ?? []
   const products = await productsByVariant(
     Array.from(new Set(lines.map((l) => l.variant_id))),
@@ -163,7 +157,7 @@ export async function toCart(c: GobitCart, region: HttpTypes.StoreRegion | undef
     promotions: (c.promotion_codes ?? []).map((code) => ({ id: code, code, is_automatic: false })),
     subtotal: c.subtotal,
     item_total: itemTotal,
-    // Medusa'daki gibi: vergi hariç satır toplamı.
+    // Vergi hariç satır toplamı.
     item_subtotal: items.reduce((sum, i) => sum + i.subtotal, 0),
     item_tax_total: items.reduce((sum, i) => sum + i.tax_total, 0),
     tax_total: c.tax_total,
@@ -179,12 +173,12 @@ export async function toCart(c: GobitCart, region: HttpTypes.StoreRegion | undef
           amount: c.total,
           currency_code: c.currency_code.toLowerCase(),
           payment_sessions: [
-            { id: `choice-${c.id}`, provider_id: medusaProviderId(choice), status: "pending", amount: c.total, data: {} },
+            { id: `choice-${c.id}`, provider_id: choice, status: "pending", amount: c.total, data: {} },
           ],
         }
       : undefined,
     metadata: c.metadata ?? {},
-  } as unknown as HttpTypes.StoreCart
+  }
 }
 
 // --- PayTR: kendi sayfasında ödenen sağlayıcı (gobit ADR 0438) -------------
@@ -352,8 +346,13 @@ export async function finishPayment(headers: Record<string, string>): Promise<Pa
   }
 }
 
-/** gobit kargo seçeneği → Medusa StoreCartShippingOption (sabit fiyat, kuralsız). */
-export function toShippingOption(o: { id: string; name: string; amount: number; currency_code: string }) {
+/** gobit kargo seçeneği → StoreCartShippingOption (sabit fiyat, kuralsız). */
+export function toShippingOption(o: {
+  id: string
+  name: string
+  amount: number
+  currency_code: string
+}): StoreCartShippingOption {
   const currency = o.currency_code.toLowerCase()
 
   return {
@@ -365,5 +364,5 @@ export function toShippingOption(o: { id: string; name: string; amount: number; 
     calculated_price: { calculated_amount: o.amount, currency_code: currency },
     insufficient_inventory: false,
     service_zone: { fulfillment_set: { type: "shipping" } },
-  } as unknown as HttpTypes.StoreCartShippingOption
+  }
 }

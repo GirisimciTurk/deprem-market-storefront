@@ -3,14 +3,14 @@ import Summary from "./summary"
 import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
 import Divider from "@modules/common/components/divider"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCart, StoreCustomer } from "types/store"
 
 const CartTemplate = ({
   cart,
   customer,
 }: {
-  cart: HttpTypes.StoreCart | null
-  customer: HttpTypes.StoreCustomer | null
+  cart: StoreCart | null
+  customer: StoreCustomer | null
 }) => {
   return (
     <div className="py-12">

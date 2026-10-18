@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreRegion } from "types/store"
 import CountrySelect from "@modules/checkout/components/country-select"
 import Input from "@modules/common/components/input"
 import Select from "@modules/common/components/select"
 import { TR_CITIES_DISTRICTS } from "@lib/util/tr-cities-districts"
 
 type Props = {
-  region: HttpTypes.StoreRegion
+  region: StoreRegion
   defaultCountryCode?: string | null
   defaultCity?: string | null
   defaultProvince?: string | null

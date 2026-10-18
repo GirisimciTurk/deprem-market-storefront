@@ -7,7 +7,7 @@ import {
   Transition,
 } from "@headlessui/react"
 import { convertToLocale } from "@lib/util/money"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCart } from "types/store"
 import { Button } from "@modules/common/components/ui"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
@@ -22,7 +22,7 @@ const CartDropdown = ({
   cart: cartState,
   label,
 }: {
-  cart?: HttpTypes.StoreCart | null
+  cart?: StoreCart | null
   label?: string
 }) => {
   const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(

@@ -1,4 +1,5 @@
-import { retrieveOrder } from "@lib/data/orders"
+import { isOwnOrder, retrieveOrder } from "@lib/data/orders"
+import { retrieveCustomer } from "@lib/data/customer"
 import OrderCompletedTemplate from "@modules/order/templates/order-completed-template"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Metadata } from "next"
@@ -7,18 +8,31 @@ import { getTranslations } from "next-intl/server"
 
 type Props = {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ token?: string | string[] }>
 }
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata")
   return {
     title: t("orderConfirmedTitle"),
     description: t("orderConfirmedDescription"),
+    robots: { index: false, follow: false },
   }
 }
 
+/**
+ * Ödeme sonrası ve sipariş e-postasının bağlantısı
+ * ({STOREFRONT_URL}/order/{id}/confirmed?token=…). Middleware e-postanın
+ * jetonunu sipariş jetonları çerezine yazıp jetonsuz adrese yönlendirir;
+ * çerez yazılamadıysa adresteki jeton doğrudan kullanılır.
+ */
 export default async function OrderConfirmedPage(props: Props) {
   const params = await props.params
-  const order = await retrieveOrder(params.id).catch(() => null)
+  const { token } = await props.searchParams
+  const given = (Array.isArray(token) ? token[0] : token)?.trim() || undefined
+  const [order, customer] = await Promise.all([
+    retrieveOrder(params.id, given).catch(() => null),
+    retrieveCustomer().catch(() => null),
+  ])
 
   if (!order) {
     return (
@@ -43,5 +57,11 @@ export default async function OrderConfirmedPage(props: Props) {
     )
   }
 
-  return <OrderCompletedTemplate order={order} />
+  // Oturum açık ve sipariş bu müşterinin değilse (misafir siparişi ya da
+  // başka hesabınki) "Bu siparişi hesabıma ekle" (gobit ADR 0450). gobit'in
+  // vitrin siparişi müşteri kimliği taşımaz; sahiplik gobit'e jetonsuz okumayla
+  // sorulur. Bilinemediyse (null) düğme gösterilmez.
+  const claimable = !!customer && (await isOwnOrder(order.id)) === false
+
+  return <OrderCompletedTemplate order={order} claimable={claimable} />
 }

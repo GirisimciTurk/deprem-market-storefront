@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server"
 import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 import ProductJsonLd, { BreadcrumbJsonLd } from "@modules/common/components/json-ld"
 import { listProductReviews } from "@lib/data/reviews"
 import { seoAlternates } from "@lib/util/seo"
@@ -57,7 +57,7 @@ export async function generateStaticParams() {
 }
 
 function getImagesForVariant(
-  product: HttpTypes.StoreProduct,
+  product: StoreProduct,
   selectedVariantId?: string
 ) {
   if (!selectedVariantId || !product.variants) {
@@ -92,18 +92,19 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   const t = await getTranslations("metadata")
-  const title = t("productBrandTitle", { title: product.title })
+  // Kök düzenin şablonu ("%s | depremTek Market") markayı <title>'a kendisi
+  // ekler; openGraph başlığı şablondan geçmez, markayı kendisi taşır.
   const description = t("productDescription", { title: product.title })
 
   return {
-    title,
+    title: product.title,
     description,
     // Canonical BİRİNCİL bölgeye sabit: /de, /fr … aynı Türkçe içeriği sunuyor.
     // Önceden canonical kendi bölgesini gösteriyordu; hreflang ise /tr diyordu —
     // iki sinyal birbirini yalanlıyor, her ülke öneki ayrı özgün sayfa sanılıyordu.
     alternates: seoAlternates(`/products/${handle}`),
     openGraph: {
-      title,
+      title: t("productBrandTitle", { title: product.title }),
       description,
       images: product.thumbnail ? [product.thumbnail] : [],
     },

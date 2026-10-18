@@ -5,7 +5,7 @@ import { toReachableImageUrl } from "@lib/util/image-url"
 import { listSellers } from "@lib/data/sellers"
 
 export const metadata: Metadata = {
-  title: "Mağazalar | depremTek Market",
+  title: "Mağazalar",
   description:
     "depremTek Market satıcı mağazaları. Doğrulanmış firmalardan deprem hazırlık ve güvenlik ürünleri.",
 }

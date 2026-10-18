@@ -1,7 +1,7 @@
 "use client"
 
-import { XMark } from "@medusajs/icons"
-import { HttpTypes } from "@medusajs/types"
+import { X } from "lucide-react"
+import { StoreOrder } from "types/store"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
@@ -13,7 +13,7 @@ import SellerShipments from "@modules/order/components/seller-shipments"
 import React from "react"
 
 type OrderDetailsTemplateProps = {
-  order: HttpTypes.StoreOrder
+  order: StoreOrder
 }
 
 const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
@@ -28,7 +28,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
           className="flex gap-2 items-center text-ui-fg-subtle hover:text-ui-fg-base"
           data-testid="back-to-overview-button"
         >
-          <XMark /> Genel bakışa dön
+          <X size={16} /> Genel bakışa dön
         </LocalizedClientLink>
       </div>
       <div

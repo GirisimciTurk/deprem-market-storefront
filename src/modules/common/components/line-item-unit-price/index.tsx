@@ -1,9 +1,9 @@
 import { convertToLocale } from "@lib/util/money"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCartLineItem, StoreOrderLineItem } from "types/store"
 import { clx } from "@modules/common/components/ui"
 
 type LineItemUnitPriceProps = {
-  item: HttpTypes.StoreCartLineItem | HttpTypes.StoreOrderLineItem
+  item: StoreCartLineItem | StoreOrderLineItem
   style?: "default" | "tight"
   currencyCode: string
 }

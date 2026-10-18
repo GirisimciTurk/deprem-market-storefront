@@ -12,7 +12,7 @@ export type TrackingStep = {
   isError?: boolean
 }
 
-// Map Medusa fulfillment and payment status to Turkish user-friendly labels
+// Siparişin gönderim ve ödeme durumunu müşteriye gösterilen Türkçe etikete çevirir
 export function getFulfillmentLabel(status: string): { text: string; color: StatusColor } {
   switch (status) {
     case "not_fulfilled":
@@ -40,8 +40,12 @@ export function getPaymentLabel(status: string): { text: string; color: StatusCo
       return { text: "Ödeme Bekleniyor", color: "orange" }
     case "awaiting":
       return { text: "Onay Bekleniyor", color: "orange" }
+    case "partially_captured":
+      return { text: "Kısmen Ödendi", color: "orange" }
     case "captured":
       return { text: "Ödendi", color: "green" }
+    case "partially_refunded":
+      return { text: "Kısmen İade Edildi", color: "grey" }
     case "refunded":
       return { text: "İade Edildi", color: "grey" }
     case "canceled":
@@ -51,8 +55,8 @@ export function getPaymentLabel(status: string): { text: string; color: StatusCo
   }
 }
 
-/** Backend'in ürettiği satıcı-bazlı aşama (bkz. backend/src/lib/order-stage.ts). */
-export type OrderStage = "received" | "preparing" | "shipped" | "canceled"
+/** gobit'in (dtm stage.go) ürettiği satıcı-bazlı aşama. */
+export type OrderStage = "received" | "preparing" | "shipped" | "delivered" | "canceled"
 
 export type SellerShipment = {
   seller_order_id: string
@@ -73,6 +77,7 @@ const STAGE_STEP: Record<Exclude<OrderStage, "canceled">, number> = {
   received: 0,
   preparing: 1,
   shipped: 2,
+  delivered: 3,
 }
 
 export function getStageLabel(stage: OrderStage): { text: string; color: StatusColor } {
@@ -83,8 +88,12 @@ export function getStageLabel(stage: OrderStage): { text: string; color: StatusC
       return { text: "Hazırlanıyor", color: "orange" }
     case "shipped":
       return { text: "Kargoya Verildi", color: "green" }
+    case "delivered":
+      return { text: "Teslim Edildi", color: "green" }
     case "canceled":
       return { text: "İptal Edildi", color: "red" }
+    default:
+      return { text: "Hazırlanıyor", color: "orange" }
   }
 }
 
@@ -164,10 +173,10 @@ export function getStatusSteps(orderObj: any): {
   }
 
   // ── BİRİNCİL KAYNAK: satıcı alt-siparişlerinden türetilen aşama ───────────
-  // Neden: çekirdek Medusa order.fulfillment_status bu sistemde HİÇ ilerlemiyor
-  // (core fulfillment yaratılmıyor), o yüzden aşağıdaki eski mantık her siparişi
-  // sonsuza kadar "Hazırlanıyor"da tutuyordu. Gerçek aşama seller_order'da.
-  // Backend `stage` alanını /store/order-tracking yanıtında gönderir.
+  // Neden: siparişin kendi fulfillment_status'u ilerlemiyor, o yüzden aşağıdaki
+  // eski mantık her siparişi sonsuza kadar "Hazırlanıyor"da tutardı. Gerçek aşama
+  // satıcı alt-siparişinde.
+  // gobit `stage` alanını sipariş takibi yanıtında (/store/v1/dtm/order-tracking) gönderir.
   const shipments: SellerShipment[] = Array.isArray(orderObj.seller_shipments)
     ? orderObj.seller_shipments
     : []
@@ -189,7 +198,7 @@ export function getStatusSteps(orderObj: any): {
 
   // ── YEDEK: eski çekirdek-durum mantığı ────────────────────────────────────
   // Alt-sipariş yoksa (stage null) buraya düşer: pazaryeri bölünmesi yapılmamış
-  // eski siparişler ve /store/order-tracking dışından beslenen ekranlar.
+  // eski siparişler ve sipariş takibi dışından beslenen ekranlar.
 
   // Mark Preparing
   if (fStatus === "not_fulfilled") {
@@ -227,4 +236,73 @@ export function getStatusSteps(orderObj: any): {
   }
 
   return { currentStep: 2, isCanceled: false, steps }
+}
+
+/** dtm'nin misafir sipariş takibi yanıtı (POST /store/v1/dtm/order-tracking). */
+export type TrackedOrder = {
+  display_id: number
+  status: string
+  placed_at: string
+  /** Küçük harf (try). */
+  currency_code: string
+  total: number
+  shipping_total: number
+  items: { product_title: string; title: string; quantity: number; total: number }[]
+  stage: OrderStage
+  stage_label: string
+  seller_shipments: {
+    seller_name: string
+    seller_handle: string
+    stage: OrderStage
+    stage_label: string
+    carrier: string
+    tracking_number: string
+    tracking_url: string
+    item_count: number
+  }[]
+}
+
+/** Takip ekranının okuduğu sipariş görünümü (adres, kimlik ve ödeme durumu yok). */
+export type TrackingView = {
+  display_id: number
+  status: string
+  created_at: string
+  currency_code: string
+  total: number
+  shipping_total: number
+  stage: OrderStage
+  stage_label: string
+  items: { id: string; title: string; variant_title: string; quantity: number; total: number }[]
+  seller_shipments: (SellerShipment & { item_count: number })[]
+}
+
+export function toTrackingView(t: TrackedOrder): TrackingView {
+  return {
+    display_id: t.display_id,
+    status: t.status,
+    created_at: t.placed_at,
+    currency_code: (t.currency_code || "try").toLowerCase(),
+    total: t.total,
+    shipping_total: t.shipping_total,
+    stage: t.stage,
+    stage_label: t.stage_label,
+    items: (t.items ?? []).map((l, i) => ({
+      id: `${t.display_id}-${i}`,
+      title: l.product_title || l.title,
+      variant_title: l.product_title && l.title !== l.product_title ? l.title : "",
+      quantity: l.quantity,
+      total: l.total,
+    })),
+    seller_shipments: (t.seller_shipments ?? []).map((s, i) => ({
+      seller_order_id: `${t.display_id}-${i}`,
+      seller_name: s.seller_name,
+      seller_handle: s.seller_handle,
+      stage: s.stage,
+      stage_label: s.stage_label,
+      carrier: s.carrier || null,
+      tracking_number: s.tracking_number || null,
+      tracking_url: s.tracking_url || null,
+      item_count: s.item_count,
+    })),
+  }
 }

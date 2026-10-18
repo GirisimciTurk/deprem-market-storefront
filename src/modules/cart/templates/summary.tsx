@@ -6,13 +6,13 @@ import CartTotals from "@modules/common/components/cart-totals"
 import Divider from "@modules/common/components/divider"
 import DiscountCode from "@modules/checkout/components/discount-code"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCart } from "types/store"
 
 type SummaryProps = {
-  cart: HttpTypes.StoreCart
+  cart: StoreCart
 }
 
-function getCheckoutStep(cart: HttpTypes.StoreCart) {
+function getCheckoutStep(cart: StoreCart) {
   if (!cart?.shipping_address?.address_1 || !cart.email) {
     return "address"
   } else if (cart?.shipping_methods?.length === 0) {

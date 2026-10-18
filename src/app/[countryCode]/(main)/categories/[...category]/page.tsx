@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server"
 
 import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
-import { HttpTypes, StoreRegion } from "@medusajs/types"
+import { StoreProductCategory, StoreRegion } from "types/store"
 import CategoryTemplate from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { seoAlternates } from "@lib/util/seo"
@@ -34,7 +34,7 @@ export async function generateStaticParams() {
     )
 
     const categoryHandles = product_categories.map(
-      (category: HttpTypes.StoreProductCategory) => category.handle
+      (category: StoreProductCategory) => category.handle
     )
 
     const staticParams = countryCodes

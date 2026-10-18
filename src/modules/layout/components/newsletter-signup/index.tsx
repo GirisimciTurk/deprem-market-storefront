@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Mail, Check, Loader2 } from "lucide-react"
 import { subscribeNewsletter } from "@lib/data/newsletter"
 
-/** Footer bülten kayıt formu. Anonim e-posta → /store/newsletter. */
+/** Footer bülten kayıt formu. Anonim e-posta → dtm bülten listesi. */
 export default function NewsletterSignup() {
   const [email, setEmail] = useState("")
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle")

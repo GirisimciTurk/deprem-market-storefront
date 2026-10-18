@@ -1,11 +1,10 @@
-import { HttpTypes } from "@medusajs/types"
+import { StoreAddress, StoreCart, StoreCustomer, StoreCustomerAddress } from "types/store"
 import Checkbox from "@modules/common/components/checkbox"
 import Input from "@modules/common/components/input"
 import Select from "@modules/common/components/select"
 import { TR_CITIES_DISTRICTS } from "@lib/util/tr-cities-districts"
 import compareAddresses from "@lib/util/compare-addresses"
-import { CheckCircleSolid } from "@medusajs/icons"
-import { Home, Briefcase, MapPin, Plus, ChevronLeft } from "lucide-react"
+import { Home, Briefcase, MapPin, Plus, ChevronLeft, CircleCheck } from "lucide-react"
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import CountrySelect from "../country-select"
 
@@ -22,8 +21,8 @@ const ShippingAddress = ({
   checked,
   onChange,
 }: {
-  customer: HttpTypes.StoreCustomer | null
-  cart: HttpTypes.StoreCart | null
+  customer: StoreCustomer | null
+  cart: StoreCart | null
   checked: boolean
   onChange: () => void
 }) => {
@@ -67,7 +66,7 @@ const ShippingAddress = ({
   const rootRef = useRef<HTMLDivElement>(null)
 
   const setFormAddress = (
-    address?: HttpTypes.StoreCartAddress,
+    address?: StoreAddress,
     email?: string
   ) => {
     if (address) {
@@ -136,15 +135,15 @@ const ShippingAddress = ({
         addressesInRegion[0]
       if (pre) {
         setSelectedId(pre.id)
-        setFormAddress(pre as HttpTypes.StoreCartAddress, customer?.email || undefined)
+        setFormAddress(pre as StoreAddress, customer?.email || undefined)
       }
     }
   }, [hasSaved])
 
   // Kart seçilince: vurgula + formu doldur + (fatura adresi aynıysa) otomatik gönder.
-  const handlePickSaved = (address: HttpTypes.StoreCustomerAddress) => {
+  const handlePickSaved = (address: StoreCustomerAddress) => {
     setSelectedId(address.id)
-    setFormAddress(address as HttpTypes.StoreCartAddress, customer?.email || undefined)
+    setFormAddress(address as StoreAddress, customer?.email || undefined)
     if (checked) setPendingSubmit(true)
   }
 
@@ -214,7 +213,7 @@ const ShippingAddress = ({
                   }`}
                 >
                   {isSel && (
-                    <CheckCircleSolid className="absolute top-3 right-3 text-brand-600" />
+                    <CircleCheck size={16} className="absolute top-3 right-3 text-brand-600" />
                   )}
                   {(a as any).address_name && (
                     <div className="flex items-center gap-1.5 mb-1.5 text-brand-700">

@@ -1,8 +1,11 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { listMyReviews } from "@lib/data/reviews"
+import { MAX_REVIEW_PHOTOS } from "@lib/util/review"
+import ReviewPhotoAdder, { ReviewPhotoGallery } from "./review-photo-adder"
 
-// Gerçek veri: müşterinin kendi yorumları backend review modülünden gelir
-// (/store/reviews/me). Eskiden localStorage demo'su kullanılıyordu.
+// Müşterinin kendi yorumları (dtm /store/v1/dtm/product-reviews/mine): giriş
+// yapmışken yazdığı yorumlar, onay durumu ve fotoğraflarıyla. Misafirken
+// yazılan yorumlar burada görünmez.
 export default async function ReviewsPage() {
   const reviews = await listMyReviews()
 
@@ -28,8 +31,12 @@ export default async function ReviewsPage() {
       {reviews.length > 0 ? (
         <div className="space-y-4">
           {reviews.map((review) => {
-            const image = review.images?.[0]
+            // Kimlikli fotoğraflar silinebilir; kimliksiz eski yanıtta adresler salt gösterilir.
+            const legacyImages = review.photos.length ? [] : review.images ?? []
+            const photoCount =
+              review.photos.length + review.pending_photos.length + legacyImages.length
             const isApproved = review.status === "approved"
+            const isRejected = review.status === "rejected"
             return (
               <div
                 key={review.id}
@@ -41,16 +48,7 @@ export default async function ReviewsPage() {
                       href={`/products/${review.product_handle}`}
                       className="w-12 h-12 rounded-lg overflow-hidden bg-ui-bg-base border flex-shrink-0 flex items-center justify-center"
                     >
-                      {image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={image}
-                          alt={review.product_title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <span className="text-lg">📦</span>
-                      )}
+                      <span className="text-lg">📦</span>
                     </LocalizedClientLink>
                     <div>
                       <LocalizedClientLink href={`/products/${review.product_handle}`}>
@@ -69,14 +67,14 @@ export default async function ReviewsPage() {
                       className={`text-2xs font-extrabold px-3 py-1 rounded-full ${
                         isApproved
                           ? "bg-green-100 text-green-700 border border-green-200"
-                          : review.status === "spam"
+                          : isRejected
                           ? "bg-brand-100 text-brand-700 border border-brand-200"
                           : "bg-amber-100 text-amber-700 border border-amber-200"
                       }`}
                     >
                       {isApproved
                         ? "Yayında ✓"
-                        : review.status === "spam"
+                        : isRejected
                         ? "Reddedildi"
                         : "Onay Bekliyor ⏳"}
                     </span>
@@ -94,6 +92,30 @@ export default async function ReviewsPage() {
                   <p className="text-xs sm:text-sm text-ui-fg-base italic leading-relaxed bg-ui-bg-base/50 p-3.5 rounded-xl border border-ui-border-base">
                     &ldquo;{review.comment}&rdquo;
                   </p>
+                  <ReviewPhotoGallery
+                    reviewId={review.id}
+                    photos={review.photos}
+                    pendingPhotos={review.pending_photos}
+                  />
+                  {legacyImages.length > 0 && (
+                    <div className="flex gap-2 flex-wrap">
+                      {legacyImages.map((url) => (
+                        <a
+                          key={url}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-14 h-14 rounded-lg overflow-hidden border border-ui-border-base flex-shrink-0"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt="Yorum fotoğrafı" loading="lazy" className="w-full h-full object-cover" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                  {!isRejected && photoCount < MAX_REVIEW_PHOTOS && (
+                    <ReviewPhotoAdder reviewId={review.id} room={MAX_REVIEW_PHOTOS - photoCount} />
+                  )}
                 </div>
               </div>
             )

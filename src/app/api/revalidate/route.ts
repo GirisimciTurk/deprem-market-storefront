@@ -4,7 +4,7 @@ import { revalidateTag } from "next/cache"
 /**
  * POST /api/revalidate?secret=...&tags=products,sellers,categories
  *
- * Backend (Medusa) bir ürün/mağaza güncellendiğinde bu ucu çağırır ve ilgili statik
+ * Backend (gobit) bir ürün/mağaza güncellendiğinde bu ucu çağırır ve ilgili statik
  * cache tag'lerini temizler → mağazadaki resim/bilgi ANINDA tazelenir. Ürün
  * fetch'leri force-cache yerine bu tag'leri + zaman-bazlı revalidate (≤30sn) kullanır.
  *

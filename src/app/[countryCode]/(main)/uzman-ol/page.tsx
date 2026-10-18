@@ -4,34 +4,37 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import FaqAccordion, {
   type FaqItem,
 } from "@modules/common/components/faq-accordion"
-import ExpertForm from "./expert-form"
 
 export const metadata: Metadata = {
-  title: "Uzman Ağına Katıl — Doğrulanmış Mühendis Dizini | depremTek Market",
+  title: "Uzman Ağına Katıl — İnşaat Mühendisi Dizini",
   description:
-    "İnşaat mühendisleri için doğrulanmış uzman dizinine ön kayıt. Bina risk tespiti, güçlendirme, statik proje ve daha fazlasında halkla buluşun.",
+    "İnşaat mühendisleri için ücretsiz uzman dizini. Profilinizi oluşturun; bina risk tespiti, güçlendirme, statik proje ve daha fazlasında sizi arayanlarla buluşun.",
 }
+
+// Profil hesap panelinde (Uzman Profilim) yazılır; oturumu olmayan ziyaretçi
+// aynı adreste giriş/üyelik formunu görür ve girince panele düşer.
+const PANEL = "/account/uzman-profilim"
 
 const STEPS = [
   {
     no: "1",
-    title: "Ön Kayıt",
-    desc: "Aşağıdaki formu doldurun; uzmanlık alanlarınızı ve hizmet bölgenizi belirtin.",
+    title: "Profilinizi Oluşturun",
+    desc: "Üye olun, hesabınızdaki “Uzman Profilim” sayfasında uzmanlık alanlarınızı, hizmet bölgenizi ve iletişim bilgilerinizi girin.",
   },
   {
     no: "2",
-    title: "Belge & Doğrulama",
-    desc: "Diploma, oda kaydı ve lisanslarınızı isteriz; her uzmanlık ayrı doğrulanır.",
+    title: "Yayınlayın",
+    desc: "Bilgilerinizin doğruluğunu beyan edip yayınlayın. Kartınız otomatik olarak kontrol edilir; uygun bulunursa hemen dizine girer.",
   },
   {
     no: "3",
-    title: "Onay & Yayın",
-    desc: "Profiliniz onaylanınca 'doğrulanmış uzman' rozetiyle dizinde yayınlanır.",
+    title: "Doğrulanmış Rozeti",
+    desc: "Diploma ve oda kaydınızı ekibimize iletin; incelendikten sonra profilinize “Doğrulanmış” rozeti eklenir.",
   },
   {
     no: "4",
-    title: "Halkla Buluşun",
-    desc: "İl/ilçe ve uzmanlık filtreleriyle sizi arayan vatandaşlar size ulaşır.",
+    title: "Talepleri Karşılayın",
+    desc: "Sizi il ve uzmanlığa göre bulan vatandaşlar doğrudan ulaşır ya da talep bırakır; talepler panelinize düşer.",
   },
 ]
 
@@ -39,7 +42,7 @@ const BENEFITS = [
   {
     icon: "✅",
     title: "Doğrulanmış Uzman Rozeti",
-    desc: "Belge bazlı doğrulama (İMO üyeliği, lisanslar) ile sahte/ehliyetsizden ayrışın; güven kazanın.",
+    desc: "Diploma ve oda kaydınız incelenince profilinize rozet eklenir; doğrulanmış profiller dizinde öne çıkar.",
   },
   {
     icon: "🪪",
@@ -70,19 +73,19 @@ const BENEFITS = [
 
 const FAQS: FaqItem[] = [
   {
-    question: "Bu ön kayıt beni neye bağlar?",
+    question: "Profilim ne zaman yayına girer?",
     answer:
-      "Hiçbir ücret veya taahhüt yok. Bu, doğrulanmış uzman dizinimize ilgi/ön kayıt aşamasıdır. Amacımız mühendislerin beklentilerini öğrenip dizini birlikte şekillendirmek. Onay ve belge doğrulaması ayrı bir adımdır.",
+      "Yayınla dediğiniz anda kartınız otomatik olarak kontrol edilir (reklam, uygunsuz içerik, konu dışı kart gibi). Uygun bulunan kart hemen dizinde görünür. Kontrol emin olamazsa kartınız ekibimizin incelemesine gider; reddedilirse gerekçesini panelinizde görür, düzeltip yeniden yayınlarsınız.",
   },
   {
     question: "Hangi uzmanlık alanları var?",
     answer:
-      "Bina Risk & Hasar Tespiti, Güçlendirme (Retrofit), Statik/Betonarme Proje, Zemin Etüdü & Geoteknik, Yapı Denetimi, Kentsel Dönüşüm Danışmanlığı ve Deprem Performans Analizi. Birden fazla alan seçebilirsiniz; her biri ayrı doğrulanır.",
+      "Bina Risk & Hasar Tespiti, Güçlendirme (Retrofit), Statik/Betonarme Proje, Zemin Etüdü & Geoteknik, Yapı Denetimi, Kentsel Dönüşüm Danışmanlığı ve Deprem Performans Analizi. Birden fazla alan seçebilirsiniz.",
   },
   {
-    question: "Doğrulama nasıl yapılıyor?",
+    question: "“Doğrulanmış” rozeti nasıl alınır?",
     answer:
-      "Onay sürecinde diploma, oda (İMO) kaydı ve ilgili lisans/sertifikalarınızı isteriz. Profiliniz, belgeleriniz elle incelenip onaylanmadan halka görünmez — dizinin güveni buna bağlı.",
+      "Profilinizdeki bilgiler sizin beyanınızdır. Diploma, oda (İMO) kaydı ve ilgili belgelerinizi ekibimize ilettiğinizde elle incelenir; uygun bulunursa profilinize “Doğrulanmış” rozeti eklenir. Adınızı, odanızı ya da sicil numaranızı değiştirirseniz rozet yeniden inceleme için düşer.",
   },
   {
     question: "Uzman olmak ücretli mi?",
@@ -92,7 +95,7 @@ const FAQS: FaqItem[] = [
   {
     question: "Müşteriyle iletişim nasıl olacak?",
     answer:
-      "Başlangıçta dizin 'pasif' çalışır: vatandaş sizi filtreleyip bulur ve belirttiğiniz kanaldan ulaşır. İlerleyen aşamada telefonunuzu gizli tutabileceğiniz 'talep bırak' formu da eklenecek.",
+      "Vatandaş sizi il ve uzmanlığa göre bulur, belirttiğiniz kanaldan (telefon, WhatsApp, e-posta) ulaşır. İsterseniz iletişim bilgilerinizi gizleyip yalnız “Talep Bırak” formuyla talep alabilirsiniz; talepler panelinize ve e-postanıza düşer.",
   },
 ]
 
@@ -129,24 +132,23 @@ export default async function UzmanOlPage() {
       {/* Hero */}
       <div className="text-center max-w-3xl mx-auto mb-14">
         <span className="text-brand-650 text-xs font-semibold tracking-wider uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
-          Doğrulanmış Uzman Dizini · Ön Kayıt
+          İnşaat Mühendisi Dizini · Ücretsiz
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-ui-fg-base tracking-tight mt-3 mb-4">
           İnşaat Mühendisi misiniz? Uzman Ağına Katılın
         </h1>
         <p className="text-ui-fg-subtle text-sm sm:text-base leading-relaxed">
-          Deprem Güvenliği Platformu, halkı doğrulanmış inşaat mühendisleriyle
-          buluşturuyor. Doğrulanmış uzman rozetiyle dizinde yer alın, sizi arayan
-          vatandaşlara görünün. Ön kayıt ücretsiz ve taahhütsüz — fikirleriniz
-          dizini şekillendirecek.
+          Deprem Güvenliği Platformu, binasını değerlendirmek isteyenleri inşaat
+          mühendisleriyle buluşturuyor. Profilinizi oluşturun, sizi arayan
+          vatandaşlara görünün. Ücretsiz ve taahhütsüz.
         </p>
         <div className="mt-6">
-          <a
-            href="#onkayit"
+          <LocalizedClientLink
+            href={PANEL}
             className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5 duration-200"
           >
-            Hemen Ön Kayıt Ol
-          </a>
+            Profilimi Oluştur
+          </LocalizedClientLink>
         </div>
       </div>
 
@@ -198,19 +200,21 @@ export default async function UzmanOlPage() {
         </div>
       </div>
 
-      {/* Ön kayıt formu */}
+      {/* Panele yönlendirme */}
       <div id="onkayit" className="scroll-mt-24 mb-16">
-        <div className="max-w-2xl mx-auto border border-ui-border-base rounded-2xl bg-ui-bg-subtle p-6 sm:p-8">
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-extrabold text-ui-fg-base">
-              Uzman Ön Kayıt Formu
-            </h2>
-            <p className="text-xs text-ui-fg-muted mt-1">
-              Bilgilerinizi bırakın, ekibimiz doğrulama ve sonraki adımlar için
-              dönüş yapsın.
-            </p>
-          </div>
-          <ExpertForm />
+        <div className="max-w-2xl mx-auto border border-brand-100 rounded-2xl bg-brand-50 p-6 sm:p-8 text-center">
+          <h2 className="text-xl font-extrabold text-ui-fg-base">Profilinizi 5 dakikada oluşturun</h2>
+          <p className="text-sm text-ui-fg-muted mt-2 mb-5">
+            Profiliniz hesabınızdaki “Uzman Profilim” sayfasında hazırlanır; dilediğiniz zaman
+            düzenler, yayından alırsınız. Gelen talepleri ve değerlendirmeleri de oradan yönetirsiniz.
+          </p>
+          <LocalizedClientLink
+            href={PANEL}
+            className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl text-sm transition-colors shadow-sm"
+          >
+            Uzman Profilime Git →
+          </LocalizedClientLink>
+          <p className="text-xs text-ui-fg-muted mt-3">Hesabınız yoksa aynı sayfadan ücretsiz üye olabilirsiniz.</p>
         </div>
       </div>
 
@@ -220,7 +224,7 @@ export default async function UzmanOlPage() {
           Sıkça Sorulan Sorular
         </h2>
         <p className="text-center text-sm text-ui-fg-muted mb-8">
-          Uzman dizini ve ön kayıt hakkında en çok merak edilenler.
+          Uzman dizini ve profil hakkında en çok merak edilenler.
         </p>
         <FaqAccordion items={FAQS} defaultOpen={0} />
       </div>

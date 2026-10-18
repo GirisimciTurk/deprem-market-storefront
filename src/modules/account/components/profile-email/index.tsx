@@ -1,16 +1,16 @@
 "use client"
 
 import React from "react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCustomer } from "types/store"
 
 type MyInformationProps = {
-  customer: HttpTypes.StoreCustomer
+  customer: StoreCustomer
 }
 
 /**
- * E-posta SALT-OKUNUR gösterilir. Medusa'da müşteri e-postası giriş (auth) kimliğine
- * bağlıdır ve /store/customers/me ile değiştirilemez (400 döner). Bu yüzden düzenleme
- * yerine bilgilendirici not gösterilir (eskiden sahte "başarıyla güncellendi" çıkıyordu).
+ * E-posta SALT-OKUNUR gösterilir: müşteri e-postası giriş kimliğine bağlıdır ve
+ * profil güncellemesiyle değiştirilemez. Bu yüzden düzenleme yerine bilgilendirici
+ * not gösterilir.
  */
 const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
   return (

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { getRegion } from "@lib/data/regions"
 import { listProducts } from "@lib/data/products"
 import ProductPreview from "@modules/products/components/product-preview"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 import { Search } from "lucide-react"
 
 type Props = {
@@ -29,11 +29,11 @@ export default async function SearchPage(props: Props) {
   const region = await getRegion(countryCode)
   if (!region) notFound()
 
-  let products: HttpTypes.StoreProduct[] = []
+  let products: StoreProduct[] = []
   if (q.length >= 2) {
     const { response } = await listProducts({
       countryCode,
-      queryParams: { q, limit: 24 } as HttpTypes.StoreProductListParams,
+      queryParams: { q, limit: 24 },
     })
     products = response.products
   }

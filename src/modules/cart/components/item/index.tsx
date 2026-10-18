@@ -2,7 +2,7 @@
 
 import { Table, Text, clx } from "@modules/common/components/ui"
 import { updateLineItem } from "@lib/data/cart"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCartLineItem } from "types/store"
 import CartItemSelect from "@modules/cart/components/cart-item-select"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import DeleteButton from "@modules/common/components/delete-button"
@@ -15,7 +15,7 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import { useState } from "react"
 
 type ItemProps = {
-  item: HttpTypes.StoreCartLineItem
+  item: StoreCartLineItem
   type?: "full" | "preview"
   currencyCode: string
 }

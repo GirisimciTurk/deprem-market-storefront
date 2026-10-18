@@ -7,7 +7,7 @@ import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProductCategory } from "types/store"
 import { isShowcaseKey } from "@lib/showcase"
 
 export default function CategoryTemplate({
@@ -20,7 +20,7 @@ export default function CategoryTemplate({
   showcase,
   countryCode,
 }: {
-  category: HttpTypes.StoreProductCategory
+  category: StoreProductCategory
   sortBy?: SortOptions
   page?: string
   minPrice?: string
@@ -37,9 +37,9 @@ export default function CategoryTemplate({
 
   if (!category || !countryCode) notFound()
 
-  const parents = [] as HttpTypes.StoreProductCategory[]
+  const parents = [] as StoreProductCategory[]
 
-  const getParents = (category: HttpTypes.StoreProductCategory) => {
+  const getParents = (category: StoreProductCategory) => {
     if (category.parent_category) {
       parents.push(category.parent_category)
       getParents(category.parent_category)

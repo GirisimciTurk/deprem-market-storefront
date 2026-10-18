@@ -124,21 +124,32 @@ export async function removeFromWishlist(productId: string): Promise<WishlistRes
 }
 
 /**
- * Cihazdaki eski localStorage favorilerini hesaba aktarır (giriş anında bir kez).
- * Hesapta zaten olanlar atlanır, hiçbir şey silinmez.
+ * Cihazdaki eski localStorage favorilerini hesaba aktarır (giriş anında bir kez):
+ * dtm'nin /store/v1/dtm/wishlist/merge okuması (istek başına en çok 200 ürün).
+ * Hesapta zaten olanlar ve yayında olmayanlar atlanır, hiçbir şey silinmez.
+ * Yanıt birleştirmeden sonraki tam listedir (en yeni önce).
  */
 export async function mergeWishlist(productIds: string[]): Promise<WishlistResult & { mergedCount: number }> {
-  let merged = 0
-  const result = await run(async (c) => {
-    const have = new Set(await productIdsOf(await saved(c)))
-    for (const id of productIds) {
-      if (have.has(id)) continue
-      const [first] = await variantsOf(id).catch(() => [] as string[])
-      if (!first) continue
-      await gobitFetch(`/store/v1/customers/${c.id}/wishlist/${encodeURIComponent(first)}`, { method: "PUT", headers: c.headers })
-      merged++
+  const ids = Array.from(new Set(productIds.filter(Boolean)))
+  if (!ids.length) return { ...(await listWishlist()), mergedCount: 0 }
+  try {
+    const headers = await getAuthHeaders()
+    if (!headers.cookie) throw new Unauthorized()
+    let list: string[] = []
+    let merged = 0
+    for (let i = 0; i < ids.length; i += 200) {
+      const r = await gobitData<{ product_ids: string[]; merged_count: number }>("/store/v1/dtm/wishlist/merge", {
+        method: "POST",
+        headers,
+        body: { product_ids: ids.slice(i, i + 200) },
+      })
+      list = r.product_ids ?? []
+      merged += r.merged_count ?? 0
     }
-  })
 
-  return { ...result, mergedCount: merged }
+    return { ...ok(list), mergedCount: merged }
+  } catch (e) {
+    if (e instanceof Unauthorized || (e instanceof GobitError && e.status === 401)) return { ...unauthorized(), mergedCount: 0 }
+    return { productIds: [], unauthorized: false, error: e instanceof Error ? e.message : String(e), mergedCount: 0 }
+  }
 }

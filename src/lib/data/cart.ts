@@ -1,6 +1,6 @@
 "use server"
 
-import { HttpTypes } from "@medusajs/types"
+import { StoreCart, StoreCartShippingOption, StoreCartUpdate } from "types/store"
 import { revalidateTag } from "next/cache"
 import { headers as nextHeaders } from "next/headers"
 import { redirect } from "next/navigation"
@@ -11,7 +11,6 @@ import {
   GobitCart,
   PaymentOutcome,
   finishPayment as finishGobitPayment,
-  gobitProviderId,
   openPaytr,
   rememberPaymentChoice,
   toCart,
@@ -27,9 +26,10 @@ import {
   setCartId,
 } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
+import type { ShippingQuote } from "@lib/util/free-shipping"
 
 // gobit sepeti (/store/v1/carts). Sepet kimliği vitrinin çerezinde
-// (_medusa_cart_id); oturum varsa istekler onun çerezini de taşır.
+// (_dt_cart_id); oturum varsa istekler onun çerezini de taşır.
 
 const message = (e: unknown) =>
   e instanceof GobitError ? e.message : e instanceof Error ? e.message : String(e)
@@ -41,6 +41,44 @@ async function invalidateCart() {
 
 async function readCart(id: string): Promise<GobitCart> {
   return gobitData<GobitCart>(`/store/v1/carts/${id}`, { headers: await getAuthHeaders(), cache: "no-store" })
+}
+
+/** Sepetin seçili teslimatlarını siler; silinenlerin seçenek kimliklerini döner. */
+async function dropShippingMethods(cartId: string, headers: Record<string, string>): Promise<string[]> {
+  const cart = await gobitData<GobitCart>(`/store/v1/carts/${cartId}`, { headers, cache: "no-store" })
+  const methods = cart.shipping_methods ?? []
+  for (const m of methods) {
+    await gobitFetch(`/store/v1/carts/${cartId}/shipping-methods/${encodeURIComponent(m.id)}`, {
+      method: "DELETE",
+      headers,
+    }).catch((e) => {
+      if (!(e instanceof GobitError && e.status === 404)) throw e
+    })
+  }
+
+  return Array.from(new Set(methods.map((m) => m.shipping_option_id).filter(Boolean)))
+}
+
+/**
+ * Satırlar değişince teslimatı yeniden seçer: gobit kargo bedelini teslimat
+ * eklenirken bir kez hesaplar (desi ve satıcı eşiği), sepet sonradan değişirse
+ * eski bedel kalırdı. Seçili teslimat silinip aynı seçenekle yeniden eklenir;
+ * seçenek artık sunulmuyorsa teslimat seçilmemiş kalır (ödeme adımı yeniden ister).
+ */
+async function rechooseShipping(cartId: string) {
+  const headers = await getAuthHeaders()
+  try {
+    const options = await dropShippingMethods(cartId, headers)
+    for (const option of options) {
+      await gobitFetch(`/store/v1/carts/${cartId}/shipping-methods`, {
+        method: "POST",
+        headers,
+        body: { shipping_option_id: option },
+      }).catch(() => {})
+    }
+  } catch {
+    // Sepet okunamadıysa satır yazımı yine de geçerli; teslimat ödeme adımında seçilir.
+  }
 }
 
 /** Sepet; kimlik verilmezse çerezdeki. Bulunamazsa çerez silinir. */
@@ -102,7 +140,7 @@ const addressBody = (a: Record<string, unknown>) => ({
   phone: a.phone || "",
 })
 
-export async function updateCart(data: HttpTypes.StoreUpdateCart) {
+export async function updateCart(data: StoreCartUpdate) {
   const cartId = await getCartId()
   if (!cartId) throw new Error("No existing cart found, please create one before updating")
   const headers = await getAuthHeaders()
@@ -141,9 +179,23 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
   } catch (e) {
     throw new Error(message(e))
   }
+  // İndirim satıcı ara toplamını, dolayısıyla ücretsiz kargo eşiğini değiştirebilir.
+  if (Array.isArray(d.promo_codes) && d.promo_codes.length) await rechooseShipping(cartId)
   await invalidateCart()
 
   return retrieveCart(cartId)
+}
+
+async function addLine(cartId: string, variantId: string, quantity: number) {
+  try {
+    await gobitFetch(`/store/v1/carts/${cartId}/line-items`, {
+      method: "POST",
+      headers: await getAuthHeaders(),
+      body: { variant_id: variantId, quantity },
+    })
+  } catch (e) {
+    throw new Error(message(e))
+  }
 }
 
 export async function addToCart({
@@ -159,15 +211,8 @@ export async function addToCart({
   const cart = await getOrSetCart(countryCode)
   if (!cart) throw new Error("Error retrieving or creating cart")
 
-  try {
-    await gobitFetch(`/store/v1/carts/${cart.id}/line-items`, {
-      method: "POST",
-      headers: await getAuthHeaders(),
-      body: { variant_id: variantId, quantity },
-    })
-  } catch (e) {
-    throw new Error(message(e))
-  }
+  await addLine(cart.id, variantId, quantity)
+  if (cart.shipping_methods?.length) await rechooseShipping(cart.id)
   await invalidateCart()
 }
 
@@ -179,10 +224,13 @@ export async function addMultipleToCart({
   items: { variantId: string; quantity: number }[]
   countryCode: string
 }) {
-  for (const it of items) {
-    if (!it.variantId) continue
-    await addToCart({ variantId: it.variantId, quantity: Math.max(1, it.quantity || 1), countryCode })
-  }
+  const wanted = items.filter((it) => it.variantId)
+  if (!wanted.length) return
+  const cart = await getOrSetCart(countryCode)
+  if (!cart) throw new Error("Error retrieving or creating cart")
+  for (const it of wanted) await addLine(cart.id, it.variantId, Math.max(1, it.quantity || 1))
+  if (cart.shipping_methods?.length) await rechooseShipping(cart.id)
+  await invalidateCart()
 }
 
 export async function updateLineItem({ lineId, quantity }: { lineId: string; quantity: number }) {
@@ -199,6 +247,7 @@ export async function updateLineItem({ lineId, quantity }: { lineId: string; qua
   } catch (e) {
     throw new Error(message(e))
   }
+  await rechooseShipping(cartId)
   await invalidateCart()
 }
 
@@ -215,14 +264,22 @@ export async function deleteLineItem(lineId: string) {
   } catch (e) {
     throw new Error(message(e))
   }
+  await rechooseShipping(cartId)
   await invalidateCart()
 }
 
+/**
+ * Teslimatı seçer. Önce sepetin seçili teslimatları silinir: gobit aynı
+ * seçeneği ikinci kez reddeder (409), başka bir seçeneği ise eskisinin yanına
+ * ekler (ikisi de ücretlenirdi).
+ */
 export async function setShippingMethod({ cartId, shippingMethodId }: { cartId: string; shippingMethodId: string }) {
   try {
+    const headers = await getAuthHeaders()
+    await dropShippingMethods(cartId, headers)
     await gobitFetch(`/store/v1/carts/${cartId}/shipping-methods`, {
       method: "POST",
-      headers: await getAuthHeaders(),
+      headers,
       body: { shipping_option_id: shippingMethodId },
     })
   } catch (e) {
@@ -236,17 +293,17 @@ export async function setShippingMethod({ cartId, shippingMethodId }: { cartId: 
  * açılır (openPaytrPayment); burada yalnız seçim tutulur.
  */
 export async function initiatePaymentSession(
-  cart: HttpTypes.StoreCart,
-  data: HttpTypes.StoreInitializePaymentSession
+  cart: StoreCart,
+  data: { provider_id: string }
 ) {
-  await rememberPaymentChoice(cart.id, gobitProviderId(data.provider_id))
+  await rememberPaymentChoice(cart.id, data.provider_id)
   await invalidateCart()
 
-  return { payment_collection: null } as unknown as HttpTypes.StorePaymentCollectionResponse
+  return { payment_collection: null }
 }
 
 export async function applyPromotions(codes: string[]) {
-  await updateCart({ promo_codes: codes } as HttpTypes.StoreUpdateCart)
+  await updateCart({ promo_codes: codes })
 }
 
 export async function submitPromotionForm(currentState: unknown, formData: FormData) {
@@ -364,7 +421,7 @@ export async function updateRegion(countryCode: string, currentPath: string) {
 
 export async function listCartOptions() {
   const cartId = await getCartId()
-  if (!cartId) return { shipping_options: [] as HttpTypes.StoreCartShippingOption[] }
+  if (!cartId) return { shipping_options: [] as StoreCartShippingOption[] }
   const options = await gobitData<{ id: string; name: string; amount: number; currency_code: string }[]>(
     `/store/v1/carts/${cartId}/shipping-options`,
     { headers: await getAuthHeaders(), cache: "no-store" }
@@ -373,14 +430,25 @@ export async function listCartOptions() {
   return { shipping_options: options.map(toShippingOption) }
 }
 
-/** Kargo yöntemi seçilmeden önceki tahmin: sepetin en ucuz kargo seçeneği. */
-export async function estimateShipping(cartId: string): Promise<{ amount: number; free: boolean } | null> {
-  const options = await gobitData<{ amount: number }[]>(`/store/v1/carts/${cartId}/shipping-options`, {
+/**
+ * dtm'nin kargo teklifi: sepetin şimdiki hâliyle desi ve satıcı eşiklerine
+ * göre kargo bedeli, satıcı satıcı. Okunamazsa null.
+ */
+export async function getShippingQuote(cartId?: string): Promise<ShippingQuote | null> {
+  const id = cartId || (await getCartId())
+  if (!id) return null
+
+  return gobitData<ShippingQuote>(`/store/v1/dtm/shipping-quote`, {
+    query: { cart_id: id },
     headers: await getAuthHeaders(),
     cache: "no-store",
-  }).catch(() => [])
-  if (!options.length) return null
-  const amount = Math.min(...options.map((o) => o.amount))
+  }).catch(() => null)
+}
 
-  return { amount, free: amount === 0 }
+/** Kargo yöntemi seçilmeden önceki tahmin (dtm'nin kargo teklifi). */
+export async function estimateShipping(cartId: string): Promise<{ amount: number; free: boolean } | null> {
+  const quote = await getShippingQuote(cartId)
+  if (!quote) return null
+
+  return { amount: quote.amount, free: quote.free }
 }

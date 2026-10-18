@@ -1,22 +1,23 @@
 "use server"
 
 import { gobitData, gobitFetch, GobitError, SALES_CHANNEL_ID } from "@lib/gobit/client"
-import { CardSeller, GobitProduct, toProduct } from "@lib/gobit/adapt"
+import { GobitProduct, ProductCard, toProduct, withCardRating } from "@lib/gobit/adapt"
 import { sortProducts } from "@lib/util/sort-products"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreProductListParams, StoreRegion } from "types/store"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 import { getLocaleSafe, pickTranslation } from "@lib/util/localize"
 import { toReachableImageUrl } from "@lib/util/image-url"
 import { matchesPriceRange } from "@lib/util/price-filter"
+import { getProductPrice } from "@lib/util/get-product-price"
 
 // Ürünün görsel URL'lerini (thumbnail + product.images) TR'den erişilemeyen
 // r2.dev'den /r2/ proxy'sine çevirir. Tek merkezde yapıldığı için her bileşen +
 // RSC hidrasyon verisi otomatik temiz URL alır (galeri product.images'ı kullanır).
 function normalizeProductImages(
-  product: HttpTypes.StoreProduct
-): HttpTypes.StoreProduct {
+  product: StoreProduct
+): StoreProduct {
   const out = { ...product }
   if (product.thumbnail) {
     out.thumbnail = toReachableImageUrl(product.thumbnail) ?? product.thumbnail
@@ -38,9 +39,9 @@ const PRODUCT_REVALIDATE_SECONDS = 30
 // Çeviri yoksa orijinal (tr) alan korunur. Ham veri tek cache'te paylaşılır;
 // overlay request başına JS'de uygulanır (sayfalar cookie okuduğu için dynamic).
 function localizeProduct(
-  product: HttpTypes.StoreProduct,
+  product: StoreProduct,
   locale: string
-): HttpTypes.StoreProduct {
+): StoreProduct {
   const i18n = (product.metadata as any)?.i18n as
     | Record<string, { title?: string; subtitle?: string; description?: string }>
     | undefined
@@ -54,17 +55,16 @@ function localizeProduct(
   }
 }
 
-type ProductSeller = { product_id: string; seller: CardSeller }
-
 // gobit'ten bir sayfa ürün: adresle (handle), kimlik listesiyle (id) ya da
-// süzgeçle. Kartın mağazası dtm'nin /product-sellers okumasından tek istekte gelir.
+// süzgeçle. Kartın mağazası ve ürün puanı dtm'nin /product-cards okumasından
+// tek istekte gelir (en çok 100 kimlik).
 async function gobitProducts(
   q: Record<string, any>,
   limit: number,
   offset: number,
-  region: HttpTypes.StoreRegion,
+  region: StoreRegion,
   next: NextFetchRequestConfig
-): Promise<{ products: HttpTypes.StoreProduct[]; count: number }> {
+): Promise<{ products: StoreProduct[]; count: number }> {
   const base = `/store/v1/sales-channels/${SALES_CHANNEL_ID}/products`
   const one = (key: string) =>
     gobitData<GobitProduct>(`${base}/${encodeURIComponent(key)}`, { query: { region_id: region.id }, next }).catch(
@@ -77,7 +77,12 @@ async function gobitProducts(
 
   let raw: GobitProduct[]
   let count: number
-  if (q.handle) {
+  if (Array.isArray(q.handle)) {
+    // Birden çok adres (blog yazısının ilgili ürünleri): tek tek okunur.
+    const handles = (q.handle as unknown[]).map(String).filter(Boolean)
+    raw = (await Promise.all(handles.slice(offset, offset + limit).map(one))).filter(Boolean) as GobitProduct[]
+    count = handles.length
+  } else if (q.handle) {
     const p = await one(String(q.handle))
     raw = p ? [p] : []
     count = raw.length
@@ -104,16 +109,27 @@ async function gobitProducts(
     count = page.count ?? raw.length
   }
 
-  const sellers = new Map<string, CardSeller>()
+  const cards = new Map<string, ProductCard>()
   if (raw.length) {
-    const found = await gobitData<ProductSeller[]>("/store/v1/dtm/product-sellers", {
-      query: { product_id: raw.map((p) => p.id) },
-      next,
-    }).catch(() => [] as ProductSeller[])
-    found.forEach((f) => sellers.set(f.product_id, f.seller))
+    const ids = raw.map((p) => p.id)
+    const pages = await Promise.all(
+      Array.from({ length: Math.ceil(ids.length / 100) }, (_, i) =>
+        gobitData<ProductCard[]>("/store/v1/dtm/product-cards", {
+          query: { product_id: ids.slice(i * 100, i * 100 + 100) },
+          next,
+        }).catch(() => [] as ProductCard[])
+      )
+    )
+    pages.flat().forEach((c) => cards.set(c.product_id, c))
   }
 
-  return { products: raw.map((p) => toProduct(p, region as any, sellers.get(p.id))), count }
+  return {
+    products: raw.map((p) => {
+      const card = cards.get(p.id)
+      return toProduct(withCardRating(p, card), region as any, card?.seller)
+    }),
+    count,
+  }
 }
 
 export const listProducts = async ({
@@ -123,13 +139,13 @@ export const listProducts = async ({
   regionId,
 }: {
   pageParam?: number
-  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductListParams
+  queryParams?: StoreProductListParams
   countryCode?: string
   regionId?: string
 }): Promise<{
-  response: { products: HttpTypes.StoreProduct[]; count: number }
+  response: { products: StoreProduct[]; count: number }
   nextPage: number | null
-  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductListParams
+  queryParams?: StoreProductListParams
 }> => {
   if (!countryCode && !regionId) {
     throw new Error("Country code or region ID is required")
@@ -139,7 +155,7 @@ export const listProducts = async ({
   const _pageParam = Math.max(pageParam, 1)
   const offset = _pageParam === 1 ? 0 : (_pageParam - 1) * limit
 
-  let region: HttpTypes.StoreRegion | undefined | null
+  let region: StoreRegion | undefined | null
 
   if (countryCode) {
     region = await getRegion(countryCode)
@@ -190,6 +206,28 @@ export const listProducts = async ({
     })
 }
 
+export type SearchHit = {
+  id: string
+  title: string
+  handle: string
+  thumbnail: string | null
+  price?: string
+}
+
+/** Üst çubuktaki canlı arama: ilk birkaç eşleşme, kartlardaki fiyatla. */
+export const searchProducts = async (term: string, countryCode: string): Promise<SearchHit[]> => {
+  const q = term.trim()
+  if (q.length < 2) return []
+  const { response } = await listProducts({ countryCode, queryParams: { q, limit: 8 } })
+  return response.products.map((p) => ({
+    id: p.id,
+    title: p.title,
+    handle: p.handle,
+    thumbnail: p.thumbnail,
+    price: getProductPrice({ product: p }).cheapestPrice?.calculated_price,
+  }))
+}
+
 /**
  * This will fetch 100 products to the Next.js cache and sort them based on the sortBy parameter.
  * It will then return the paginated products based on the page and limit parameters.
@@ -205,7 +243,7 @@ export const listProductsWithSort = async ({
   showcase,
 }: {
   page?: number
-  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
+  queryParams?: StoreProductListParams
   sortBy?: SortOptions
   countryCode: string
   minPrice?: string
@@ -214,9 +252,9 @@ export const listProductsWithSort = async ({
   /** Sabit vitrin kategorisi key'i — ürün metadata.showcase içermeli. */
   showcase?: string
 }): Promise<{
-  response: { products: HttpTypes.StoreProduct[]; count: number }
+  response: { products: StoreProduct[]; count: number }
   nextPage: number | null
-  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
+  queryParams?: StoreProductListParams
 }> => {
   const limit = queryParams?.limit || 12
 
@@ -319,7 +357,7 @@ export const listProductsWithSort = async ({
 }
 
 /** Kimliği verilen ürünler (favoriler gibi istemci bileşenleri için). */
-export const listProductsByIds = async (ids: string[], regionId: string): Promise<HttpTypes.StoreProduct[]> => {
+export const listProductsByIds = async (ids: string[], regionId: string): Promise<StoreProduct[]> => {
   if (!ids.length) return []
   const { response } = await listProducts({ regionId, queryParams: { id: ids, limit: ids.length } as any })
 

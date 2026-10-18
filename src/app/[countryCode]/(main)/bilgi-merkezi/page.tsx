@@ -12,7 +12,7 @@ import {
 } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Bilgi & Eğitim Merkezi — Deprem Hazırlığı Rehberleri | depremTek Market",
+  title: "Bilgi & Eğitim Merkezi — Deprem Hazırlığı Rehberleri",
   description:
     "Deprem öncesi hazırlık, aile afet planı, çanta hazırlama ve bina güvenliği üzerine doğrulanmış rehberler, eğitim içerikleri ve uzman önerileri.",
 }

@@ -1,86 +1,17 @@
-import { CreditCard } from "@medusajs/icons"
-import Bancontact from "@modules/common/icons/bancontact"
-import Ideal from "@modules/common/icons/ideal"
-import PayPal from "@modules/common/icons/paypal"
+import { CreditCard } from "lucide-react"
 import React from "react"
 
-/* Map of payment provider_id to their title and icon. Add in any payment providers you want to use. */
-export const paymentInfoMap: Record<
-  string,
-  { title: string; icon: React.JSX.Element }
-> = {
-  pp_stripe_stripe: {
-    title: "Kredi Kartı",
-    icon: <CreditCard />,
-  },
-  "pp_medusa-payments_default": {
-    title: "Kredi Kartı",
-    icon: <CreditCard />,
-  },
-  "pp_stripe-ideal_stripe": {
-    title: "iDeal",
-    icon: <Ideal />,
-  },
-  "pp_stripe-bancontact_stripe": {
-    title: "Bancontact",
-    icon: <Bancontact />,
-  },
-  pp_paypal_paypal: {
-    title: "PayPal",
-    icon: <PayPal />,
-  },
-  pp_system_default: {
-    title: "Kapıda Ödeme",
-    icon: <CreditCard />,
-  },
-  "pp_iyzico-mock_iyzico-mock": {
-    title: "Kredi / Banka Kartı (iyzico)",
-    icon: <CreditCard />,
-  },
-  "pp_paytr_paytr": {
+/** gobit'in ödeme sağlayıcıları: kimliği → ödeme adımında görünen ad ve simge. */
+export const paymentInfoMap: Record<string, { title: string; icon: React.JSX.Element }> = {
+  paytr: {
     title: "Kredi / Banka Kartı (PayTR)",
-    icon: <CreditCard />,
+    icon: <CreditCard size={16} />,
   },
-  // Add more payment providers here
+  manual: {
+    title: "Kapıda Ödeme",
+    icon: <CreditCard size={16} />,
+  },
 }
 
-// This only checks if it is native stripe or medusa payments for card payments, it ignores the other stripe-based providers
-export const isStripeLike = (providerId?: string) => {
-  return (
-    providerId?.startsWith("pp_stripe_") || providerId?.startsWith("pp_medusa-")
-  )
-}
-
-export const isPaypal = (providerId?: string) => {
-  return providerId?.startsWith("pp_paypal")
-}
-export const isManual = (providerId?: string) => {
-  return (
-    providerId?.startsWith("pp_system_default") || 
-    providerId === "iyzico-mock" || 
-    providerId === "pp_iyzico-mock_iyzico-mock"
-  )
-}
-
-// Add currencies that don't need to be divided by 100
-export const noDivisionCurrencies = [
-  "krw",
-  "jpy",
-  "vnd",
-  "clp",
-  "pyg",
-  "xaf",
-  "xof",
-  "bif",
-  "djf",
-  "gnf",
-  "kmf",
-  "mga",
-  "rwf",
-  "xpf",
-  "htg",
-  "vuv",
-  "xag",
-  "xdr",
-  "xau",
-]
+/** Elle (çevrimiçi tahsilatsız) ödeme: sipariş doğrudan verilir. */
+export const isManual = (providerId?: string) => providerId === "manual"

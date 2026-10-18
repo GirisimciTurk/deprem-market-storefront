@@ -1,13 +1,13 @@
 "use client"
 
-import { ArrowRightOnRectangle } from "@medusajs/icons"
+import { LogOut } from "lucide-react"
 import { clx } from "@modules/common/components/ui"
 import { useParams, usePathname } from "next/navigation"
 import React from "react"
 
 import { signout } from "@lib/data/customer"
 import { unbindPushFromAccount } from "@lib/util/push"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCustomer } from "types/store"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import MapPin from "@modules/common/icons/map-pin"
@@ -15,6 +15,24 @@ import Package from "@modules/common/icons/package"
 import User from "@modules/common/icons/user"
 
 // Inline SVG Icon components for premium feel
+const IdBadgeIcon = ({ size = 20 }: { size?: number }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <circle cx="9" cy="10" r="2" />
+    <path d="M15 8h2M15 12h2M7 16h10" />
+  </svg>
+)
+
 const HomeIcon = ({ size = 20 }: { size?: number }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +136,7 @@ const HardHatIcon = ({ size = 20 }: { size?: number }) => (
 const AccountNav = ({
   customer,
 }: {
-  customer: HttpTypes.StoreCustomer | null
+  customer: StoreCustomer | null
 }) => {
   const route = usePathname()
   const { countryCode } = useParams() as { countryCode: string }
@@ -267,6 +285,18 @@ const AccountNav = ({
                   </LocalizedClientLink>
                 </li>
                 <li>
+                  <LocalizedClientLink
+                    href="/account/uzman-profilim"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <IdBadgeIcon size={20} />
+                      <span>Uzman Profilim</span>
+                    </div>
+                    <ChevronDown className="transform -rotate-90" />
+                  </LocalizedClientLink>
+                </li>
+                <li>
                   <button
                     type="button"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full text-brand-600"
@@ -274,7 +304,7 @@ const AccountNav = ({
                     data-testid="logout-button"
                   >
                     <div className="flex items-center gap-x-2">
-                      <ArrowRightOnRectangle />
+                      <LogOut size={16} />
                       <span>Çıkış Yap</span>
                     </div>
                     <ChevronDown className="transform -rotate-90" />
@@ -384,6 +414,15 @@ const AccountNav = ({
                   Hizmet Al
                 </AccountNavLink>
               </li>
+              <li>
+                <AccountNavLink
+                  href="/account/uzman-profilim"
+                  active={isActive("/account/uzman-profilim")}
+                  icon={<IdBadgeIcon size={18} />}
+                >
+                  Uzman Profilim
+                </AccountNavLink>
+              </li>
 
               <li className="mt-4 pt-4 border-t border-ui-border-base">
                 <button
@@ -391,7 +430,7 @@ const AccountNav = ({
                   onClick={handleLogout}
                   className="w-full flex items-center gap-x-3 px-3 py-2.5 text-brand-600 hover:bg-brand-50 hover:text-brand-750 font-bold rounded-xl transition-all duration-200 text-left text-xs"
                 >
-                  <ArrowRightOnRectangle />
+                  <LogOut size={16} />
                   <span>Çıkış Yap</span>
                 </button>
               </li>

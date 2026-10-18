@@ -1,10 +1,10 @@
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { listBlogPosts } from "@lib/data/blog"
+import { listBlogCategories, listBlogPosts } from "@lib/data/blog"
 import { getTranslations } from "next-intl/server"
 
-export async function generateMetadata(props: {
+export async function generateMetadata(_props: {
   params: Promise<{ countryCode: string }>
 }): Promise<Metadata> {
   const t = await getTranslations("blog")
@@ -16,12 +16,24 @@ export async function generateMetadata(props: {
 
 export default async function BlogPage(props: {
   params: Promise<{ countryCode: string }>
+  searchParams: Promise<{ kategori?: string | string[] }>
 }) {
   const params = await props.params
   const { countryCode } = params
+  const { kategori } = await props.searchParams
   const t = await getTranslations("blog")
 
-  const posts = await listBlogPosts(countryCode)
+  const categories = await listBlogCategories()
+  const wanted = (Array.isArray(kategori) ? kategori[0] : kategori)?.trim() || ""
+  // Bilinmeyen kategori süzgeci tüm yazılara düşer.
+  const active = categories.some((c) => c.category === wanted) ? wanted : ""
+  const posts = await listBlogPosts(countryCode, active || undefined)
+  const chip = (on: boolean) =>
+    `px-4 py-1.5 rounded-full text-sm font-semibold border transition-colors ${
+      on
+        ? "bg-brand-600 border-brand-600 text-white"
+        : "bg-white border-ui-border-base text-ui-fg-subtle hover:border-brand-500 hover:text-brand-600"
+    }`
 
   return (
     <div className="bg-ui-bg-subtle min-h-screen py-16">
@@ -38,6 +50,25 @@ export default async function BlogPage(props: {
             {t("intro")}
           </p>
         </div>
+
+        {/* Kategori süzgeci */}
+        {categories.length > 0 && (
+          <nav aria-label={t("categoriesLabel")} className="flex flex-wrap justify-center gap-2 mb-10">
+            <Link href={`/${countryCode}/blog`} className={chip(!active)} aria-current={!active ? "page" : undefined}>
+              {t("allCategories")}
+            </Link>
+            {categories.map((c) => (
+              <Link
+                key={c.category}
+                href={`/${countryCode}/blog?kategori=${encodeURIComponent(c.category)}`}
+                className={chip(active === c.category)}
+                aria-current={active === c.category ? "page" : undefined}
+              >
+                {c.category} <span className="opacity-70">({c.posts})</span>
+              </Link>
+            ))}
+          </nav>
+        )}
 
         {/* Blog Posts Grid */}
         {posts.length === 0 ? (
@@ -79,6 +110,17 @@ export default async function BlogPage(props: {
                     </time>
                     <span>•</span>
                     <span className="font-medium text-ui-fg-base">{post.author}</span>
+                    {post.category && (
+                      <>
+                        <span>•</span>
+                        <Link
+                          href={`/${countryCode}/blog?kategori=${encodeURIComponent(post.category)}`}
+                          className="text-brand-600 hover:underline"
+                        >
+                          {post.category}
+                        </Link>
+                      </>
+                    )}
                   </div>
 
                   <h2 className="text-xl font-bold text-ui-fg-base group-hover:text-brand-600 transition-colors duration-200 line-clamp-2 leading-snug">

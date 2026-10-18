@@ -1,6 +1,6 @@
 "use server"
 
-import { HttpTypes } from "@medusajs/types"
+import { StoreCartShippingOption } from "types/store"
 import { gobitData } from "@lib/gobit/client"
 import { toShippingOption } from "@lib/gobit/cart"
 import { getAuthHeaders } from "./cookies"
@@ -20,4 +20,4 @@ export const calculatePriceForShippingOption = async (
   _optionId: string,
   _cartId: string,
   _data?: Record<string, unknown>
-) => null as HttpTypes.StoreCartShippingOption | null
+) => null as StoreCartShippingOption | null

@@ -10,7 +10,7 @@ import { SHOWCASE_CATEGORIES } from "@lib/showcase"
  * Her bölüm yalnız ürünü varsa render edilir; başlıktaki "Tümünü gör" o vitrin
  * kategorisinin tam listesine (/store?showcase=<key>) gider.
  *
- * Not: Medusa store API metadata dizisini kolay filtrelemediği için ürünler tek
+ * Not: ürün listesi metadata dizisiyle süzülemediği için ürünler tek
  * seferde (fiyat + metadata ile) çekilip in-app bölümlere ayrılır (fiyat filtresi
  * gibi). Katalog büyürse bir /store/showcase endpoint'ine geçilebilir.
  */

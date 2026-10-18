@@ -4,7 +4,7 @@ import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-g
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCollection } from "types/store"
 import { isShowcaseKey } from "@lib/showcase"
 
 export default function CollectionTemplate({
@@ -18,7 +18,7 @@ export default function CollectionTemplate({
   countryCode,
 }: {
   sortBy?: SortOptions
-  collection: HttpTypes.StoreCollection
+  collection: StoreCollection
   page?: string
   minPrice?: string
   maxPrice?: string

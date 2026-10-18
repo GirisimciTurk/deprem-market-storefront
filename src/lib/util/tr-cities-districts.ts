@@ -81,3 +81,10 @@ export const TR_CITIES_DISTRICTS: Record<string, string[]> = {
   "Yozgat": ["Akdağmadeni", "Aydıncık", "Boğazlıyan", "Çandır", "Çayıralan", "Çekerek", "Kadışehri", "Saraykent", "Sarıkaya", "Şefaatli", "Sorgun", "Yenifakılı", "Yerköy", "Yozgat"],
   "Zonguldak": ["Alaplı", "Çaycuma", "Devrek", "Gökçebey", "Karadenizereğli", "Zonguldak"]
 };
+
+/** "istanbul" / " İSTANBUL " → "İstanbul"; listede yoksa undefined. */
+export function findCity(name?: string | null): string | undefined {
+  const key = name?.trim().toLocaleLowerCase("tr")
+  if (!key) return undefined
+  return Object.keys(TR_CITIES_DISTRICTS).find((c) => c.toLocaleLowerCase("tr") === key)
+}

@@ -1,5 +1,5 @@
 import { listProducts } from "@lib/data/products"
-import { HttpTypes } from "@medusajs/types"
+import { StoreRegion } from "types/store"
 import ProductActions from "@modules/products/components/product-actions"
 
 /**
@@ -10,7 +10,7 @@ export default async function ProductActionsWrapper({
   region,
 }: {
   id: string
-  region: HttpTypes.StoreRegion
+  region: StoreRegion
 }) {
   const product = await listProducts({
     queryParams: { id: [id] },

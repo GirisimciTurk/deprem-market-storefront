@@ -2,12 +2,12 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 import LoginHint from "@modules/common/components/login-hint"
 import { useWishlist } from "@lib/context/wishlist-context"
 
 type FavoriteButtonProps = {
-  product: HttpTypes.StoreProduct
+  product: StoreProduct
   cheapestPrice?: {
     calculated_price: string
   } | null

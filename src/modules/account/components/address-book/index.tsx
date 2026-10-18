@@ -2,11 +2,11 @@ import React from "react"
 
 import AddAddress from "../address-card/add-address"
 import EditAddress from "../address-card/edit-address-modal"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCustomer, StoreRegion } from "types/store"
 
 type AddressBookProps = {
-  customer: HttpTypes.StoreCustomer
-  region: HttpTypes.StoreRegion
+  customer: StoreCustomer
+  region: StoreRegion
 }
 
 const AddressBook: React.FC<AddressBookProps> = ({ customer, region }) => {

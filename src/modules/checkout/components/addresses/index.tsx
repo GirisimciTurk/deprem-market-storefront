@@ -1,9 +1,9 @@
 "use client"
+import { CircleCheck } from "lucide-react"
 import { setAddresses } from "@lib/data/cart"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import compareAddresses from "@lib/util/compare-addresses"
-import { CheckCircleSolid } from "@medusajs/icons"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCart, StoreCustomer } from "types/store"
 import Divider from "@modules/common/components/divider"
 import { Heading, Text } from "@modules/common/components/ui"
 import Spinner from "@modules/common/icons/spinner"
@@ -18,8 +18,8 @@ const Addresses = ({
   cart,
   customer,
 }: {
-  cart: HttpTypes.StoreCart | null
-  customer: HttpTypes.StoreCustomer | null
+  cart: StoreCart | null
+  customer: StoreCustomer | null
 }) => {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -47,7 +47,7 @@ const Addresses = ({
           className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
         >
           Teslimat Adresi
-          {!isOpen && <CheckCircleSolid />}
+          {!isOpen && <CircleCheck size={16} />}
         </Heading>
         {!isOpen && cart?.shipping_address && (
           <Text>

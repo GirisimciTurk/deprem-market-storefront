@@ -2,10 +2,9 @@ const c = require("ansi-colors");
 
 const requiredEnvs = [
   {
-    key: "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY",
-    // TODO: we need a good doc to point this to
+    key: "NEXT_PUBLIC_GOBIT_PUBLISHABLE_KEY",
     description:
-      "Learn how to create a publishable key: https://docs.medusajs.com/v2/resources/storefront-development/publishable-api-keys",
+      "gobit vitrin anahtarı (pk_…): gobit admin'de satış kanalına bağlı bir publishable key oluşturun.",
   },
 ];
 

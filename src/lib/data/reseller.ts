@@ -3,26 +3,26 @@
 import { gobitData, gobitFetch } from "@lib/gobit/client"
 import { headers as nextHeaders } from "next/headers"
 import { getAuthHeaders } from "./cookies"
+import { toMyResellerApplication, type GobitApplication, type MyResellerApplication } from "@lib/gobit/adapt"
 
 // Bayilik ve firma başvuruları dtm'ye (/store/v1/dtm/storefront-applications)
 // gider; pazaryeri sözleşmeleri /store/v1/dtm/contracts'tan okunur. Başvuru
 // geçerli bir VKN ya da TCKN ister (sağlama ile denetlenir).
 
-export interface MyResellerApplication {
-  companyName: string
-  contactName: string
-  taxOfficeNumber?: string
-  email: string
-  phone: string
-  city: string
-  message?: string
-  date: string
-  status: "pending" | "approved" | "rejected" | "suspended"
-  applicationType: "bayi" | "firma"
-}
+export type { MyResellerApplication }
 
-/** Müşterinin kendi başvurusunu okuyan uç dtm'de yok. */
-export const getMyResellerApplication = async (): Promise<MyResellerApplication | null> => null
+/** Müşterinin en yeni başvurusu (adresiyle eşleşen ya da hesabından açılan); yoksa null. */
+export const getMyResellerApplication = async (): Promise<MyResellerApplication | null> => {
+  const headers = await getAuthHeaders()
+  if (!headers.cookie) return null
+
+  const apps = await gobitData<GobitApplication[]>("/store/v1/dtm/reseller-applications/me", {
+    headers,
+    cache: "no-store",
+  }).catch(() => [] as GobitApplication[])
+
+  return apps[0] ? toMyResellerApplication(apps[0]) : null
+}
 
 export type SellerContract = { id: string; title: string; version: number; body: string; required?: boolean }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { sendContact } from "@lib/data/contact"
+import { sendHavarRequest } from "@lib/data/havar"
 import { useState } from "react"
 
 type HavarType = "purchase" | "rental"
@@ -23,6 +23,7 @@ export default function HavarClient() {
   const [tab, setTab] = useState<HavarType>("purchase")
   const [form, setForm] = useState({ ...emptyForm })
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+  const [errorText, setErrorText] = useState("")
 
   const set = (k: keyof typeof form, v: any) => setForm((f) => ({ ...f, [k]: v }))
 
@@ -38,22 +39,13 @@ export default function HavarClient() {
     }
     setStatus("loading")
     try {
-      // gobit'te ayrı bir Havar talep kaydı yok: talep, ayrıntılarıyla dtm'nin
-      // iletişim kutusuna "Havar talebi" konusuyla düşer.
-      const details = Object.entries(form)
-        .filter(([k, v]) => k !== "ack" && v !== "" && v !== false)
-        .map(([k, v]) => `${k}: ${String(v)}`)
-        .join("\n")
-      const res = await sendContact({
-        name: form.full_name,
-        email: form.email,
-        subject: `Havar talebi (${tab})`,
-        message: details,
-      })
-      if (!res.success) throw new Error("Talep gönderilemedi.")
+      const { ack: _ack, ...fields } = form
+      const res = await sendHavarRequest({ ...fields, type: tab })
+      if (!res.success) throw new Error(res.error ?? "Talep gönderilemedi.")
       setStatus("success")
       setForm({ ...emptyForm })
-    } catch {
+    } catch (err) {
+      setErrorText(err instanceof Error ? err.message : "")
       setStatus("error")
     }
   }
@@ -264,7 +256,7 @@ export default function HavarClient() {
                 {status === "loading" ? "Gönderiliyor..." : "Ön İlgi / Talep Bırak"}
               </button>
               {status === "error" && (
-                <p className="text-sm text-red-600 text-center">Talep gönderilemedi. Lütfen tekrar deneyin.</p>
+                <p className="text-sm text-red-600 text-center">{errorText || "Talep gönderilemedi. Lütfen tekrar deneyin."}</p>
               )}
             </form>
           )}

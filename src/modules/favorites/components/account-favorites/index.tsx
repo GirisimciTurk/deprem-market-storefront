@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useCallback, useEffect, useState } from "react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreRegion } from "types/store"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { listProductsByIds } from "@lib/data/products"
 import { useWishlist } from "@lib/context/wishlist-context"
@@ -17,10 +17,10 @@ import { getProductPrice } from "@lib/util/get-product-price"
 export default function AccountFavorites({
   region,
 }: {
-  region: HttpTypes.StoreRegion
+  region: StoreRegion
 }) {
   const { productIds, toggle, pendingId } = useWishlist()
-  const [products, setProducts] = useState<HttpTypes.StoreProduct[]>([])
+  const [products, setProducts] = useState<StoreProduct[]>([])
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
@@ -34,7 +34,7 @@ export default function AccountFavorites({
       setProducts(
         productIds
           .map((id) => api.find((p) => p.id === id))
-          .filter((p): p is HttpTypes.StoreProduct => Boolean(p))
+          .filter((p): p is StoreProduct => Boolean(p))
       )
     } catch (e) {
       console.error("[AccountFavorites] Ürünler çekilemedi", e)

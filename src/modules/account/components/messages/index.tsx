@@ -215,6 +215,11 @@ export default function Messages({
                     {detail?.subject || activeConversation?.subject}
                   </p>
                 )}
+                {(detail?.order_display_id ?? activeConversation?.order_display_id) != null && (
+                  <p className="text-3xs text-ui-fg-muted">
+                    {labels.order} #{detail?.order_display_id ?? activeConversation?.order_display_id}
+                  </p>
+                )}
               </div>
             </div>
 

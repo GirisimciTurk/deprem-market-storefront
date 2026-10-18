@@ -1,5 +1,11 @@
 import "server-only"
 import { cookies as nextCookies } from "next/headers"
+import {
+  ORDER_TOKENS_COOKIE,
+  ORDER_TOKENS_MAX_AGE,
+  parseOrderTokens,
+  withOrderToken,
+} from "@lib/util/order-tokens"
 
 // gobit oturumu: identity-session'ın imzalı çerezi (gobit_session). Vitrin onu
 // kendi alanında _gobit_session olarak tutar ve sunucu tarafı gobit isteklerine
@@ -24,7 +30,7 @@ export const getAuthHeaders = async (): Promise<Record<string, string>> => {
 export const getCacheTag = async (tag: string): Promise<string> => {
   try {
     const cookies = await nextCookies()
-    const cacheId = cookies.get("_medusa_cache_id")?.value
+    const cacheId = cookies.get("_dt_cache_id")?.value
 
     if (!cacheId) {
       return ""
@@ -84,13 +90,13 @@ export const removeAuthToken = async () => {
 
 export const getCartId = async () => {
   const cookies = await nextCookies()
-  return cookies.get("_medusa_cart_id")?.value
+  return cookies.get("_dt_cart_id")?.value
 }
 
 export const setCartId = async (cartId: string) => {
   try {
     const cookies = await nextCookies()
-    cookies.set("_medusa_cart_id", cartId, {
+    cookies.set("_dt_cart_id", cartId, {
       maxAge: 60 * 60 * 24 * 7,
       httpOnly: true,
       // "lax": ödeme sağlayıcısı dönüşünde (cross-site → /checkout) sepet cookie'sinin
@@ -106,7 +112,7 @@ export const setCartId = async (cartId: string) => {
 export const removeCartId = async () => {
   try {
     const cookies = await nextCookies()
-    cookies.set("_medusa_cart_id", "", { maxAge: -1 })
+    cookies.set("_dt_cart_id", "", { maxAge: -1 })
   } catch {
     /* render bağlamında cookie yazılamaz — best-effort (retrieveCart catch'i buradan geçer) */
   }
@@ -114,24 +120,24 @@ export const removeCartId = async () => {
 
 // gobit'in sipariş jetonu (X-Order-Token, gobit ADR 0439): misafir alışverişte
 // sipariş sayfası onunla açılır. Tamamlamanın verdiği jetonlar, siparişe göre,
-// bu çerezde tutulur (en çok son 10 sipariş).
-const ORDER_TOKENS = "_gobit_order_tokens"
-
+// bu çerezde tutulur (en çok son 10 sipariş). E-postadaki sipariş bağlantısının
+// jetonunu (?token=) middleware aynı çereze yazar.
 async function orderTokens(): Promise<Record<string, string>> {
   try {
-    const raw = (await nextCookies()).get(ORDER_TOKENS)?.value
-    return raw ? (JSON.parse(raw) as Record<string, string>) : {}
+    return parseOrderTokens((await nextCookies()).get(ORDER_TOKENS_COOKIE)?.value)
   } catch {
     return {}
   }
 }
 
+/** Bu tarayıcının jetonunu sakladığı siparişler (eskiden yeniye). */
+export const savedOrderIds = async (): Promise<string[]> => Object.keys(await orderTokens())
+
 export const rememberOrderToken = async (orderId: string, token: string) => {
   try {
-    const kept = Object.entries(await orderTokens()).slice(-9)
     const cookies = await nextCookies()
-    cookies.set(ORDER_TOKENS, JSON.stringify(Object.fromEntries([...kept, [orderId, token]])), {
-      maxAge: 60 * 60 * 24 * 30,
+    cookies.set(ORDER_TOKENS_COOKIE, withOrderToken(cookies.get(ORDER_TOKENS_COOKIE)?.value, orderId, token), {
+      maxAge: ORDER_TOKENS_MAX_AGE,
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
@@ -141,9 +147,12 @@ export const rememberOrderToken = async (orderId: string, token: string) => {
   }
 }
 
-/** Siparişi okumak için başlıklar: oturum çerezi ve varsa siparişin jetonu. */
-export const getOrderHeaders = async (orderId: string): Promise<Record<string, string>> => {
-  const token = (await orderTokens())[orderId]
+/**
+ * Siparişi okumak için başlıklar: oturum çerezi ve varsa siparişin jetonu
+ * (verilen, yoksa çerezdeki).
+ */
+export const getOrderHeaders = async (orderId: string, given?: string): Promise<Record<string, string>> => {
+  const token = given || (await orderTokens())[orderId]
 
   return { ...(await getAuthHeaders()), ...(token ? { "X-Order-Token": token } : {}) }
 }

@@ -3,7 +3,7 @@
 import { Fragment, useState } from "react"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { Menu, X } from "lucide-react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreRegion } from "types/store"
 import { useTranslations } from "next-intl"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import useToggleState from "@lib/hooks/use-toggle-state"
@@ -34,7 +34,7 @@ const MENU_GROUPS: { titleKey: string; items: NavItem[] }[] = [
     titleKey: "experts",
     items: [
       { key: "findEngineer", href: "/uzmanlar" },
-      { key: "havar", href: "/havar" },
+      { key: "carbonFiber", href: "/hizmetler/karbon-fiber" },
     ],
   },
   {
@@ -59,7 +59,7 @@ const SINGLE_LINKS: NavItem[] = [
 export default function CategoryDrawer({
   regions,
 }: {
-  regions: HttpTypes.StoreRegion[] | null
+  regions: StoreRegion[] | null
 }) {
   const t = useTranslations("drawer")
   const tNav = useTranslations("navMenu")

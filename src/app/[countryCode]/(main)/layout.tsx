@@ -1,10 +1,9 @@
 import { Metadata } from "next"
 
-import { listCartOptions, retrieveCart } from "@lib/data/cart"
+import { getShippingQuote, retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import { getRegion } from "@lib/data/regions"
 import { getBaseURL } from "@lib/util/env"
-import { StoreCartShippingOption } from "@medusajs/types"
 import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
 import Footer from "@modules/layout/templates/footer"
 import Nav from "@modules/layout/templates/nav"
@@ -37,13 +36,8 @@ export default async function PageLayout(props: {
     retrieveCart(),
     getRegion(countryCode),
   ])
-  let shippingOptions: StoreCartShippingOption[] = []
-
-  if (cart) {
-    const { shipping_options } = await listCartOptions()
-
-    shippingOptions = shipping_options
-  }
+  // Ücretsiz kargo hedefi: dtm'nin kargo teklifindeki satıcı eşikleri.
+  const shippingQuote = cart?.items?.length ? await getShippingQuote(cart.id) : null
 
   // Favoriler hesaba bağlı: liste sunucuda çekilip provider'a veriliyor, böylece
   // kalp butonları ve nav sayacı ilk boyamada doğru durumda geliyor (localStorage
@@ -65,7 +59,7 @@ export default async function PageLayout(props: {
           <FreeShippingPriceNudge
             variant="popup"
             cart={cart}
-            shippingOptions={shippingOptions}
+            quote={shippingQuote}
           />
         )}
         {props.children}

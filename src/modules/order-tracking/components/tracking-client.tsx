@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react"
 import { trackOrder } from "@lib/data/orders"
 import { convertToLocale } from "@lib/util/money"
 import { getCarrierName, getTrackingUrl } from "@lib/util/cargo"
-import { toReachableImageUrl } from "@lib/util/image-url"
 import {
   Button,
   Input,
@@ -15,10 +14,10 @@ import {
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import {
   getFulfillmentLabel,
-  getPaymentLabel,
   getStageLabel,
   getStatusSteps,
   type OrderStage,
+  type TrackingView,
 } from "./tracking-utils"
 
 type TrackingClientProps = {
@@ -36,17 +35,18 @@ export default function TrackingClient({
   const [displayId, setDisplayId] = useState("")
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
-  const [order, setOrder] = useState<any | null>(null)
+  const [order, setOrder] = useState<TrackingView | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  // Auto-fill form and search if displayId and email are passed from query parameters
+  // Bağlantıdaki sipariş numarası formu doldurur; e-posta adresi URL'ye
+  // yazılmaz (eski bağlantılarda varsa sorgu yapılır).
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const qId = params.get("id")
+    const qId = (params.get("id") || "").replace(/\D/g, "")
     const qEmail = params.get("email")
+    if (qId) setDisplayId(qId)
     if (qId && qEmail) {
-      setDisplayId(qId)
       setEmail(qEmail)
       handleSearch(null, qId, qEmail)
     }
@@ -69,15 +69,15 @@ export default function TrackingClient({
 
     try {
       const result = await trackOrder(searchId, searchEmail)
-      if (result) {
-        setOrder(result)
-        // Update URL query parameters for shareability
+      if (result.order) {
+        setOrder(result.order)
+        // Paylaşılabilir bağlantıda yalnız sipariş numarası durur.
         const url = new URL(window.location.href)
         url.searchParams.set("id", searchId)
-        url.searchParams.set("email", searchEmail)
+        url.searchParams.delete("email")
         window.history.pushState({}, "", url.toString())
       } else {
-        setError("Sipariş bulunamadı. Lütfen bilgilerinizi kontrol edin.")
+        setError(result.error || "Sipariş bulunamadı. Lütfen bilgilerinizi kontrol edin.")
       }
     } catch (err: any) {
       setError(err?.message || "Sipariş sorgulanırken bir hata oluştu.")
@@ -252,63 +252,16 @@ export default function TrackingClient({
                       Sipariş #{order.display_id}
                     </span>
                     {/* Rozet ile hemen altındaki çizelge AYNI şeyi söylemeli:
-                        ikisi de satıcı aşamasından beslenir. `stage` yoksa
-                        (alt-siparişi olmayan eski sipariş) eski etikete düşer. */}
+                        ikisi de satıcı aşamasından beslenir. */}
                     {(() => {
-                      const badge = order.stage
-                        ? getStageLabel(order.stage)
-                        : getFulfillmentLabel(order.fulfillment_status)
+                      const badge = getStageLabel(order.stage)
                       return <Badge color={badge.color}>{badge.text}</Badge>
                     })()}
-                    <Badge color={getPaymentLabel(order.payment_status).color}>
-                      {getPaymentLabel(order.payment_status).text}
-                    </Badge>
                   </div>
                   <Text className="text-sm text-gray-500">
                     Sipariş Tarihi:{" "}
                     {new Date(order.created_at).toLocaleString("tr-TR")}
                   </Text>
-                </div>
-
-                <div className="flex items-center gap-2 self-stretch md:self-auto">
-                  <div className="bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-mono select-all shrink-0">
-                    ID: {order.id}
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard(order.id, "id")}
-                    className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
-                    title="Sipariş ID'sini kopyala"
-                  >
-                    {copiedId === "id" ? (
-                      <svg
-                        className="w-4 h-4 text-green-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                        />
-                      </svg>
-                    )}
-                  </button>
                 </div>
               </div>
 
@@ -477,8 +430,8 @@ export default function TrackingClient({
                 </div>
               </div>
 
-              {/* Fulfillments / Cargo Tracking Link */}
-              {order.fulfillments && order.fulfillments.length > 0 && (
+              {/* Satıcı paketleri ve kargo takip bağlantıları */}
+              {order.seller_shipments.length > 0 && (
                 <div className="bg-brand-50/50 rounded-xl border border-brand-100/60 p-5">
                   <h3 className="font-bold text-brand-900 text-sm mb-3 flex items-center gap-2">
                     <svg
@@ -496,112 +449,114 @@ export default function TrackingClient({
                     </svg>
                     Kargo Takip Bilgileri
                   </h3>
-                  {order.fulfillments.map((fulfillment: any, fIdx: number) => {
-                    // Takip bilgisi fulfillment.labels'tan gelir (tracking_number/tracking_url).
-                    const labels = fulfillment.labels || []
-                    const trackingNumbers = labels
-                      .map((l: any) => l?.tracking_number)
-                      .filter(Boolean)
-                    const trackingLinks = labels.map((l: any) => l?.tracking_url)
+                  <div className="flex flex-col gap-4">
+                  {order.seller_shipments.map((shipment, fIdx) => {
+                    const num = shipment.tracking_number
+                    const carrier = shipment.carrier || "yurtici"
+                    const link =
+                      num &&
+                      (shipment.tracking_url ||
+                        getTrackingUrl(num, carrier) ||
+                        `https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=${num}`)
+                    const label = getStageLabel(shipment.stage)
                     return (
-                      <div key={fulfillment.id} className="flex flex-col gap-3">
-                        <div className="text-xs text-brand-700 font-medium">
-                          Paket #{fIdx + 1} - Kargo Firması:{" "}
-                          {getCarrierName(fulfillment.provider_id)}
+                      <div key={shipment.seller_order_id} className="flex flex-col gap-3">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-brand-700 font-medium">
+                          <span>
+                            Paket #{fIdx + 1}
+                            {shipment.seller_name ? ` - ${shipment.seller_name}` : ""}
+                            {shipment.item_count ? ` (${shipment.item_count} ürün)` : ""}
+                            {num ? ` - Kargo Firması: ${getCarrierName(carrier)}` : ""}
+                          </span>
+                          <Badge color={label.color} className="py-0.5 px-2 text-[10px]">
+                            {shipment.stage_label || label.text}
+                          </Badge>
                         </div>
-                        {trackingNumbers.length > 0 ? (
-                          trackingNumbers.map((num: string, nIdx: number) => {
-                            const link =
-                              trackingLinks[nIdx] ||
-                              getTrackingUrl(num, fulfillment.provider_id) ||
-                              `https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=${num}`
-                            return (
-                              <div
-                                key={nIdx}
-                                className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-lg border border-brand-100"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <span className="text-xs font-semibold text-gray-700">
-                                    Takip Numarası:
-                                  </span>
-                                  <span className="font-mono text-sm text-gray-900 font-bold select-all">
-                                    {num}
-                                  </span>
-                                  <button
-                                    onClick={() =>
-                                      copyToClipboard(
-                                        num,
-                                        `track-${fIdx}-${nIdx}`
-                                      )
-                                    }
-                                    className="p-1.5 hover:bg-gray-100 rounded text-gray-500 transition-colors"
-                                    title="Takip kodunu kopyala"
-                                  >
-                                    {copiedId === `track-${fIdx}-${nIdx}` ? (
-                                      <svg
-                                        className="w-3.5 h-3.5 text-green-600"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M5 13l4 4L19 7"
-                                        />
-                                      </svg>
-                                    ) : (
-                                      <svg
-                                        className="w-3.5 h-3.5"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                                        />
-                                      </svg>
-                                    )}
-                                  </button>
-                                </div>
-                                <a
-                                  href={link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline flex items-center gap-1 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-md transition-colors"
+                        {num ? (
+                        <div
+                          className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-lg border border-brand-100"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs font-semibold text-gray-700">
+                              Takip Numarası:
+                            </span>
+                            <span className="font-mono text-sm text-gray-900 font-bold select-all">
+                              {num}
+                            </span>
+                            <button
+                              onClick={() =>
+                                copyToClipboard(
+                                  num,
+                                  `track-${fIdx}`
+                                )
+                              }
+                              className="p-1.5 hover:bg-gray-100 rounded text-gray-500 transition-colors"
+                              title="Takip kodunu kopyala"
+                            >
+                              {copiedId === `track-${fIdx}` ? (
+                                <svg
+                                  className="w-3.5 h-3.5 text-green-600"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
                                 >
-                                  Kargom Nerede?
-                                  <svg
-                                    className="w-3.5 h-3.5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                                    />
-                                  </svg>
-                                </a>
-                              </div>
-                            )
-                          })
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              ) : (
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
+                          <a
+                            href={link || undefined}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline flex items-center gap-1 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-md transition-colors"
+                          >
+                            Kargom Nerede?
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
+                            </svg>
+                          </a>
+                        </div>
                         ) : (
                           <div className="text-xs text-gray-500 bg-white p-3 rounded-lg border border-gray-100 italic">
-                            Kargo takip numarası henüz girilmemiş. Siparişiniz
-                            kargoya verildiğinde takip linki burada
-                            görünecektir.
+                            {shipment.stage === "canceled"
+                              ? "Bu paket iptal edildi."
+                              : "Kargo takip numarası henüz girilmemiş. Paket kargoya verildiğinde takip bağlantısı burada görünecektir."}
                           </div>
                         )}
                       </div>
                     )
                   })}
+                  </div>
                 </div>
               )}
 
@@ -611,29 +566,23 @@ export default function TrackingClient({
                   Sipariş İçeriği
                 </h3>
                 <div className="flex flex-col gap-4">
-                  {order.items.map((item: any) => (
+                  {order.items.map((item) => (
                     <div
                       key={item.id}
                       className="flex gap-4 items-center bg-gray-50/50 p-3 rounded-xl border border-gray-100/40"
                     >
-                      {item.thumbnail && (
-                        <img
-                          src={toReachableImageUrl(item.thumbnail)}
-                          alt={item.title}
-                          className="w-16 h-16 object-cover rounded-lg bg-gray-100 border border-gray-200 shrink-0"
-                        />
-                      )}
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-semibold text-gray-900 truncate">
                           {item.title}
                         </h4>
                         <Text className="text-xs text-gray-500 mt-0.5">
+                          {item.variant_title ? `${item.variant_title} · ` : ""}
                           Miktar: {item.quantity} adet
                         </Text>
                       </div>
                       <div className="text-sm font-bold text-gray-900 font-mono">
                         {convertToLocale({
-                          amount: item.unit_price * item.quantity,
+                          amount: item.total,
                           currency_code: order.currency_code,
                         })}
                       </div>
@@ -642,51 +591,33 @@ export default function TrackingClient({
                 </div>
               </div>
 
-              {/* Delivery Details */}
-              <div className="border-t border-gray-100 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-semibold text-sm text-gray-900 mb-2">
-                    Teslimat Adresi
-                  </h4>
-                  <div className="text-xs text-gray-600 flex flex-col gap-1">
-                    <span className="font-bold">
-                      {order.shipping_address?.first_name}{" "}
-                      {order.shipping_address?.last_name}
-                    </span>
-                    <span>
-                      {order.shipping_address?.address_1}{" "}
-                      {order.shipping_address?.address_2}
-                    </span>
-                    <span>
-                      {order.shipping_address?.postal_code}{" "}
-                      {order.shipping_address?.city} /{" "}
-                      {order.shipping_address?.country_code?.toUpperCase()}
-                    </span>
-                    {order.shipping_address?.phone && (
-                      <span>Tel: {order.shipping_address?.phone}</span>
-                    )}
-                  </div>
+              {/* Tutar özeti — teslimat adresi güvenlik gereği bu sorguda gösterilmez */}
+              <div className="border-t border-gray-100 pt-6 flex flex-col gap-2 text-sm text-gray-600">
+                <div className="flex justify-between">
+                  <span>Kargo Ücreti</span>
+                  <span className="font-mono">
+                    {order.shipping_total > 0
+                      ? convertToLocale({
+                          amount: order.shipping_total,
+                          currency_code: order.currency_code,
+                        })
+                      : "Ücretsiz"}
+                  </span>
                 </div>
-
-                <div>
-                  <h4 className="font-semibold text-sm text-gray-900 mb-2">
-                    Kargo Yöntemi
-                  </h4>
-                  <div className="text-xs text-gray-600 flex flex-col gap-1">
-                    <span className="font-semibold">
-                      {order.shipping_methods?.[0]?.name || "Standart Kargo"}
-                    </span>
-                    <span>
-                      Kargo Ücreti:{" "}
-                      {order.shipping_methods?.[0]?.amount !== undefined
-                        ? convertToLocale({
-                            amount: order.shipping_methods[0].amount,
-                            currency_code: order.currency_code,
-                          })
-                        : "Ücretsiz"}
-                    </span>
-                  </div>
+                <div className="flex justify-between font-bold text-gray-900">
+                  <span>Toplam</span>
+                  <span className="font-mono">
+                    {convertToLocale({
+                      amount: order.total,
+                      currency_code: order.currency_code,
+                    })}
+                  </span>
                 </div>
+                <Text className="text-xs text-gray-400 mt-1">
+                  Teslimat adresi ve iletişim bilgileri güvenliğiniz için bu
+                  sorguda gösterilmez; tüm ayrıntılar için üye girişi yapın ya da
+                  sipariş e-postanızdaki bağlantıyı kullanın.
+                </Text>
               </div>
             </div>
           )}

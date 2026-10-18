@@ -3,13 +3,13 @@
 // Asistan uçları gobit/dtm'de henüz yok: istek 404 alır ve aşağıdaki yedek
 // yanıt gösterilir.
 import { gobitData } from "@lib/gobit/client"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 import { listProducts } from "./products"
 
 export type AssistantTurn = { role: "user" | "assistant"; content: string }
 
 export type AssistantItem = {
-  product: HttpTypes.StoreProduct
+  product: StoreProduct
   quantity: number
   reason: string
 }
@@ -95,14 +95,14 @@ export async function askAssistant(input: {
   if (openId) idSet.add(openId)
   const ids = Array.from(idSet)
 
-  let byId = new Map<string, HttpTypes.StoreProduct>()
+  let byId = new Map<string, StoreProduct>()
   if (ids.length > 0) {
     try {
       const {
         response: { products },
       } = await listProducts({
         countryCode: input.countryCode,
-        queryParams: { id: ids, limit: ids.length } as HttpTypes.StoreProductListParams,
+        queryParams: { id: ids, limit: ids.length },
       })
       byId = new Map(products.map((p) => [p.id as string, p]))
     } catch {

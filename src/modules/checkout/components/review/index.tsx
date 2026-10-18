@@ -4,10 +4,10 @@ import { Heading, clx } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PaymentButton from "../payment-button"
 import { useSearchParams } from "next/navigation"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCart } from "types/store"
 import { useState } from "react"
 
-const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
+const Review = ({ cart }: { cart: StoreCart }) => {
   const searchParams = useSearchParams()
 
   const isOpen = searchParams.get("step") === "review"

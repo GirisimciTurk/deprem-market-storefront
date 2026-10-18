@@ -1,4 +1,4 @@
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 import { ShieldCheck, FileText } from "lucide-react"
 import { toReachableImageUrl } from "@lib/util/image-url"
 
@@ -18,7 +18,7 @@ export type ProductCertification = {
   document_url?: string | null
 }
 
-function parseCertifications(product: HttpTypes.StoreProduct): ProductCertification[] {
+function parseCertifications(product: StoreProduct): ProductCertification[] {
   const raw = (product.metadata as any)?.certifications
   if (!Array.isArray(raw)) return []
   return raw
@@ -41,7 +41,7 @@ function parseCertifications(product: HttpTypes.StoreProduct): ProductCertificat
 export default function ProductCertifications({
   product,
 }: {
-  product: HttpTypes.StoreProduct
+  product: StoreProduct
 }) {
   const certs = parseCertifications(product)
   if (certs.length === 0) return null

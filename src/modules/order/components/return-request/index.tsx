@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { HttpTypes } from "@medusajs/types"
+import { StoreOrder } from "types/store"
 import { Button } from "@modules/common/components/ui"
 import Divider from "@modules/common/components/divider"
 import {
@@ -12,7 +12,7 @@ import {
 } from "@lib/data/returns"
 
 type Props = {
-  order: HttpTypes.StoreOrder
+  order: StoreOrder
 }
 
 // İade yalnızca kargolanmış/teslim edilmiş siparişler için mantıklı.

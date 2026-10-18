@@ -1,12 +1,12 @@
-import { HttpTypes } from "@medusajs/types"
+import { StoreProductCategory } from "types/store"
 import { gobitFetch } from "@lib/gobit/client"
 import { GobitCategory, toCategories } from "@lib/gobit/adapt"
 import { getCacheOptions } from "./cookies"
 
 // gobit kategorileri düz liste verir; ağaç (category_children, parent_category)
-// burada kurulur. Medusa'nın `*products` gömmesi yok: bir kategorinin ürünleri
+// burada kurulur. Kategoriye gömülü ürün listesi yok: bir kategorinin ürünleri
 // ürün listesinden `category_tree_id` ile okunur.
-async function allCategories(): Promise<HttpTypes.StoreProductCategory[]> {
+async function allCategories(): Promise<StoreProductCategory[]> {
   const cacheOpts = await getCacheOptions("categories")
   const next = {
     ...cacheOpts,
@@ -35,7 +35,7 @@ export const listCategories = async (query?: Record<string, unknown>) => {
 
 export const getCategoryByHandle = async (
   categoryHandle: string[]
-): Promise<HttpTypes.StoreProductCategory> => {
+): Promise<StoreProductCategory> => {
   const safeDecode = (s: string) => {
     try {
       return decodeURIComponent(s)
@@ -46,6 +46,6 @@ export const getCategoryByHandle = async (
   const handle = categoryHandle.map(safeDecode)
   const last = handle[handle.length - 1]
 
-  // Bulunamayan kategori Medusa'daki gibi boş cevaptır; sayfa notFound() der.
-  return (await allCategories()).find((c) => c.handle === last) as HttpTypes.StoreProductCategory
+  // Bulunamayan kategori boş cevaptır; sayfa notFound() der.
+  return (await allCategories()).find((c) => c.handle === last) as StoreProductCategory
 }

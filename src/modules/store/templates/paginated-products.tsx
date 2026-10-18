@@ -47,9 +47,9 @@ export default async function PaginatedProducts({
   }
 
   // categoryId virgülle ayrılmış çoklu seçim olabilir (cat_1,cat_2).
-  // Seçim ALT KATEGORİLERİYLE genişletilir: Medusa `category_id`'yi doğrudan
-  // atama olarak yorumluyor, ürünler de yaprak kategorilere atandığı için ana
-  // kategori seçildiğinde sonuç boş geliyordu.
+  // Seçim ALT KATEGORİLERİYLE genişletilir: ürün sorgusu `category_id`'yi
+  // doğrudan atama olarak yorumlar, ürünler de yaprak kategorilere atandığı için
+  // ana kategori seçildiğinde sonuç boş gelirdi.
   const selectedCategoryIds = categoryId
     ? categoryId.split(",").filter(Boolean)
     : []

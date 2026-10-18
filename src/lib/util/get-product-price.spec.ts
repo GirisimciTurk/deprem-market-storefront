@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { getPricesForVariant, getProductPrice } from "./get-product-price"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 
 const makeVariant = (
   calculated: number,
@@ -83,7 +83,7 @@ describe("getProductPrice", () => {
         makeVariant(10000, 10000),
         makeVariant(20000, 20000),
       ],
-    } as unknown as HttpTypes.StoreProduct
+    } as unknown as StoreProduct
 
     const { cheapestPrice } = getProductPrice({ product })
     expect(cheapestPrice).not.toBeNull()
@@ -98,7 +98,7 @@ describe("getProductPrice", () => {
         { ...makeVariant(10000, 10000), id: "v_a" },
         { ...makeVariant(25000, 25000), id: "v_b" },
       ],
-    } as unknown as HttpTypes.StoreProduct
+    } as unknown as StoreProduct
 
     const { variantPrice } = getProductPrice({ product, variantId: "v_b" })
     expect(variantPrice).not.toBeNull()
@@ -109,7 +109,7 @@ describe("getProductPrice", () => {
     const product = {
       id: "prod_1",
       variants: [{ ...makeVariant(10000, 10000), id: "v_a" }],
-    } as unknown as HttpTypes.StoreProduct
+    } as unknown as StoreProduct
 
     const { variantPrice } = getProductPrice({ product, variantId: "missing" })
     expect(variantPrice).toBeNull()
@@ -119,7 +119,7 @@ describe("getProductPrice", () => {
     const product = {
       id: "prod_1",
       variants: [],
-    } as unknown as HttpTypes.StoreProduct
+    } as unknown as StoreProduct
     expect(getProductPrice({ product }).cheapestPrice).toBeNull()
   })
 })

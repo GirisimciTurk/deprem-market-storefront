@@ -5,7 +5,7 @@ import SearchModal from "@modules/layout/components/search-modal"
 import { getTranslations } from "next-intl/server"
 import { listRegions } from "@lib/data/regions"
 import { retrieveCustomer } from "@lib/data/customer"
-import { StoreRegion } from "@medusajs/types"
+import { StoreRegion } from "types/store"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
 import Logo from "@modules/layout/components/logo"
@@ -13,6 +13,7 @@ import FavoritesNavIcon from "@modules/layout/components/favorites-nav-icon"
 import CategoryDrawer from "@modules/layout/components/category-drawer"
 import DealerMenu from "@modules/layout/components/dealer-menu"
 import LocaleSelect from "@modules/layout/components/locale-select"
+import { accountLinkLabelKey } from "./account-label"
 
 export default async function Nav({ countryCode }: { countryCode: string }) {
   const [regions, customer, t] = await Promise.all([
@@ -25,6 +26,9 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
   const region = regions?.find((r) =>
     r.countries?.some((c) => c.iso_2 === countryCode)
   )
+
+  // Hesap bağlantısı oturum açıkken "Hesabım", değilken "Giriş Yap".
+  const accountLabel = t(accountLinkLabelKey(!!customer))
 
   // Etiket: masaüstünde (≥small) ikon yanında metin; mobilde yalnız ikon.
   const labelCls =
@@ -53,7 +57,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
           {/* Orta: büyük arama çubuğu (Amazon tarzı) */}
           <div className="flex min-w-0 flex-1 justify-center">
             <div className="w-full max-w-lg">
-              <SearchModal regionId={region?.id} />
+              <SearchModal />
             </div>
           </div>
 
@@ -78,8 +82,8 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
               className="hover:text-ui-fg-base flex items-center gap-x-1.5 p-2"
               href="/account"
               data-testid="nav-account-link"
-              title={t("loginLabel")}
-              aria-label={t("loginLabel")}
+              title={accountLabel}
+              aria-label={accountLabel}
             >
               {/* Baretli kişi (afet/güvenlik temalı hesap ikonu) */}
               <svg
@@ -101,7 +105,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
                 {/* omuzlar */}
                 <path d="M5.5 20.5a6.5 6.5 0 0 1 13 0" />
               </svg>
-              <span className={labelCls}>{t("loginLabel")}</span>
+              <span className={labelCls}>{accountLabel}</span>
             </LocalizedClientLink>
 
             {/* Favoriler yalnızca giriş yapmış kullanıcıya gösterilir */}

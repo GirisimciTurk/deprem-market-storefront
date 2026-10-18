@@ -8,7 +8,7 @@ import CollapsibleSection from "@modules/common/components/collapsible-section"
 import FirmaForm from "./firma-form"
 
 export const metadata: Metadata = {
-  title: "Firmamız Olun | depremTek Market",
+  title: "Firmamız Olun",
   description:
     "Firmanızla depremTek Market'te kendi mağazanızı açın, ürünlerinizi satın. Hizmeti baştan sona siz yürütürsünüz; biz yalnızca sattığınız ürünün komisyonunu alırız.",
 }

@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { HttpTypes } from "@medusajs/types"
+import { StoreRegion } from "types/store"
 import {
   X,
   Send,
@@ -42,7 +42,7 @@ export default function AiMascot({
   hideLauncher = false,
 }: {
   countryCode: string
-  region: HttpTypes.StoreRegion | null
+  region: StoreRegion | null
   /** Dışarıdan kontrol (örn. ContactDock). Verilmezse bileşen kendi durumunu tutar. */
   open?: boolean
   onOpenChange?: (open: boolean) => void

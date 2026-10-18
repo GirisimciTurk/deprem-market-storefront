@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { getStageLabel, getStatusSteps } from "./tracking-utils"
+import { getStageLabel, getStatusSteps, toTrackingView, type TrackedOrder } from "./tracking-utils"
 
 const CREATED = "2026-07-01T09:00:00.000Z"
 
@@ -160,5 +160,59 @@ describe("getStageLabel", () => {
     expect(getStageLabel("preparing").text).toBe("Hazırlanıyor")
     expect(getStageLabel("shipped").text).toBe("Kargoya Verildi")
     expect(getStageLabel("canceled").text).toBe("İptal Edildi")
+  })
+})
+
+describe("toTrackingView — misafir sipariş takibi yanıtı", () => {
+  const tracked: TrackedOrder = {
+    display_id: 1042,
+    status: "pending",
+    placed_at: "2026-10-01T09:00:00Z",
+    currency_code: "TRY",
+    total: 123000,
+    shipping_total: 9000,
+    items: [
+      { product_title: "Deprem Çantası", title: "Büyük", quantity: 1, total: 100000 },
+      { product_title: "Düdük", title: "Düdük", quantity: 2, total: 14000 },
+    ],
+    stage: "delivered",
+    stage_label: "Teslim Edildi",
+    seller_shipments: [
+      {
+        seller_name: "depremTek Market",
+        seller_handle: "depremtek",
+        stage: "delivered",
+        stage_label: "Teslim Edildi",
+        carrier: "yurtici",
+        tracking_number: "YK123",
+        tracking_url: "",
+        item_count: 3,
+      },
+    ],
+  }
+
+  it("adres ve kimlik taşımaz; tutarlar ve satırlar korunur", () => {
+    const v = toTrackingView(tracked)
+    expect(v).not.toHaveProperty("id")
+    expect(v).not.toHaveProperty("shipping_address")
+    expect(v.currency_code).toBe("try")
+    expect(v.created_at).toBe("2026-10-01T09:00:00Z")
+    expect(v.items.map((i) => [i.title, i.variant_title, i.total])).toEqual([
+      ["Deprem Çantası", "Büyük", 100000],
+      ["Düdük", "", 14000],
+    ])
+    expect(v.seller_shipments[0]).toMatchObject({
+      seller_order_id: "1042-0",
+      tracking_number: "YK123",
+      tracking_url: null,
+      item_count: 3,
+    })
+  })
+
+  it("teslim edilen sipariş çizelgenin son adımında görünür", () => {
+    const { currentStep, steps } = getStatusSteps(toTrackingView(tracked))
+    expect(currentStep).toBe(3)
+    expect(steps.every((s) => s.completed)).toBe(true)
+    expect(getStageLabel("delivered").text).toBe("Teslim Edildi")
   })
 })

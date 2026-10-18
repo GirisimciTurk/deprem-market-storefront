@@ -8,18 +8,22 @@ import OnboardingCta from "@modules/order/components/onboarding-cta"
 import OrderDetails from "@modules/order/components/order-details"
 import ShippingDetails from "@modules/order/components/shipping-details"
 import PaymentDetails from "@modules/order/components/payment-details"
-import { HttpTypes } from "@medusajs/types"
+import TransferRequestForm from "@modules/account/components/transfer-request-form"
+import { StoreOrder } from "types/store"
 
 type OrderCompletedTemplateProps = {
-  order: HttpTypes.StoreOrder
+  order: StoreOrder
+  /** Oturumdaki müşteri bu siparişi hesabına ekleyebilir (devir talebi). */
+  claimable?: boolean
 }
 
 export default async function OrderCompletedTemplate({
   order,
+  claimable = false,
 }: OrderCompletedTemplateProps) {
   const cookies = await nextCookies()
 
-  const isOnboarding = cookies.get("_medusa_onboarding")?.value === "true"
+  const isOnboarding = cookies.get("_dt_onboarding")?.value === "true"
 
   return (
     <div className="py-6 min-h-[calc(100vh-64px)]">
@@ -37,6 +41,7 @@ export default async function OrderCompletedTemplate({
             <span>Siparişiniz başarıyla oluşturuldu.</span>
           </Heading>
           <OrderDetails order={order} />
+          {claimable && <TransferRequestForm orderId={order.id} />}
           <Heading level="h2" className="flex flex-row text-3xl-regular">
             Özet
           </Heading>

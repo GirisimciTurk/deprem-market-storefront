@@ -94,7 +94,7 @@ export default function ExpertRequestForm({
       <p className="text-sm text-ui-fg-subtle">
         İletişim bilgilerinizi bırakın; <strong>{expertName}</strong> size dönüş yapsın.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
         <input
           type="text"
           required

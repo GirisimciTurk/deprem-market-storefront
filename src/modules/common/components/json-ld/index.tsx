@@ -1,8 +1,8 @@
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 import { SITE_CONTACT } from "@lib/config/contact"
 
 type ProductJsonLdProps = {
-  product: HttpTypes.StoreProduct
+  product: StoreProduct
   url: string
   /** Onaylı yorumlardan hesaplanan ortalama/sayı. reviewCount>0 ise schema'ya eklenir. */
   aggregateRating?: { ratingValue: number; reviewCount: number }

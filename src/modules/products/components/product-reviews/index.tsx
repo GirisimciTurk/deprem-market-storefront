@@ -12,7 +12,7 @@ type ProductReviewsProps = {
   isLoggedIn: boolean
 }
 
-export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn }: ProductReviewsProps) {
+export default function ProductReviews({ productHandle, isLoggedIn }: ProductReviewsProps) {
   const [reviews, setReviews] = useState<Review[]>([])
   const [showForm, setShowForm] = useState(false)
   const [filterRating, setFilterRating] = useState<number | null>(null)
@@ -166,7 +166,7 @@ export default function ProductReviews({ productHandle, isLoggedIn: _isLoggedIn 
         {/* Review Form or Reviews List (Right Column) */}
         <div className="lg:col-span-8">
           {showForm ? (
-            <ReviewForm productHandle={productHandle} onClose={() => setShowForm(false)} />
+            <ReviewForm productHandle={productHandle} isLoggedIn={isLoggedIn} onClose={() => setShowForm(false)} />
           ) : (
             <ReviewsList
               reviews={filteredReviews}

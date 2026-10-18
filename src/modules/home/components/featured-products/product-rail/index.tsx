@@ -1,5 +1,5 @@
 import { listProducts } from "@lib/data/products"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCollection, StoreRegion } from "types/store"
 import { Text } from "@modules/common/components/ui"
 
 import InteractiveLink from "@modules/common/components/interactive-link"
@@ -9,8 +9,8 @@ export default async function ProductRail({
   collection,
   region,
 }: {
-  collection: HttpTypes.StoreCollection
-  region: HttpTypes.StoreRegion
+  collection: StoreCollection
+  region: StoreRegion
 }) {
   const {
     response: { products: pricedProducts },

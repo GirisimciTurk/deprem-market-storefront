@@ -1,11 +1,11 @@
 "use client"
 
+import { ArrowUpRight } from "lucide-react"
 import React from "react"
 import { usePathname } from "next/navigation"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { Text } from "@modules/common/components/ui"
-import { ArrowUpRightMini } from "@medusajs/icons"
 
 export default function NotFound() {
   const t = useTranslations("notFound")
@@ -28,7 +28,7 @@ export default function NotFound() {
         <Text className="text-ui-fg-interactive font-medium">
           {t("backHome")}
         </Text>
-        <ArrowUpRightMini
+        <ArrowUpRight size={16}
           className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ease-in-out duration-150"
           color="var(--fg-interactive)"
         />

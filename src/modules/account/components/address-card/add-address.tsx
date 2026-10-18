@@ -1,12 +1,12 @@
 "use client"
 
-import { Plus } from "@medusajs/icons"
+import { Plus } from "lucide-react"
 import { Button, Heading } from "@modules/common/components/ui"
 import { useActionState, useEffect, useState } from "react"
 
 import { addCustomerAddress } from "@lib/data/customer"
 import useToggleState from "@lib/hooks/use-toggle-state"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCustomerAddress, StoreRegion } from "types/store"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
 import Modal from "@modules/common/components/modal"
@@ -17,8 +17,8 @@ const AddAddress = ({
   region,
   addresses: _addresses,
 }: {
-  region: HttpTypes.StoreRegion
-  addresses: HttpTypes.StoreCustomerAddress[]
+  region: StoreRegion
+  addresses: StoreCustomerAddress[]
 }) => {
   const [successState, setSuccessState] = useState(false)
   const { state, open, close: closeModal } = useToggleState(false)
@@ -54,7 +54,7 @@ const AddAddress = ({
         data-testid="add-address-button"
       >
         <span className="w-12 h-12 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center group-hover:bg-brand-100 transition-colors">
-          <Plus />
+          <Plus size={16} />
         </span>
         <span className="text-base-semi text-ui-fg-base">Yeni Adres Ekle</span>
         <span className="text-small-regular text-ui-fg-subtle">

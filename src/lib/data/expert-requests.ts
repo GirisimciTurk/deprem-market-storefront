@@ -1,7 +1,9 @@
 "use server"
 
-import { gobitFetch } from "@lib/gobit/client"
+import { revalidateTag } from "next/cache"
+import { GobitError, gobitData, gobitFetch } from "@lib/gobit/client"
 import { getAuthHeaders } from "./cookies"
+import type { ExpertReview } from "./experts"
 
 /** Uzmana iletişim talebi (dtm): giriş gerekir. */
 export async function sendExpertRequest(
@@ -29,55 +31,57 @@ export async function sendExpertRequest(
   }
 }
 
-/** "Uzman ol": oturumdaki hesabın uzman kartını yazar ve yayımlar (dtm). */
-export async function saveMyExpertCard(input: {
-  kind: string
-  full_name: string
-  title: string
-  about?: string
-  city: string
-  district: string
-  service_provinces: string[]
-  specialties: string[]
-  experience_years?: number
-  chamber?: string
-  phone: string
-  whatsapp?: string
-  email: string
-  contact_hidden: boolean
-}): Promise<{ success: boolean; error: string | null; unauthorized?: boolean }> {
+/** Uzmana değerlendirme (dtm): giriş gerekir; her hesap bir uzmana bir kez yazar. */
+export async function writeExpertReview(
+  slug: string,
+  input: { author_name: string; rating: number; body: string; declaration: boolean; job_id?: string }
+): Promise<{ success: boolean; error: string | null; unauthorized?: boolean }> {
   const headers = await getAuthHeaders()
-  if (!headers.cookie) return { success: false, error: "Uzman kartı açmak için giriş yapın.", unauthorized: true }
+  if (!headers.cookie) {
+    return { success: false, error: "Değerlendirme yazmak için giriş yapın.", unauthorized: true }
+  }
   try {
-    await gobitFetch("/store/v1/dtm/experts/me", {
-      method: "PUT",
+    await gobitFetch(`/store/v1/dtm/experts/${encodeURIComponent(slug)}/reviews`, {
+      method: "POST",
       headers,
       body: {
-        kind: input.kind,
-        full_name: input.full_name,
-        title: input.title,
-        headline: "",
-        about: input.about ?? "",
-        photo_url: "",
-        city: input.city,
-        district: input.district,
-        address: "",
-        service_provinces: input.service_provinces,
-        nationwide: false,
-        specialties: input.specialties,
-        experience_years: input.experience_years ?? null,
-        chamber: input.chamber ?? "",
-        registry_no: "",
-        phone: input.phone,
-        whatsapp: input.whatsapp ?? "",
-        email: input.email,
-        website: "",
-        contact_hidden: input.contact_hidden,
+        author_name: input.author_name,
+        rating: input.rating,
+        body: input.body,
+        declaration: input.declaration,
+        job_id: input.job_id ?? "",
       },
     })
-    await gobitFetch("/store/v1/dtm/experts/me/publish", { method: "POST", headers, body: {} })
+    // Kart puanı ve yorum listesi "experts" etiketiyle önbellekte.
+    revalidateTag("experts")
     return { success: true, error: null }
   } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : String(e) }
+    return { success: false, ...reviewError(e) }
   }
+}
+
+/** Hesabın bu uzmana yazdığı değerlendirme; yoksa (ya da giriş yoksa) null. */
+export async function getMyExpertReview(slug: string): Promise<ExpertReview | null> {
+  const headers = await getAuthHeaders()
+  if (!headers.cookie) return null
+  return gobitData<ExpertReview>(`/store/v1/dtm/experts/${encodeURIComponent(slug)}/reviews/mine`, {
+    headers,
+    cache: "no-store",
+  }).catch((e) => {
+    if (e instanceof GobitError && (e.status === 404 || e.status === 401)) return null
+    throw e
+  })
+}
+
+// gobit'in İngilizce hata metinlerini ziyaretçiye Türkçe anlatır.
+function reviewError(e: unknown): { error: string; unauthorized?: boolean } {
+  if (!(e instanceof GobitError)) return { error: "Değerlendirme gönderilemedi. Lütfen tekrar deneyin." }
+  if (e.status === 401) return { error: "Oturumunuzun süresi dolmuş; lütfen tekrar giriş yapın.", unauthorized: true }
+  if (e.status === 409) return { error: "Bu uzmanı daha önce değerlendirdiniz." }
+  if (e.status === 404) return { error: "Bu profil artık yayında değil." }
+  if (e.status === 429) return { error: "Çok fazla deneme yapıldı; biraz sonra tekrar deneyin." }
+  if (/own card/.test(e.message)) return { error: "Kendi profilinizi değerlendiremezsiniz." }
+  if (/not a job this expert/.test(e.message)) return { error: "Bu iş numarası bu uzmanın tamamladığı bir işe ait değil." }
+  if (e.status === 403) return { error: "Bu iş numarası hesabınızdan açılmış bir talebe ait değil." }
+  return { error: "Değerlendirme gönderilemedi. Lütfen bilgileri kontrol edip tekrar deneyin." }
 }

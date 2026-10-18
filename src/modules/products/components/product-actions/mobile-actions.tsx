@@ -9,12 +9,12 @@ import X from "@modules/common/icons/x"
 import { getProductPrice } from "@lib/util/get-product-price"
 import OptionSelect from "./option-select"
 import StockAlertButton from "../stock-alert-button"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreVariant } from "types/store"
 import { isSimpleProduct } from "@lib/util/product"
 
 type MobileActionsProps = {
-  product: HttpTypes.StoreProduct
-  variant?: HttpTypes.StoreProductVariant
+  product: StoreProduct
+  variant?: StoreVariant
   options: Record<string, string | undefined>
   updateOptions: (title: string, value: string) => void
   inStock?: boolean

@@ -1,19 +1,23 @@
 "use client"
 
 import React, { useState, useRef } from "react"
-import { submitReview, uploadReviewImages } from "@lib/data/reviews"
+import { submitReview, uploadReviewPhoto } from "@lib/data/reviews"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { fileToResizedPhoto, MAX_PHOTOS, type ReviewPhoto } from "./review-utils"
 
 /**
  * Değerlendirme gönderme formu — tüm form state'ini kendi içinde tutar; başarılı
- * gönderimde yorum PENDING olur (admin onayı), liste güncellenmez. `onClose` form
- * panelini kapatır (Vazgeç / Tamam).
+ * gönderimde yorum onay bekler, liste güncellenmez. Fotoğraflar yorum yazıldıktan
+ * sonra yazarı olarak eklenir; bu yüzden yalnız giriş yapmış müşteri fotoğraf
+ * ekleyebilir. `onClose` form panelini kapatır (Vazgeç / Tamam).
  */
 export default function ReviewForm({
   productHandle,
+  isLoggedIn,
   onClose,
 }: {
   productHandle: string
+  isLoggedIn: boolean
   onClose: () => void
 }) {
   const [formName, setFormName] = useState("")
@@ -23,6 +27,7 @@ export default function ReviewForm({
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [photoNotice, setPhotoNotice] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,36 +57,50 @@ export default function ReviewForm({
 
     setSubmitting(true)
     setSubmitError(null)
+    setPhotoNotice(null)
 
-    // Önce fotoğrafları R2'ye yükle, dönen URL'leri yoruma ekle.
-    let imageUrls: string[] = []
-    if (formPhotos.length > 0) {
-      const up = await uploadReviewImages(
-        formPhotos.map((p) => ({ filename: p.filename, mime_type: p.mime_type, data: p.data }))
-      )
-      if (up.error) {
-        setSubmitting(false)
-        setSubmitError("Fotoğraflar yüklenemedi. Lütfen tekrar deneyin veya fotoğrafsız gönderin.")
-        return
-      }
-      imageUrls = up.urls
-    }
-
+    // Önce yorum yazılır; fotoğraflar sonra, yorumun yazarı olarak eklenir.
     const res = await submitReview({
       product_handle: productHandle,
       rating: formRating,
       comment: formComment,
       name: formName.trim(),
-      images: imageUrls.length > 0 ? imageUrls : undefined,
     })
-    setSubmitting(false)
 
     if (!res.success) {
+      setSubmitting(false)
       setSubmitError(
-        "Değerlendirmeniz gönderilemedi. Lütfen daha sonra tekrar deneyin."
+        res.error || "Değerlendirmeniz gönderilemedi. Lütfen daha sonra tekrar deneyin."
       )
       return
     }
+
+    if (formPhotos.length > 0) {
+      if (!res.review_id) {
+        setPhotoNotice("Oturumunuz kapandığı için fotoğraflar eklenemedi; yorumunuz fotoğrafsız gönderildi.")
+      } else {
+        let failed = 0
+        let lastError: string | null = null
+        // Sırayla: her istek tek fotoğraf taşır (sunucu eylemi gövde sınırı).
+        for (const p of formPhotos) {
+          const up = await uploadReviewPhoto(res.review_id, {
+            filename: p.filename,
+            mime_type: p.mime_type,
+            data: p.data,
+          })
+          if (up.error) {
+            failed++
+            lastError = up.error
+          }
+        }
+        if (failed > 0) {
+          setPhotoNotice(
+            `${failed} fotoğraf eklenemedi${lastError ? `: ${lastError}` : "."} Fotoğrafları Hesabım › Yorumlarım sayfasından yeniden ekleyebilirsiniz.`
+          )
+        }
+      }
+    }
+    setSubmitting(false)
 
     // Başarılı — yorum PENDING (admin onayı bekler), listeye eklemiyoruz; onay mesajı gösteriyoruz.
     setSubmitError(null)
@@ -108,6 +127,9 @@ export default function ReviewForm({
             Yorumunuz onay için ekibimize iletildi. Onaylandıktan sonra ürün
             sayfasında yayınlanacaktır.
           </p>
+          {photoNotice && (
+            <p className="text-xs text-amber-700 font-medium ml-8 mt-1">{photoNotice}</p>
+          )}
           <button
             type="button"
             onClick={onClose}
@@ -164,7 +186,16 @@ export default function ReviewForm({
             />
           </div>
 
-          {/* Photo Upload Area */}
+          {/* Photo Upload Area — yalnız giriş yapmış müşteri (fotoğraf yorumun yazarına bağlanır) */}
+          {!isLoggedIn ? (
+            <p className="text-xs text-gray-500">
+              Yorumunuza fotoğraf eklemek için{" "}
+              <LocalizedClientLink href="/account" className="font-bold text-brand-600 hover:underline">
+                giriş yapın
+              </LocalizedClientLink>
+              .
+            </p>
+          ) : (
           <div>
             <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">Fotoğraf Ekle</label>
             <div className="flex items-center gap-3 flex-wrap">
@@ -201,6 +232,7 @@ export default function ReviewForm({
               ))}
             </div>
           </div>
+          )}
 
           {submitError && (
             <p className="text-sm font-semibold text-brand-600">
@@ -221,7 +253,7 @@ export default function ReviewForm({
               disabled={submitting}
               className="bg-brand-650 hover:bg-brand-700 text-white font-extrabold py-2 px-6 rounded-lg text-sm transition-colors shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {submitting ? "Gönderiliyor..." : "Gönder"}
+              {submitting ? (formPhotos.length > 0 && isLoggedIn ? "Gönderiliyor, fotoğraflar yükleniyor..." : "Gönderiliyor...") : "Gönder"}
             </button>
           </div>
         </div>

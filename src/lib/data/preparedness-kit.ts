@@ -3,11 +3,11 @@
 // Asistan uçları gobit/dtm'de henüz yok: istek 404 alır ve aşağıdaki yedek
 // yanıt gösterilir.
 import { gobitData } from "@lib/gobit/client"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 import { listProducts } from "./products"
 
 export type KitItem = {
-  product: HttpTypes.StoreProduct
+  product: StoreProduct
   quantity: number
   reason: string
 }
@@ -76,7 +76,7 @@ export async function getPreparednessKit(
     response: { products },
   } = await listProducts({
     countryCode,
-    queryParams: { id: ids, limit: ids.length } as HttpTypes.StoreProductListParams,
+    queryParams: { id: ids, limit: ids.length },
   })
 
   const byId = new Map(products.map((p) => [p.id, p]))

@@ -6,22 +6,16 @@ import { useTranslations } from "next-intl"
 import { Search, X, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { toReachableImageUrl } from "@lib/util/image-url"
-import { convertToLocale } from "@lib/util/money"
+import { searchProducts, type SearchHit } from "@lib/data/products"
 
-type SearchResult = {
-  id: string
-  title: string
-  handle: string
-  thumbnail: string | null
-  price?: string
-}
+type SearchResult = SearchHit
 
 /**
  * Satır-içi (inline) canlı arama. Çubuğa doğrudan yazılır; sonuçlar çubuğun
  * hemen ALTINDA açılır liste olarak gelir (modal/popup yok). Amazon tarzı:
  * solda metin alanı, sağda turuncu arama düğmesi.
  */
-export default function SearchModal({ regionId }: { regionId?: string }) {
+export default function SearchModal() {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -71,39 +65,7 @@ export default function SearchModal({ regionId }: { regionId?: string }) {
     const timer = setTimeout(async () => {
       setIsLoading(true)
       try {
-        const backendUrl =
-          process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-        const publishableKey =
-          process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-
-        // region_id ŞART: calculated_price yalnız bölge bağlamında hesaplanır;
-        // yoksa açılır listedeki fiyatlar null/yanlış gelir.
-        const regionParam = regionId ? `&region_id=${regionId}` : ""
-        const res = await fetch(
-          `${backendUrl}/store/products?q=${encodeURIComponent(query)}&limit=8${regionParam}&fields=id,title,handle,thumbnail,*variants.calculated_price`,
-          {
-            headers: {
-              "x-publishable-api-key": publishableKey,
-            },
-          }
-        )
-        const data = await res.json()
-
-        const mapped: SearchResult[] = (data.products || []).map((p: any) => ({
-          id: p.id,
-          title: p.title,
-          handle: p.handle,
-          thumbnail: p.thumbnail,
-          // calculated_amount minor birimdir (kuruş) → convertToLocale 100'e böler;
-          // site genelindeki fiyat gösterimiyle tutarlı olması için burada da kullanılır.
-          price: p.variants?.[0]?.calculated_price?.calculated_amount
-            ? convertToLocale({
-                amount: p.variants[0].calculated_price.calculated_amount,
-                currency_code: p.variants[0].calculated_price.currency_code || "TRY",
-              })
-            : undefined,
-        }))
-        setResults(mapped)
+        setResults(await searchProducts(query, countryCode))
       } catch (err) {
         console.error("Search error:", err)
         setResults([])
@@ -113,7 +75,7 @@ export default function SearchModal({ regionId }: { regionId?: string }) {
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [query, countryCode, isTr, regionId])
+  }, [query, countryCode])
 
   const resetSearch = () => {
     setOpen(false)

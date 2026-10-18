@@ -6,12 +6,12 @@ import Input from "@modules/common/components/input"
 import NativeSelect from "@modules/common/components/native-select"
 
 import { addCustomerAddress, updateCustomerAddress } from "@lib/data/customer"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCustomer, StoreRegion } from "types/store"
 import AccountInfo from "../account-info"
 
 type MyInformationProps = {
-  customer: HttpTypes.StoreCustomer
-  regions: HttpTypes.StoreRegion[]
+  customer: StoreCustomer
+  regions: StoreRegion[]
 }
 
 const ProfileBillingAddress: React.FC<MyInformationProps> = ({

@@ -1,7 +1,7 @@
 /**
  * Kategori ağacı yardımcıları.
  *
- * Medusa'nın ürün sorgusu `category_id`'yi DOĞRUDAN atama olarak yorumlar:
+ * Ürün sorgusu `category_id`'yi DOĞRUDAN atama olarak yorumlar:
  * ürün "Deprem Çantası > Aile Çantası" alt kategorisine bağlıysa, üst kategori
  * ("Deprem Çantası") ile filtrelendiğinde GELMEZ. Ürünler pratikte yaprak
  * kategorilere atandığı için ana kategorilerin hepsi boş görünüyordu.

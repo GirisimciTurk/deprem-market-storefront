@@ -1,78 +1,76 @@
 "use client"
 
 import { acceptTransferRequest, declineTransferRequest } from "@lib/data/orders"
-import { Button, Text } from "@modules/common/components/ui"
+import { Button, Heading, Text } from "@modules/common/components/ui"
 import { useState } from "react"
 
-type TransferStatus = "pending" | "success" | "error"
+type Answer = "accept" | "decline"
 
-const TransferActions = ({ id, token }: { id: string; token: string }) => {
+/**
+ * Devir talebinin kabul/ret düğmeleri. Yalnız düğmeyle çalışır: bağlantıyı
+ * izleyen bir e-posta tarayıcısı devri kabul edemez. Jeton gövdede gider.
+ */
+const TransferActions = ({ transferId, token }: { transferId: string; token: string }) => {
+  const [pending, setPending] = useState<Answer | null>(null)
+  const [done, setDone] = useState<Answer | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [status, setStatus] = useState<{
-    accept: TransferStatus | null
-    decline: TransferStatus | null
-  } | null>({
-    accept: null,
-    decline: null,
-  })
 
-  const acceptTransfer = async () => {
-    setStatus({ accept: "pending", decline: null })
+  const answer = async (which: Answer) => {
+    setPending(which)
     setErrorMessage(null)
-
-    const { success, error } = await acceptTransferRequest(id, token)
-
-    if (error) setErrorMessage(error)
-    setStatus({ accept: success ? "success" : "error", decline: null })
+    const act = which === "accept" ? acceptTransferRequest : declineTransferRequest
+    const { success, error } = await act(transferId, token)
+    setPending(null)
+    if (success) setDone(which)
+    else setErrorMessage(error)
   }
 
-  const declineTransfer = async () => {
-    setStatus({ accept: null, decline: "pending" })
-    setErrorMessage(null)
+  if (done === "accept") {
+    return (
+      <div className="flex flex-col gap-y-2" data-testid="transfer-accepted">
+        <Heading level="h2" className="text-lg text-emerald-600">
+          Sipariş devredildi
+        </Heading>
+        <Text className="text-zinc-600">
+          Sipariş artık talepte bulunan hesaba ait. Bu adresteki sipariş bağlantıları siparişi artık açmaz;
+          siparişle ilgili e-postalar yeni sahibinin adresine gider.
+        </Text>
+      </div>
+    )
+  }
 
-    const { success, error } = await declineTransferRequest(id, token)
-
-    if (error) setErrorMessage(error)
-    setStatus({ accept: null, decline: success ? "success" : "error" })
+  if (done === "decline") {
+    return (
+      <div className="flex flex-col gap-y-2" data-testid="transfer-declined">
+        <Heading level="h2" className="text-lg text-emerald-600">
+          Devir talebi reddedildi
+        </Heading>
+        <Text className="text-zinc-600">Sipariş sizde kalmaya devam ediyor; hiçbir şey değişmedi.</Text>
+      </div>
+    )
   }
 
   return (
     <div className="flex flex-col gap-y-4">
-      {status?.accept === "success" && (
-        <Text className="text-emerald-500">
-          Sipariş başarıyla devredildi!
-        </Text>
-      )}
-      {status?.decline === "success" && (
-        <Text className="text-emerald-500">
-          Sipariş devri başarıyla reddedildi!
-        </Text>
-      )}
-      {status?.accept !== "success" && status?.decline !== "success" && (
-        <div className="flex gap-x-4">
-          <Button
-            size="large"
-            onClick={acceptTransfer}
-            isLoading={status?.accept === "pending"}
-            disabled={
-              status?.accept === "pending" || status?.decline === "pending"
-            }
-          >
-            Devri kabul et
-          </Button>
-          <Button
-            size="large"
-            variant="secondary"
-            onClick={declineTransfer}
-            isLoading={status?.decline === "pending"}
-            disabled={
-              status?.accept === "pending" || status?.decline === "pending"
-            }
-          >
-            Devri reddet
-          </Button>
-        </div>
-      )}
+      <div className="flex flex-wrap gap-4">
+        <Button
+          size="large"
+          onClick={() => answer("accept")}
+          isLoading={pending === "accept"}
+          disabled={pending !== null}
+        >
+          Devri kabul et
+        </Button>
+        <Button
+          size="large"
+          variant="secondary"
+          onClick={() => answer("decline")}
+          isLoading={pending === "decline"}
+          disabled={pending !== null}
+        >
+          Devri reddet
+        </Button>
+      </div>
       {errorMessage && <Text className="text-brand-500">{errorMessage}</Text>}
     </div>
   )

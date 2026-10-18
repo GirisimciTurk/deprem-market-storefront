@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Sparkles, ShoppingCart, Check, Lightbulb, ShieldAlert, MessageSquare } from "lucide-react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreRegion } from "types/store"
 import { useTranslations } from "next-intl"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -13,7 +13,7 @@ export default function PreparednessClient({
   region,
   countryCode,
 }: {
-  region: HttpTypes.StoreRegion | null
+  region: StoreRegion | null
   countryCode: string
 }) {
   const t = useTranslations("preparedness")

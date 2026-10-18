@@ -1,13 +1,13 @@
 "use client"
 
-import { HttpTypes } from "@medusajs/types"
+import { StoreProductImage } from "types/store"
 import Image from "next/image"
 import React, { useState, useMemo } from "react"
 
 import { toReachableImageUrl } from "@lib/util/image-url"
 
 type ImageGalleryProps = {
-  images: HttpTypes.StoreProductImage[]
+  images: StoreProductImage[]
   productHandle?: string
 }
 

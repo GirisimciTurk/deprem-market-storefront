@@ -31,12 +31,11 @@ const Login = ({ setCurrentView }: Props) => {
     }
     startTransition(async () => {
       try {
-        const { location } = await initiateGoogleLogin()
+        const { location, error } = await initiateGoogleLogin()
         if (location) {
           window.location.href = location
         } else {
-          // Already authenticated — reload to pick up the session.
-          window.location.reload()
+          setGoogleError(error || "Google ile giriş yapılamadı.")
         }
       } catch (err) {
         setGoogleError(

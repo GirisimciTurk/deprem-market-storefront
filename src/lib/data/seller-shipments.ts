@@ -1,7 +1,7 @@
 "use server"
 
 import { gobitData } from "@lib/gobit/client"
-import { getOrderHeaders } from "./cookies"
+import { getAuthHeaders, getOrderHeaders } from "./cookies"
 
 export type StoreSellerShipmentItem = {
   title?: string
@@ -13,7 +13,7 @@ export type StoreSellerShipment = {
   seller_name: string
   seller_handle: string
   /** Türetilmiş aşama — 4 aşamalı takip çizelgesiyle aynı dil (backend/lib/order-stage.ts). */
-  stage?: "received" | "preparing" | "shipped" | "canceled"
+  stage?: "received" | "preparing" | "shipped" | "delivered" | "canceled"
   stage_label?: string
   /** Ham enum. Backend `stage` göndermezse buradan türetiliyor (geriye dönük uyum). */
   fulfillment_status: string
@@ -69,13 +69,39 @@ export async function getSellerShipments(orderId: string): Promise<StoreSellerSh
 
 export type StoreOrderStage = {
   order_id: string
-  stage: "received" | "preparing" | "shipped" | "canceled"
+  stage: "received" | "preparing" | "shipped" | "delivered" | "canceled"
   stage_label: string
 }
 
-/** Siparişlerin özet aşaması; okunamayan sipariş listede yer almaz. */
+/**
+ * Siparişlerin özet aşaması; okunamayan sipariş listede yer almaz. Giriş yapmış
+ * müşteri için dtm'nin toplu okuması (/store/v1/dtm/order-stages, istek başına
+ * en çok 50 sipariş); oturum yoksa ya da toplu okuma olmazsa her sipariş kendi
+ * takibinden (jetonuyla) okunur.
+ */
 export async function getOrderStages(orderIds: string[]): Promise<Record<string, StoreOrderStage>> {
-  const all = await Promise.all(orderIds.map(tracking))
+  const ids = Array.from(new Set(orderIds.filter(Boolean)))
+  if (!ids.length) return {}
+
+  const headers = await getAuthHeaders()
+  if (headers.cookie) {
+    try {
+      const pages = await Promise.all(
+        Array.from({ length: Math.ceil(ids.length / 50) }, (_, i) =>
+          gobitData<StoreOrderStage[]>("/store/v1/dtm/order-stages", {
+            query: { order_ids: ids.slice(i * 50, i * 50 + 50).join(",") },
+            headers,
+            cache: "no-store",
+          })
+        )
+      )
+      return Object.fromEntries(pages.flat().map((s) => [s.order_id, s]))
+    } catch {
+      // Aşağıdaki sipariş başına okumaya düşer.
+    }
+  }
+
+  const all = await Promise.all(ids.map(tracking))
 
   return Object.fromEntries(
     all.filter(Boolean).map((t) => [t!.order_id, { order_id: t!.order_id, stage: t!.stage, stage_label: t!.stage_label }])

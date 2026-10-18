@@ -1,6 +1,6 @@
 "use server"
 
-import { HttpTypes } from "@medusajs/types"
+import { StoreRegion } from "types/store"
 import { gobitData } from "@lib/gobit/client"
 import { GobitRegion, toRegion } from "@lib/gobit/adapt"
 import { getCacheOptions } from "./cookies"
@@ -17,10 +17,10 @@ export const listRegions = async () => {
 export const retrieveRegion = async (id: string) => {
   const regions = await listRegions()
 
-  return regions.find((r) => r.id === id) as HttpTypes.StoreRegion
+  return regions.find((r) => r.id === id) as StoreRegion
 }
 
-const regionMap = new Map<string, HttpTypes.StoreRegion>()
+const regionMap = new Map<string, StoreRegion>()
 
 export const getRegion = async (countryCode: string) => {
   if (regionMap.has(countryCode)) {

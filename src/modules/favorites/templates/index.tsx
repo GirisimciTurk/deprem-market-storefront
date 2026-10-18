@@ -1,14 +1,14 @@
 "use client"
 
 import React, { useCallback, useEffect, useState } from "react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreRegion } from "types/store"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { listProductsByIds } from "@lib/data/products"
 import { useWishlist } from "@lib/context/wishlist-context"
 
 type FavoritesTemplateProps = {
-  region: HttpTypes.StoreRegion
+  region: StoreRegion
   countryCode: string
 }
 
@@ -25,7 +25,7 @@ export default function FavoritesTemplate({
   countryCode: _countryCode,
 }: FavoritesTemplateProps) {
   const { productIds, isLoggedIn } = useWishlist()
-  const [products, setProducts] = useState<HttpTypes.StoreProduct[]>([])
+  const [products, setProducts] = useState<StoreProduct[]>([])
   const [loading, setLoading] = useState(true)
 
   const loadFavoriteProducts = useCallback(async () => {
@@ -41,7 +41,7 @@ export default function FavoritesTemplate({
       // ürünler listeden düşer.
       const ordered = productIds
         .map((id) => apiProducts.find((p) => p.id === id))
-        .filter((p): p is HttpTypes.StoreProduct => Boolean(p))
+        .filter((p): p is StoreProduct => Boolean(p))
 
       setProducts(ordered)
     } catch (e) {

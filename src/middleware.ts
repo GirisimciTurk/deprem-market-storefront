@@ -1,13 +1,21 @@
-import { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
 import { foldHandle } from "@lib/gobit/adapt"
+import {
+  ORDER_TOKENS_COOKIE,
+  ORDER_TOKENS_MAX_AGE,
+  confirmedOrderId,
+  withOrderToken,
+} from "@lib/util/order-tokens"
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
-const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+const BACKEND_URL = process.env.NEXT_PUBLIC_GOBIT_BACKEND_URL
+const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_GOBIT_PUBLISHABLE_KEY
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "tr"
 
+// Ülke kodu → gobit bölgesi; yalnız hangi ülkelerin satışta olduğunu bilmek için.
+type RegionRef = { id: string }
+
 const regionMapCache = {
-  regionMap: new Map<string, HttpTypes.StoreRegion>(),
+  regionMap: new Map<string, RegionRef>(),
   regionMapUpdated: Date.now(),
 }
 
@@ -16,7 +24,7 @@ async function getRegionMap(cacheId: string) {
 
   if (!BACKEND_URL) {
     throw new Error(
-      "Middleware.ts: Error fetching regions. Did you set up regions in your Medusa Admin and define a NEXT_PUBLIC_MEDUSA_BACKEND_URL environment variable."
+      "Middleware.ts: Error fetching regions. Define the NEXT_PUBLIC_GOBIT_BACKEND_URL environment variable and make sure gobit has at least one region."
     )
   }
 
@@ -24,7 +32,7 @@ async function getRegionMap(cacheId: string) {
     !regionMap.keys().next().value ||
     regionMapUpdated < Date.now() - 3600 * 1000
   ) {
-    // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
+    // Bölgeler gobit'ten doğrudan fetch ile okunur: middleware Edge'de çalışır, lib/gobit/client yalnız sunucuda (server-only).
     const response = await fetch(`${BACKEND_URL}/store/v1/regions`, {
       method: "GET",
       headers: {
@@ -47,13 +55,13 @@ async function getRegionMap(cacheId: string) {
     const regions = json.data as { id: string; countries?: { code: string }[] }[]
 
     if (!regions?.length) {
-      return new Map<string, HttpTypes.StoreRegion>()
+      return new Map<string, RegionRef>()
     }
 
     // Create a map of country codes to regions.
     regions.forEach((region) => {
       region.countries?.forEach((c) => {
-        regionMapCache.regionMap.set(c.code.toLowerCase(), region as unknown as HttpTypes.StoreRegion)
+        regionMapCache.regionMap.set(c.code.toLowerCase(), region)
       })
     })
 
@@ -64,13 +72,13 @@ async function getRegionMap(cacheId: string) {
 }
 
 /**
- * Fetches regions from Medusa and sets the region cookie.
+ * İsteğin ülke kodunu seçer: adresteki, Cloudflare/Vercel başlığındaki ya da varsayılan.
  * @param request
  * @param response
  */
 async function getCountryCode(
   request: NextRequest,
-  regionMap: Map<string, HttpTypes.StoreRegion | number>
+  regionMap: Map<string, RegionRef>
 ) {
   let countryCode
 
@@ -107,7 +115,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const cacheIdCookie = request.cookies.get("_medusa_cache_id")
+  const cacheIdCookie = request.cookies.get("_dt_cache_id")
   const cacheId = cacheIdCookie?.value || crypto.randomUUID()
 
   const regionMap = await getRegionMap(cacheId)
@@ -118,8 +126,8 @@ export async function middleware(request: NextRequest) {
   const firstPathSegment = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
   const urlHasCountry = firstPathSegment === country.toLowerCase()
 
-  // Medusa'dan kalma Türkçe kategori adresi (/tr/categories/eğitim-ve-planlama):
-  // göç aracı adresi ASCII'ye katladı; eski bağlantı yeni adrese kalıcı yönlenir.
+  // Eski kategori adresleri Türkçe harfliydi (/tr/categories/eğitim-ve-planlama);
+  // kategori adresleri artık ASCII. Dizinlenmiş eski bağlantı yeni adrese kalıcı yönlenir.
   const categoryPath = request.nextUrl.pathname.match(/^\/([^/]+)\/categories\/(.+)$/)
   if (urlHasCountry && categoryPath) {
     const segments = categoryPath[2].split("/").map((seg) => {
@@ -137,19 +145,44 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // E-postadaki sipariş bağlantısı (/{ülke}/order/{id}/confirmed?token=…):
+  // gobit'in sipariş jetonu bir kez okunur, sipariş jetonları çerezine yazılır
+  // ve jetonsuz adrese yönlenilir; jeton adres çubuğunda, geçmişte ve üçüncü
+  // taraf betiklerin gördüğü URL'de kalmaz (gobit ADR 0439). Sipariş sayfası
+  // ve iade/kargo okumaları jetonu çerezden X-Order-Token olarak geçirir.
+  const mailedOrder = urlHasCountry ? confirmedOrderId(request.nextUrl.pathname) : null
+  const mailedToken = request.nextUrl.searchParams.get("token")?.trim()
+  if (mailedOrder && mailedToken) {
+    const url = request.nextUrl.clone()
+    url.searchParams.delete("token")
+    const response = NextResponse.redirect(url, 303)
+    response.headers.set("Referrer-Policy", "no-referrer")
+    response.cookies.set(
+      ORDER_TOKENS_COOKIE,
+      withOrderToken(request.cookies.get(ORDER_TOKENS_COOKIE)?.value, mailedOrder, mailedToken),
+      {
+        maxAge: ORDER_TOKENS_MAX_AGE,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      }
+    )
+    return response
+  }
+
   if (urlHasCountry) {
     const response = NextResponse.next()
     if (!cacheIdCookie) {
-      response.cookies.set("_medusa_cache_id", cacheId, {
+      response.cookies.set("_dt_cache_id", cacheId, {
         maxAge: 60 * 60 * 24,
       })
     }
 
-    // Clear completed cart cookie if we are on the order confirmation page
-    const pathname = request.nextUrl.pathname
-    if (/\/order\/[^\/]+\/confirmed/.test(pathname)) {
-      response.cookies.set("_medusa_cart_id", "", { maxAge: -1 })
-    }
+    // Sipariş onay sayfasında sepet çerezi silinmez: tamamlama (cart.ts
+    // settle, ödeme sonucu) çerezi zaten siler, tamamlanmış sepeti de
+    // retrieveCart düşürür. Sayfa artık sipariş e-postasından da açıldığı
+    // için burada silmek, o sırada doldurulan yeni sepeti kaybettirirdi.
 
     return response
   }

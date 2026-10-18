@@ -20,7 +20,7 @@ export default function SellerExperts({ experts, hasInstallationPoint }: { exper
               <LocalizedClientLink href={`/uzmanlar/${e.slug}`} className="font-semibold text-brand-700 hover:underline">
                 {e.full_name}
               </LocalizedClientLink>
-              <p className="text-xs text-gray-600">{[e.title, e.city].filter(Boolean).join(" · ")}</p>
+              <p className="text-xs text-gray-600">{[e.title || e.headline, e.city].filter(Boolean).join(" · ")}</p>
             </li>
           ))}
         </ul>

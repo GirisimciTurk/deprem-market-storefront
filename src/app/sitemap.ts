@@ -8,7 +8,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://depremmarket.com"
 /**
  * Sitemap YALNIZ birincil bölge önekini listeler.
  *
- * Önceden her Medusa bölgesinin her ülke kodu için ayrı URL üretiliyordu
+ * Önceden her bölgenin her ülke kodu için ayrı URL üretiliyordu
  * (canlıda dk/fr/de/it/es/se/gb/tr → 8 kopya, 14 ürün için 112 URL, toplam 649).
  * Ülke öneki DİL değil bölge; hepsi aynı Türkçe içeriği sunuyor. Google'a
  * 8 ayrı kopya göndermek sıralama sinyallerini böler ve tarama bütçesini

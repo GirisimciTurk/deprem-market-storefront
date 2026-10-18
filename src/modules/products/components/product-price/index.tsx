@@ -1,12 +1,12 @@
 import { getProductPrice } from "@lib/util/get-product-price"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreVariant } from "types/store"
 
 export default function ProductPrice({
   product,
   variant,
 }: {
-  product: HttpTypes.StoreProduct
-  variant?: HttpTypes.StoreProductVariant
+  product: StoreProduct
+  variant?: StoreVariant
 }) {
   const { cheapestPrice, variantPrice } = getProductPrice({
     product,

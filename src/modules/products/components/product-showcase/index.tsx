@@ -2,12 +2,12 @@
 
 import React, { useState } from "react"
 import { Video, Maximize2, Eye, X } from "lucide-react"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct, StoreProductImage } from "types/store"
 import { toReachableImageUrl } from "@lib/util/image-url"
 
 interface ShowcaseProps {
-  product: HttpTypes.StoreProduct
-  images?: HttpTypes.StoreProductImage[]
+  product: StoreProduct
+  images?: StoreProductImage[]
 }
 
 type Spec = { label: string; value: string }

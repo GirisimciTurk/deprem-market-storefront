@@ -1,11 +1,11 @@
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
-import { HttpTypes } from "@medusajs/types"
+import { StoreProduct } from "types/store"
 import Product from "../product-preview"
 import { getBoughtTogetherIds } from "@lib/data/recommendations"
 
 type Props = {
-  product: HttpTypes.StoreProduct
+  product: StoreProduct
   countryCode: string
 }
 
@@ -26,14 +26,14 @@ export default async function BoughtTogether({ product, countryCode }: Props) {
       id: ids,
       region_id: region.id,
       is_giftcard: false,
-    } as HttpTypes.StoreProductListParams,
+    },
   })
 
   // Backend'in birliktelik sırasını koru.
   const byId = new Map(response.products.map((p) => [p.id, p]))
   const ordered = ids
     .map((id) => byId.get(id))
-    .filter((p): p is HttpTypes.StoreProduct => !!p && p.id !== product.id)
+    .filter((p): p is StoreProduct => !!p && p.id !== product.id)
 
   if (!ordered.length) return null
 

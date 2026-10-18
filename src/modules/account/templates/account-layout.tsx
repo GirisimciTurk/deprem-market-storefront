@@ -1,10 +1,10 @@
 import React from "react"
 
 import AccountNav from "../components/account-nav"
-import { HttpTypes } from "@medusajs/types"
+import { StoreCustomer } from "types/store"
 
 interface AccountLayoutProps {
-  customer: HttpTypes.StoreCustomer | null
+  customer: StoreCustomer | null
   children: React.ReactNode
 }
 

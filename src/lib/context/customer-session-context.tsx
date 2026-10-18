@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useMemo } from "react"
 
 /**
- * Giriş durumunun istemci tarafındaki tek kaynağı. Müşteri kimliği (_medusa_jwt)
+ * Giriş durumunun istemci tarafındaki tek kaynağı. Müşteri kimliği (_dt_jwt)
  * yalnızca sunucuda okunabildiği için değer (main) layout'unda hesaplanıp buraya
  * verilir; giriş gerektiren kontroller (favori kalbi, "stoğa gelince haber ver")
  * bunu okuyup sunucuya HİÇ gitmeden giriş uyarısı gösterebilir.

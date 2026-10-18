@@ -73,6 +73,12 @@ self.addEventListener("push", (event: PushEvent) => {
   const title = payload.title || "depremTek Market"
   // Aksiyon başına URL'leri data'ya gömeriz (NotificationAction tipi url taşımaz),
   // notificationclick'te tıklanan aksiyona göre hedefi çözeriz.
+  // "Stoğa geldi" bildirimi düğmesiz gelir (gobit'in push servisi düğme
+  // taşımaz); ürüne giden düğmeyi burada ekleriz.
+  if (!payload.actions?.length && payload.tag?.startsWith("stock-") && payload.url) {
+    const en = (self.navigator.language || "").toLowerCase().startsWith("en")
+    payload.actions = [{ action: "open", title: en ? "View product" : "Ürüne git", url: payload.url }]
+  }
   const actions = (payload.actions || []).slice(0, 2) // tarayıcılar genelde 2 buton gösterir
   const actionUrls: Record<string, string> = {}
   for (const a of actions) {
