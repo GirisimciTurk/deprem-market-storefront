@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server"
 import OrderOverview from "@modules/account/components/order-overview"
 import { notFound } from "next/navigation"
 import { listOrders } from "@lib/data/orders"
+import { listLegacyOrders } from "@lib/data/legacy-orders"
+import LegacyOrders from "@modules/account/components/legacy-orders"
 import Divider from "@modules/common/components/divider"
 import TransferRequestForm from "@modules/account/components/transfer-request-form"
 
@@ -16,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Orders() {
-  const orders = await listOrders()
+  const [orders, legacy] = await Promise.all([listOrders(), listLegacyOrders()])
 
   if (!orders) {
     notFound()
@@ -31,7 +33,8 @@ export default async function Orders() {
         </p>
       </div>
       <div>
-        <OrderOverview orders={orders} />
+        {(orders.length > 0 || legacy.length === 0) && <OrderOverview orders={orders} />}
+        <LegacyOrders orders={legacy} />
         <Divider className="mb-8 mt-8" />
         <TransferRequestForm />
       </div>
