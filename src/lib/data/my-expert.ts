@@ -2,11 +2,12 @@
 
 import { revalidateTag } from "next/cache"
 import { GobitError, gobitData } from "@lib/gobit/client"
-import { getAuthHeaders } from "./cookies"
+import { getExpertHeaders } from "./cookies"
 
-// Oturumdaki hesabın kendi uzman kartı (dtm /store/v1/dtm/experts/me…): düzenleme,
-// yayın, fotoğraf, gelen talepler ve değerlendirmelere yanıt. Kartı yalnız sahibi
-// görür; herkese açık okuma lib/data/experts.ts'te.
+// Oturumdaki uzman hesabının kendi kartı (dtm /store/v1/dtm/experts/me…): düzenleme,
+// yayın, fotoğraf, gelen talepler ve değerlendirmelere yanıt. Uzman hesabı
+// müşteri hesabından ayrıdır (expert-auth.ts); istekler uzman oturumuyla gider.
+// Kartı yalnız sahibi görür; herkese açık okuma lib/data/experts.ts'te.
 
 /** Sahibin gördüğü kart: taslak/inceleme durumu ve operatörün gerekçeleri dahil. */
 export type MyExpertCard = {
@@ -87,10 +88,10 @@ export type OwnReview = {
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string; unauthorized?: boolean }
 
-const SIGN_IN = "Bu işlem için giriş yapın."
+const SIGN_IN = "Bu işlem için uzman hesabınızla giriş yapın."
 
 async function headersOrNull() {
-  const headers = await getAuthHeaders()
+  const headers = await getExpertHeaders()
   return headers.cookie ? headers : null
 }
 
@@ -147,7 +148,8 @@ export async function getMyExpert(): Promise<MyExpertCard | null> {
   if (!headers) return null
   return gobitData<MyExpertCard>("/store/v1/dtm/experts/me", { headers, cache: "no-store" }).catch(
     (e) => {
-      if (e instanceof GobitError && e.status === 404) return null
+      // Kart yok (404) ya da uzman oturumu düşmüş (401): sayfa girişi ister.
+      if (e instanceof GobitError && (e.status === 404 || e.status === 401)) return null
       throw e
     }
   )
@@ -238,7 +240,7 @@ export async function getExpertInbox(): Promise<{ items: InboxRequest[]; new: nu
 
 export async function moveInboxRequest(id: string, status: "read" | "closed"): Promise<Result<InboxRequest>> {
   return run((headers) =>
-    gobitData<InboxRequest>(`/store/v1/dtm/expert-requests/${encodeURIComponent(id)}/status`, {
+    gobitData<InboxRequest>(`/store/v1/dtm/expert-inbox/${encodeURIComponent(id)}/status`, {
       method: "POST",
       headers,
       body: { status },

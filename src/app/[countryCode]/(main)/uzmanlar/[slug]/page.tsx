@@ -274,10 +274,10 @@ export default async function ExpertProfilePage({
               <p className="text-sm text-ui-fg-subtle border border-ui-border-base rounded-xl bg-ui-bg-subtle p-4">
                 Bu sizin profiliniz. Gelen değerlendirmeleri{" "}
                 <LocalizedClientLink
-                  href="/account/uzman-profilim"
+                  href="/uzman/panel"
                   className="font-semibold text-brand-600 hover:underline"
                 >
-                  Uzman Profilim
+                  Uzman Paneli
                 </LocalizedClientLink>{" "}
                 sayfasından görüp yanıtlayabilirsiniz.
               </p>

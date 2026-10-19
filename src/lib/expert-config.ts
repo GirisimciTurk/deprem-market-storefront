@@ -109,3 +109,6 @@ export const EXPERT_BUDGET_TIERS: ExpertBudgetTier[] = [
   { key: "500_1000", label: "Aylık 500 – 1.000 ₺" },
   { key: "1000_plus", label: "Aylık 1.000 ₺ +" },
 ]
+
+/** Uzman hesabı şifresinin en az uzunluğu (dtm ExpertPasswordMin). */
+export const EXPERT_PASSWORD_MIN = 8

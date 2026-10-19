@@ -11,15 +11,16 @@ export const metadata: Metadata = {
     "İnşaat mühendisleri için ücretsiz uzman dizini. Profilinizi oluşturun; bina risk tespiti, güçlendirme, statik proje ve daha fazlasında sizi arayanlarla buluşun.",
 }
 
-// Profil hesap panelinde (Uzman Profilim) yazılır; oturumu olmayan ziyaretçi
-// aynı adreste giriş/üyelik formunu görür ve girince panele düşer.
-const PANEL = "/account/uzman-profilim"
+// Profil, müşteri hesabından ayrı uzman hesabının panelinde (/uzman/panel)
+// yazılır: ziyaretçi uzman hesabını açar ya da uzman girişi yapar, panele düşer.
+const SIGN_UP = "/uzman/giris?kayit=1"
+const SIGN_IN = "/uzman/giris"
 
 const STEPS = [
   {
     no: "1",
     title: "Profilinizi Oluşturun",
-    desc: "Üye olun, hesabınızdaki “Uzman Profilim” sayfasında uzmanlık alanlarınızı, hizmet bölgenizi ve iletişim bilgilerinizi girin.",
+    desc: "Ücretsiz uzman hesabı açın; Uzman Paneli'nde uzmanlık alanlarınızı, hizmet bölgenizi ve iletişim bilgilerinizi girin.",
   },
   {
     no: "2",
@@ -144,11 +145,17 @@ export default async function UzmanOlPage() {
         </p>
         <div className="mt-6">
           <LocalizedClientLink
-            href={PANEL}
+            href={SIGN_UP}
             className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl text-sm transition-all shadow-md hover:-translate-y-0.5 duration-200"
           >
             Profilimi Oluştur
           </LocalizedClientLink>
+          <p className="text-xs text-ui-fg-muted mt-3">
+            Uzman hesabınız var mı?{" "}
+            <LocalizedClientLink href={SIGN_IN} className="font-semibold text-brand-600 hover:underline">
+              Uzman Girişi
+            </LocalizedClientLink>
+          </p>
         </div>
       </div>
 
@@ -205,16 +212,22 @@ export default async function UzmanOlPage() {
         <div className="max-w-2xl mx-auto border border-brand-100 rounded-2xl bg-brand-50 p-6 sm:p-8 text-center">
           <h2 className="text-xl font-extrabold text-ui-fg-base">Profilinizi 5 dakikada oluşturun</h2>
           <p className="text-sm text-ui-fg-muted mt-2 mb-5">
-            Profiliniz hesabınızdaki “Uzman Profilim” sayfasında hazırlanır; dilediğiniz zaman
-            düzenler, yayından alırsınız. Gelen talepleri ve değerlendirmeleri de oradan yönetirsiniz.
+            Profiliniz uzman hesabınızın Uzman Paneli'nde hazırlanır; dilediğiniz zaman düzenler,
+            yayından alırsınız. Gelen talepleri ve değerlendirmeleri de oradan yönetirsiniz.
           </p>
           <LocalizedClientLink
-            href={PANEL}
+            href={SIGN_UP}
             className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl text-sm transition-colors shadow-sm"
           >
-            Uzman Profilime Git →
+            Uzman Hesabı Aç →
           </LocalizedClientLink>
-          <p className="text-xs text-ui-fg-muted mt-3">Hesabınız yoksa aynı sayfadan ücretsiz üye olabilirsiniz.</p>
+          <p className="text-xs text-ui-fg-muted mt-3">
+            Uzman hesabı alışveriş hesabınızdan ayrıdır; aynı e-postayı kullanabilirsiniz. Hesabınız varsa{" "}
+            <LocalizedClientLink href={SIGN_IN} className="font-semibold text-brand-600 hover:underline">
+              Uzman Girişi
+            </LocalizedClientLink>{" "}
+            yapın.
+          </p>
         </div>
       </div>
 

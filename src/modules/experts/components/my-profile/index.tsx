@@ -18,7 +18,7 @@ import {
 } from "@lib/data/my-expert"
 import { CITIES, Chip, Field, PhotoField, ProvincePicker, SaveBar, Section, inputCls } from "./editor-parts"
 
-// "Uzman Profilim": hesabın kendi uzman kartı (gihak.org /pro'dan uyarlandı).
+// "Uzman Paneli": uzman hesabının kendi kartı (gihak.org /pro'dan uyarlandı).
 // Her şey tek PUT ile kaydedilir; yayın ayrıdır ve beyan ister. Yayınlanan kart
 // önce otomatik kontrolden (gobit → Gemini) geçer: emin olunan kart hemen
 // yayına girer, reddedilen gerekçesiyle döner, kalanı ekip inceler.

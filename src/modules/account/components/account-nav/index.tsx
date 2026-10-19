@@ -15,24 +15,6 @@ import Package from "@modules/common/icons/package"
 import User from "@modules/common/icons/user"
 
 // Inline SVG Icon components for premium feel
-const IdBadgeIcon = ({ size = 20 }: { size?: number }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="4" width="18" height="16" rx="2" />
-    <circle cx="9" cy="10" r="2" />
-    <path d="M15 8h2M15 12h2M7 16h10" />
-  </svg>
-)
-
 const HomeIcon = ({ size = 20 }: { size?: number }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -285,18 +267,6 @@ const AccountNav = ({
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink
-                    href="/account/uzman-profilim"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <IdBadgeIcon size={20} />
-                      <span>Uzman Profilim</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </LocalizedClientLink>
-                </li>
-                <li>
                   <button
                     type="button"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full text-brand-600"
@@ -412,15 +382,6 @@ const AccountNav = ({
                   icon={<WrenchIcon size={18} />}
                 >
                   Hizmet Al
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/uzman-profilim"
-                  active={isActive("/account/uzman-profilim")}
-                  icon={<IdBadgeIcon size={18} />}
-                >
-                  Uzman Profilim
                 </AccountNavLink>
               </li>
 

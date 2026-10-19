@@ -88,6 +88,42 @@ export const removeAuthToken = async () => {
   }
 }
 
+// Uzman oturumu: dtm'nin uzman hesabı çerezi (dtm_expert_session), müşteri
+// oturumundan ayrı. Vitrin onu _dtm_expert_session olarak tutar; aynı kişi hem
+// müşteri hem uzman olarak oturum açık tutabilir, biri ötekini etkilemez.
+export const EXPERT_SESSION_COOKIE = "dtm_expert_session"
+const EXPERT_COOKIE = "_dtm_expert_session"
+
+export const getExpertHeaders = async (): Promise<Record<string, string>> => {
+  try {
+    const token = (await nextCookies()).get(EXPERT_COOKIE)?.value
+    return token ? { cookie: `${EXPERT_SESSION_COOKIE}=${token}` } : {}
+  } catch {
+    return {}
+  }
+}
+
+export const setExpertToken = async (token: string) => {
+  try {
+    ;(await nextCookies()).set(EXPERT_COOKIE, token, {
+      maxAge: 60 * 60 * 24 * 30,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    })
+  } catch {
+    /* render bağlamında cookie yazılamaz — best-effort */
+  }
+}
+
+export const removeExpertToken = async () => {
+  try {
+    ;(await nextCookies()).set(EXPERT_COOKIE, "", { maxAge: -1 })
+  } catch {
+    /* render bağlamında cookie yazılamaz — best-effort */
+  }
+}
+
 export const getCartId = async () => {
   const cookies = await nextCookies()
   return cookies.get("_dt_cart_id")?.value

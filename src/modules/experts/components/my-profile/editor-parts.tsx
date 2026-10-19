@@ -5,7 +5,7 @@ import { Camera, Check, X } from "lucide-react"
 import ExpertAvatar from "../expert-avatar"
 import { TR_CITIES_DISTRICTS } from "@lib/util/tr-cities-districts"
 
-// "Uzman Profilim" düzenleyicisinin yapı taşları (gihak.org /pro'dan uyarlandı).
+// "Uzman Paneli" düzenleyicisinin yapı taşları (gihak.org /pro'dan uyarlandı).
 // Durumu sayfa tutar; bunlar yalnız bir dilimini çizer.
 
 export const inputCls =

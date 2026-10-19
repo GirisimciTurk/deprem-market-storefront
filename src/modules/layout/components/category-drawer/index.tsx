@@ -34,6 +34,7 @@ const MENU_GROUPS: { titleKey: string; items: NavItem[] }[] = [
     titleKey: "experts",
     items: [
       { key: "findEngineer", href: "/uzmanlar" },
+      { key: "expertSignIn", href: "/uzman/giris" },
       { key: "carbonFiber", href: "/hizmetler/karbon-fiber" },
     ],
   },
