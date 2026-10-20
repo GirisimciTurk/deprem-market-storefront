@@ -9,7 +9,7 @@ type ConvertToLocaleParams = {
 }
 
 // Helper to get decimal digits for a currency
-const getDecimalDigits = (currencyCode: string): number => {
+export const getDecimalDigits = (currencyCode: string): number => {
   const zeroDecimalCurrencies = ["jpy", "krw", "vnd", "clp", "lpf", "gnf", "kmf", "mga", "pyg", "rwf", "ugx", "vuv", "xaf", "xof", "xpf"]
   const threeDecimalCurrencies = ["bhd", "iqd", "jod", "kwd", "lyd", "omr", "tnd"]
   

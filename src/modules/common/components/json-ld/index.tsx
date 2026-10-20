@@ -1,5 +1,6 @@
 import { StoreProduct } from "types/store"
 import { SITE_CONTACT } from "@lib/config/contact"
+import { getDecimalDigits } from "@lib/util/money"
 
 type ProductJsonLdProps = {
   product: StoreProduct
@@ -20,6 +21,9 @@ export default function ProductJsonLd({ product, url, aggregateRating }: Product
 
   const currency =
     (product.variants?.[0] as any)?.calculated_price?.currency_code?.toUpperCase() || "TRY"
+  // calculated_amount en küçük birimle (kuruş); schema.org fiyatı ana birimle
+  // ister ("2790.00"). Kuruş olduğu gibi yazılınca Google fiyatı 100 katı görüyordu.
+  const digits = getDecimalDigits(currency)
 
   const hasStock = product.variants?.some(
     (v: any) => (v.inventory_quantity ?? 0) > 0 || v.manage_inventory === false
@@ -56,7 +60,7 @@ export default function ProductJsonLd({ product, url, aggregateRating }: Product
             "@type": "Offer",
             url,
             priceCurrency: currency,
-            price: cheapestVariant.toFixed(2),
+            price: (cheapestVariant / Math.pow(10, digits)).toFixed(digits),
             availability: hasStock
               ? "https://schema.org/InStock"
               : "https://schema.org/OutOfStock",
