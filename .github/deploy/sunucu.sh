@@ -2,7 +2,10 @@
 # Vitrini canlıya alır. CI kaynağı /opt/deprem/ci-staging/storefront'a
 # kopyalar, bu betik sunucuda çalışır:
 #
-#   ssh <sunucu> "SHA=<commit> bash -s" < .github/deploy/sunucu.sh
+#   ssh <sunucu> "SHA=<commit> bash /opt/deprem/ci-staging/storefront-sunucu.sh"
+#
+# DOSYADAN çalışır: stdin'den (bash -s) verilince içerideki docker compose
+# komutları betiğin kalanını yutar ve dağıtım sessizce yarıda kalır (2026-10-20).
 #
 # Sıra: kaynak yedeği + önceki imaja etiket → derleme → aday konteyner sınanır
 # → yayına alınır → yayındaki sınanır. Derleme ya da aday tutmazsa canlıya hiç
@@ -11,6 +14,8 @@
 # Etiket derlemeden ÖNCE atılır: sunucu containerd snapshotter kullanıyor ve
 # latest yeni imaja taşınınca etiketsiz eski imajın kaydı kayboluyor.
 set -euo pipefail
+[ -f "${BASH_SOURCE[0]:-}" ] || { echo "::error::sunucu.sh dosyadan çalıştırılmalı (bash -s değil)"; exit 1; }
+exec </dev/null
 
 SVC=storefront
 PORT=8000
@@ -103,3 +108,4 @@ docker images --format '{{.Tag}}' "$IMG" | { grep '^ci-onceki-' || true; } | sor
 ls -1t backups/"$SVC"-src-ci-*.tgz | tail -n +6 | xargs -r rm -f
 echo "$TS $SVC ${SHA:-?}" >> backups/ci-deploys.log
 docker compose ps "$SVC"
+echo "== tamam"

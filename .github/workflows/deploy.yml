@@ -64,7 +64,11 @@ jobs:
           done
 
       - name: Derle, sına, yayına al
-        run: ssh deploy "SHA=$GITHUB_SHA bash -s" < .github/deploy/sunucu.sh
+        run: |
+          # Betik dosyadan çalışır (bkz. sunucu.sh başı); "== tamam" görülmezse yarıda kalmıştır.
+          ssh deploy 'cat > /opt/deprem/ci-staging/storefront-sunucu.sh' < .github/deploy/sunucu.sh
+          ssh deploy "SHA=$GITHUB_SHA bash /opt/deprem/ci-staging/storefront-sunucu.sh" | tee sunucu.log
+          grep -q '^== tamam$' sunucu.log
 
       - name: Dışarıdan doğrula
         run: curl -fsS -o /dev/null --retry 3 --retry-delay 5 https://depremtek.market/tr
