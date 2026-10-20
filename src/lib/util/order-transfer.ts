@@ -49,8 +49,12 @@ const MESSAGES: Record<string, string> = {
   order_transfer_unproven: "Siparişi hesabınıza eklemek için giriş yapmanız gerekiyor.",
   order_not_found: "Bu siparişi sipariş e-postanızdaki bağlantıdan açıp oradan aktarın.",
   order_transfer_own_order: "Bu sipariş zaten hesabınızda.",
+  // gobit ADR 0459'dan beri bir hesaba bağlı sipariş de bu kodla reddedilir;
+  // onu yalnız operatör başka hesaba taşıyabilir.
   order_not_transferable:
-    "Bu sipariş devredilemez: iptal edilmiş, kişisel verileri silinmiş ya da e-posta adresi olmayan bir sipariş.",
+    "Bu sipariş devredilemez: yalnız misafir olarak verilmiş siparişler bir hesaba eklenebilir. İptal edilmiş, kişisel verileri silinmiş ya da e-posta adresi olmayan siparişler de devredilemez.",
+  order_transfer_requests_spent:
+    "Bu sipariş için 7 gün içinde en fazla üç devir talebi yapılabilir. Lütfen daha sonra tekrar deneyin.",
   order_transfer_addition:
     "Bu sipariş başka bir siparişe ek olarak verilmiş; o siparişle birlikte devredilir.",
   order_transfer_pending: "Bu sipariş için yanıt bekleyen bir devir talebi zaten var.",

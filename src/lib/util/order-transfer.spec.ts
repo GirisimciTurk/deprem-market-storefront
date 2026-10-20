@@ -58,6 +58,12 @@ describe("transferErrorMessage", () => {
     expect(transferErrorMessage("order_transfer_mail_failed", 503)).toMatch(/geri alındı/)
   })
 
+  it("tells a customer's order apart and names the request quota (gobit ADR 0459)", () => {
+    expect(transferErrorMessage("order_not_transferable", 409)).toMatch(/yalnız misafir olarak verilmiş/)
+    // The quota has its own code; it must not read as the generic 429.
+    expect(transferErrorMessage("order_transfer_requests_spent", 429)).toMatch(/en fazla üç devir talebi/)
+  })
+
   it("falls back on the status, then on the given text", () => {
     expect(transferErrorMessage("", 401)).toMatch(/giriş yapmanız/)
     expect(transferErrorMessage(undefined, 429)).toMatch(/Çok fazla deneme/)

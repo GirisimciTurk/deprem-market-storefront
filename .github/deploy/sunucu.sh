@@ -48,6 +48,13 @@ bekle() { # host
   return 1
 }
 
+# compose "up -d" yeni imajı her zaman fark etmiyor (2026-10-20: gobit
+# "Running" deyip eski imajda kaldı); yayından sonra bu doğrulanır.
+yeni_imajda() {
+  [ "$(docker inspect --format '{{.Image}}' "$(docker compose ps -q "$SVC")")" = \
+    "$(docker image inspect --format '{{.Id}}' "$IMG:latest")" ]
+}
+
 kaynagi_geri_yukle() {
   rm -rf "${SRC_ROOT:?}/$SVC"
   tar xzf "$YEDEK" -C "$SRC_ROOT"
@@ -89,9 +96,9 @@ fi
 aday_kaldir
 
 echo "== yayın"
-docker compose up -d --no-deps "$SVC"
+docker compose up -d --no-deps --force-recreate "$SVC"
 # nginx upstream adresini yüklenirken çözer; yeni konteynerin adresi için yeniden yüklenir.
-if ! { bekle "$SVC" && docker compose exec -T nginx nginx -s reload && kontrol "$SVC"; }; then
+if ! { yeni_imajda && bekle "$SVC" && docker compose exec -T nginx nginx -s reload && kontrol "$SVC"; }; then
   docker compose logs --tail 60 "$SVC" 2>&1 || true
   docker tag "$ONCEKI" "$IMG:latest"
   kaynagi_geri_yukle
