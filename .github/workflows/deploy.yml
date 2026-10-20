@@ -1,7 +1,9 @@
 name: Deploy storefront (VPS)
 
-# main'e her push'ta otomatik deploy. NEXT_PUBLIC_* değerleri sunucudaki
-# docker-compose.yml build-arg'larından (.env) gelir; build sunucuda yapılır.
+# main'e her push'ta: testler geçerse kaynak sunucuya kopyalanır, orada
+# .github/deploy/sunucu.sh derler, aday konteyneri sınar ve yayına alır; bir
+# adım tutmazsa önceki sürüm kalır ya da geri gelir. NEXT_PUBLIC_* değerleri
+# sunucudaki docker-compose.yml derleme argümanlarından (.env) gelir.
 on:
   push:
     branches: [main]
@@ -15,43 +17,54 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: SSH anahtarını hazırla
+      # Sunucunun anahtarı DEPLOY_KNOWN_HOSTS'ta sabit ("deploy-vps ssh-ed25519 …"):
+      # ssh-keyscan'e güvenmek araya girene kapı açardı.
+      - name: SSH'ı hazırla
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
         run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf '%s\n' "Host deploy" "  HostName $DEPLOY_HOST" "  User $DEPLOY_USER" \
+            "  IdentityFile ~/.ssh/id_ed25519" "  HostKeyAlias deploy-vps" "  StrictHostKeyChecking yes" \
+            "  ConnectTimeout 20" "  ConnectionAttempts 3" "  ServerAliveInterval 30" "  ServerAliveCountMax 40" \
+            > ~/.ssh/config
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/config
 
-      - name: Kodu sunucuya rsync'le
+      - name: Kaynağı sunucuya kopyala
         run: |
-          # rsync zaman zaman ssh bağlantı hatasıyla (exit 255) düşüyor → 4 deneme + artan backoff.
+          # rsync zaman zaman ssh bağlantı hatasıyla (exit 255) düşüyor → 4 deneme + artan bekleme.
           n=0
-          until rsync -az --delete \
-            --exclude='.git' --exclude='.github' --exclude='node_modules' \
-            --exclude='.next' --exclude='.env' --exclude='.env.*' \
-            --exclude='coverage' --exclude='*.log' \
-            -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o ConnectTimeout=20 -o ConnectionAttempts=3 -o ServerAliveInterval=15 -o ServerAliveCountMax=8" \
-            ./ "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/opt/deprem/deprem-market-storefront/"; do
-            n=$((n+1)); [ $n -ge 4 ] && { echo "rsync 4 denemede de başarısız (ssh 255 flaky)"; exit 1; }
+          until rsync -az --delete --exclude='.git' --exclude='.github' \
+            --rsync-path='mkdir -p /opt/deprem/ci-staging && rsync' \
+            ./ deploy:/opt/deprem/ci-staging/storefront/; do
+            n=$((n+1)); [ $n -ge 4 ] && { echo "rsync 4 denemede de başarısız"; exit 1; }
             echo "rsync denemesi $n başarısız, $((n*10))s sonra tekrar..."; sleep $((n*10))
           done
 
-      - name: Build + restart
-        run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
-            -o ConnectTimeout=20 -o ConnectionAttempts=3 \
-            -o ServerAliveInterval=30 -o ServerAliveCountMax=40 \
-            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" bash -se <<'REMOTE'
-          set -e
-          exec 9>/tmp/deprem-deploy.lock; flock 9
-          cd /opt/deprem/deploy
-          # --no-deps: yalnız storefront build/start edilsin (depends_on backend'i build ETMESİN)
-          docker compose build storefront
-          docker compose up -d --no-deps storefront
-          docker compose ps storefront
-          REMOTE
+      - name: Derle, sına, yayına al
+        run: ssh deploy "SHA=$GITHUB_SHA bash -s" < .github/deploy/sunucu.sh
+
+      - name: Dışarıdan doğrula
+        run: curl -fsS -o /dev/null --retry 3 --retry-delay 5 https://depremtek.market/tr
