@@ -7,21 +7,21 @@
  * (next build && next start) veya gerçek dağıtımda çalışır.
  */
 import {
+  getVapidPublicKey,
   savePushSubscription,
   removePushSubscription,
   saveStockAlert,
   unbindPushSubscription,
 } from "@lib/data/push"
 
-// VAPID PUBLIC anahtarı gizli DEĞİLDİR (tarayıcıya gönderilir). Üretim public
-// anahtarını fallback olarak gömüyoruz ki storefront tarafında ayrı .env /
-// docker-compose build-arg gerekmesin. Yerelde NEXT_PUBLIC_VAPID_PUBLIC_KEY
-// (.env.local) bunu geçersiz kılar. Backend'in private anahtarıyla EŞLEŞMELİ.
-const PROD_VAPID_PUBLIC_KEY =
-  "BFyThC7n5hu9M5WBhk3_dnC5yn-J04fZKZrmefKOf05lP9cE9Cy1YIIQP-7dR7s76ZrdOKa9w8JsHk5jiT5m9eI"
+// VAPID genel anahtarı gobit'ten okunur, vitrine gömülmez: eskiden gömülü
+// anahtarın özel yarısı kaybolmuştu ve hiçbir abonelik bildirim alamıyordu.
+// Sayfa başına bir kez sorulur.
+let serverKey: Promise<string | null> | null = null
 
-function getVapidPublicKey(): string {
-  return process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || PROD_VAPID_PUBLIC_KEY
+function getServerKey(): Promise<string | null> {
+  serverKey ??= getVapidPublicKey().catch(() => null)
+  return serverKey
 }
 
 export type PushPermission = "default" | "granted" | "denied" | "unsupported"
@@ -96,6 +96,38 @@ function serialize(sub: PushSubscription, locale?: string) {
   }
 }
 
+/** Abonelik bu anahtarla mı kurulmuş? Başka anahtarlı abonelik bildirim alamaz. */
+function subscribedWith(sub: PushSubscription, key: Uint8Array): boolean {
+  const current = sub.options?.applicationServerKey
+  // Okunamıyorsa (eski tarayıcı) değişmemiş say: her açılışta yeniden abone olmasın.
+  if (!current) return true
+  const bytes = new Uint8Array(current)
+  return bytes.length === key.length && bytes.every((b, i) => b === key[i])
+}
+
+/**
+ * Cihazın gobit'in güncel anahtarıyla kurulmuş aboneliği. Başka anahtarla
+ * kurulmuş olan (anahtar değişti) bırakılıp yenisi açılır; izin zaten
+ * verildiği için tarayıcı yeniden sormaz.
+ */
+async function currentSubscription(
+  reg: ServiceWorkerRegistration,
+  vapidKey: string
+): Promise<PushSubscription> {
+  const key = urlBase64ToUint8Array(vapidKey)
+  const sub = await reg.pushManager.getSubscription()
+  if (sub && subscribedWith(sub, key)) return sub
+  if (sub) {
+    await removePushSubscription(sub.endpoint).catch(() => null)
+    await sub.unsubscribe().catch(() => false)
+  }
+  return await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    // TS 5.7 Uint8Array<ArrayBufferLike> ↔ BufferSource katılığını aş.
+    applicationServerKey: key as BufferSource,
+  })
+}
+
 /**
  * İzin ister (gerekirse), PushManager aboneliği oluşturur ve backend'e kaydeder.
  * Başarılıysa PushSubscription döner, aksi halde null.
@@ -105,11 +137,9 @@ export async function subscribeToPush(
 ): Promise<PushSubscription | null> {
   if (!isPushSupported()) return null
 
-  const vapidKey = getVapidPublicKey()
-  if (!vapidKey) {
-    console.warn("[push] VAPID public anahtarı yok.")
-    return null
-  }
+  // Anahtar izin istemiyle aynı anda sorulur: istemden önce beklenen bir ağ
+  // isteği, tarayıcının kullanıcı hareketine bağlı izin penceresini engelleyebilir.
+  const keyRequest = getServerKey()
 
   // İzin
   let permission = Notification.permission
@@ -118,19 +148,16 @@ export async function subscribeToPush(
   }
   if (permission !== "granted") return null
 
+  const vapidKey = await keyRequest
+  if (!vapidKey) {
+    console.warn("[push] VAPID genel anahtarı alınamadı (gobit'te web-push kurulu mu?).")
+    return null
+  }
+
   const reg = await getReadyRegistration()
   if (!reg) return null
 
-  // Var olan aboneliği yeniden kullan, yoksa yeni oluştur.
-  let sub = await reg.pushManager.getSubscription()
-  if (!sub) {
-    sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      // TS 5.7 Uint8Array<ArrayBufferLike> ↔ BufferSource katılığını aş.
-      applicationServerKey: urlBase64ToUint8Array(vapidKey) as BufferSource,
-    })
-  }
-
+  const sub = await currentSubscription(reg, vapidKey)
   await savePushSubscription(serialize(sub, locale))
   return sub
 }
@@ -222,13 +249,17 @@ export async function unbindPushFromAccount(): Promise<void> {
  *
  * İzin İSTEMEZ (requestPermission çağrılmaz), yani kullanıcıya hiçbir pencere
  * göstermez. Bu olmadan çıkış-giriş yapan kullanıcının sipariş bildirimleri
- * sessizce kesilirdi.
+ * sessizce kesilirdi. gobit'in anahtarı değiştiyse abonelik burada yeni
+ * anahtarla yenilenir (izin verilmiş cihazda istem bir daha hiç çıkmaz).
  */
 export async function syncPushSubscription(locale?: string): Promise<void> {
   try {
     if (getPermission() !== "granted") return
-    const sub = await getExistingSubscription()
-    if (!sub) return
+    const reg = await getReadyRegistration()
+    if (!reg || !(await reg.pushManager.getSubscription())) return
+    const vapidKey = await getServerKey()
+    if (!vapidKey) return
+    const sub = await currentSubscription(reg, vapidKey)
     await savePushSubscription(serialize(sub, locale))
   } catch {
     /* senkron hatası sayfayı etkilemesin */

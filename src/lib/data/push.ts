@@ -13,6 +13,17 @@ type SerializedSubscription = {
   locale?: string
 }
 
+/**
+ * gobit'in VAPID genel anahtarı (/store/v1/webpush/vapid-key). Vitrinde
+ * yapılandırılmaz: gobit'teki anahtar değişince vitrin eski anahtarla abone
+ * yapmaya devam etmesin. Web-push kurulu değilse (anahtar yok) null.
+ */
+export async function getVapidPublicKey(): Promise<string | null> {
+  return gobitData<{ public_key: string }>("/store/v1/webpush/vapid-key", { next: { revalidate: 300 } })
+    .then((k) => k.public_key || null)
+    .catch(() => null)
+}
+
 async function sessionCustomer(headers: Record<string, string>): Promise<string | undefined> {
   if (!headers.cookie) return undefined
 
