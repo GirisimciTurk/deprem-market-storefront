@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { listSellerContracts, submitApplication } from "@lib/data/reseller"
+import { foldRefCode, isRefCode, useRefCode } from "@lib/hooks/use-ref-code"
 import SellerContracts, { SellerContract } from "@modules/common/components/seller-contracts"
 
 /**
@@ -37,6 +38,7 @@ export default function FirmaForm() {
     taxOffice: "",
   })
   const [dialCode, setDialCode] = useState("+90")
+  const [refCode, setRefCode] = useRefCode()
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle")
@@ -81,6 +83,7 @@ export default function FirmaForm() {
         taxId: formData.taxId,
         taxOffice: formData.taxOffice,
         city: formData.address,
+        refCode: isRefCode(refCode) ? foldRefCode(refCode) : "",
         note: [
           `Adres: ${formData.address.trim()}`,
           `Satış / Hizmet: ${formData.offering.trim()}`,
@@ -301,6 +304,20 @@ export default function FirmaForm() {
             value={formData.taxOffice}
             disabled={status === "loading"}
             onChange={(e) => setFormData({ ...formData, taxOffice: e.target.value })}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-ui-fg-base uppercase tracking-wider mb-1.5">
+            Pazarlamacı Kodu (isteğe bağlı)
+          </label>
+          <input
+            type="text"
+            value={refCode}
+            maxLength={20}
+            disabled={status === "loading"}
+            onChange={(e) => setRefCode(e.target.value.toUpperCase())}
+            placeholder="Size verildiyse"
             className={inputCls}
           />
         </div>

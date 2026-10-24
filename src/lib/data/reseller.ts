@@ -43,6 +43,8 @@ export async function submitApplication(input: {
   iban?: string
   city?: string
   note?: string
+  /** Pazarlamacı referans kodu; onaylanınca satıcı o pazarlamacıya bağlanır. */
+  refCode?: string
   contracts: SellerContract[]
 }): Promise<{ success: boolean; error: string | null }> {
   // Sözleşme kabulünün kanıtı ziyaretçinin adresi ve tarayıcısıdır: bu sunucu
@@ -69,6 +71,7 @@ export async function submitApplication(input: {
         iban: input.iban ?? "",
         city: input.city ?? "",
         note: input.note ?? "",
+        ref_code: input.refCode ?? "",
         contract_accepted: input.contracts.length > 0,
         contract_version: input.contracts.map((c) => `${c.id}:v${c.version}`).join(","),
       },

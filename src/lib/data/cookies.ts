@@ -124,6 +124,40 @@ export const removeExpertToken = async () => {
   }
 }
 
+// Pazarlamacı oturumu (dtm marketers.go): uzmanınki gibi müşteri oturumundan ayrı çerezde.
+export const MARKETER_SESSION_COOKIE = "dtm_marketer_session"
+const MARKETER_COOKIE = "_dtm_marketer_session"
+
+export const getMarketerHeaders = async (): Promise<Record<string, string>> => {
+  try {
+    const token = (await nextCookies()).get(MARKETER_COOKIE)?.value
+    return token ? { cookie: `${MARKETER_SESSION_COOKIE}=${token}` } : {}
+  } catch {
+    return {}
+  }
+}
+
+export const setMarketerToken = async (token: string) => {
+  try {
+    ;(await nextCookies()).set(MARKETER_COOKIE, token, {
+      maxAge: 60 * 60 * 24 * 30,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    })
+  } catch {
+    /* render bağlamında cookie yazılamaz — best-effort */
+  }
+}
+
+export const removeMarketerToken = async () => {
+  try {
+    ;(await nextCookies()).set(MARKETER_COOKIE, "", { maxAge: -1 })
+  } catch {
+    /* render bağlamında cookie yazılamaz — best-effort */
+  }
+}
+
 export const getCartId = async () => {
   const cookies = await nextCookies()
   return cookies.get("_dt_cart_id")?.value
